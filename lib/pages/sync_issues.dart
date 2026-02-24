@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:intl/intl.dart';
+import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/backend/synchronization/push/result.dart';
 import 'package:open_authenticator/model/backend/synchronization/queue.dart';
 import 'package:open_authenticator/model/database/database.dart';
 import 'package:open_authenticator/spacing.dart';
 import 'package:open_authenticator/widgets/app_scaffold.dart';
-import 'package:open_authenticator/widgets/centered_circular_progress_indicator.dart';
+import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
-import 'package:open_authenticator/widgets/error.dart';
 import 'package:open_authenticator/widgets/expandable_tile.dart';
-import 'package:open_authenticator/widgets/image_text_buttons.dart';
+import 'package:open_authenticator/widgets/image_text_actions.dart';
 import 'package:open_authenticator/widgets/waiting_overlay.dart';
 
 /// The sync issues page.
@@ -25,8 +26,8 @@ class SyncIssuesPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    AsyncValue<List<PushOperationResult>> errors = ref.watch(pushOperationsErrorsProvider);
-    return AppScaffold.scrollable(
+    AsyncValue<List<PushOperationError>> errors = ref.watch(pushOperationsErrorsProvider);
+    return AppScaffold.asyncValue(
       header: FHeader.nested(
         prefixes: [
           ClickableHeaderAction.back(
@@ -44,49 +45,44 @@ class SyncIssuesPage extends ConsumerWidget {
             },
           ),
         ],
-        title: const Text('Synchronization issues'), // TODO
+        title: Text(translations.syncIssues.title),
       ),
-      center: !errors.hasValue || errors.value!.isEmpty,
-      children: switch (errors) {
-        AsyncData(:final value) => [
-          if (value.isEmpty)
-            ImageTextButtonsWidget.icon(
-              icon: FIcons.checkCheck,
-              text: "It's all good !",
-            )
-          else
-            for (int i = 0; i < value.length; i++)
-              Padding(
-                padding: EdgeInsets.only(bottom: i < value.length - 1 ? kBigSpace : 0),
-                child: _PushOperationErrorWidget(
-                  error: value[i],
-                  onDeletePress: () async {
-                    await showWaitingOverlay(
-                      context,
-                      future: ref.read(appDatabaseProvider).deleteBackendPushOperationError(value[i]),
-                    );
-                  },
-                ),
+      asyncValue: errors,
+      builder: (value) => [
+        if (value.isEmpty)
+          ImageTextActions.icon(
+            icon: FIcons.checkCheck,
+            text: translations.syncIssues.operations.empty,
+          )
+        else
+          for (int i = 0; i < value.length; i++)
+            Padding(
+              padding: EdgeInsets.only(bottom: i < value.length - 1 ? kBigSpace : 0),
+              child: _PushOperationErrorWidget(
+                error: value[i],
+                onDeletePress: () async {
+                  await showWaitingOverlay(
+                    context,
+                    future: ref.read(appDatabaseProvider).deleteBackendPushOperationError(value[i]),
+                  );
+                },
               ),
-        ],
-        AsyncError(:final error, :final stackTrace) => [
-          ErrorDisplayWidget(
-            error: error,
-            stackTrace: stackTrace,
-          ),
-        ],
-        AsyncLoading() => [
-          const CenteredCircularProgressIndicator(),
-        ],
-      },
+            ),
+      ],
+      onRetryPressed: () => ref.invalidate(pushOperationsErrorsProvider),
     );
   }
 }
 
+/// A push operation error widget.
 class _PushOperationErrorWidget extends ConsumerWidget {
-  final PushOperationResult error;
+  /// The push operation error.
+  final PushOperationError error;
+
+  /// The on delete press callback.
   final VoidCallback? onDeletePress;
 
+  /// Creates a new push operation error widget instance.
   const _PushOperationErrorWidget({
     required this.error,
     this.onDeletePress,
@@ -94,25 +90,29 @@ class _PushOperationErrorWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => ExpandableTile(
-    title: Text('Error ${error.errorCode}'),
+    title: Text(
+      translations.syncIssues.operations.title(errorCode: error.errorCode),
+    ),
     children: [
       if (error.errorKind!.isPermanent)
         Text(
-          'This error is permanent and the operation will not be retried.',
+          translations.syncIssues.operations.expandable.permanent,
           style: TextStyle(
             fontSize: context.theme.typography.xs.fontSize,
             fontWeight: FontWeight.bold,
           ),
         ),
       Text(
-        'Date : ${error.createdAt}',
+        translations.syncIssues.operations.expandable.date(
+          date: '${DateFormat.yMd(translations.$meta.locale.underscoreTag).format(error.createdAt)} ${DateFormat.Hms(translations.$meta.locale.underscoreTag).format(error.createdAt)}',
+        ),
         style: TextStyle(
           fontSize: context.theme.typography.xs.fontSize,
           fontWeight: FontWeight.bold,
         ),
       ),
       Text(
-        'Details :',
+        translations.syncIssues.operations.expandable.details,
         style: TextStyle(
           fontSize: context.theme.typography.xs.fontSize,
           fontWeight: FontWeight.bold,
@@ -130,7 +130,7 @@ class _PushOperationErrorWidget extends ConsumerWidget {
           variant: .destructive,
           mainAxisSize: .min,
           onPress: onDeletePress,
-          child: const Text('Delete'),
+          child: ButtonText(translations.syncIssues.operations.expandable.deleteButton),
         ),
       ),
     ],

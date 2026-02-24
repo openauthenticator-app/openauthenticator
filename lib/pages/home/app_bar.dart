@@ -59,6 +59,7 @@ class _HomePageHeader extends ConsumerWidget {
     return showSearchBox ? _SearchBox(header: header) : header;
   }
 
+  /// Triggered when a TOTP is selected following a search.
   Future<void> onTotpFound(WidgetRef ref, Totp totp) async {
     List<Totp> totps = await ref.read(totpRepositoryProvider.future);
     int index = totps.indexOf(totp);
@@ -84,13 +85,13 @@ class _AppBarTitle extends StatelessWidget {
     builder: (context, constraints) {
       if (textMaxWidth != null && constraints.maxWidth <= textMaxWidth!) {
         double size = context.theme.typography.xl3.fontSize ?? 32;
-        return SizedScalableImageWidget(
+        return SizedScalableImage(
           height: size,
           width: size,
           asset: 'assets/images/logo.si',
         );
       }
-      return const TitleWidget();
+      return const TitleText();
     },
   );
 }
@@ -116,7 +117,7 @@ class _SyncHeaderAction extends ConsumerWidget {
       case SynchronizationPhaseSyncing():
         return const ClickableHeaderAction(
           onPress: null,
-          icon: RotationAnimationWidget(
+          icon: RotationAnimation(
             child: Icon(FIcons.refreshCcw),
           ),
         );
@@ -124,7 +125,7 @@ class _SyncHeaderAction extends ConsumerWidget {
         return ClickableHeaderAction(
           onPress: () async {
             if (exception is InvalidSessionException || exception is NoSessionException) {
-              InvalidSessionDialog.openDialogAndHandleChoice(context);
+              InvalidSessionDialog.openDialog(context, handleResult: true);
             } else {
               ErrorDialogResult? result = await ErrorDialog.openDialog(
                 context,

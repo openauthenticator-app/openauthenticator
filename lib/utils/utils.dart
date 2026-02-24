@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hashlib_codecs/hashlib_codecs.dart';
@@ -45,13 +43,6 @@ void handleException(Object? ex, StackTrace? stackTrace, {bool? sendToSentry}) {
 
 /// Returns whether the given type [S] is a subtype of type [T].
 bool isSubtype<S, T>() => <S>[] is List<T>;
-
-/// Generates a random string.
-String generateRandomString([int length = 20]) {
-  String chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
-  Random random = Random();
-  return String.fromCharCodes(Iterable.generate(length, (_) => chars.codeUnitAt(random.nextInt(chars.length))));
-}
 
 /// Compares two [Uint8List]s by comparing 8 bytes at a time.
 /// Kudos to https://stackoverflow.com/a/70751501/3608831.

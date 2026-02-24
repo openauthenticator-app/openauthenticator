@@ -5,13 +5,14 @@ import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/totp/decrypted.dart';
 import 'package:open_authenticator/model/totp/totp.dart';
 import 'package:open_authenticator/utils/platform.dart';
+import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
 import 'package:open_authenticator/widgets/totp/code.dart';
 import 'package:open_authenticator/widgets/totp/image.dart';
 
 /// Allows to display TOTPs in a [ListView].
-class TotpWidget extends StatelessWidget {
+class TotpTile extends StatelessWidget {
   /// The default image size.
   static const double _kDefaultImageSize = 70;
 
@@ -34,7 +35,7 @@ class TotpWidget extends StatelessWidget {
   final WidgetBuilder? suffixBuilder;
 
   /// Creates a new TOTP widget instance that adapts itself to the current platform.
-  TotpWidget.adaptive({
+  TotpTile.adaptive({
     Key? key,
     required Totp totp,
     double imageSize = _kDefaultImageSize,
@@ -65,7 +66,7 @@ class TotpWidget extends StatelessWidget {
        );
 
   /// Creates a new TOTP widget instance.
-  const TotpWidget({
+  const TotpTile({
     super.key,
     required this.totp,
     this.imageSize = _kDefaultImageSize,
@@ -78,11 +79,11 @@ class TotpWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) => ClickableTile(
     prefix: totp.isDecrypted
-        ? TotpCountdownImageWidget(
+        ? TotpCountdownImage(
             totp: totp,
             size: imageSize,
           )
-        : TotpImageWidget.fromTotp(
+        : TotpImage.fromTotp(
             totp: totp,
             size: imageSize,
           ),
@@ -110,7 +111,7 @@ class TotpWidget extends StatelessWidget {
     subtitle: totp.isDecrypted && displayCode
         ? Padding(
             padding: const EdgeInsets.only(top: 6),
-            child: TotpCodeWidget(
+            child: TotpCode(
               totp: totp as DecryptedTotp,
               textStyle: context.theme.typography.xl2,
             ),
@@ -128,7 +129,7 @@ class TotpWidget extends StatelessWidget {
     VoidCallback? onDeletePress,
   }) {
     if (currentPlatform.isDesktop) {
-      return (context) => _DesktopActionsWidget(
+      return (context) => _DesktopActions(
         totp: totp,
         onDecryptPress: onDecryptPress,
         onEditPress: onEditPress,
@@ -225,7 +226,7 @@ class _MobileActionsDialog extends StatelessWidget {
       ClickableButton(
         variant: .secondary,
         onPress: () => Navigator.pop(context),
-        child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+        child: ButtonText(MaterialLocalizations.of(context).cancelButtonLabel),
       ),
     ],
     children: [
@@ -254,7 +255,7 @@ enum _MobileActionsDialogResult {
 }
 
 /// Wraps all three desktop actions in a widget.
-class _DesktopActionsWidget extends StatelessWidget {
+class _DesktopActions extends StatelessWidget {
   /// The TOTP instance.
   final Totp totp;
 
@@ -268,7 +269,7 @@ class _DesktopActionsWidget extends StatelessWidget {
   final VoidCallback? onDeletePress;
 
   /// Creates a new desktop actions instance.
-  const _DesktopActionsWidget({
+  const _DesktopActions({
     required this.totp,
     this.onDecryptPress,
     this.onEditPress,

@@ -17,7 +17,7 @@ class _AddTotpDialog extends StatelessWidget {
       ClickableButton(
         variant: .secondary,
         onPress: () => Navigator.pop(context),
-        child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+        child: ButtonText(MaterialLocalizations.of(context).cancelButtonLabel),
       ),
     ],
     children: [

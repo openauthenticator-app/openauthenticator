@@ -43,7 +43,9 @@
     			<string>app.openauthenticator</string>
     			<key>CFBundleURLSchemes</key>
     			<array>
+    				<string>openauthenticator</string>
     				<string>otpauth</string>
+    				<string>rc-653ef11675</string>
     			</array>
     		</dict>
     	</array>

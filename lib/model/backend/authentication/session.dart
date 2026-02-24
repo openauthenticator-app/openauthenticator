@@ -9,15 +9,21 @@ import 'package:open_authenticator/model/backend/request/response.dart';
 import 'package:open_authenticator/utils/result.dart';
 import 'package:simple_secure_storage/simple_secure_storage.dart';
 
+/// Represents a session.
 class Session with EquatableMixin {
-  final String? accessToken;
+  /// The access token.
+  final String accessToken;
+
+  /// The refresh token.
   final String refreshToken;
 
+  /// Creates a new session instance.
   const Session({
     required this.accessToken,
     required this.refreshToken,
   });
 
+  /// Creates a copy of the session.
   Session copyWith({
     String? accessToken,
     String? refreshToken,
@@ -32,27 +38,34 @@ class Session with EquatableMixin {
     accessToken,
     refreshToken,
   ];
-
-  static bool hasExpired(Object? error) => error is BackendRequestError && error.errorCode == BackendRequestError.kExpiredSessionError;
 }
 
+/// The stored session provider.
 final storedSessionProvider = AsyncNotifierProvider<StoredSessionNotifier, Session?>(StoredSessionNotifier.new);
 
+/// The stored session notifier.
 class StoredSessionNotifier extends AsyncNotifier<Session?> {
+  /// The preferences key where the access token is stored.
+  static const String _kAccessToken = 'accessToken';
+
+  /// The preferences key where the refresh token is stored.
   static const String _kRefreshToken = 'refreshToken';
 
   @override
   Future<Session?> build() async {
+    String? accessToken = await SimpleSecureStorage.read(_kAccessToken);
     String? refreshToken = await SimpleSecureStorage.read(_kRefreshToken);
-    return refreshToken == null
+    return accessToken == null || refreshToken == null
         ? null
         : Session(
-            accessToken: null,
+            accessToken: accessToken,
             refreshToken: refreshToken,
           );
   }
 
+  /// Stores the session and uses it.
   Future<void> storeAndUse(Session session) async {
+    await SimpleSecureStorage.write(_kAccessToken, session.accessToken);
     await SimpleSecureStorage.write(_kRefreshToken, session.refreshToken);
     state = AsyncData(
       Session(
@@ -62,29 +75,34 @@ class StoredSessionNotifier extends AsyncNotifier<Session?> {
     );
   }
 
+  /// Clears the session.
   Future<Result> clear() async {
+    await SimpleSecureStorage.delete(_kAccessToken);
     await SimpleSecureStorage.delete(_kRefreshToken);
     state = const AsyncData(null);
     return const ResultSuccess();
   }
 }
 
-final sessionRefreshRequestsQueueProvider = NotifierProvider<SessionRefreshRequestsQueue, SessionRefreshState>(SessionRefreshRequestsQueue.new);
+/// The session refresh manager provider.
+final sessionRefreshManagerProvider = NotifierProvider<SessionRefreshManager, SessionRefreshState>(SessionRefreshManager.new);
 
-class SessionRefreshRequestsQueue extends Notifier<SessionRefreshState> {
+/// The session refresh manager notifier.
+class SessionRefreshManager extends Notifier<SessionRefreshState> {
   @override
   SessionRefreshState build() {
-    ref.watch(storedSessionProvider); // TODO: not refreshed on login
+    ref.listen(storedSessionProvider, (_, _) => state = .idle);
     return .idle;
   }
 
+  /// Refreshes the session.
   Future<Result> refresh({Session? session}) async {
     if (state == .inProgress || state == .invalidSession) {
       return const ResultCancelled();
     }
     state = .inProgress;
     try {
-      Backend backend = await ref.read(backendProvider.notifier);
+      BackendClient backend = await ref.read(backendClientProvider.notifier);
       Result<Session> result = await _sendRefreshRequest(backend, session: session);
       if (result is! ResultSuccess<Session>) {
         if (result is ResultError) {
@@ -112,24 +130,20 @@ class SessionRefreshRequestsQueue extends Notifier<SessionRefreshState> {
     }
   }
 
-  Future<Result<Session>> _sendRefreshRequest(Backend backend, {Session? session}) async {
+  /// Sends a refresh request.
+  Future<Result<Session>> _sendRefreshRequest(BackendClient backend, {Session? session}) async {
     try {
       session ??= await ref.read(storedSessionProvider.future);
       if (session == null) {
         throw const NoSessionException();
       }
-      Result<RefreshTokenResponse> result = await backend.sendHttpRequest(
-        RefreshTokenRequest(
+      Result<RefreshSessionResponse> result = await backend.sendHttpRequest(
+        RefreshSessionRequest(
           refreshToken: session.refreshToken,
         ),
         session: session,
       );
-      return result.to(
-        (response) => Session(
-          accessToken: response!.accessToken,
-          refreshToken: response.refreshToken,
-        ),
-      );
+      return result.to((response) => response!.session);
     } catch (ex, stackTrace) {
       return ResultError(
         exception: ex,
@@ -139,11 +153,26 @@ class SessionRefreshRequestsQueue extends Notifier<SessionRefreshState> {
   }
 }
 
+/// The no session exception.
 class NoSessionException implements Exception {
+  /// Creates a new no session exception instance.
   const NoSessionException();
 
   @override
   String toString() => 'The user must be logged-in to proceed';
 }
 
-enum SessionRefreshState { idle, inProgress, success, invalidSession }
+/// The session refresh state.
+enum SessionRefreshState {
+  /// The session refresh state is idle.
+  idle,
+
+  /// The session refresh state is in progress.
+  inProgress,
+
+  /// The session refresh state is success.
+  success,
+
+  /// The session refresh state is invalid.
+  invalidSession,
+}

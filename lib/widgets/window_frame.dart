@@ -8,12 +8,12 @@ import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:window_manager/window_manager.dart';
 
 /// Allows to display a window frame.
-class WindowFrameWidget extends StatelessWidget {
+class DesktopWindowFrame extends StatelessWidget {
   /// The child widget.
   final Widget child;
 
   /// Creates a new window frame widget instance.
-  const WindowFrameWidget({
+  const DesktopWindowFrame({
     super.key,
     required this.child,
   });

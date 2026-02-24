@@ -32,19 +32,18 @@ import 'package:open_authenticator/utils/platform.dart';
 import 'package:open_authenticator/utils/result.dart';
 import 'package:open_authenticator/utils/utils.dart';
 import 'package:open_authenticator/widgets/app_scaffold.dart';
-import 'package:open_authenticator/widgets/centered_circular_progress_indicator.dart';
+import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
 import 'package:open_authenticator/widgets/dialog/confirmation_dialog.dart';
 import 'package:open_authenticator/widgets/dialog/error_dialog.dart';
 import 'package:open_authenticator/widgets/dialog/invalid_session_dialog.dart';
 import 'package:open_authenticator/widgets/dialog/text_input_dialog.dart';
-import 'package:open_authenticator/widgets/error.dart';
-import 'package:open_authenticator/widgets/image_text_buttons.dart';
+import 'package:open_authenticator/widgets/image_text_actions.dart';
 import 'package:open_authenticator/widgets/rotation_animation.dart';
 import 'package:open_authenticator/widgets/sized_scalable_image.dart';
-import 'package:open_authenticator/widgets/smooth_highlight.dart';
-import 'package:open_authenticator/widgets/title.dart';
+import 'package:open_authenticator/widgets/smooth_scale.dart';
+import 'package:open_authenticator/widgets/title_text.dart';
 import 'package:open_authenticator/widgets/toast.dart';
 import 'package:open_authenticator/widgets/totp/widget.dart';
 import 'package:open_authenticator/widgets/waiting_overlay.dart';
@@ -106,66 +105,9 @@ class _HomePageState extends ConsumerState<HomePage> {
     AsyncValue<List<Totp>> totps = ref.watch(totpRepositoryProvider);
     StorageType? storageType = ref.watch(storageTypeSettingsEntryProvider).value;
     bool displaySearchButton = ref.read(displaySearchButtonSettingsEntryProvider).value ?? true;
-    Widget body = switch (totps) {
-      AsyncData(:final value) => _RequireProviderValueWidget.cryptoStore(
-        childIfAbsent: Center(
-          child: SingleChildScrollView(
-            child: ImageTextButtonsWidget.icon(
-              icon: FIcons.lock,
-              text: translations.home.noCryptoStore.message,
-              buttons: [
-                ClickableButton(
-                  onPress: () => MasterPasswordUtils.changeMasterPassword(context, ref, askForUnlock: false),
-                  prefix: const Icon(FIcons.rectangleEllipsis),
-                  child: Text(translations.home.noCryptoStore.resetButton),
-                ),
-              ],
-            ),
-          ),
-        ),
-        child: _RevealFloatingActionButtonWidget(
-          onHideFloatingActionButton: () {
-            if (showFloatingActionButton) {
-              setState(() => showFloatingActionButton = false);
-            }
-          },
-          onShowFloatingActionButton: () {
-            if (!showFloatingActionButton) {
-              setState(() => showFloatingActionButton = true);
-            }
-          },
-          child: _RevealSearchBoxWidget(
-            onHideSearchBox: () {
-              if (showSearchBox) {
-                setState(() => showSearchBox = false);
-              }
-            },
-            onShowSearchBox: () {
-              if (!showSearchBox) {
-                setState(() => showSearchBox = true);
-              }
-            },
-            child: (displaySearchButton || (!displaySearchButton && showSearchBox)) && (currentPlatform.isMobile || kDebugMode) && storageType == StorageType.shared
-                ? _TotpsRefreshIndicatorWidget(
-                    onRefresh: () => ref.read(synchronizationControllerProvider.notifier).forceSync(),
-                    child: buildTotpsListWidget(value),
-                  )
-                : buildTotpsListWidget(value),
-          ),
-        ),
-      ),
-      AsyncError(:final error, :final stackTrace) => ErrorDisplayWidget(
-        error: error,
-        stackTrace: stackTrace,
-        onRetryPressed: () {
-          ref.invalidate(totpRepositoryProvider);
-          ref.read(synchronizationControllerProvider.notifier).forceSync();
-        },
-      ),
-      _ => const CenteredCircularProgressIndicator(),
-    };
-
-    return AppScaffold(
+    return AppScaffold.asyncValue(
+      asyncValue: totps,
+      scrollable: false,
       header: _HomePageHeader(
         showAddButton: !_RevealFloatingActionButtonWidget.hasFloatingActionButton,
         onAddButtonPress: () => onAddButtonPress(context),
@@ -188,23 +130,76 @@ class _HomePageState extends ConsumerState<HomePage> {
         },
         showSearchBox: showSearchBox,
       ),
-      children: [
-        if (_RevealFloatingActionButtonWidget.hasFloatingActionButton)
-          Stack(
-            alignment: Alignment.bottomRight,
-            children: [
-              body,
-              _RequireProviderValueWidget.cryptoStoreAndTotpList(
-                child: _FloatingAddButton(
-                  showFloatingActionButton: showFloatingActionButton,
-                  onAddButtonPress: onAddButtonPress,
-                ),
+      builder: (value) {
+        Widget body = _RequireProviderValueWidget.cryptoStore(
+          childIfAbsent: Center(
+            child: SingleChildScrollView(
+              child: ImageTextActions.icon(
+                icon: FIcons.lock,
+                text: translations.home.noCryptoStore.message,
+                actions: [
+                  ClickableButton(
+                    onPress: () => MasterPasswordUtils.changeMasterPassword(context, ref, askForUnlock: false),
+                    prefix: const Icon(FIcons.rectangleEllipsis),
+                    child: ButtonText(translations.home.noCryptoStore.resetButton),
+                  ),
+                ],
               ),
-            ],
-          )
-        else
-          body,
-      ],
+            ),
+          ),
+          child: _RevealFloatingActionButtonWidget(
+            onHideFloatingActionButton: () {
+              if (showFloatingActionButton) {
+                setState(() => showFloatingActionButton = false);
+              }
+            },
+            onShowFloatingActionButton: () {
+              if (!showFloatingActionButton) {
+                setState(() => showFloatingActionButton = true);
+              }
+            },
+            child: _RevealSearchBoxWidget(
+              onHideSearchBox: () {
+                if (showSearchBox) {
+                  setState(() => showSearchBox = false);
+                }
+              },
+              onShowSearchBox: () {
+                if (!showSearchBox) {
+                  setState(() => showSearchBox = true);
+                }
+              },
+              child: (displaySearchButton || (!displaySearchButton && showSearchBox)) && (currentPlatform.isMobile || kDebugMode) && storageType == StorageType.shared
+                  ? _TotpsRefreshIndicatorWidget(
+                      onRefresh: () => ref.read(synchronizationControllerProvider.notifier).forceSync(),
+                      child: buildTotpsListWidget(value),
+                    )
+                  : buildTotpsListWidget(value),
+            ),
+          ),
+        );
+        return [
+          if (_RevealFloatingActionButtonWidget.hasFloatingActionButton)
+            Stack(
+              alignment: Alignment.bottomRight,
+              children: [
+                body,
+                _RequireProviderValueWidget.cryptoStoreAndTotpList(
+                  child: _FloatingAddButton(
+                    showFloatingActionButton: showFloatingActionButton,
+                    onAddButtonPress: onAddButtonPress,
+                  ),
+                ),
+              ],
+            )
+          else
+            body,
+        ];
+      },
+      onRetryPressed: () {
+        ref.invalidate(totpRepositoryProvider);
+        ref.read(synchronizationControllerProvider.notifier).forceSync();
+      },
     );
   }
 

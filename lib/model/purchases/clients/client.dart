@@ -1,3 +1,4 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/app.dart';
 import 'package:open_authenticator/model/backend/user.dart';
@@ -110,8 +111,8 @@ abstract class RevenueCatClient {
     Map<PackageType, Price> result = {};
     for (Package package in offering.availablePackages) {
       result[package.packageType] = Price(
-        amount: package.storeProduct.price,
-        formattedAmount: package.storeProduct.priceString,
+        amount: package.storeProduct.price / 100,
+        currencyCode: package.storeProduct.currencyCode,
       );
     }
     return result;
@@ -131,21 +132,21 @@ abstract class RevenueCatClient {
 }
 
 /// Represents a price.
-class Price {
+class Price with EquatableMixin {
   /// The raw amount.
   final double amount;
 
-  /// The formatted amount, with the currency.
-  final String formattedAmount;
+  /// The currency code.
+  final String currencyCode;
 
   /// Creates a new price instance.
   const Price({
     required this.amount,
-    required this.formattedAmount,
+    required this.currencyCode,
   });
 
   @override
-  String toString() => formattedAmount;
+  List<Object?> get props => [amount, currencyCode];
 }
 
 /// Represents a purchasable item.
@@ -153,7 +154,8 @@ enum Purchasable {
   /// Allows to subscribe to the Contributor Plan.
   contributorPlan(
     offeringId: AppContributorPlan.offeringId,
-  );
+  )
+  ;
 
   /// The offering ID.
   final String offeringId;

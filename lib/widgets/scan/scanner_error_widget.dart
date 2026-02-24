@@ -27,9 +27,9 @@ class ScannerErrorWidget extends StatelessWidget {
         ),
         Text(
           switch (error.errorCode) {
-            MobileScannerErrorCode.controllerUninitialized => translations.error.scan.controllerUninitialized(exception: error.errorDetails?.details ?? error.errorCode),
-            MobileScannerErrorCode.permissionDenied => translations.error.scan.accessDenied(exception: error.errorDetails?.details ?? error.errorCode),
-            MobileScannerErrorCode.unsupported => translations.error.scan.unsupported(exception: error.errorDetails?.details ?? error.errorCode),
+            .controllerUninitialized => translations.error.scan.controllerUninitialized(exception: error.errorDetails?.details ?? error.errorCode),
+            .permissionDenied => translations.error.scan.accessDenied(exception: error.errorDetails?.details ?? error.errorCode),
+            .unsupported => translations.error.scan.unsupported(exception: error.errorDetails?.details ?? error.errorCode),
             _ => translations.error.generic.withException(exception: error.errorDetails?.details ?? error.errorCode),
           },
         ),

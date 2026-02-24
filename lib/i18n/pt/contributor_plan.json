@@ -18,7 +18,7 @@
         "annual": "Ano",
         "monthly": "Mês"
       },
-      "priceSubtitle(rich)": "$subtitle\n$price / $interval.",
+      "price(rich)": "$price / $interval",
       "subtitle(map)": {
         "annual": "Cobrança anual.",
         "monthly": "Cobrança mensal."

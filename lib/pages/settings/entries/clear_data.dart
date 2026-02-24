@@ -16,6 +16,7 @@ import 'package:open_authenticator/model/totp/image_cache.dart';
 import 'package:open_authenticator/utils/platform.dart';
 import 'package:open_authenticator/utils/result.dart';
 import 'package:open_authenticator/utils/shared_preferences_with_prefix.dart';
+import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
 import 'package:open_authenticator/widgets/dialog/confirmation_dialog.dart';
@@ -109,7 +110,7 @@ class ClearDataSettingsEntryWidget extends ConsumerWidget with FTileMixin {
                 ClickableButton(
                   variant: .ghost,
                   onPress: () => Navigator.pop(context),
-                  child: Text(MaterialLocalizations.of(context).continueButtonLabel),
+                  child: ButtonText(MaterialLocalizations.of(context).continueButtonLabel),
                 ),
               ]
             : null,

@@ -1,7 +1,10 @@
 {
-  "noError": "Erfolgreich!",
+  "noError": "Die Aktion war erfolgreich.",
+  "errorDialog": {
+    "title": "Fehler",
+    "retryButton": "Erneut versuchen"
+  },
   "appUnlock": "Die App konnte nicht entsperrt werden. Bitte versuchen Sie es erneut.",
-  "totpDecrypt": "Dieses TOTP konnte nicht entschlüsselt werden. Bitte stellen Sie sicher, dass Sie das richtige Passwort eingegeben haben.",
   "validation": {
     "number": "Sie müssen eine gültige Zahl eingeben.",
     "empty": "Dieses Feld ist erforderlich.",
@@ -27,5 +30,7 @@
     "currentStoragePasswordMismatch": "Ungültiges Master-Passwort eingegeben.",
     "encryptionKeyChangeFailed": "Beim Verschlüsseln Ihrer Daten ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.",
     "genericError": "Beim Migrieren Ihrer Daten ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut."
-  }
+  },
+  "totpDecrypt": "Dieses TOTP konnte nicht entschlüsselt werden. Bitte stellen Sie sicher, dass Sie das richtige Passwort eingegeben haben.",
+  "invalidCode": "Ungültiger Code."
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 
 /// Creates the SnackBar and shows it.
@@ -7,7 +8,7 @@ FToasterEntry showSuccessToast(BuildContext context, {required String text}) => 
   context,
   background: context.theme.colors.primary,
   foreground: context.theme.colors.primaryForeground,
-  title: 'Success',
+  title: translations.miscellaneous.toast.success,
   text: text,
   icon: FIcons.check,
 );
@@ -17,7 +18,7 @@ FToasterEntry showErrorToast(BuildContext context, {required String text}) => _s
   context,
   background: context.theme.colors.destructive,
   foreground: context.theme.colors.destructiveForeground,
-  title: 'An error occurred',
+  title: translations.miscellaneous.toast.error,
   text: text,
   icon: FIcons.circleAlert,
 );

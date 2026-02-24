@@ -1,14 +1,18 @@
 part of 'provider.dart';
 
+/// The email authentication provider.
 final emailAuthenticationProvider = Provider<EmailAuthenticationProvider>(
   (ref) => EmailAuthenticationProvider._(
     ref: ref,
   ),
 );
 
+/// The email authentication provider.
 class EmailAuthenticationProvider extends AuthenticationProvider {
+  /// The email authentication provider id.
   static const String kProviderId = 'email';
 
+  /// Creates a new email authentication provider instance.
   const EmailAuthenticationProvider._({
     required super.ref,
   }) : super(
@@ -28,16 +32,28 @@ class EmailAuthenticationProvider extends AuthenticationProvider {
     return result;
   }
 
+  /// Requests to sign in.
   Future<Result> requestSignIn(String email) => _requestLogin(email, link: false);
 
+  /// Requests to link.
   Future<Result> requestLinking(String email) => _requestLogin(email, link: true);
 
+  /// Requests a login for either signing in or linking.
   Future<Result> _requestLogin(String email, {bool link = false}) async {
     String backendUrl = await _ref.read(backendUrlSettingsEntryProvider.future);
-    await launchUrl(Uri.parse('$backendUrl/auth/provider/$id/redirect?email=$email&mode=${link ? 'link' : 'login'}'));
+    String uriPrefix = '$backendUrl/auth/provider/$id/redirect?email=$email';
+    Uri uri;
+    if (link) {
+      User? user = await _ref.read(userProvider.future);
+      uri = Uri.parse('$uriPrefix&mode=link&userId=${user!.id}');
+    } else {
+      uri = Uri.parse('$uriPrefix&mode=login');
+    }
+    await launchUrl(uri);
     return const ResultSuccess();
   }
 
+  /// Confirms the email.
   Future<Result> confirm(String code) async {
     try {
       EmailConfirmationData? data = await _ref.read(emailConfirmationStateProvider.future);
@@ -45,7 +61,7 @@ class EmailAuthenticationProvider extends AuthenticationProvider {
         throw Exception('No email to confirm.');
       }
       Result<EmailConfirmResponse> response = await _ref
-          .read(backendProvider.notifier)
+          .read(backendClientProvider.notifier)
           .sendHttpRequest(
             EmailConfirmRequest(
               email: data.email,
@@ -65,21 +81,22 @@ class EmailAuthenticationProvider extends AuthenticationProvider {
     }
   }
 
+  /// Cancels the confirmation.
   Future<Result> cancelConfirmation() async {
     try {
       EmailConfirmationData? data = await _ref.read(emailConfirmationStateProvider.future);
       if (data == null) {
         return const ResultSuccess();
       }
-      Result<EmailCancelResponse> response = await _ref
-          .read(backendProvider.notifier)
+      Result<EmailConfirmationCancelResponse> response = await _ref
+          .read(backendClientProvider.notifier)
           .sendHttpRequest(
-            EmailCancelRequest(
+            EmailConfirmationCancelRequest(
               email: data.email,
               cancelCode: data.cancelCode,
             ),
           );
-      if (response is! ResultSuccess<EmailCancelResponse>) {
+      if (response is! ResultSuccess<EmailConfirmationCancelResponse>) {
         return response;
       }
       await _ref.read(emailConfirmationStateProvider.notifier)._cancelConfirmation();
@@ -145,10 +162,15 @@ class EmailConfirmationStateNotifier extends AsyncNotifier<EmailConfirmationData
   }
 }
 
+/// The email confirmation data.
 class EmailConfirmationData with EquatableMixin {
+  /// The email.
   final String email;
+
+  /// The cancel code.
   final String cancelCode;
 
+  /// Creates a new email confirmation data instance.
   const EmailConfirmationData({
     required this.email,
     required this.cancelCode,

@@ -20,6 +20,7 @@ part 'github.dart';
 part 'google.dart';
 part 'microsoft.dart';
 
+/// The authentication provider provider.
 final authenticationProvider = Provider.family<AuthenticationProvider?, String>(
   (ref, id) => ref.watch(
     authenticationProviders.select(
@@ -30,6 +31,7 @@ final authenticationProvider = Provider.family<AuthenticationProvider?, String>(
   ),
 );
 
+/// The authentication providers provider.
 final authenticationProviders = Provider<List<AuthenticationProvider>>(
   (ref) => List.unmodifiable([
     ref.watch(emailAuthenticationProvider),
@@ -40,6 +42,7 @@ final authenticationProviders = Provider<List<AuthenticationProvider>>(
   ]),
 );
 
+/// The user authentication providers provider.
 final userAuthenticationProviders = Provider<List<AuthenticationProvider>>((ref) {
   User? user = ref.watch(userProvider).value;
   if (user == null) {
@@ -52,17 +55,24 @@ final userAuthenticationProviders = Provider<List<AuthenticationProvider>>((ref)
   ]);
 });
 
+/// Represents an authentication provider.
 sealed class AuthenticationProvider {
+  /// The authentication provider id.
   final String id;
+
+  /// The Riverpod ref instance.
   final Ref _ref;
 
+  /// Creates a new authentication provider instance.
   const AuthenticationProvider({
     required this.id,
     required Ref ref,
   }) : _ref = ref;
 
+  /// Changes the provider id of the user.
   User _changeId(User user, String providerUserId);
 
+  /// Unlinks the provider.
   Future<Result> unlink() async {
     try {
       User? user = await _ref.read(userProvider.future);
@@ -70,7 +80,7 @@ sealed class AuthenticationProvider {
         return const ResultCancelled();
       }
       return await _ref
-          .read(backendProvider.notifier)
+          .read(backendClientProvider.notifier)
           .sendHttpRequest(
             ProviderUnlinkRequest(
               provider: this,
@@ -84,6 +94,7 @@ sealed class AuthenticationProvider {
     }
   }
 
+  /// Triggered when the redirect is received.
   Future<Result> onRedirectReceived(Uri uri) async {
     try {
       List<String> path = uri.pathSegments;
@@ -95,10 +106,10 @@ sealed class AuthenticationProvider {
         return const ResultCancelled();
       }
       User? user = await _ref.read(userProvider.future);
-      SessionRefreshState sessionRefreshState = _ref.read(sessionRefreshRequestsQueueProvider);
+      SessionRefreshState sessionRefreshState = _ref.read(sessionRefreshManagerProvider);
       if (user == null || sessionRefreshState == .invalidSession) {
         Result<ProviderLoginResponse> response = await _ref
-            .read(backendProvider.notifier)
+            .read(backendClientProvider.notifier)
             .sendHttpRequest(
               ProviderLoginRequest(
                 provider: this,
@@ -109,17 +120,10 @@ sealed class AuthenticationProvider {
         if (response is! ResultSuccess<ProviderLoginResponse>) {
           return response;
         }
-        await _ref
-            .read(storedSessionProvider.notifier)
-            .storeAndUse(
-              Session(
-                accessToken: response.value.accessToken,
-                refreshToken: response.value.refreshToken,
-              ),
-            );
+        await _ref.read(storedSessionProvider.notifier).storeAndUse(response.value.session);
       } else {
         Result<ProviderLinkResponse> response = await _ref
-            .read(backendProvider.notifier)
+            .read(backendClientProvider.notifier)
             .sendHttpRequest(
               ProviderLinkRequest(
                 provider: this,
@@ -142,14 +146,26 @@ sealed class AuthenticationProvider {
   }
 }
 
+/// An OAuthentication provider.
 mixin OAuthenticationProvider on AuthenticationProvider {
+  /// Requests to sign in.
   Future<Result> requestSignIn() => _requestLogin(link: false);
 
+  /// Requests to link.
   Future<Result> requestLinking() => _requestLogin(link: true);
 
+  /// Requests a login for either signing in or linking.
   Future<Result> _requestLogin({bool link = false}) async {
     String backendUrl = await _ref.read(backendUrlSettingsEntryProvider.future);
-    await launchUrl(Uri.parse('$backendUrl/auth/provider/$id/redirect?mode=${link ? 'link' : 'login'}'));
+    String uriPrefix = '$backendUrl/auth/provider/$id/redirect';
+    Uri uri;
+    if (link) {
+      User? user = await _ref.read(userProvider.future);
+      uri = Uri.parse('$uriPrefix?mode=link&userId=${user!.id}');
+    } else {
+      uri = Uri.parse('$uriPrefix?mode=login');
+    }
+    await launchUrl(uri);
     return const ResultSuccess();
   }
 }

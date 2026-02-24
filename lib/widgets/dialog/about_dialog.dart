@@ -4,18 +4,28 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:open_authenticator/spacing.dart';
+import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/centered_circular_progress_indicator.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
 import 'package:open_authenticator/widgets/error.dart';
 
-class AboutDialog extends StatelessWidget {
+/// Allows to show an about dialog.
+class AboutAppDialog extends StatelessWidget {
+  /// The application name.
   final String? applicationName;
+
+  /// The application version.
   final String? applicationVersion;
+
+  /// The application icon.
   final Widget? applicationIcon;
+
+  /// The application legalese.
   final String? applicationLegalese;
 
-  const AboutDialog({
+  /// Creates a new about dialog instance.
+  const AboutAppDialog({
     super.key,
     this.applicationName,
     this.applicationVersion,
@@ -31,12 +41,12 @@ class AboutDialog extends StatelessWidget {
         ClickableButton(
           variant: .secondary,
           onPress: () => _LicensesDialog.show(context),
-          child: Text(MaterialLocalizations.of(context).licensesPageTitle),
+          child: ButtonText(MaterialLocalizations.of(context).licensesPageTitle),
         ),
       ClickableButton(
         variant: .secondary,
         onPress: () => Navigator.pop(context),
-        child: Text(MaterialLocalizations.of(context).closeButtonLabel),
+        child: ButtonText(MaterialLocalizations.of(context).closeButtonLabel),
       ),
     ],
     children: [
@@ -68,6 +78,7 @@ class AboutDialog extends StatelessWidget {
     ],
   );
 
+  /// Opens the about dialog.
   static Future<void> show(
     BuildContext context, {
     String? applicationName,
@@ -76,7 +87,7 @@ class AboutDialog extends StatelessWidget {
     String? applicationLegalese,
   }) => showFDialog(
     context: context,
-    builder: (context, style, animation) => AboutDialog(
+    builder: (context, style, animation) => AboutAppDialog(
       applicationName: applicationName,
       applicationVersion: applicationVersion,
       applicationIcon: applicationIcon,
@@ -85,54 +96,56 @@ class AboutDialog extends StatelessWidget {
   );
 }
 
+/// The licenses dialog.
 class _LicensesDialog extends StatefulWidget {
+  /// Creates a new licenses dialog instance.
   const _LicensesDialog();
 
   @override
   State<_LicensesDialog> createState() => _LicensesDialogState();
 
+  /// Allows to show the licenses dialog.
   static Future<void> show(BuildContext context) => showFDialog(
     context: context,
     builder: (context, style, animation) => const _LicensesDialog(),
   );
 }
 
+/// The licenses dialog state.
 class _LicensesDialogState extends State<_LicensesDialog> {
-  late final Future<List<_PackageLicense>> _future = _loadLicenses();
-
   @override
   Widget build(BuildContext context) => FutureBuilder<List<_PackageLicense>>(
-    future: _future,
+    future: _loadLicenses(),
     builder: (context, snapshot) => AppDialog(
       title: Text(MaterialLocalizations.of(context).licensesPageTitle),
       actions: [
         ClickableButton(
           variant: .secondary,
           onPress: () => Navigator.of(context).pop(),
-          child: Text(MaterialLocalizations.of(context).closeButtonLabel),
+          child: ButtonText(MaterialLocalizations.of(context).closeButtonLabel),
         ),
       ],
       children: [
-        if (snapshot.hasError) ErrorDetails(error: snapshot.error),
+        if (snapshot.hasError) ErrorWithStackTrace(error: snapshot.error),
         if (snapshot.data == null)
-          const CenteredCircularProgressIndicator()
+          const Padding(
+            padding: EdgeInsets.all(kBigSpace),
+            child: CenteredCircularProgressIndicator(),
+          )
         else
-          for (int i = 0; i < snapshot.data!.length; i++)
-            Padding(
-              padding: EdgeInsets.only(bottom: i == snapshot.data!.length - 1 ? 0 : kSpace),
-              child: _PackageRow(
-                title: snapshot.data![i].package,
-                subtitle: '${snapshot.data![i].estimatedLines} lignes',
-                onPress: () => _openDetails(
-                  context,
-                  package: snapshot.data![i],
-                ),
+          for (_PackageLicense package in snapshot.data!)
+            _PackageRow(
+              title: package.package,
+              onPress: () => _openDetails(
+                context,
+                package: package,
               ),
             ),
       ],
     ),
   );
 
+  /// Loads the licenses.
   Future<List<_PackageLicense>> _loadLicenses() async {
     List<LicenseEntry> entries = await LicenseRegistry.licenses.toList();
 
@@ -152,6 +165,7 @@ class _LicensesDialogState extends State<_LicensesDialog> {
     ]..sort((a, b) => a.package.toLowerCase().compareTo(b.package.toLowerCase()));
   }
 
+  /// Opens the details of a package.
   Future<void> _openDetails(
     BuildContext context, {
     required _PackageLicense package,
@@ -163,7 +177,7 @@ class _LicensesDialogState extends State<_LicensesDialog> {
         ClickableButton(
           variant: .secondary,
           onPress: () => Navigator.of(context).pop(),
-          child: Text(MaterialLocalizations.of(context).closeButtonLabel),
+          child: ButtonText(MaterialLocalizations.of(context).closeButtonLabel),
         ),
       ],
       children: [
@@ -180,37 +194,39 @@ class _LicensesDialogState extends State<_LicensesDialog> {
   );
 }
 
+/// Represents a package row.
 class _PackageRow extends StatelessWidget {
+  /// The title of the row.
   final String title;
-  final String subtitle;
+
+  /// The action to perform when the row is pressed.
   final VoidCallback onPress;
 
+  /// Creates a new package row instance.
   const _PackageRow({
     required this.title,
-    required this.subtitle,
     required this.onPress,
   });
 
   @override
   Widget build(BuildContext context) => ClickableTile(
     title: Text(title),
-    subtitle: Text(subtitle),
     onPress: onPress,
     suffix: const Icon(FIcons.chevronRight),
   );
 }
 
+/// Represents a package license.
 class _PackageLicense {
+  /// The package.
   final String package;
+
+  /// The paragraphs.
   final List<LicenseParagraph> paragraphs;
 
+  /// Creates a new package license instance.
   const _PackageLicense({
     required this.package,
     required this.paragraphs,
   });
-
-  int get estimatedLines {
-    int chars = paragraphs.fold<int>(0, (acc, p) => acc + p.text.length);
-    return (chars / 70).ceil();
-  }
 }

@@ -31,12 +31,12 @@ class DividerText extends StatelessWidget {
     ),
     child: Row(
       children: [
-        Expanded(child: leftDivider),
+        Flexible(child: leftDivider),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: kSpace),
           child: text,
         ),
-        Expanded(child: rightDivider),
+        Flexible(child: rightDivider),
       ],
     ),
   );

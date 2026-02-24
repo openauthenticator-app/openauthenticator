@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 
+/// A widget that is clickable, and therefore displays a [SystemMouseCursors.click] cursor.
 class Clickable extends StatelessWidget with FTileMixin, FItemMixin {
+  /// The child.
   final Widget child;
 
+  /// Creates a new clickable widget instance.
   const Clickable({
     super.key,
     required this.child,
@@ -16,11 +19,15 @@ class Clickable extends StatelessWidget with FTileMixin, FItemMixin {
   );
 }
 
+/// Allows to easily make a widget clickable.
 extension MakeClickable on Widget {
+  /// Makes the current widget clickable.
   Widget clickable({bool clickable = true}) => clickable ? Clickable(child: this) : this;
 }
 
+/// A clickable tile.
 class ClickableTile extends FTile {
+  /// Creates a new clickable tile instance.
   ClickableTile({
     super.key,
     required super.title,
@@ -46,6 +53,7 @@ class ClickableTile extends FTile {
     super.suffix,
   });
 
+  /// Creates a new clickable raw tile instance.
   ClickableTile.raw({
     super.key,
     required super.child,
@@ -76,7 +84,9 @@ class ClickableTile extends FTile {
       );
 }
 
+/// A clickable button.
 class ClickableButton extends FButton {
+  /// Creates a new clickable button instance.
   ClickableButton({
     super.key,
     required super.onPress,
@@ -102,6 +112,7 @@ class ClickableButton extends FButton {
     super.suffix,
   });
 
+  /// Creates a new clickable button icon instance.
   ClickableButton.icon({
     super.key,
     required super.onPress,
@@ -121,6 +132,7 @@ class ClickableButton extends FButton {
     super.actions,
   }) : super.icon();
 
+  /// Creates a new clickable raw button instance.
   const ClickableButton.raw({
     super.key,
     required super.onPress,
@@ -148,7 +160,9 @@ class ClickableButton extends FButton {
       );
 }
 
+/// A clickable header action.
 class ClickableHeaderAction extends FHeaderAction {
+  /// Creates a new clickable header action instance.
   const ClickableHeaderAction({
     super.key,
     required super.icon,
@@ -168,6 +182,7 @@ class ClickableHeaderAction extends FHeaderAction {
     super.actions,
   });
 
+  /// Creates a new clickable header back action instance.
   const ClickableHeaderAction.back({
     Key? key,
     required VoidCallback? onPress,
@@ -199,6 +214,7 @@ class ClickableHeaderAction extends FHeaderAction {
          actions: actions,
        );
 
+  /// Creates a new clickable header X action instance.
   const ClickableHeaderAction.x({
     Key? key,
     required VoidCallback? onPress,

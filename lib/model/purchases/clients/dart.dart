@@ -15,7 +15,7 @@ class RevenueCatDartClient extends RevenueCatClient {
 
   @override
   Future<void> initialize() async {
-    await PurchasesDart.configure(
+    await _PurchasesDartConfigurator.configure(
       PurchasesDartConfiguration(
         webBillingApiKey: purchasesConfiguration.apiKey,
         appUserId: purchasesConfiguration.appUserID,
@@ -44,5 +44,19 @@ class RevenueCatDartClient extends RevenueCatClient {
   Future<Result> restorePurchases() async {
     await PurchasesDart.updateAppUserId(purchasesConfiguration.appUserID!);
     return const ResultCancelled();
+  }
+}
+
+/// The PurchasesDart configurator.
+class _PurchasesDartConfigurator {
+  /// Whether the PurchasesDart has been configured.
+  static bool isConfigured = false;
+
+  /// Sets up Purchases with your API key and an app user id.
+  static Future<void> configure(PurchasesDartConfiguration configuration) async {
+    if (!isConfigured) {
+      await PurchasesDart.configure(configuration);
+      isConfigured = true;
+    }
   }
 }

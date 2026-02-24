@@ -91,7 +91,7 @@ class AppDialog extends StatelessWidget {
           [
             .all(
               const .delta(
-                padding: EdgeInsets.zero,
+                padding: .value(EdgeInsets.zero),
                 titleSpacing: 0,
                 bodySpacing: 0,
                 contentSpacing: 0,
@@ -114,13 +114,24 @@ class AppDialog extends StatelessWidget {
   }
 }
 
+/// An adaptive action padding widget.
 class _AdaptiveActionPadding extends StatelessWidget {
+  /// The index of the action.
   final int actionIndex;
+
+  /// The number of actions.
   final int actionsCount;
+
+  /// The action widget.
   final Widget action;
+
+  /// The gap between two actions.
   final double gap;
+
+  /// The gap between the action and the edge of the dialog.
   final double bigGap;
 
+  /// Creates a new adaptive action padding instance.
   const _AdaptiveActionPadding({
     super.key,
     required this.actionIndex,
@@ -131,26 +142,25 @@ class _AdaptiveActionPadding extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) => switch (MediaQuery.sizeOf(context).width) {
-    final width when width < context.theme.breakpoints.sm => Padding(
-      padding: EdgeInsets.only(
-        top: actionIndex == 0 ? bigGap : gap,
-        right: bigGap,
-        bottom: actionIndex == actionsCount - 1 ? bigGap : gap,
-        left: bigGap,
-      ),
-      child: action,
-    ),
-    _ => Padding(
-      padding: EdgeInsets.only(
-        top: bigGap,
-        right: actionIndex == 0 ? bigGap : gap,
-        bottom: bigGap,
-        left: actionIndex == actionsCount - 1 ? bigGap : gap,
-      ),
-      child: action,
-    ),
-  };
+  Widget build(BuildContext context) => MediaQuery.sizeOf(context).width < context.theme.breakpoints.sm
+      ? Padding(
+          padding: EdgeInsets.only(
+            top: actionIndex == 0 ? bigGap : gap,
+            right: bigGap,
+            bottom: actionIndex == actionsCount - 1 ? bigGap : gap,
+            left: bigGap,
+          ),
+          child: action,
+        )
+      : Padding(
+          padding: EdgeInsets.only(
+            top: bigGap,
+            right: actionIndex == 0 ? bigGap : gap,
+            bottom: bigGap,
+            left: actionIndex == actionsCount - 1 ? bigGap : gap,
+          ),
+          child: action,
+        );
 }
 
 /// The app dialog title widget.
@@ -172,14 +182,17 @@ class _AppDialogTitle extends StatelessWidget {
     mainAxisSize: .min,
     children: [
       FHeader(
-        title: Align(child: title, alignment: Alignment.centerLeft,),
+        title: Align(
+          alignment: Alignment.centerLeft,
+          child: title,
+        ),
         style: .delta(
           titleTextStyle: .delta(
             fontSize: context.theme.typography.xl.fontSize,
             fontWeight: FontWeight.normal,
             height: 1,
           ),
-          padding: AppDialog.kDefaultContentPadding.copyWith(top: kBigSpace, bottom: kBigSpace),
+          padding: .value(AppDialog.kDefaultContentPadding.copyWith(top: kBigSpace, bottom: kBigSpace)),
         ),
         suffixes: [
           if (currentPlatform.isDesktop && displayCloseButton != false)
@@ -195,7 +208,7 @@ class _AppDialogTitle extends StatelessWidget {
       ),
       const FDivider(
         style: .delta(
-          padding: EdgeInsets.zero,
+          padding: .value(EdgeInsets.zero),
         ),
       ),
     ],

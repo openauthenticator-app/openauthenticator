@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/spacing.dart';
 import 'package:open_authenticator/widgets/sized_scalable_image.dart';
-import 'package:open_authenticator/widgets/title.dart';
+import 'package:open_authenticator/widgets/title_text.dart';
 
-/// Allows to display an image, followed by a text and some buttons.
-class ImageTextButtonsWidget extends StatelessWidget {
+/// Allows to display an image, followed by a text and some actions.
+class ImageTextActions extends StatelessWidget {
   /// The image size.
   static const double _kImageSize = 80;
 
@@ -15,39 +15,39 @@ class ImageTextButtonsWidget extends StatelessWidget {
   /// The message to display.
   final String? text;
 
-  /// The buttons.
-  final List<Widget> buttons;
+  /// The actions.
+  final List<Widget> actions;
 
-  /// Creates a new image text buttons instance.
-  const ImageTextButtonsWidget({
+  /// Creates a new image text actions instance.
+  const ImageTextActions({
     super.key,
     required this.image,
     this.text,
-    this.buttons = const [],
+    this.actions = const [],
   });
 
-  /// Creates a new image text buttons instance from an asset.
-  const ImageTextButtonsWidget.asset({
+  /// Creates a new image text actions instance from an asset.
+  const ImageTextActions.asset({
     Key? key,
     required String asset,
     String? text,
-    List<Widget> buttons = const [],
+    List<Widget> actions = const [],
   }) : this(
          key: key,
-         image: const SizedScalableImageWidget(
+         image: const SizedScalableImage(
            height: _kImageSize,
            asset: 'assets/images/home.si',
          ),
          text: text,
-         buttons: buttons,
+         actions: actions,
        );
 
-  /// Creates a new image text buttons instance from an icon.
-  ImageTextButtonsWidget.icon({
+  /// Creates a new image text actions instance from an icon.
+  ImageTextActions.icon({
     Key? key,
     required IconData icon,
     String? text,
-    List<Widget> buttons = const [],
+    List<Widget> actions = const [],
   }) : this(
          key: key,
          image: AppTitleGradient(
@@ -57,7 +57,7 @@ class ImageTextButtonsWidget extends StatelessWidget {
            ),
          ),
          text: text,
-         buttons: buttons,
+         actions: actions,
        );
 
   @override
@@ -69,17 +69,17 @@ class ImageTextButtonsWidget extends StatelessWidget {
         child: image,
       ),
       Padding(
-        padding: EdgeInsets.only(bottom: buttons.isEmpty ? 0 : kBigSpace),
+        padding: EdgeInsets.only(bottom: actions.isEmpty ? 0 : kBigSpace),
         child: Text(
           text ?? translations.error.generic.noTryAgain,
           textAlign: TextAlign.center,
         ),
       ),
-      for (int i = 0; i < buttons.length; i++)
+      for (int i = 0; i < actions.length; i++)
         Center(
           child: Padding(
-            padding: EdgeInsets.only(bottom: i == buttons.length - 1 ? 0 : kSpace),
-            child: buttons[i],
+            padding: EdgeInsets.only(bottom: i == actions.length - 1 ? 0 : kSpace),
+            child: actions[i],
           ),
         ),
     ],

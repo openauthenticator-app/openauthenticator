@@ -18,7 +18,7 @@
         "annual": "Anno",
         "monthly": "Mese"
       },
-      "priceSubtitle(rich)": "$subtitle\n$price / $interval.",
+      "price(rich)": "$price / $interval",
       "subtitle(map)": {
         "annual": "Ricevi la fatturazione ogni anno.",
         "monthly": "Ricevi la fatturazione ogni mese."

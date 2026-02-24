@@ -7,6 +7,7 @@ import 'package:open_authenticator/model/backend/request/response.dart';
 import 'package:open_authenticator/model/backend/synchronization/push/operation.dart';
 import 'package:open_authenticator/model/backend/synchronization/push/result.dart';
 import 'package:open_authenticator/model/crypto.dart';
+import 'package:open_authenticator/model/database/database.steps.dart';
 import 'package:open_authenticator/model/totp/algorithm.dart';
 import 'package:open_authenticator/model/totp/json.dart';
 import 'package:open_authenticator/model/totp/totp.dart';
@@ -36,7 +37,10 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(SqliteUtils.openConnection(_kDbFileName));
 
   @override
-  int get schemaVersion => 2; // TODO: Migration
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(onUpgrade: schemaUpgrade);
 
   /// Stores the given [totp].
   Future<void> addTotp(Totp totp) async {
@@ -142,8 +146,7 @@ class AppDatabase extends _$AppDatabase {
     return deletedTotp != null;
   }
 
-  Future<int> countOutboxOperations() async => (await (select(pendingBackendPushOperations)).get()).length;
-
+  /// Returns the push operation associated to the given [uuid].
   Future<PushOperation?> getPendingBackendPushOperation(String uuid) async {
     _DriftBackendPushOperation? operation =
         await (select(pendingBackendPushOperations)
@@ -153,19 +156,24 @@ class AppDatabase extends _$AppDatabase {
     return operation?.asBackendPushOperation;
   }
 
+  /// Selects the pending backend push operations.
   Selectable<PushOperation> _selectPendingBackendPushOperations() {
     SimpleSelectStatement<$PendingBackendPushOperationsTable, _DriftBackendPushOperation> operations = select(pendingBackendPushOperations)..orderBy([(table) => OrderingTerm.asc(table.createdAt)]);
     return operations.map((operation) => operation.asBackendPushOperation);
   }
 
+  /// Returns the pending backend push operations.
   Future<List<PushOperation>> listPendingBackendPushOperations() => _selectPendingBackendPushOperations().get();
 
+  /// Returns the stream of pending backend push operations.
   Stream<List<PushOperation>> watchPendingBackendPushOperations() => _selectPendingBackendPushOperations().watch();
 
+  /// Adds a new pending backend push operation.
   Future<void> addPendingBackendPushOperation(PushOperation operation) async {
     await into(pendingBackendPushOperations).insert(operation.asDriftBackendPushOperation);
   }
 
+  /// Replaces all pending backend push operations by [operations].
   Future<void> replacePendingBackendPushOperations(List<PushOperation> operations) async {
     await batch((batch) {
       batch.deleteAll(pendingBackendPushOperations);
@@ -178,10 +186,12 @@ class AppDatabase extends _$AppDatabase {
     });
   }
 
+  /// Deletes the pending backend push operation associated to the given [operation].
   Future<void> deletePendingBackendPushOperation(PushOperation operation) async {
     await (delete(pendingBackendPushOperations)..where((pendingOperation) => pendingOperation.uuid.isValue(operation.uuid))).go();
   }
 
+  /// Applies the given push response.
   Future<void> applyPushResponse(SynchronizationPushResponse value) async {
     Set<String> toDelete = {};
     Map<String, List<PushOperationResult>> resultsWithErrors = {};
@@ -200,14 +210,14 @@ class AppDatabase extends _$AppDatabase {
         if (!result.errorKind!.isPermanent) {
           PushOperation? operation = await getPendingBackendPushOperation(result.operationUuid);
           if (operation != null) {
-            switch (operation.kind) {
-              case PushOperationKind.set:
-                Map<String, dynamic>? totpData = (operation as PushOperation<Map<String, dynamic>>).payload[result.totpUuid];
+            switch (operation) {
+              case SetTotpsPushOperation(:final payload):
+                Map<String, dynamic>? totpData = payload[result.totpUuid];
                 if (totpData != null) {
                   toSet.add(JsonTotp.fromJson(totpData, uuid: result.totpUuid));
                 }
                 break;
-              case PushOperationKind.delete:
+              case DeleteTotpsPushOperation():
                 toDelete.add(result.totpUuid);
                 break;
             }
@@ -216,10 +226,10 @@ class AppDatabase extends _$AppDatabase {
         errors.add(result.asDriftBackendPushOperationError);
       }
       if (toSet.isNotEmpty) {
-        toRetry.add(PushOperation.setTotps(totps: toSet).asDriftBackendPushOperation);
+        toRetry.add(SetTotpsPushOperation(totps: toSet).asDriftBackendPushOperation);
       }
       if (toDelete.isNotEmpty) {
-        toRetry.add(PushOperation.deleteTotps(uuids: toDelete).asDriftBackendPushOperation);
+        toRetry.add(DeleteTotpsPushOperation(uuids: toDelete).asDriftBackendPushOperation);
       }
     }
     await batch((batch) {
@@ -229,36 +239,54 @@ class AppDatabase extends _$AppDatabase {
     });
   }
 
-  Selectable<PushOperationResult> _selectBackendPushOperationErrors() {
+  /// Selects the backend push operation errors.
+  Selectable<PushOperationError> _selectBackendPushOperationErrors() {
     SimpleSelectStatement<$BackendPushOperationErrorsTable, _DriftBackendPushOperationError> operations = select(backendPushOperationErrors)..orderBy([(table) => OrderingTerm.asc(table.createdAt)]);
-    return operations.map((operation) => operation.asBackendPushOperationResult);
+    return operations.map((operation) => operation.asBackendPushOperationResult as PushOperationError);
   }
 
-  Future<List<PushOperationResult>> listBackendPushOperationErrors() => _selectBackendPushOperationErrors().get();
+  /// Returns the backend push operation errors.
+  Future<List<PushOperationError>> listBackendPushOperationErrors() => _selectBackendPushOperationErrors().get();
 
-  Stream<List<PushOperationResult>> watchBackendPushOperationErrors() => _selectBackendPushOperationErrors().watch();
+  /// Returns the stream of backend push operation errors.
+  Stream<List<PushOperationError>> watchBackendPushOperationErrors() => _selectBackendPushOperationErrors().watch();
 
-  Future<void> deleteBackendPushOperationError(PushOperationResult error) async {
+  /// Adds a new backend push operation error.
+  Future<void> deleteBackendPushOperationError(PushOperationError error) async {
     assert(!error.success, 'Cannot delete a successful operation.');
     await (delete(backendPushOperationErrors)..where(
           (operation) =>
               operation.totpUuid.isValue(error.totpUuid) &
               operation.operationUuid.isValue(error.operationUuid) &
-              operation.errorKind.isValue(error.errorCode!) &
+              operation.errorKind.isValue(error.errorCode) &
               operation.errorDetails.isValue(error.errorDetails!) &
               operation.createdAt.isValue(error.createdAt.millisecondsSinceEpoch),
         ))
         .go();
   }
 
+  /// Deletes all backend push operation errors.
   Future<void> clearBackendPushOperationErrors() async {
     await (delete(backendPushOperationErrors)).go();
   }
 
+  /// Clears all totps, deleted totps, pending backend push operations and backend push operation errors.
   Future<void> clear() => batch((batch) {
     batch.deleteAll(totps);
     batch.deleteAll(deletedTotps);
     batch.deleteAll(pendingBackendPushOperations);
     batch.deleteAll(backendPushOperationErrors);
   });
+}
+
+/// Allows to migrate the database scheme to the latest version.
+extension _Migrations on GeneratedDatabase {
+  /// Returns the migration strategy.
+  OnUpgrade get schemaUpgrade => stepByStep(
+    from1To2: (migrator, schema) async {
+      await migrator.createTable(schema.deletedTotps);
+      await migrator.createTable(schema.pendingBackendPushOperations);
+      await migrator.createTable(schema.backendPushOperationErrors);
+    },
+  );
 }

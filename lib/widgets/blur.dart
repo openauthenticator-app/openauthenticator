@@ -1,11 +1,10 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:open_authenticator/utils/brightness_listener.dart';
+import 'package:forui/forui.dart';
 
 /// Allows to blur a widget. Kudos to "jagritjkh/blur" for the initial implementation.
-class BlurWidget extends ConsumerStatefulWidget {
+class Blur extends StatelessWidget {
   /// A widget to display below the blur effect.
   final Widget? below;
 
@@ -28,7 +27,7 @@ class BlurWidget extends ConsumerStatefulWidget {
   final AlignmentGeometry alignment;
 
   /// Creates a new blur widget instance.
-  const BlurWidget({
+  const Blur({
     super.key,
     this.below,
     this.above,
@@ -40,30 +39,24 @@ class BlurWidget extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _BlurWidgetState();
-}
-
-/// The blur widget state.
-class _BlurWidgetState extends ConsumerState<BlurWidget> with BrightnessListener {
-  @override
   Widget build(BuildContext context) => ClipRRect(
-    borderRadius: widget.borderRadius ?? BorderRadius.zero,
+    borderRadius: borderRadius ?? BorderRadius.zero,
     child: Stack(
       children: [
-        if (widget.below != null) widget.below!,
+        ?below,
         Positioned.fill(
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: widget.blur, sigmaY: widget.blur),
+            filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
             child: Container(
               decoration: BoxDecoration(
-                color: (currentBrightness == Brightness.light ? Colors.white : Colors.black).withValues(alpha: widget.colorOpacity),
+                color: context.theme.colors.background.withValues(alpha: colorOpacity),
               ),
-              alignment: widget.alignment,
-              child: widget.overlay,
+              alignment: alignment,
+              child: overlay,
             ),
           ),
         ),
-        if (widget.above != null) widget.above!,
+        ?above,
       ],
     ),
   );

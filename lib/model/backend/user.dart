@@ -11,15 +11,30 @@ import 'package:open_authenticator/model/backend/request/response.dart';
 import 'package:open_authenticator/utils/result.dart';
 import 'package:path_provider/path_provider.dart';
 
+/// Represents a user, got from the backend.
 class User {
+  /// The user ID.
   final String id;
+
+  /// The TOTPs limit.
   final int totpsLimit;
+
+  /// The user email.
   final String? email;
+
+  /// The user Google ID.
   final String? googleId;
+
+  /// The user GitHub ID.
   final String? githubId;
+
+  /// The user Microsoft ID.
   final String? microsoftId;
+
+  /// The user Apple ID.
   final String? appleId;
 
+  /// Creates a new user instance.
   const User._({
     required this.id,
     required this.totpsLimit,
@@ -30,6 +45,7 @@ class User {
     this.appleId,
   });
 
+  /// Creates a new user instance from a JSON map.
   User.fromJson(Map<String, dynamic> json)
     : this._(
         id: json['id'],
@@ -40,6 +56,7 @@ class User {
         microsoftId: json['providers']?['microsoftId'],
       );
 
+  /// Whether the user has an authentication provider.
   bool hasAuthenticationProvider(String providerId) => switch (providerId) {
     EmailAuthenticationProvider.kProviderId => email != null,
     GoogleAuthenticationProvider.kProviderId => googleId != null,
@@ -49,6 +66,7 @@ class User {
     _ => false,
   };
 
+  /// Gets the user authentication provider ID.
   static Future<File> _getFile({bool create = false}) async {
     Directory directory = await getApplicationSupportDirectory();
     File file = File('${directory.path}/user.json');
@@ -58,6 +76,7 @@ class User {
     return file;
   }
 
+  /// Reads the user from the cache.
   static Future<User?> _readFromCache() async {
     File file = await _getFile();
     if (!file.existsSync()) {
@@ -68,11 +87,13 @@ class User {
     return json['id'] == null ? null : User.fromJson(json);
   }
 
+  /// Saves the user to the cache.
   Future<void> _saveToCache() async {
     File file = await _getFile(create: true);
     await file.writeAsString(jsonEncode(toJson()));
   }
 
+  /// Creates a copy of the user.
   User copyWith({
     int? totpsLimit,
     String? email,
@@ -90,6 +111,7 @@ class User {
     appleId: appleId ?? this.appleId,
   );
 
+  /// Converts the user to a JSON map.
   Map<String, dynamic> toJson() => {
     'id': id,
     'totpsLimit': totpsLimit,
@@ -101,8 +123,10 @@ class User {
   };
 }
 
+/// The user provider.
 final userProvider = AsyncNotifierProvider<UserNotifier, User?>(UserNotifier.new);
 
+/// The user notifier.
 class UserNotifier extends AsyncNotifier<User?> {
   @override
   Future<User?> build() async {
@@ -115,9 +139,10 @@ class UserNotifier extends AsyncNotifier<User?> {
     return user;
   }
 
+  /// Refreshes the user info.
   Future<Result> refreshUserInfo() async {
     Result<GetUserInfoResponse> result = await ref
-        .read(backendProvider.notifier)
+        .read(backendClientProvider.notifier)
         .sendHttpRequest(
           const GetUserInfoRequest(),
         );
@@ -128,11 +153,13 @@ class UserNotifier extends AsyncNotifier<User?> {
     return const ResultSuccess();
   }
 
+  /// Changes the user.
   Future<void> changeUser(User user) async {
     await user._saveToCache();
     state = AsyncData(user);
   }
 
+  /// Logs out the user.
   Future<Result> logoutUser() async {
     try {
       Session? session = await ref.read(storedSessionProvider.future);
@@ -140,7 +167,7 @@ class UserNotifier extends AsyncNotifier<User?> {
         return const ResultSuccess();
       }
       Result<UserLogoutResponse> result = await ref
-          .read(backendProvider.notifier)
+          .read(backendClientProvider.notifier)
           .sendHttpRequest(
             UserLogoutRequest(
               refreshToken: session.refreshToken,
@@ -159,10 +186,11 @@ class UserNotifier extends AsyncNotifier<User?> {
     }
   }
 
+  /// Deletes the user.
   Future<Result> deleteUser() async {
     try {
       Result<DeleteUserResponse> result = await ref
-          .read(backendProvider.notifier)
+          .read(backendClientProvider.notifier)
           .sendHttpRequest(
             const DeleteUserRequest(),
           );

@@ -9,6 +9,7 @@ import 'package:open_authenticator/pages/home/page.dart';
 import 'package:open_authenticator/pages/intro/slides/slide.dart';
 import 'package:open_authenticator/spacing.dart';
 import 'package:open_authenticator/utils/brightness_listener.dart';
+import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/centered_circular_progress_indicator.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/step_progress_indicator.dart';
@@ -112,7 +113,7 @@ class IntroPageState extends ConsumerState<IntroPage> with BrightnessListener {
                   }
                 : null,
             prefix: Icon(hasFinished ? FIcons.check : FIcons.chevronRight),
-            child: Text(hasFinished ? translations.intro.button.finish : translations.intro.button.next),
+            child: ButtonText(hasFinished ? translations.intro.button.finish : translations.intro.button.next),
           ),
         ],
       ),

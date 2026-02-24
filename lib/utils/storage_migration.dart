@@ -8,6 +8,7 @@ import 'package:open_authenticator/model/password_verification/password_verifica
 import 'package:open_authenticator/model/settings/storage_type.dart';
 import 'package:open_authenticator/utils/form_label.dart';
 import 'package:open_authenticator/utils/result.dart';
+import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
 import 'package:open_authenticator/widgets/dialog/error_dialog.dart';
@@ -189,12 +190,12 @@ class _ConfirmationDialogState extends State<_ConfirmationDialog> {
           }
           Navigator.pop(context, _ConfirmationResult(confirm: true, backupPassword: createBackup ? backupPassword : null));
         },
-        child: Text(MaterialLocalizations.of(context).continueButtonLabel),
+        child: ButtonText(MaterialLocalizations.of(context).continueButtonLabel),
       ),
       ClickableButton(
         variant: .secondary,
         onPress: () => Navigator.pop(context, const _ConfirmationResult()),
-        child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+        child: ButtonText(MaterialLocalizations.of(context).cancelButtonLabel),
       ),
     ],
     children: [
@@ -267,7 +268,7 @@ class _StorageMigrationDeletedTotpPolicyPickerDialog extends StatelessWidget {
       ClickableButton(
         variant: .secondary,
         onPress: () => Navigator.pop(context),
-        child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+        child: ButtonText(MaterialLocalizations.of(context).cancelButtonLabel),
       ),
     ],
     children: [

@@ -18,7 +18,7 @@
         "annual": "Jahr",
         "monthly": "Monat"
       },
-      "priceSubtitle(rich)": "$subtitle\n$price / $interval.",
+      "price(rich)": "$price / $interval",
       "subtitle(map)": {
         "annual": "Abrechnung erfolgt jährlich.",
         "monthly": "Abrechnung erfolgt monatlich."

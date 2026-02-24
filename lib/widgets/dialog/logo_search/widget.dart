@@ -13,7 +13,7 @@ import 'package:open_authenticator/widgets/dialog/logo_search/sources.dart';
 import 'package:open_authenticator/widgets/smart_image.dart';
 
 /// Allows to search for logos on various sources.
-class LogoSearchWidget extends StatefulWidget {
+class LogoSearch extends StatefulWidget {
   /// The initial search keywords to use.
   final String? initialSearchKeywords;
 
@@ -24,7 +24,7 @@ class LogoSearchWidget extends StatefulWidget {
   final double imageWidth;
 
   /// Creates a new Wikimedia logo search instance.
-  const LogoSearchWidget({
+  const LogoSearch({
     super.key,
     this.initialSearchKeywords,
     this.onLogoClicked,
@@ -32,11 +32,11 @@ class LogoSearchWidget extends StatefulWidget {
   });
 
   @override
-  State<StatefulWidget> createState() => _LogoSearchWidgetState();
+  State<StatefulWidget> createState() => _LogoSearchState();
 }
 
 /// The Wikimedia logo search state.
-class _LogoSearchWidgetState extends State<LogoSearchWidget> {
+class _LogoSearchState extends State<LogoSearch> {
   /// The default search term.
   static const String kDefaultSearch = 'microsoft';
 
@@ -147,7 +147,7 @@ class _LogoSearchWidgetState extends State<LogoSearchWidget> {
     Widget image = UnconstrainedBox(
       child: SizedBox(
         width: widget.imageWidth,
-        child: SmartImageWidget(
+        child: SmartImage(
           source: imageUrl,
           height: widget.imageWidth,
           width: widget.imageWidth,

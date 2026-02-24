@@ -1,6 +1,7 @@
 {
   "title": "Limite TOTP raggiunto",
   "message": {
+    "error": "Hai raggiunto il numero massimo di TOTP sincronizzabili, ma non siamo in grado di mostrarti le opzioni disponibili per estendere questo limite. Riprova più tardi o contattaci se hai bisogno di aiuto.",
     "notSubscribed": {
       "auto": "Stai attualmente sincronizzando i tuoi TOTP e hai superato il limite di $count TOTP prima di dover sottoscrivere il Piano Contributor. Quindi devi memorizzarli localmente (il che significa, nessuna ulteriore sincronizzazione), o sottoscrivere il Piano Contributor.",
       "manual": "Stai attualmente sincronizzando i tuoi TOTP e hai un limite di $count TOTP prima di dover sottoscrivere il Piano Contributor. Quindi devi memorizzarli localmente (il che significa, nessuna ulteriore sincronizzazione), o sottoscrivere il Piano Contributor per aggiungere un altro TOTP."

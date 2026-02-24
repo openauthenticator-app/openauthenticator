@@ -38,7 +38,7 @@ class TotpLimit {
   bool _willExceedIfAddMore({
     int count = 1,
     StorageType? storageType,
-  }) => (storageType ?? this.storageType) == StorageType.shared && currentTotpCount + count > userTotpsLimit!;
+  }) => (storageType ?? this.storageType) == StorageType.shared && userTotpsLimit != null && currentTotpCount + count > userTotpsLimit!;
 
   /// Returns whether the limit will be exceeded if one more TOTP is added.
   bool willExceedIfAddMore({int count = 1}) => _willExceedIfAddMore(

@@ -119,6 +119,7 @@ import 'package:open_authenticator/utils/utils.dart';
   );
 }
 
+/// Adapts the header styles.
 FVariantsDelta<FHeaderVariantConstraint, FHeaderVariant, FHeaderStyle, FHeaderStyleDelta> _adaptHeaderStyles({
   required EdgeInsetsGeometry originalPadding,
   Color? actionHoverColor,
@@ -135,9 +136,11 @@ FVariantsDelta<FHeaderVariantConstraint, FHeaderVariant, FHeaderStyle, FHeaderSt
             ],
           ),
         ),
-        padding: EdgeInsets.symmetric(
-          vertical: originalPadding.vertical / 2,
-          horizontal: originalPadding.horizontal / 2,
+        padding: .value(
+          .symmetric(
+            vertical: originalPadding.vertical / 2,
+            horizontal: originalPadding.horizontal / 2,
+          ),
         ),
         decoration: .delta(
           border: BoxBorder.fromLTRB(
@@ -149,6 +152,7 @@ FVariantsDelta<FHeaderVariantConstraint, FHeaderVariant, FHeaderStyle, FHeaderSt
   ],
 );
 
+/// Adapts the tile styles.
 FVariantsDelta<FItemVariantConstraint, FItemVariant, FTileStyle, FTileStyleDelta> _adaptTileStyles({
   Color? backgroundColor,
   Color? hoveredBackgroundColor,
@@ -193,7 +197,8 @@ FVariantsDelta<FItemVariantConstraint, FItemVariant, FTileStyle, FTileStyleDelta
   ],
 );
 
-FVariantsDelta<FButtonVariantConstraint, FButtonVariant, FButtonSizes, FButtonSizesDelta> _adaptButtonStyles({
+/// Adapts the button styles.
+FVariantsDelta<FButtonVariantConstraint, FButtonVariant, FButtonSizeStyles, FButtonSizesDelta> _adaptButtonStyles({
   Color? secondaryColor,
   double highlightAmount = 0.075,
 }) => .delta(
@@ -238,6 +243,7 @@ FVariantsDelta<FButtonVariantConstraint, FButtonVariant, FButtonSizes, FButtonSi
   ],
 );
 
+/// Adapts the text field styles.
 FTextFieldStyleDelta _adaptTextFieldStyle({
   FVariantsDelta<FFormFieldVariantConstraint, FFormFieldVariant, TextStyle, TextStyleDelta>? labelTextStyle,
   FVariantsDelta<FTextFieldVariantConstraint, FTextFieldVariant, TextStyle, TextStyleDelta>? contentTextStyle,
@@ -252,6 +258,7 @@ FTextFieldStyleDelta _adaptTextFieldStyle({
   ),
 );
 
+/// Adapts the select styles.
 FSelectStyleDelta _adaptSelectStyle({
   FVariantsDelta<FFormFieldVariantConstraint, FFormFieldVariant, TextStyle, TextStyleDelta>? labelTextStyle,
 }) => .delta(
@@ -260,6 +267,7 @@ FSelectStyleDelta _adaptSelectStyle({
   ),
 );
 
+/// Adapts the popover menu styles.
 FPopoverMenuStyleDelta _adaptPopoverMenuStyle({
   Color? hoveredBackgroundColor,
   List<BoxShadow>? boxShadow,
@@ -287,9 +295,10 @@ FPopoverMenuStyleDelta _adaptPopoverMenuStyle({
   ),
 );
 
+/// Adapts the general styles.
 FStyleDelta _adaptGeneralStyle({
   List<BoxShadow>? shadow,
 }) => .delta(
-  pagePadding: const EdgeInsets.all(kBigSpace),
+  pagePadding: const .value(.all(kBigSpace)),
   shadow: shadow,
 );

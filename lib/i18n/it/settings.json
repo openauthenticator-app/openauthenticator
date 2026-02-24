@@ -182,6 +182,14 @@
   },
   "dangerZone": {
     "title": "Zona di pericolo",
+    "changeBackendUrl": {
+      "title": "Cambia l'URL del backend",
+      "subtitle": "Cambia l'URL del server backend.",
+      "inputDialog": {
+        "title": "URL del server backend",
+        "message": "Inserisci l'URL del server backend. Per default, è \"$defaultBackendUrl\"."
+      }
+    },
     "deleteAccount": {
       "title": "Elimina il tuo account",
       "subtitle": "Elimina il tuo account e tutti i tuoi dati sincronizzati."

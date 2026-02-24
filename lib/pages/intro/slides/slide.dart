@@ -148,7 +148,7 @@ class IntroPageSlideWidgetState extends ConsumerState<IntroPageSlideWidget> with
               animation: _imageAnimation,
               child: SizedBox(
                 height: 200,
-                child: SizedScalableImageWidget(
+                child: SizedScalableImage(
                   asset: widget.slide.imagePath,
                 ),
               ),

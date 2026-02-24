@@ -40,11 +40,11 @@ class AboutSettingsEntryWidget extends StatelessWidget with FTileMixin {
         ),
       ),
       enabled: snapshot.data is! _DefaultPackageInfo,
-      onPress: () => AboutDialog.show(
+      onPress: () => AboutAppDialog.show(
         context,
         applicationName: App.appName,
         applicationVersion: 'v${snapshot.data!.version}',
-        applicationIcon: const SizedScalableImageWidget(
+        applicationIcon: const SizedScalableImage(
           asset: 'assets/images/logo.si',
           height: 90,
           width: 90,

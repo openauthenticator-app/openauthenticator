@@ -9,6 +9,7 @@ import 'package:open_authenticator/model/totp/totp.dart';
 import 'package:open_authenticator/pages/intro/slides/slide.dart';
 import 'package:open_authenticator/pages/settings/entries/synchronize.dart';
 import 'package:open_authenticator/utils/account.dart';
+import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 
 /// The slide that allows the user to login to Firebase.
@@ -58,12 +59,12 @@ class _LogInButton extends ConsumerWidget {
         ? ClickableButton(
             onPress: () => AccountUtils.trySignIn(context),
             prefix: const Icon(FIcons.logIn),
-            child: Text(translations.intro.logIn.button.loggedOut),
+            child: ButtonText(translations.intro.logIn.button.loggedOut),
           )
         : ClickableButton(
             onPress: null,
             prefix: const Icon(FIcons.check),
-            child: Text(translations.intro.logIn.button.loggedIn),
+            child: ButtonText(translations.intro.logIn.button.loggedIn),
           );
   }
 }

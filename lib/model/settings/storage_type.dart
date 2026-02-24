@@ -60,7 +60,7 @@ class StorageTypeSettingsEntry extends EnumSettingsEntry<StorageType> {
       AppDatabase database = ref.read(appDatabaseProvider);
       List<String> toDelete = [];
       Result<GetUserTotpsResponse> result = await ref
-          .read(backendProvider.notifier)
+          .read(backendClientProvider.notifier)
           .sendHttpRequest(
             const GetUserTotpsRequest(),
           );
@@ -120,13 +120,13 @@ class StorageTypeSettingsEntry extends EnumSettingsEntry<StorageType> {
 
       ref.read(pushOperationsQueueProvider.notifier)
         ..enqueue(
-          PushOperation.setTotps(
+          SetTotpsPushOperation(
             totps: toAdd,
           ),
           andRun: false,
         )
         ..enqueue(
-          PushOperation.deleteTotps(
+          DeleteTotpsPushOperation(
             uuids: toDelete,
           ),
         );

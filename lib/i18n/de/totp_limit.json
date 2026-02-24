@@ -1,6 +1,7 @@
 {
   "title": "TOTP-Limit erreicht",
   "message": {
+    "error": "Sie haben die maximale Anzahl synchronisierbarer TOTPs erreicht, aber wir können Ihnen die verfügbaren Optionen zur Erweiterung dieses Limits nicht anzeigen. Bitte versuchen Sie es später erneut oder kontaktieren Sie uns, wenn Sie Hilfe benötigen.",
     "notSubscribed": {
       "auto": "Sie synchronisieren gerade Ihre TOTPs und haben das Limit von $count TOTPs überschritten, bevor Sie den Contributor-Plan abonnieren müssen. Sie müssen sie also entweder lokal speichern (was bedeutet, keine Synchronisierung mehr) oder den Contributor-Plan abonnieren.",
       "manual": "Sie synchronisieren gerade Ihre TOTPs und haben ein Limit von $count TOTPs, bevor Sie den Contributor-Plan abonnieren müssen. Sie müssen sie also entweder lokal speichern (was bedeutet, keine Synchronisierung mehr) oder den Contributor-Plan abonnieren, um ein weiteres TOTP hinzuzufügen."

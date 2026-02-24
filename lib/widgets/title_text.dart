@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:open_authenticator/app.dart';
 
 /// The title widget with a nice green color.
-class TitleWidget extends StatelessWidget {
+class TitleText extends StatelessWidget {
   /// The text to display.
   final String text;
 
@@ -13,7 +13,7 @@ class TitleWidget extends StatelessWidget {
   final TextStyle? textStyle;
 
   /// Creates a new title widget instance.
-  const TitleWidget({
+  const TitleText({
     super.key,
     this.text = App.appName,
     this.textAlign,

@@ -4,23 +4,23 @@ import 'package:open_authenticator/model/totp/decrypted.dart';
 import 'package:open_authenticator/widgets/totp/time_based.dart';
 
 /// Displays a TOTP code.
-class TotpCodeWidget extends TimeBasedTotpWidget {
+class TotpCode extends TimeBasedTotpWidget {
   /// The text style.
   final TextStyle? textStyle;
 
   /// Creates a new TOTP code widget instance.
-  const TotpCodeWidget({
+  const TotpCode({
     super.key,
     required super.totp,
     this.textStyle,
   });
 
   @override
-  State<TimeBasedTotpWidget> createState() => _TotpCodeWidgetState();
+  State<TimeBasedTotpWidget> createState() => _TotpCodeState();
 }
 
 /// The TOTP code widget state.
-class _TotpCodeWidgetState extends TimeBasedTotpWidgetState<TotpCodeWidget> {
+class _TotpCodeState extends TimeBasedTotpWidgetState<TotpCode> {
   /// The current code.
   late String code = currentTimeCode;
 

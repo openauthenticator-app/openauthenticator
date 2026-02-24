@@ -51,37 +51,29 @@ class ToggleFlashlightButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) => ValueListenableBuilder(
     valueListenable: controller,
-    builder: (context, state, child) {
-      if (!state.isInitialized || !state.isRunning) {
-        return const SizedBox.shrink();
-      }
-
-      switch (state.torchState) {
-        case TorchState.auto:
-          return ClickableButton.icon(
-            variant: .secondary,
-            onPress: controller.toggleTorch,
-            child: const Icon(FIcons.sparkles),
-          );
-        case TorchState.off:
-          return ClickableButton.icon(
-            variant: .secondary,
-            onPress: controller.toggleTorch,
-            child: const Icon(FIcons.zapOff),
-          );
-        case TorchState.on:
-          return ClickableButton.icon(
-            variant: .secondary,
-            onPress: controller.toggleTorch,
-            child: const Icon(FIcons.zap),
-          );
-        case TorchState.unavailable:
-          return ClickableButton.icon(
-            variant: .secondary,
-            onPress: null,
-            child: const Icon(Icons.flash_off),
-          );
-      }
-    },
+    builder: (context, state, child) => state.isInitialized && state.isRunning
+        ? switch (state.torchState) {
+            TorchState.auto => ClickableButton.icon(
+              variant: .secondary,
+              onPress: controller.toggleTorch,
+              child: const Icon(FIcons.sparkles),
+            ),
+            TorchState.off => ClickableButton.icon(
+              variant: .secondary,
+              onPress: controller.toggleTorch,
+              child: const Icon(FIcons.zapOff),
+            ),
+            TorchState.on => ClickableButton.icon(
+              variant: .secondary,
+              onPress: controller.toggleTorch,
+              child: const Icon(FIcons.zap),
+            ),
+            TorchState.unavailable => ClickableButton.icon(
+              variant: .secondary,
+              onPress: null,
+              child: const Icon(Icons.flash_off),
+            ),
+          }
+        : const SizedBox.shrink(),
   );
 }

@@ -1,47 +1,38 @@
 import 'package:flutter/material.dart';
 
 /// Huge thanks to `smooth_highlight` library for this.
-class SmoothHighlight extends StatefulWidget {
-  /// Highlight target widget.
+class SmoothScale extends StatefulWidget {
+  /// Scale target widget.
   /// If child has no size, nothing happens.
   final Widget child;
 
-  /// The highlight color.
-  /// If [enabled] is false, this color is not used.
-  final Color color;
-
-  /// Whether this highlight is enabled.
-  /// If false, the child does not be highlight at all. default to true.
-  /// Ex. `enabled: count % 2 ==0` means that highlight if count is only even.
+  /// Whether the scale is enabled.
+  /// If false, the child does not scale at all. default to true.
+  /// Ex. `enabled: count % 2 ==0` means that scale if count is only even.
   final bool enabled;
 
-  /// Whether this highlight works also in initState phase.
-  /// If true, the highlight will be applied to the child in initState phase. default to false.
-  final bool useInitialHighLight;
+  /// Whether this scale works also in initState phase.
+  /// If true, the scale will be applied to the child in initState phase. default to false.
+  final bool useInitialScale;
 
-  /// The padding of the highlight.
-  final EdgeInsets padding;
+  /// Triggered when the animation has been finished.
+  final VoidCallback? onAnimationFinished;
 
-  /// Triggered when the highlight has been finished.
-  final VoidCallback? onHighlightFinished;
-
-  /// Creates a new smooth highlight widget instance.
-  const SmoothHighlight({
+  /// Creates a new smooth scale widget instance.
+  const SmoothScale({
     super.key,
     required this.child,
-    required this.color,
     this.enabled = true,
-    this.useInitialHighLight = false,
-    this.padding = EdgeInsets.zero,
-    this.onHighlightFinished,
+    this.useInitialScale = false,
+    this.onAnimationFinished,
   });
 
   @override
-  State<SmoothHighlight> createState() => _SmoothHighlightState();
+  State<SmoothScale> createState() => _SmoothScaleState();
 }
 
 /// The smooth highlight wiget state.
-class _SmoothHighlightState extends State<SmoothHighlight> with SingleTickerProviderStateMixin {
+class _SmoothScaleState extends State<SmoothScale> with SingleTickerProviderStateMixin {
   /// Whether the widget has been disposed.
   bool disposed = false;
 
@@ -52,23 +43,21 @@ class _SmoothHighlightState extends State<SmoothHighlight> with SingleTickerProv
   );
 
   /// The animation.
-  late final Animation<Decoration> animation = animationController
+  late final Animation<double> animation = animationController
       .drive(
         CurveTween(curve: Curves.easeInOut),
       )
       .drive(
-        DecorationTween(
-          begin: const BoxDecoration(),
-          end: BoxDecoration(
-            color: widget.color,
-          ),
+        Tween<double>(
+          begin: 1,
+          end: 1.03,
         ),
       );
 
   @override
   void initState() {
     super.initState();
-    if (widget.useInitialHighLight) {
+    if (widget.useInitialScale) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         animationController.forward();
       });
@@ -77,7 +66,7 @@ class _SmoothHighlightState extends State<SmoothHighlight> with SingleTickerProv
       switch (status) {
         case AnimationStatus.dismissed:
           if (mounted) {
-            widget.onHighlightFinished?.call();
+            widget.onAnimationFinished?.call();
           }
           break;
         case AnimationStatus.completed:
@@ -95,7 +84,7 @@ class _SmoothHighlightState extends State<SmoothHighlight> with SingleTickerProv
   }
 
   @override
-  void didUpdateWidget(covariant SmoothHighlight oldWidget) {
+  void didUpdateWidget(covariant SmoothScale oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.enabled) {
       animationController.forward();
@@ -110,16 +99,10 @@ class _SmoothHighlightState extends State<SmoothHighlight> with SingleTickerProv
   }
 
   @override
-  Widget build(BuildContext context) {
-    Widget child = Padding(
-      padding: widget.padding,
-      child: widget.child,
-    );
-    return widget.enabled
-        ? DecoratedBoxTransition(
-            decoration: animation,
-            child: child,
-          )
-        : child;
-  }
+  Widget build(BuildContext context) => widget.enabled
+      ? ScaleTransition(
+          scale: animation,
+          child: widget.child,
+        )
+      : widget.child;
 }

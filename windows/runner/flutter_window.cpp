@@ -14,74 +14,6 @@
 #include "include/firebase/app/function_registry.h"
 #include "include/firebase/app/reference_counted_future_impl.h"
 
-void PlatformAppCheckProvider::GetToken(std::function<void(firebase::app_check::AppCheckToken, int, const std::string&)> completion_callback) {
-  if (!FlutterWindow::instance || !FlutterWindow::instance->method_channel_app_check) {
-    completion_callback({}, -2, "Instance cannot be found.");
-    return;
-  }
-
-  std::string publisher = GetPublisher();
-  auto arguments = std::make_unique<flutter::EncodableValue>(flutter::EncodableMap{
-    {flutter::EncodableValue("publisher"), flutter::EncodableValue(publisher)},
-  });
-  auto result_handler = std::make_unique<flutter::MethodResultFunctions<>>(
-    [completion_callback](const flutter::EncodableValue* value) {
-      auto token = std::get<flutter::EncodableMap>(*value);
-      completion_callback(
-        firebase::app_check::AppCheckToken{
-          std::get<std::string>(token["token"]),
-          std::get<std::int32_t>(token["ttl"])
-        },
-        0,
-        ""
-      );
-    },
-    [completion_callback](const std::string& error_code, const std::string& error_message, const void* error_details) {
-      completion_callback({}, -1, error_message);
-    },
-    [completion_callback]() {
-      completion_callback({}, -3, "Method not implemented.");
-    }
-  );
-
-  FlutterWindow::instance->method_channel_app_check->InvokeMethod("appCheck.requestToken", std::move(arguments), std::move(result_handler));
-}
-
-std::string PlatformAppCheckProvider::GetPublisher() {
-  UINT32 length = 0;
-  if (GetCurrentPackageId(&length, nullptr) == ERROR_INSUFFICIENT_BUFFER) {
-    std::vector<BYTE> buffer(length);
-    const auto packageId = reinterpret_cast<PACKAGE_ID*>(buffer.data());
-    if (GetCurrentPackageId(&length, reinterpret_cast<BYTE*>(packageId)) == ERROR_SUCCESS && packageId->publisher != nullptr) {
-      const std::wstring publisher(packageId->publisher);
-      if (publisher.empty()) {
-        return "";
-      }
-
-      const auto sizeNeeded = WideCharToMultiByte(CP_UTF8, 0, &publisher.at(0), static_cast<int>(publisher.size()), nullptr, 0, nullptr, nullptr);
-      if (sizeNeeded <= 0) {
-        throw std::runtime_error("WideCharToMultiByte() failed: " + std::to_string(sizeNeeded));
-      }
-
-      std::string result(sizeNeeded, 0);
-      WideCharToMultiByte(CP_UTF8, 0, &publisher.at(0), static_cast<int>(publisher.size()), &result.at(0), sizeNeeded, nullptr, nullptr);
-      return result;
-    }
-  }
-
-  return "";
-}
-
-PlatformAppCheckProviderFactory* PlatformAppCheckProviderFactory::GetInstance() {
-  static PlatformAppCheckProviderFactory app_check_provider_factory;
-  return &app_check_provider_factory;
-}
-
-firebase::app_check::AppCheckProvider* PlatformAppCheckProviderFactory::CreateProvider(firebase::App* app) {
-  // Create and return a PlatformAppCheckProvider object.
-  return new PlatformAppCheckProvider();
-}
-
 FlutterWindow* FlutterWindow::GetInstance(const flutter::DartProject& project) {
   if (!instance) {
     instance = new FlutterWindow(project);
@@ -146,25 +78,6 @@ bool FlutterWindow::OnCreate() {
     }
   });
 
-  method_channel_app_check = std::make_unique<flutter::MethodChannel<>>(flutter_controller_->engine()->messenger(), "app.openauthenticator.appcheck", &flutter::StandardMethodCodec::GetInstance());
-  method_channel_app_check->SetMethodCallHandler([this](const flutter::MethodCall<>& call, std::unique_ptr<flutter::MethodResult<>> result) {
-    if (call.method_name() == "appCheck.activate") {
-      const auto* arguments = std::get_if<flutter::EncodableMap>(call.arguments());
-      auto debugTokenValue = arguments->find(flutter::EncodableValue("debugToken"));
-      if (debugTokenValue != arguments->end()) {
-        std::string debugToken = std::get<std::string>(debugTokenValue->second);
-        firebase::app_check::DebugAppCheckProviderFactory::GetInstance()
-          ->SetDebugToken(debugToken);
-        firebase::app_check::AppCheck::SetAppCheckProviderFactory(firebase::app_check::DebugAppCheckProviderFactory::GetInstance());
-      } else {
-        firebase::app_check::AppCheck::SetAppCheckProviderFactory(PlatformAppCheckProviderFactory::GetInstance());
-      }
-      result->Success(true);
-    } else {
-      result->NotImplemented();
-    }
-  });
-
   SetChildContent(flutter_controller_->view()->GetNativeWindow());
 
   flutter_controller_->engine()->SetNextFrameCallback([&]() {
@@ -183,10 +96,6 @@ void FlutterWindow::OnDestroy() {
   if (method_channel_auth) {
     method_channel_auth->SetMethodCallHandler(nullptr);
     method_channel_auth = nullptr;
-  }
-  if (method_channel_app_check) {
-    method_channel_app_check->SetMethodCallHandler(nullptr);
-    method_channel_app_check = nullptr;
   }
   if (flutter_controller_) {
     flutter_controller_ = nullptr;

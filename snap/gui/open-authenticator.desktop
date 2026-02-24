@@ -6,3 +6,4 @@ Icon=${SNAP}/meta/gui/icon.svg
 Terminal=false
 Type=Application
 Categories=Utility;Security;
+MimeType=x-scheme-handler/openauthenticator;x-scheme-handler/otpauth;x-scheme-handler/rc-653ef11675;

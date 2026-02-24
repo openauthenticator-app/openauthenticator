@@ -5,6 +5,7 @@ import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/purchases/clients/client.dart';
 import 'package:open_authenticator/model/purchases/contributor_plan.dart';
 import 'package:open_authenticator/utils/contributor_plan.dart';
+import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
 import 'package:open_authenticator/widgets/dialog/error_dialog.dart';
@@ -22,13 +23,18 @@ class ContributorPlanEntryWidget extends ConsumerWidget with FTileMixin {
   Widget build(BuildContext context, WidgetRef ref) {
     AsyncValue<ContributorPlanState> state = ref.watch(contributorPlanStateProvider);
     switch (state) {
-      case AsyncData(:ContributorPlanState value):
+      case AsyncData(:final value):
         switch (value) {
           case ContributorPlanState.impossible:
-            return const SizedBox.shrink();
-          case ContributorPlanState.inactive:
             return ClickableTile(
               prefix: const Icon(FIcons.userX),
+              title: Text(translations.settings.application.contributorPlan.title),
+              subtitle: Text(translations.settings.application.contributorPlan.subtitle.inactive),
+              enabled: false,
+            );
+          case ContributorPlanState.inactive:
+            return ClickableTile(
+              prefix: const Icon(FIcons.userLock),
               title: Text(translations.settings.application.contributorPlan.title),
               subtitle: Text(translations.settings.application.contributorPlan.subtitle.inactive),
               onPress: () => ContributorPlanUtils.purchase(context),
@@ -64,12 +70,12 @@ class ContributorPlanEntryWidget extends ConsumerWidget with FTileMixin {
                           );
                         }
                       },
-                      child: Text(translations.settings.application.contributorPlan.subscriptionDialog.manageSubscription.button),
+                      child: ButtonText(translations.settings.application.contributorPlan.subscriptionDialog.manageSubscription.button),
                     ),
                     ClickableButton(
                       variant: .secondary,
                       onPress: () => Navigator.pop(context),
-                      child: Text(MaterialLocalizations.of(context).closeButtonLabel),
+                      child: ButtonText(MaterialLocalizations.of(context).closeButtonLabel),
                     ),
                   ],
                   children: [

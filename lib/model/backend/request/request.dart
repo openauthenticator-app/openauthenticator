@@ -6,17 +6,24 @@ import 'package:open_authenticator/model/backend/request/error.dart';
 import 'package:open_authenticator/model/backend/request/response.dart';
 import 'package:open_authenticator/model/backend/synchronization/push/operation.dart';
 
+/// Represents a backend request.
 sealed class BackendRequest<T extends BackendResponse> {
+  /// The route.
   final String route;
+
+  /// Whether the request needs authorization.
   final bool needsAuthorization;
 
+  /// Creates a new backend request instance.
   const BackendRequest({
     required this.route,
     this.needsAuthorization = false,
   });
 
+  /// Executes the request.
   Future<http.Response> execute(http.Client client, Uri url, {Map<String, String>? headers});
 
+  /// Converts the response to a backend response.
   T toResponse(http.Response response) {
     Map<String, dynamic> json = jsonDecode(response.body);
     if (!json['success']) {
@@ -30,16 +37,22 @@ sealed class BackendRequest<T extends BackendResponse> {
     return _toResponseIfNoError(json['data']);
   }
 
+  /// Converts the response to a backend response.
   T _toResponseIfNoError(dynamic data);
 }
 
+/// Represents a backend request with a body.
 mixin BackendWithBodyRequest<T extends BackendResponse> on BackendRequest<T> {
+  /// The body.
   Object? get body => null;
 
+  /// The encoding.
   Encoding? get encoding => null;
 }
 
+/// Represents a backend GET request.
 abstract class BackendGetRequest<T extends BackendResponse> extends BackendRequest<T> {
+  /// Creates a new backend GET request instance.
   const BackendGetRequest({
     required super.route,
     super.needsAuthorization,
@@ -52,7 +65,9 @@ abstract class BackendGetRequest<T extends BackendResponse> extends BackendReque
   );
 }
 
+/// Represents a backend POST request.
 abstract class BackendPostRequest<T extends BackendResponse> extends BackendRequest<T> with BackendWithBodyRequest<T> {
+  /// Creates a new backend POST request instance.
   const BackendPostRequest({
     required super.route,
     super.needsAuthorization,
@@ -70,7 +85,9 @@ abstract class BackendPostRequest<T extends BackendResponse> extends BackendRequ
   );
 }
 
+/// Represents a backend DELETE request.
 abstract class BackendDeleteRequest<T extends BackendResponse> extends BackendRequest<T> with BackendWithBodyRequest<T> {
+  /// Creates a new backend DELETE request instance.
   const BackendDeleteRequest({
     required super.route,
     super.needsAuthorization,
@@ -88,7 +105,9 @@ abstract class BackendDeleteRequest<T extends BackendResponse> extends BackendRe
   );
 }
 
+/// A request that allows to get the user info.
 class GetUserInfoRequest extends BackendGetRequest<GetUserInfoResponse> {
+  /// Creates a new get user info request instance.
   const GetUserInfoRequest()
     : super(
         route: '/user',
@@ -99,7 +118,9 @@ class GetUserInfoRequest extends BackendGetRequest<GetUserInfoResponse> {
   GetUserInfoResponse _toResponseIfNoError(dynamic data) => GetUserInfoResponse.fromJson(data);
 }
 
+/// A request that allows to delete the user.
 class DeleteUserRequest extends BackendDeleteRequest<DeleteUserResponse> {
+  /// Creates a new delete user request instance.
   const DeleteUserRequest()
     : super(
         route: '/user',
@@ -110,7 +131,9 @@ class DeleteUserRequest extends BackendDeleteRequest<DeleteUserResponse> {
   DeleteUserResponse _toResponseIfNoError(dynamic data) => DeleteUserResponse.fromJson(data);
 }
 
+/// A request that allows to get the user totps.
 class GetUserTotpsRequest extends BackendGetRequest<GetUserTotpsResponse> {
+  /// Creates a new get user totps request instance.
   const GetUserTotpsRequest()
     : super(
         route: '/totps',
@@ -121,10 +144,13 @@ class GetUserTotpsRequest extends BackendGetRequest<GetUserTotpsResponse> {
   GetUserTotpsResponse _toResponseIfNoError(dynamic data) => GetUserTotpsResponse.fromJson(data);
 }
 
-class RefreshTokenRequest extends BackendPostRequest<RefreshTokenResponse> {
+/// A request that allows refresh the session.
+class RefreshSessionRequest extends BackendPostRequest<RefreshSessionResponse> {
+  /// The refresh token.
   final String refreshToken;
 
-  RefreshTokenRequest({
+  /// Creates a new refresh session request instance.
+  const RefreshSessionRequest({
     required this.refreshToken,
   }) : super(
          route: '/auth/refresh',
@@ -135,13 +161,16 @@ class RefreshTokenRequest extends BackendPostRequest<RefreshTokenResponse> {
   Object? get body => {'refreshToken': refreshToken};
 
   @override
-  RefreshTokenResponse _toResponseIfNoError(dynamic data) => RefreshTokenResponse.fromJson(data);
+  RefreshSessionResponse _toResponseIfNoError(dynamic data) => RefreshSessionResponse.fromJson(data);
 }
 
+/// A request that allows to logout the user.
 class UserLogoutRequest extends BackendPostRequest<UserLogoutResponse> {
+  /// The refresh token.
   final String refreshToken;
 
-  UserLogoutRequest({
+  /// Creates a new user logout request instance.
+  const UserLogoutRequest({
     required this.refreshToken,
   }) : super(
          route: '/auth/logout',
@@ -155,11 +184,16 @@ class UserLogoutRequest extends BackendPostRequest<UserLogoutResponse> {
   UserLogoutResponse _toResponseIfNoError(dynamic data) => UserLogoutResponse.fromJson(data);
 }
 
+/// A request that allows to confirm an email address.
 class EmailConfirmRequest extends BackendPostRequest<EmailConfirmResponse> {
+  /// The email.
   final String email;
+
+  /// The code.
   final String code;
 
-  EmailConfirmRequest({
+  /// Creates a new email confirm request instance.
+  const EmailConfirmRequest({
     required this.email,
     required this.code,
   }) : super(
@@ -177,11 +211,16 @@ class EmailConfirmRequest extends BackendPostRequest<EmailConfirmResponse> {
   EmailConfirmResponse _toResponseIfNoError(dynamic data) => EmailConfirmResponse.fromJson(data);
 }
 
-class EmailCancelRequest extends BackendPostRequest<EmailCancelResponse> {
+/// A request that allows to cancel an email address confirmation.
+class EmailConfirmationCancelRequest extends BackendPostRequest<EmailConfirmationCancelResponse> {
+  /// The email.
   final String email;
+
+  /// The cancel code.
   final String cancelCode;
 
-  EmailCancelRequest({
+  /// Creates a new email confirmation cancel request instance.
+  const EmailConfirmationCancelRequest({
     required this.email,
     required this.cancelCode,
   }) : super(
@@ -196,13 +235,18 @@ class EmailCancelRequest extends BackendPostRequest<EmailCancelResponse> {
   };
 
   @override
-  EmailCancelResponse _toResponseIfNoError(dynamic data) => EmailCancelResponse.fromJson(data);
+  EmailConfirmationCancelResponse _toResponseIfNoError(dynamic data) => EmailConfirmationCancelResponse.fromJson(data);
 }
 
+/// A request that allows to login with a provider.
 class ProviderLoginRequest extends BackendPostRequest<ProviderLoginResponse> {
+  /// The authorization code.
   final String authorizationCode;
+
+  /// The code verifier.
   final String? codeVerifier;
 
+  /// Creates a new provider login request instance.
   ProviderLoginRequest({
     required AuthenticationProvider provider,
     required this.authorizationCode,
@@ -221,10 +265,15 @@ class ProviderLoginRequest extends BackendPostRequest<ProviderLoginResponse> {
   ProviderLoginResponse _toResponseIfNoError(dynamic data) => ProviderLoginResponse.fromJson(data);
 }
 
+/// A request that allows to link a provider.
 class ProviderLinkRequest extends BackendPostRequest<ProviderLinkResponse> {
+  /// The authorization code.
   final String authorizationCode;
+
+  /// The code verifier.
   final String? codeVerifier;
 
+  /// Creates a new provider link request instance.
   ProviderLinkRequest({
     required AuthenticationProvider provider,
     required this.authorizationCode,
@@ -244,7 +293,9 @@ class ProviderLinkRequest extends BackendPostRequest<ProviderLinkResponse> {
   ProviderLinkResponse _toResponseIfNoError(dynamic data) => ProviderLinkResponse.fromJson(data);
 }
 
+/// A request that allows to unlink a provider.
 class ProviderUnlinkRequest extends BackendPostRequest<ProviderUnlinkResponse> {
+  /// Creates a new provider unlink request instance.
   ProviderUnlinkRequest({
     required AuthenticationProvider provider,
   }) : super(
@@ -256,9 +307,12 @@ class ProviderUnlinkRequest extends BackendPostRequest<ProviderUnlinkResponse> {
   ProviderUnlinkResponse _toResponseIfNoError(dynamic data) => ProviderUnlinkResponse.fromJson(data);
 }
 
+/// A request that allows to push operations.
 class SynchronizationPushRequest extends BackendPostRequest<SynchronizationPushResponse> {
+  /// The operations.
   final List<PushOperation> operations;
 
+  /// Creates a new synchronization push request instance.
   const SynchronizationPushRequest({
     this.operations = const [],
   }) : super(
@@ -275,9 +329,12 @@ class SynchronizationPushRequest extends BackendPostRequest<SynchronizationPushR
   SynchronizationPushResponse _toResponseIfNoError(dynamic data) => SynchronizationPushResponse.fromJson(data);
 }
 
+/// A request that allows to pull TOTPs.
 class SynchronizationPullRequest extends BackendPostRequest<SynchronizationPullResponse> {
+  /// The timestamps.
   final Map<String, DateTime> timestamps;
 
+  /// Creates a new synchronization pull request instance.
   const SynchronizationPullRequest({
     this.timestamps = const {},
   }) : super(

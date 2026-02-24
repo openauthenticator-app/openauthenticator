@@ -7,7 +7,7 @@ import 'package:open_authenticator/utils/jovial_svg.dart';
 import 'package:open_authenticator/utils/utils.dart';
 
 /// Displays a classic image or a vector image.
-class SmartImageWidget extends StatelessWidget {
+class SmartImage extends StatelessWidget {
   /// The image key.
   /// Useful when [imageCache] should not be taken into account.
   final Key? imageKey;
@@ -34,7 +34,7 @@ class SmartImageWidget extends StatelessWidget {
   final Duration? fadeInDuration;
 
   /// Creates a new smart image widget instance.
-  SmartImageWidget({
+  SmartImage({
     super.key,
     this.imageKey,
     required this.source,

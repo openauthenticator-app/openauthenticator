@@ -31,7 +31,7 @@ class _TotpsListWidget extends ConsumerWidget {
     return totps.isEmpty
         ? Center(
             child: SingleChildScrollView(
-              child: ImageTextButtonsWidget.asset(
+              child: ImageTextActions.asset(
                 asset: 'assets/images/home.si',
                 text: translations.home.empty,
               ),
@@ -46,7 +46,7 @@ class _TotpsListWidget extends ConsumerWidget {
               physics: const AlwaysScrollableScrollPhysics(),
               itemBuilder: (context, position) {
                 Totp totp = totps[position];
-                Widget totpWidget = TotpWidget.adaptive(
+                Widget totpWidget = TotpTile.adaptive(
                   key: ValueKey(totp.uuid),
                   totp: totp,
                   displayCode: isUnlocked,
@@ -57,11 +57,9 @@ class _TotpsListWidget extends ConsumerWidget {
                   onCopyPress: (displayCopyButton && !currentPlatform.isDesktop) && totp.isDecrypted ? (() => copyCode(context, totp as DecryptedTotp)) : null,
                 );
                 return position == emphasisIndex
-                    ? SmoothHighlight(
-                        // TODO: Doesn't work
-                        color: context.theme.colors.secondary,
-                        useInitialHighLight: true,
-                        onHighlightFinished: onHighlightFinished,
+                    ? SmoothScale(
+                        useInitialScale: true,
+                        onAnimationFinished: onHighlightFinished,
                         child: totpWidget,
                       )
                     : totpWidget;

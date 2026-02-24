@@ -15,10 +15,13 @@ import 'package:open_authenticator/model/totp/repository.dart';
 import 'package:open_authenticator/model/totp/totp.dart';
 import 'package:open_authenticator/utils/result.dart';
 
-final pushOperationsErrorsProvider = StreamProvider<List<PushOperationResult>>((ref) => ref.watch(appDatabaseProvider).watchBackendPushOperationErrors());
+/// The push operations errors provider.
+final pushOperationsErrorsProvider = StreamProvider<List<PushOperationError>>((ref) => ref.watch(appDatabaseProvider).watchBackendPushOperationErrors());
 
+/// The push operations queue provider.
 final pushOperationsQueueProvider = AsyncNotifierProvider<PushOperationsQueue, List<PushOperation>>(PushOperationsQueue.new);
 
+/// Allows to manage the push operations queue.
 class PushOperationsQueue extends AsyncNotifier<List<PushOperation>> {
   @override
   Future<List<PushOperation>> build() async {
@@ -29,9 +32,9 @@ class PushOperationsQueue extends AsyncNotifier<List<PushOperation>> {
     return await database.listPendingBackendPushOperations();
   }
 
+  /// Enqueues a push operation.
   Future<void> enqueue(
     PushOperation operation, {
-    bool checkSettings = true,
     bool andRun = true,
   }) async {
     AppDatabase database = ref.read(appDatabaseProvider);
@@ -41,6 +44,7 @@ class PushOperationsQueue extends AsyncNotifier<List<PushOperation>> {
     }
   }
 
+  /// Pushes the pending operations.
   Future<Result> _push({bool checkSettings = true}) async {
     if (checkSettings) {
       StorageType storageType = await ref.read(storageTypeSettingsEntryProvider.future);
@@ -60,7 +64,7 @@ class PushOperationsQueue extends AsyncNotifier<List<PushOperation>> {
     }
 
     Result<SynchronizationPushResponse> result = await ref
-        .read(backendProvider.notifier)
+        .read(backendClientProvider.notifier)
         .sendHttpRequest(
           SynchronizationPushRequest(
             operations: compactedOperations,
@@ -74,43 +78,7 @@ class PushOperationsQueue extends AsyncNotifier<List<PushOperation>> {
     return const ResultSuccess();
   }
 
-  Future<Result> _pull({bool checkSettings = true}) async {
-    if (checkSettings) {
-      StorageType storageType = await ref.read(storageTypeSettingsEntryProvider.future);
-      if (storageType == StorageType.localOnly) {
-        return const ResultCancelled();
-      }
-    }
-    List<Totp> totps = await ref.read(totpRepositoryProvider.future);
-    Result<SynchronizationPullResponse> result = await ref
-        .read(backendProvider.notifier)
-        .sendHttpRequest(
-          SynchronizationPullRequest(
-            timestamps: {
-              for (Totp totp in totps) totp.uuid: totp.updatedAt,
-            },
-          ),
-        );
-    if (result is! ResultSuccess<SynchronizationPullResponse>) {
-      return result;
-    }
-
-    TotpRepository repository = ref.read(totpRepositoryProvider.notifier);
-    await repository.addTotps(
-      result.value.inserts,
-      fromNetwork: true,
-    );
-    await repository.updateTotps(
-      result.value.updates,
-      fromNetwork: true,
-    );
-    await repository.deleteTotps(
-      result.value.deletes,
-      fromNetwork: true,
-    );
-    return const ResultSuccess();
-  }
-
+  /// Compacts the push operations list.
   List<PushOperation> _compact(List<PushOperation> operations) {
     if (operations.isEmpty) {
       return [];
@@ -120,9 +88,8 @@ class PushOperationsQueue extends AsyncNotifier<List<PushOperation>> {
     List<PushOperation> result = [];
 
     for (PushOperation operation in operations.reversed) {
-      switch (operation.kind) {
-        case PushOperationKind.set:
-          Map<String, dynamic> payload = operation.payload as Map<String, dynamic>;
+      switch (operation) {
+        case SetTotpsPushOperation(:final payload):
           Map<String, dynamic> newPayload = {
             for (MapEntry<String, dynamic> entry in payload.entries)
               if (processedTotpUuids.add(entry.key)) entry.key: entry.value,
@@ -131,8 +98,7 @@ class PushOperationsQueue extends AsyncNotifier<List<PushOperation>> {
             result.add(operation.copyWith(payload: newPayload));
           }
           break;
-        case PushOperationKind.delete:
-          List<String> payload = operation.payload as List<String>;
+        case DeleteTotpsPushOperation(:final payload):
           List<String> newPayload = payload.where((uuid) => processedTotpUuids.add(uuid)).toList();
           if (newPayload.isNotEmpty) {
             result.add(operation.copyWith(payload: newPayload));
@@ -144,21 +110,28 @@ class PushOperationsQueue extends AsyncNotifier<List<PushOperation>> {
     return result.reversed.toList();
   }
 
-  void _onDatabaseUpdate(List<PushOperation> operations) {
-    state = AsyncData(operations);
-  }
+  /// Triggered when the database updates.
+  void _onDatabaseUpdate(List<PushOperation> operations) => state = AsyncData(operations);
 }
 
+/// The synchronization controller provider.
 final synchronizationControllerProvider = NotifierProvider<SynchronizationController, SynchronizationStatus>(SynchronizationController.new);
 
+/// Allows to control the synchronization process.
 class SynchronizationController extends Notifier<SynchronizationStatus> {
+  /// The synchronization periodic interval.
   static const Duration _kPeriodicInterval = Duration(minutes: 10);
 
+  /// The synchronization coalesce delay.
   static const Duration _kCoalesceDelay = Duration(milliseconds: 300);
 
+  /// A [Random] instance.
   final Random _random = Random();
 
+  /// The current coalesce timer.
   Timer? _coalesceTimer;
+
+  /// The current retry timer.
   Timer? _retryTimer;
 
   @override
@@ -189,6 +162,7 @@ class SynchronizationController extends Notifier<SynchronizationStatus> {
   //   }
   // }
 
+  /// Disposes the controller.
   void _dispose() {
     // WidgetsBinding.instance.removeObserver(this);
 
@@ -199,7 +173,8 @@ class SynchronizationController extends Notifier<SynchronizationStatus> {
     _retryTimer = null;
   }
 
-  void notifyLocalChange() {
+  /// Notifies the local change.
+  void notifyLocalChange({bool checkSettings = true}) {
     if (_retryTimer != null) {
       return;
     }
@@ -209,20 +184,22 @@ class SynchronizationController extends Notifier<SynchronizationStatus> {
       _kCoalesceDelay,
       () {
         _coalesceTimer = null;
-        _run();
+        _run(checkSettings: checkSettings);
       },
     );
   }
 
-  Future<void> forceSync() async {
+  /// Forces a synchronization.
+  Future<void> forceSync({bool checkSettings = true}) async {
     _retryTimer?.cancel();
     _retryTimer = null;
     _coalesceTimer?.cancel();
     _coalesceTimer = null;
-    await _run();
+    await _run(checkSettings: checkSettings);
   }
 
-  Future<void> _run() async {
+  /// Runs the synchronization.
+  Future<void> _run({bool checkSettings = true}) async {
     bool retry = true;
     try {
       if (state.phase is SynchronizationPhaseSyncing) {
@@ -243,7 +220,7 @@ class SynchronizationController extends Notifier<SynchronizationStatus> {
           phase: const SynchronizationPhaseUpToDate(),
           retryAttempt: retry ? state.retryAttempt : 0,
         );
-        Result pushResult = await ref.read(pushOperationsQueueProvider.notifier)._push();
+        Result pushResult = await ref.read(pushOperationsQueueProvider.notifier)._push(checkSettings: checkSettings);
         if (pushResult is! ResultSuccess) {
           if (pushResult is ResultCancelled) {
             onFinish(retry: false);
@@ -252,7 +229,7 @@ class SynchronizationController extends Notifier<SynchronizationStatus> {
             Error.throwWithStackTrace(error.$1, error.$2);
           }
         } else {
-          Result pullResult = await ref.read(pushOperationsQueueProvider.notifier)._pull();
+          Result pullResult = await _pull(checkSettings: checkSettings);
           if (pullResult is! ResultSuccess) {
             if (pullResult is ResultCancelled) {
               onFinish(retry: false);
@@ -288,6 +265,7 @@ class SynchronizationController extends Notifier<SynchronizationStatus> {
     }
   }
 
+  /// Schedules a retry.
   void _scheduleRetry() {
     int jitterMs = _random.nextInt(250);
 
@@ -302,5 +280,43 @@ class SynchronizationController extends Notifier<SynchronizationStatus> {
         _run();
       },
     );
+  }
+
+  /// Pulls changes from the backend.
+  Future<Result> _pull({bool checkSettings = true}) async {
+    if (checkSettings) {
+      StorageType storageType = await ref.read(storageTypeSettingsEntryProvider.future);
+      if (storageType == StorageType.localOnly) {
+        return const ResultCancelled();
+      }
+    }
+    List<Totp> totps = await ref.read(totpRepositoryProvider.future);
+    Result<SynchronizationPullResponse> result = await ref
+        .read(backendClientProvider.notifier)
+        .sendHttpRequest(
+          SynchronizationPullRequest(
+            timestamps: {
+              for (Totp totp in totps) totp.uuid: totp.updatedAt,
+            },
+          ),
+        );
+    if (result is! ResultSuccess<SynchronizationPullResponse>) {
+      return result;
+    }
+
+    TotpRepository repository = ref.read(totpRepositoryProvider.notifier);
+    await repository.addTotps(
+      result.value.inserts,
+      fromNetwork: true,
+    );
+    await repository.updateTotps(
+      result.value.updates,
+      fromNetwork: true,
+    );
+    await repository.deleteTotps(
+      result.value.deletes,
+      fromNetwork: true,
+    );
+    return const ResultSuccess();
   }
 }

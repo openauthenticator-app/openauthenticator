@@ -6,6 +6,7 @@ import 'package:open_authenticator/model/backend/authentication/providers/provid
 import 'package:open_authenticator/utils/brightness_listener.dart';
 import 'package:open_authenticator/utils/result.dart';
 import 'package:open_authenticator/widgets/authentication_provider_image.dart';
+import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
 import 'package:open_authenticator/widgets/dialog/text_input_dialog.dart';
@@ -62,7 +63,7 @@ class AuthenticationProviderPickerDialog extends ConsumerWidget {
         ClickableButton(
           variant: .secondary,
           onPress: () => Navigator.pop(context),
-          child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+          child: ButtonText(MaterialLocalizations.of(context).cancelButtonLabel),
         ),
       ],
       children: [

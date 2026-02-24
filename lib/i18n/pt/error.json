@@ -1,5 +1,9 @@
 {
-  "noError": "Sucesso!",
+  "noError": "Operação realizada com sucesso.",
+  "errorDialog": {
+    "title": "Erro",
+    "retryButton": "Tentar novamente"
+  },
   "validation": {
     "number": "Você deve inserir um número válido",
     "empty": "Este campo é obrigatório",
@@ -27,5 +31,6 @@
     "encryptionKeyChangeFailed": "Ocorreu um erro ao criptografar seus dados. Tente novamente mais tarde.",
     "genericError": "Ocorreu um erro ao migrar seus dados. Tente novamente mais tarde."
   },
-  "totpDecrypt": "Falha ao descriptografar este TOTP. Certifique-se de que inseriu a senha correta."
+  "totpDecrypt": "Falha ao descriptografar este TOTP. Certifique-se de que inseriu a senha correta.",
+  "invalidCode": "Código inválido."
 }

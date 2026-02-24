@@ -11,7 +11,7 @@ import 'package:open_authenticator/widgets/smart_image.dart';
 import 'package:open_authenticator/widgets/totp/time_based.dart';
 
 /// Displays a TOTP image.
-class TotpImageWidget extends ConsumerWidget {
+class TotpImage extends ConsumerWidget {
   /// The TOTP UUID.
   final String? uuid;
 
@@ -28,7 +28,7 @@ class TotpImageWidget extends ConsumerWidget {
   final double size;
 
   /// Creates a new TOTP image widget instance.
-  const TotpImageWidget({
+  const TotpImage({
     super.key,
     this.uuid,
     this.imageUrl,
@@ -38,7 +38,7 @@ class TotpImageWidget extends ConsumerWidget {
   });
 
   /// Creates a new TOTP image widget instance from a TOTP instance.
-  TotpImageWidget.fromTotp({
+  TotpImage.fromTotp({
     Key? key,
     required Totp totp,
     double size = 100,
@@ -83,7 +83,7 @@ class TotpImageWidget extends ConsumerWidget {
           return _makeCircle(_createDefaultImage());
         }
         return _makeCircle(
-          SmartImageWidget(
+          SmartImage(
             imageKey: ValueKey('$uuid/$imageUrl'),
             source: source,
             height: size,
@@ -112,13 +112,13 @@ class TotpImageWidget extends ConsumerWidget {
             _filterColor,
             BlendMode.color,
           ),
-          child: SizedScalableImageWidget(
+          child: SizedScalableImage(
             height: size,
             width: size,
             asset: 'assets/images/logo.si',
           ),
         )
-      : SmartImageWidget(
+      : SmartImage(
           source: imageUrl!,
           height: size,
           width: size,
@@ -127,7 +127,7 @@ class TotpImageWidget extends ConsumerWidget {
 }
 
 /// Displays the TOTP image with a countdown.
-class TotpCountdownImageWidget extends StatelessWidget {
+class TotpCountdownImage extends StatelessWidget {
   /// The TOTP.
   final Totp totp;
 
@@ -138,7 +138,7 @@ class TotpCountdownImageWidget extends StatelessWidget {
   final MaterialColor progressColor;
 
   /// Creates a new TOTP countdown image widget instance.
-  const TotpCountdownImageWidget({
+  const TotpCountdownImage({
     super.key,
     required this.totp,
     this.size = 30,
@@ -151,12 +151,12 @@ class TotpCountdownImageWidget extends StatelessWidget {
     child: Stack(
       children: [
         Positioned.fill(
-          child: TotpImageWidget.fromTotp(
+          child: TotpImage.fromTotp(
             totp: totp,
           ),
         ),
         Positioned.fill(
-          child: _TotpCountdownImageWidgetCircularProgress(
+          child: _TotpCountdownImageCircularProgress(
             totp: totp,
             size: size,
             progressColor: progressColor,
@@ -168,7 +168,7 @@ class TotpCountdownImageWidget extends StatelessWidget {
 }
 
 /// Displays the TOTP image with a countdown.
-class _TotpCountdownImageWidgetCircularProgress extends TimeBasedTotpWidget {
+class _TotpCountdownImageCircularProgress extends TimeBasedTotpWidget {
   /// The circle size.
   final double size;
 
@@ -176,18 +176,18 @@ class _TotpCountdownImageWidgetCircularProgress extends TimeBasedTotpWidget {
   final MaterialColor progressColor;
 
   /// Creates a new TOTP countdown image widget instance.
-  const _TotpCountdownImageWidgetCircularProgress({
+  const _TotpCountdownImageCircularProgress({
     required super.totp,
     this.size = 30,
     this.progressColor = Colors.green,
   });
 
   @override
-  State<TimeBasedTotpWidget> createState() => _TotpCountdownImageWidgetCircularProgressState();
+  State<TimeBasedTotpWidget> createState() => _TotpCountdownImageCircularProgressState();
 }
 
 /// The TOTP countdown image widget state.
-class _TotpCountdownImageWidgetCircularProgressState extends TimeBasedTotpWidgetState<_TotpCountdownImageWidgetCircularProgress> with WidgetsBindingObserver, TickerProviderStateMixin {
+class _TotpCountdownImageCircularProgressState extends TimeBasedTotpWidgetState<_TotpCountdownImageCircularProgress> with WidgetsBindingObserver, TickerProviderStateMixin {
   /// The progress indicator color.
   late Color color = widget.progressColor.shade700;
 
@@ -223,7 +223,7 @@ class _TotpCountdownImageWidgetCircularProgressState extends TimeBasedTotpWidget
   }
 
   @override
-  void didUpdateWidget(covariant _TotpCountdownImageWidgetCircularProgress oldWidget) {
+  void didUpdateWidget(covariant _TotpCountdownImageCircularProgress oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.totp.validity != widget.totp.validity) {
       cancelAnimation();

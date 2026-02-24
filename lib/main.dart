@@ -22,14 +22,16 @@ import 'package:open_authenticator/pages/settings/page.dart';
 import 'package:open_authenticator/pages/sync_issues.dart';
 import 'package:open_authenticator/pages/totp.dart';
 import 'package:open_authenticator/themes.dart';
-import 'package:open_authenticator/utils/brightness_listener.dart';
 import 'package:open_authenticator/utils/platform.dart';
 import 'package:open_authenticator/utils/rate_my_app.dart';
 import 'package:open_authenticator/utils/result.dart';
 import 'package:open_authenticator/utils/utils.dart';
+import 'package:open_authenticator/widgets/animated_theme.dart';
 import 'package:open_authenticator/widgets/centered_circular_progress_indicator.dart';
 import 'package:open_authenticator/widgets/dialog/invalid_session_dialog.dart';
 import 'package:open_authenticator/widgets/dialog/totp_limit_dialog.dart';
+import 'package:open_authenticator/widgets/error.dart';
+import 'package:open_authenticator/widgets/migrator.dart';
 import 'package:open_authenticator/widgets/unlock_challenge.dart';
 import 'package:open_authenticator/widgets/waiting_overlay.dart';
 import 'package:open_authenticator/widgets/window_frame.dart';
@@ -109,12 +111,13 @@ class OpenAuthenticatorApp extends ConsumerWidget {
         locale: locale,
         initialRoute: value ? IntroPage.name : HomePage.name,
       ),
-      AsyncError(:final error) => _createMaterialApp(
+      AsyncError(:final error, :final stackTrace) => _createMaterialApp(
         showIntroState: 'error',
         theme: theme,
         locale: locale,
-        home: Center(
-          child: Text('Error : $error.'),
+        home: ErrorAlert(
+          error: error,
+          stackTrace: stackTrace,
         ),
       ),
       _ => _createMaterialApp(
@@ -146,11 +149,11 @@ class OpenAuthenticatorApp extends ConsumerWidget {
     themeMode: theme.value,
     darkTheme: greenTheme.dark.toApproximateMaterialTheme(),
     theme: greenTheme.light.toApproximateMaterialTheme(),
-    builder: (context, child) => _AnimatedTheme(
+    builder: (context, child) => AnimatedFTheme(
       light: greenTheme.light,
       dark: greenTheme.dark,
       child: FToaster(
-        child: WindowFrameWidget(
+        child: DesktopWindowFrame(
           child: child!,
         ),
       ),
@@ -190,29 +193,6 @@ class OpenAuthenticatorApp extends ConsumerWidget {
         : {},
     initialRoute: home == null ? initialRoute : null,
     home: home,
-  );
-}
-
-class _AnimatedTheme extends ConsumerStatefulWidget {
-  final FThemeData light;
-  final FThemeData dark;
-  final Widget child;
-
-  const _AnimatedTheme({
-    required this.light,
-    required this.dark,
-    required this.child,
-  });
-
-  @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _AnimatedThemeState();
-}
-
-class _AnimatedThemeState extends ConsumerState<_AnimatedTheme> with BrightnessListener {
-  @override
-  Widget build(BuildContext context) => FTheme(
-    data: currentBrightness == .dark ? widget.dark : widget.light,
-    child: widget.child,
   );
 }
 
@@ -273,7 +253,7 @@ class _RouteWidgetState extends ConsumerState<_RouteWidget> {
         fireImmediately: true,
       );
       ref.listenManual(
-        sessionRefreshRequestsQueueProvider,
+        sessionRefreshManagerProvider,
         (previous, next) {
           if (previous == next) {
             return;
@@ -304,8 +284,10 @@ class _RouteWidgetState extends ConsumerState<_RouteWidget> {
   }
 
   @override
-  Widget build(BuildContext context) => UnlockChallengeWidget(
-    child: widget.child,
+  Widget build(BuildContext context) => UnlockChallenge(
+    child: Migrator(
+      child: widget.child,
+    ),
   );
 
   /// Handles an in-app link.
@@ -339,17 +321,14 @@ class _RouteWidgetState extends ConsumerState<_RouteWidget> {
   /// Handles TOTP limit exceeded.
   Future<void> handleTotpLimitExceeded() async {
     if (mounted) {
-      TotpLimitDialog.showAndBlock(
-        context,
-        autoDialog: true,
-      );
+      TotpLimitDialog.showAndBlock(context);
     }
   }
 
   /// Handles an invalid session.
   Future<void> handleInvalidSession() async {
     if (mounted) {
-      await InvalidSessionDialog.openDialogAndHandleChoice(context);
+      await InvalidSessionDialog.openDialog(context, handleResult: true);
     }
   }
 }

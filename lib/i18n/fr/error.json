@@ -1,5 +1,9 @@
 {
-  "noError": "Succès !",
+  "noError": "Opération effectuée avec succès.",
+  "errorDialog": {
+    "title": "Erreur",
+    "retryButton": "Réessayer"
+  },
   "validation": {
     "number": "Vous devez entrer un nombre valide",
     "empty": "Ce champ est requis",
@@ -27,5 +31,6 @@
     "encryptionKeyChangeFailed": "Une erreur est survenue pendant le chiffrement de vos données. Veuillez réessayer plus tard.",
     "genericError": "Une erreur est survenue pendant la migration de vos données. Veuillez réessayer plus tard."
   },
-  "totpDecrypt": "Impossible de déchiffrer ce TOTP. Veuillez vous assurer d'avoir entré le bon mot de passe."
+  "totpDecrypt": "Impossible de déchiffrer ce TOTP. Veuillez vous assurer d'avoir entré le bon mot de passe.",
+  "invalidCode": "Code invalide."
 }

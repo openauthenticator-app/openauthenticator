@@ -74,7 +74,7 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
       StorageType storageType = await ref.read(storageTypeSettingsEntryProvider.future);
       if (storageType == StorageType.shared && !fromNetwork) {
         _enqueue(
-          PushOperation.setTotps(
+          SetTotpsPushOperation(
             totps: totps,
           ),
         );
@@ -100,7 +100,7 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
       StorageType storageType = await ref.read(storageTypeSettingsEntryProvider.future);
       if (storageType == StorageType.shared && !fromNetwork) {
         _enqueue(
-          PushOperation.deleteTotps(
+          DeleteTotpsPushOperation(
             uuids: [
               for (Totp totp in totpsList) totp.uuid,
             ],
@@ -108,7 +108,7 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
           andRun: false,
         );
         _enqueue(
-          PushOperation.setTotps(
+          SetTotpsPushOperation(
             totps: totps,
           ),
         );
@@ -164,7 +164,7 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
       StorageType storageType = await ref.read(storageTypeSettingsEntryProvider.future);
       if (storageType == StorageType.shared && !fromNetwork) {
         _enqueue(
-          PushOperation.setTotps(
+          SetTotpsPushOperation(
             totps: totps,
           ),
         );
@@ -202,7 +202,7 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
       StorageType storageType = await ref.read(storageTypeSettingsEntryProvider.future);
       if (storageType == StorageType.shared && !fromNetwork) {
         _enqueue(
-          PushOperation.deleteTotps(
+          DeleteTotpsPushOperation(
             uuids: uuids,
           ),
         );
@@ -253,7 +253,7 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
         StorageType storageType = await ref.read(storageTypeSettingsEntryProvider.future);
         if (storageType == StorageType.shared) {
           _enqueue(
-            PushOperation.setTotps(
+            SetTotpsPushOperation(
               totps: newTotps,
             ),
           );

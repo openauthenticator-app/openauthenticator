@@ -15,10 +15,12 @@ Future<Totp?> _showTotpSearch(
       _SearchPageRoute(maintainState: maintainState),
     );
 
+/// The search page route.
 class _SearchPageRoute extends PageRoute<Totp> {
   @override
   final bool maintainState;
 
+  /// Creates a new search page route instance.
   _SearchPageRoute({
     required this.maintainState,
   });
@@ -45,38 +47,28 @@ class _SearchPageRoute extends PageRoute<Totp> {
     BuildContext context,
     Animation<double> animation,
     Animation<double> secondaryAnimation,
-  ) => Consumer(
-    builder: (context, ref, child) {
-      AsyncValue<List<Totp>> totps = ref.watch(totpRepositoryProvider);
-      return switch (totps) {
-        AsyncValue(:final value?) => _SearchPage(
-          totps: value,
-          animation: animation,
-        ),
-        AsyncError(:final error, :final stackTrace) => ErrorDisplayWidget(
-          error: error,
-          stackTrace: stackTrace,
-        ),
-        _ => const CircularProgressIndicator(),
-      };
-    },
+  ) => _SearchPage(
+    animation: animation,
   );
 }
 
-class _SearchPage extends StatefulWidget {
-  final List<Totp> totps;
+/// The search page.
+class _SearchPage extends ConsumerStatefulWidget {
+  /// The animation.
   final Animation<double> animation;
 
+  /// Creates a new search page instance.
   const _SearchPage({
-    required this.totps,
     required this.animation,
   });
 
   @override
-  State<StatefulWidget> createState() => _SearchPageState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _SearchPageState();
 }
 
-class _SearchPageState extends State<_SearchPage> {
+/// The search page state.
+class _SearchPageState extends ConsumerState<_SearchPage> {
+  /// The focus node.
   late final FocusNode focusNode = FocusNode(
     onKeyEvent: (FocusNode node, KeyEvent event) {
       if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
@@ -87,8 +79,10 @@ class _SearchPageState extends State<_SearchPage> {
     },
   );
 
+  /// The query focus node.
   final FocusNode queryFocusNode = FocusNode();
 
+  /// The query controller.
   late final TextEditingController queryController = TextEditingController()
     ..addListener(() {
       if (mounted) {
@@ -104,34 +98,39 @@ class _SearchPageState extends State<_SearchPage> {
   }
 
   @override
-  Widget build(BuildContext context) => AppScaffold.scrollable(
-    header: FHeader.nested(
-      prefixes: [
-        ClickableHeaderAction.x(
-          onPress: () => Navigator.pop(context),
-        ),
-      ],
-      title: FTextField(
-        suffixBuilder: (_, _, _) => ClickableButton.icon(
-          variant: .ghost,
-          onPress: null,
-          child: const Icon(FIcons.search),
-        ),
-        style: .delta(
-          color: .delta(
-            [
-              .base(context.theme.tileStyles.base.decoration.base.color),
-            ],
+  Widget build(BuildContext context) {
+    AsyncValue<List<Totp>> totps = ref.watch(totpRepositoryProvider);
+    return AppScaffold.asyncValue(
+      header: FHeader.nested(
+        prefixes: [
+          ClickableHeaderAction.x(
+            onPress: () => Navigator.pop(context),
           ),
+        ],
+        title: FTextField(
+          suffixBuilder: (_, _, _) => ClickableButton.icon(
+            variant: .ghost,
+            onPress: null,
+            child: const Icon(FIcons.search),
+          ),
+          style: .delta(
+            color: .delta(
+              [
+                .base(context.theme.tileStyles.base.decoration.base.color),
+              ],
+            ),
+          ),
+          control: .managed(controller: queryController),
+          focusNode: queryFocusNode,
+          hint: MaterialLocalizations.of(context).searchFieldLabel,
+          onSubmit: (_) => queryFocusNode.unfocus(),
         ),
-        control: .managed(controller: queryController),
-        focusNode: queryFocusNode,
-        hint: MaterialLocalizations.of(context).searchFieldLabel,
-        onSubmit: (_) => queryFocusNode.unfocus(),
       ),
-    ),
-    children: buildResults(context),
-  );
+      asyncValue: totps,
+      builder: buildResults,
+      onRetryPressed: () => ref.invalidate(totpRepositoryProvider),
+    );
+  }
 
   @override
   void dispose() {
@@ -142,22 +141,23 @@ class _SearchPageState extends State<_SearchPage> {
     queryController.dispose();
   }
 
-  List<Widget> buildResults(BuildContext context) {
-    List<Totp> searchResults = widget.totps.search(queryController.text);
-    List<Widget> result = [];
-    for (int i = 0; i < searchResults.length; i++) {
-      Totp totp = searchResults[i];
-      result.add(
-        TotpWidget(
-          key: ValueKey(totp.uuid),
-          totp: totp,
-          onTap: (context) => Navigator.pop(context, totp),
+  /// Builds the results.
+  List<Widget> buildResults(List<Totp> totps) {
+    List<Totp> searchResults = totps.search(queryController.text);
+    return [
+      for (Totp totp in searchResults)
+        Padding(
+          padding: const EdgeInsets.only(bottom: kBigSpace),
+          child: TotpTile(
+            key: ValueKey(totp.uuid),
+            totp: totp,
+            onTap: (context) => Navigator.pop(context, totp),
+          ),
         ),
-      );
-    }
-    return result;
+    ];
   }
 
+  /// Triggered when the animation status changes.
   void onAnimationStatusChanged(AnimationStatus status) {
     if (!status.isCompleted) {
       return;

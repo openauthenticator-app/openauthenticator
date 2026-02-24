@@ -22,12 +22,18 @@ extension _ToOpenAuthenticatorTotp on _DriftTotp {
 /// Contains some useful methods for the generated [_DriftBackendPushOperation] class.
 extension _ToOpenAuthenticatorBackendPushOperation on _DriftBackendPushOperation {
   /// Converts this instance to a [PushOperation].
-  PushOperation get asBackendPushOperation => PushOperation(
-    uuid: uuid,
-    kind: kind,
-    payload: jsonDecode(jsonPayload),
-    createdAt: createdAt,
-  );
+  PushOperation get asBackendPushOperation => switch (kind) {
+    PushOperationKind.set => SetTotpsPushOperation.raw(
+      uuid: uuid,
+      payload: jsonDecode(jsonPayload),
+      createdAt: createdAt,
+    ),
+    PushOperationKind.delete => DeleteTotpsPushOperation.raw(
+      uuid: uuid,
+      payload: jsonDecode(jsonPayload),
+      createdAt: createdAt,
+    ),
+  };
 }
 
 /// Contains some useful methods for the generated [_DriftBackendPushOperationError] class.
@@ -64,7 +70,10 @@ extension _ToDriftBackendPushOperation on PushOperation {
   /// Converts this instance to a Drift generated [_DriftBackendPushOperation].
   _DriftBackendPushOperation get asDriftBackendPushOperation => _DriftBackendPushOperation(
     uuid: uuid,
-    kind: kind,
+    kind: switch (this) {
+      SetTotpsPushOperation() => PushOperationKind.set,
+      DeleteTotpsPushOperation() => PushOperationKind.delete,
+    },
     jsonPayload: jsonEncode(payload),
     createdAt: createdAt,
   );

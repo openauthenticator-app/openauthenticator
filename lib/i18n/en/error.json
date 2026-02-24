@@ -1,5 +1,9 @@
 {
-  "noError": "Success !",
+  "noError": "Operation done with success.",
+  "errorDialog": {
+    "title": "Error",
+    "retryButton": "Retry"
+  },
   "validation": {
     "number": "You should enter a valid number",
     "empty": "This field is required",
@@ -27,5 +31,6 @@
     "encryptionKeyChangeFailed": "An error occurred while encrypting your data. Please try again later.",
     "genericError": "An error occurred while migrating your data. Please try again later."
   },
-  "totpDecrypt": "Failed to decrypt this TOTP. Please ensure you have entered the correct password."
+  "totpDecrypt": "Failed to decrypt this TOTP. Please ensure you have entered the correct password.",
+  "invalidCode": "Invalid code."
 }

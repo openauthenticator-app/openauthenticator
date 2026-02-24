@@ -121,7 +121,7 @@ class AccountUtils {
         if (handleEmailInvalidCodeError && exception is BackendRequestError && exception.errorCode == 'invalidCode') {
           showErrorToast(
             context,
-            text: 'Invalid code.', // TODO
+            text: translations.error.invalidCode,
           );
           return;
         }

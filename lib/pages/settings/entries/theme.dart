@@ -4,6 +4,7 @@ import 'package:forui/forui.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/settings/theme.dart';
 import 'package:open_authenticator/pages/settings/entries/widgets.dart';
+import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
 
@@ -44,7 +45,7 @@ class _ThemePickerDialog extends ConsumerWidget {
         ClickableButton(
           variant: .secondary,
           onPress: () => Navigator.pop(context),
-          child: Text(MaterialLocalizations.of(context).closeButtonLabel),
+          child: ButtonText(MaterialLocalizations.of(context).closeButtonLabel),
         ),
       ],
       children: [

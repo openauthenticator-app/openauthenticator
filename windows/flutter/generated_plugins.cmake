@@ -4,7 +4,10 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   app_links
+  cloud_firestore
   connectivity_plus
+  firebase_auth
+  firebase_core
   local_auth_windows
   screen_retriever_windows
   sentry_flutter

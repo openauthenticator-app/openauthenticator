@@ -4,6 +4,7 @@ import 'package:forui/forui.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/password_verification/password_verification.dart';
 import 'package:open_authenticator/utils/result.dart';
+import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
 import 'package:open_authenticator/widgets/form/password_form_field.dart';
@@ -103,12 +104,12 @@ class _TextInputDialogState extends State<TextInputDialog> {
     actions: [
       ClickableButton(
         onPress: valid ? (() => Navigator.pop(context, value)) : null,
-        child: Text(MaterialLocalizations.of(context).okButtonLabel),
+        child: ButtonText(MaterialLocalizations.of(context).okButtonLabel),
       ),
       ClickableButton(
         variant: .secondary,
         onPress: () => Navigator.pop(context),
-        child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+        child: ButtonText(MaterialLocalizations.of(context).cancelButtonLabel),
       ),
     ],
     children: [
@@ -225,12 +226,12 @@ class _MasterPasswordInputDialogState extends ConsumerState<MasterPasswordInputD
     actions: [
       ClickableButton(
         onPress: onOkPress,
-        child: Text(MaterialLocalizations.of(context).okButtonLabel),
+        child: ButtonText(MaterialLocalizations.of(context).okButtonLabel),
       ),
       ClickableButton(
         variant: .secondary,
         onPress: () => Navigator.pop(context),
-        child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+        child: ButtonText(MaterialLocalizations.of(context).cancelButtonLabel),
       ),
     ],
     children: [

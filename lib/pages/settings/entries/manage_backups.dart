@@ -12,6 +12,7 @@ import 'package:open_authenticator/model/backup.dart';
 import 'package:open_authenticator/pages/settings/entries/widgets.dart';
 import 'package:open_authenticator/spacing.dart';
 import 'package:open_authenticator/utils/result.dart';
+import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/centered_circular_progress_indicator.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
@@ -50,9 +51,6 @@ class ManageBackupSettingsEntryWidget extends ConsumerWidget with FTileMixin {
 
 /// The dialog that allows to restore a backup.
 class _RestoreBackupDialog extends ConsumerStatefulWidget {
-  /// The date format to use inside the dialog.
-  static const String kDateFormat = 'yyyy-MM-dd HH:mm:ss';
-
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _RestoreBackupDialogState();
 }
@@ -64,7 +62,6 @@ class _RestoreBackupDialogState extends ConsumerState<_RestoreBackupDialog> {
 
   @override
   Widget build(BuildContext context) {
-    DateFormat formatter = DateFormat(_RestoreBackupDialog.kDateFormat);
     AsyncValue<List<Backup>> backups = ref.watch(backupStoreProvider);
     List<Widget> children;
     switch (backups) {
@@ -83,7 +80,7 @@ class _RestoreBackupDialogState extends ConsumerState<_RestoreBackupDialog> {
           for (Backup backup in value)
             ExpandableTile(
               title: Text(
-                formatter.format(backup.dateTime),
+                '${DateFormat.yMd(translations.$meta.locale.underscoreTag).format(backup.dateTime)} ${DateFormat.Hms(translations.$meta.locale.underscoreTag).format(backup.dateTime)}',
               ),
               children: createBackupActions(backup),
             ),
@@ -108,12 +105,12 @@ class _RestoreBackupDialogState extends ConsumerState<_RestoreBackupDialog> {
         ClickableButton(
           variant: .secondary,
           onPress: importBackup,
-          child: Text(translations.settings.backups.manageBackups.button.import),
+          child: ButtonText(translations.settings.backups.manageBackups.button.import),
         ),
         ClickableButton(
           variant: .secondary,
           onPress: () => Navigator.pop(context),
-          child: Text(MaterialLocalizations.of(context).closeButtonLabel),
+          child: ButtonText(MaterialLocalizations.of(context).closeButtonLabel),
         ),
       ],
       children: children,
@@ -126,25 +123,25 @@ class _RestoreBackupDialogState extends ConsumerState<_RestoreBackupDialog> {
       variant: .secondary,
       onPress: () => restoreBackup(backup),
       prefix: const Icon(FIcons.upload),
-      child: Text(translations.settings.backups.manageBackups.button.restore),
+      child: ButtonText(translations.settings.backups.manageBackups.button.restore),
     ),
     ClickableButton(
       variant: .secondary,
       onPress: () => shareBackup(backup),
       prefix: const Icon(FIcons.share),
-      child: Text(translations.settings.backups.manageBackups.button.share),
+      child: ButtonText(translations.settings.backups.manageBackups.button.share),
     ),
     ClickableButton(
       variant: .secondary,
       onPress: () => exportBackup(backup),
       prefix: const Icon(FIcons.arrowUpDown),
-      child: Text(translations.settings.backups.manageBackups.button.export),
+      child: ButtonText(translations.settings.backups.manageBackups.button.export),
     ),
     ClickableButton(
-      variant: .secondary,
+      variant: .destructive,
       onPress: () => deleteBackup(backup),
       prefix: const Icon(FIcons.trash),
-      child: Text(translations.settings.backups.manageBackups.button.delete),
+      child: ButtonText(translations.settings.backups.manageBackups.button.delete),
     ),
   ];
 

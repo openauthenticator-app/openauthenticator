@@ -6,6 +6,7 @@ import 'package:open_authenticator/model/backend/authentication/providers/provid
 import 'package:open_authenticator/pages/settings/entries/widgets.dart';
 import 'package:open_authenticator/utils/account.dart';
 import 'package:open_authenticator/utils/result.dart';
+import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
 import 'package:open_authenticator/widgets/dialog/confirmation_dialog.dart';
@@ -100,7 +101,7 @@ class _ConfirmActionPickerDialog extends StatelessWidget {
       ClickableButton(
         variant: .secondary,
         onPress: () => Navigator.pop(context),
-        child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+        child: ButtonText(MaterialLocalizations.of(context).cancelButtonLabel),
       ),
     ],
     children: [
@@ -111,6 +112,7 @@ class _ConfirmActionPickerDialog extends StatelessWidget {
         onPress: () => Navigator.pop(context, _ConfirmAction.tryConfirm),
       ),
       ClickableTile(
+        variants: {.destructive},
         prefix: const Icon(FIcons.x),
         title: Text(translations.settings.synchronization.confirmEmail.confirmActionPickerDialog.cancelConfirmation.title),
         subtitle: Text(translations.settings.synchronization.confirmEmail.confirmActionPickerDialog.cancelConfirmation.subtitle),

@@ -1,0 +1,9 @@
+{
+  "title": "Bentornato!",
+  "message": "L'app è stata aggiornata a una versione completamente nuova. Per favore, considera di migrare i tuoi TOTP per continuare a usarli. Se eri autenticato, anche il tuo account verrà migrato durante questo processo.",
+  "button": {
+    "migrate": "Migra",
+    "dontMigrate": "Non migrare"
+  },
+  "error": "Si è verificato un errore durante la migrazione dei tuoi dati. Per favore, riprova."
+}

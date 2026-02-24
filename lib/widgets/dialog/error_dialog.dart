@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:open_authenticator/i18n/translations.g.dart';
+import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
 import 'package:open_authenticator/widgets/error.dart';
@@ -28,22 +30,22 @@ class ErrorDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AppDialog(
-    title: const Text('Erreur'),
+    title: Text(translations.error.errorDialog.title),
     actions: [
       if (allowRetry)
         ClickableButton(
           variant: .secondary,
           onPress: () => Navigator.pop(context, ErrorDialogResult.retry),
-          child: const Text('Réessayer'),
+          child: ButtonText(translations.error.errorDialog.retryButton),
         ),
       ClickableButton(
         variant: .secondary,
         onPress: () => Navigator.pop(context, ErrorDialogResult.cancel),
-        child: Text(allowRetry ? 'Annuler' : 'Fermer'),
+        child: ButtonText(allowRetry ? MaterialLocalizations.of(context).cancelButtonLabel : MaterialLocalizations.of(context).closeButtonLabel),
       ),
-    ], // TODO: Localize
+    ],
     children: [
-      ErrorDetails(
+      ErrorWithStackTrace(
         error: error,
         stackTrace: stackTrace,
         message: message,

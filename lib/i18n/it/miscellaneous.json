@@ -1,4 +1,5 @@
 {
+  "disableTotpSync": "Devi prima disabilitare la sincronizzazione di TOTP.",
   "urlCopiedToClipboard": "URL copiato negli appunti!",
   "waitingDialogDefaultMessage": "Attendere prego...",
   "masterPasswordDialog": {
@@ -11,5 +12,9 @@
       "text": "Password per il backup",
       "hint": "Inserisci la password del backup"
     }
+  },
+  "toast": {
+    "success": "Successo",
+    "error": "Errore"
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
 
@@ -23,12 +24,12 @@ class ConfirmationDialog extends StatelessWidget {
     actions: [
       ClickableButton(
         onPress: () => Navigator.pop(context, true),
-        child: Text(MaterialLocalizations.of(context).okButtonLabel),
+        child: ButtonText(MaterialLocalizations.of(context).okButtonLabel),
       ),
       ClickableButton(
         variant: .secondary,
         onPress: () => Navigator.pop(context, false),
-        child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+        child: ButtonText(MaterialLocalizations.of(context).cancelButtonLabel),
       ),
     ],
     children: [

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
+import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
 
@@ -74,7 +75,7 @@ class _WaitingDialog extends StatelessWidget {
           : [
               ClickableButton(
                 variant: .secondary,
-                child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+                child: ButtonText(MaterialLocalizations.of(context).cancelButtonLabel),
                 onPress: () {
                   if (onCancel!()) {
                     Navigator.pop(context);

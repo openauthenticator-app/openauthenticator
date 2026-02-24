@@ -15,28 +15,29 @@ import 'package:open_authenticator/utils/master_password.dart';
 import 'package:open_authenticator/utils/result.dart';
 import 'package:open_authenticator/widgets/app_scaffold.dart';
 import 'package:open_authenticator/widgets/blur.dart';
+import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/text_input_dialog.dart';
-import 'package:open_authenticator/widgets/title.dart';
+import 'package:open_authenticator/widgets/title_text.dart';
 import 'package:open_authenticator/widgets/toast.dart';
 
 /// The unlock challenge widget.
-class UnlockChallengeWidget extends ConsumerStatefulWidget {
+class UnlockChallenge extends ConsumerStatefulWidget {
   /// The child widget.
   final Widget child;
 
   /// Creates a new unlock challenge widget instance.
-  const UnlockChallengeWidget({
+  const UnlockChallenge({
     super.key,
     required this.child,
   });
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _UnlockChallengeWidgetState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _UnlockChallengeState();
 }
 
 /// The master password unlock route widget state.
-class _UnlockChallengeWidgetState extends ConsumerState<UnlockChallengeWidget> {
+class _UnlockChallengeState extends ConsumerState<UnlockChallenge> {
   /// Will be non-null if the app cannot be unlocked for a specific reason.
   CannotUnlockException? cannotUnlockException;
 
@@ -51,58 +52,56 @@ class _UnlockChallengeWidgetState extends ConsumerState<UnlockChallengeWidget> {
   @override
   Widget build(BuildContext context) {
     AsyncValue<AppLockState> appLockState = ref.watch(appLockStateProvider);
-    switch (appLockState) {
-      case AsyncData<AppLockState>(:final value):
-        if (value == AppLockState.unlocked) {
-          return widget.child;
-        }
-        return AppScaffold(
-          center: true,
-          children: [
-            BlurWidget(
-              above: switch (cannotUnlockException) {
-                LocalAuthenticationDeviceNotSupported() => _UnlockChallengeWidgetContent(
-                  text: translations.appUnlock.cannotUnlock.localAuthentication.deviceNotSupported,
-                  buttonIcon: FIcons.x,
-                  buttonLabel: translations.appUnlock.cannotUnlock.localAuthentication.button,
-                  onButtonPress: () async {
-                    List<PasswordVerificationMethod> passwordVerificationMethod = await ref.read(passwordVerificationProvider.future);
-                    if (passwordVerificationMethod.isNotEmpty) {
-                      String? password = context.mounted ? (await MasterPasswordInputDialog.prompt(context)) : null;
-                      if (password == null) {
-                        return;
-                      }
-                    }
-                    await ref.read(appUnlockMethodSettingsEntryProvider.notifier).changeValue(NoneAppUnlockMethod.kMethodId);
-                    await tryUnlockIfNeeded();
-                  },
-                ),
-                MasterPasswordNoPasswordVerificationMethodAvailable() || MasterPasswordNoSalt() => _UnlockChallengeWidgetContent(
-                  text: translations.appUnlock.cannotUnlock.masterPassword.noPasswordVerificationMethodAvailable,
-                  buttonIcon: FIcons.keyRound,
-                  buttonLabel: translations.appUnlock.cannotUnlock.masterPassword.button,
-                  onButtonPress: () async {
-                    Result<String> changeResult = await MasterPasswordUtils.changeMasterPassword(context, ref, askForUnlock: false);
-                    if (changeResult is ResultSuccess<String>) {
-                      await ref.read(appUnlockMethodSettingsEntryProvider.notifier).changeValue(NoneAppUnlockMethod.kMethodId, disableResult: changeResult);
-                      await tryUnlockIfNeeded();
-                    }
-                  },
-                ),
-                _ => _UnlockChallengeWidgetContent(
-                  text: translations.appUnlock.widget.text(app: App.appName),
-                  buttonIcon: FIcons.keyRound,
-                  buttonLabel: translations.appUnlock.widget.button,
-                  onButtonPress: value == AppLockState.unlockChallengedStarted ? null : tryUnlockIfNeeded,
-                ),
-              },
-              below: widget.child,
-            ),
-          ],
-        );
-      default:
-        return widget.child;
-    }
+    return switch (appLockState) {
+      AsyncData<AppLockState>(:final value) =>
+        value == .unlocked
+            ? widget.child
+            : AppScaffold(
+                center: true,
+                children: [
+                  Blur(
+                    above: switch (cannotUnlockException) {
+                      LocalAuthenticationDeviceNotSupported() => _UnlockChallengeContent(
+                        text: translations.appUnlock.cannotUnlock.localAuthentication.deviceNotSupported,
+                        buttonIcon: FIcons.x,
+                        buttonLabel: translations.appUnlock.cannotUnlock.localAuthentication.button,
+                        onButtonPress: () async {
+                          List<PasswordVerificationMethod> passwordVerificationMethod = await ref.read(passwordVerificationProvider.future);
+                          if (passwordVerificationMethod.isNotEmpty) {
+                            String? password = context.mounted ? (await MasterPasswordInputDialog.prompt(context)) : null;
+                            if (password == null) {
+                              return;
+                            }
+                          }
+                          await ref.read(appUnlockMethodSettingsEntryProvider.notifier).changeValue(NoneAppUnlockMethod.kMethodId);
+                          await tryUnlockIfNeeded();
+                        },
+                      ),
+                      MasterPasswordNoPasswordVerificationMethodAvailable() || MasterPasswordNoSalt() => _UnlockChallengeContent(
+                        text: translations.appUnlock.cannotUnlock.masterPassword.noPasswordVerificationMethodAvailable,
+                        buttonIcon: FIcons.keyRound,
+                        buttonLabel: translations.appUnlock.cannotUnlock.masterPassword.button,
+                        onButtonPress: () async {
+                          Result<String> changeResult = await MasterPasswordUtils.changeMasterPassword(context, ref, askForUnlock: false);
+                          if (changeResult is ResultSuccess<String>) {
+                            await ref.read(appUnlockMethodSettingsEntryProvider.notifier).changeValue(NoneAppUnlockMethod.kMethodId, disableResult: changeResult);
+                            await tryUnlockIfNeeded();
+                          }
+                        },
+                      ),
+                      _ => _UnlockChallengeContent(
+                        text: translations.appUnlock.widget.text(app: App.appName),
+                        buttonIcon: FIcons.keyRound,
+                        buttonLabel: translations.appUnlock.widget.button,
+                        onButtonPress: value == AppLockState.unlockChallengedStarted ? null : tryUnlockIfNeeded,
+                      ),
+                    },
+                    below: widget.child,
+                  ),
+                ],
+              ),
+      _ => widget.child,
+    };
   }
 
   /// Tries to unlock the app.
@@ -123,8 +122,8 @@ class _UnlockChallengeWidgetState extends ConsumerState<UnlockChallengeWidget> {
   }
 }
 
-/// The content of [UnlockChallengeWidget].
-class _UnlockChallengeWidgetContent extends StatelessWidget {
+/// The content of [UnlockChallenge].
+class _UnlockChallengeContent extends StatelessWidget {
   /// The text to display.
   final String text;
 
@@ -138,7 +137,7 @@ class _UnlockChallengeWidgetContent extends StatelessWidget {
   final VoidCallback? onButtonPress;
 
   /// Creates a new unlock challenge widget content instance.
-  const _UnlockChallengeWidgetContent({
+  const _UnlockChallengeContent({
     required this.text,
     required this.buttonLabel,
     this.buttonIcon,
@@ -154,7 +153,7 @@ class _UnlockChallengeWidgetContent extends StatelessWidget {
           padding: const EdgeInsets.only(bottom: kBigSpace),
           child: FittedBox(
             fit: BoxFit.scaleDown,
-            child: TitleWidget(
+            child: TitleText(
               textAlign: TextAlign.center,
               textStyle: context.theme.typography.xl2,
             ),
@@ -167,14 +166,12 @@ class _UnlockChallengeWidgetContent extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
         ),
-        Center(
-          child: SizedBox(
-            width: math.min(MediaQuery.sizeOf(context).width - kBigSpace, 300),
-            child: ClickableButton(
-              onPress: onButtonPress,
-              prefix: buttonIcon == null ? null : Icon(buttonIcon),
-              child: Text(buttonLabel),
-            ),
+        SizedBox(
+          width: math.min(MediaQuery.sizeOf(context).width - kBigSpace, 300),
+          child: ClickableButton(
+            onPress: onButtonPress,
+            prefix: buttonIcon == null ? null : Icon(buttonIcon),
+            child: ButtonText(buttonLabel),
           ),
         ),
       ],

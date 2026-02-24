@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:jovial_svg/jovial_svg.dart';
 
 /// A sized scalable image widget.
-class SizedScalableImageWidget extends StatelessWidget {
+class SizedScalableImage extends StatelessWidget {
   /// The width.
   final double? width;
 
@@ -26,7 +26,7 @@ class SizedScalableImageWidget extends StatelessWidget {
   final bool useContainer;
 
   /// Creates a new sized scalable image widget instance.
-  const SizedScalableImageWidget({
+  const SizedScalableImage({
     super.key,
     this.width,
     this.height,

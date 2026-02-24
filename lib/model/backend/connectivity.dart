@@ -3,9 +3,12 @@ import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+/// The connectivity state provider.
 final connectivityStateProvider = AsyncNotifierProvider<ConnectivityStateNotifier, bool>(ConnectivityStateNotifier.new);
 
+/// Allows to manage the connectivity state.
 class ConnectivityStateNotifier extends AsyncNotifier<bool> {
+  /// The [Connectivity] instance.
   final Connectivity _connectivity = Connectivity();
 
   @override
@@ -17,5 +20,6 @@ class ConnectivityStateNotifier extends AsyncNotifier<bool> {
     return result.firstOrNull != ConnectivityResult.none;
   }
 
+  /// Triggered when the connectivity state has changed.
   void _onConnectivityChanged(List<ConnectivityResult> result) => state = AsyncData(result.firstOrNull != ConnectivityResult.none);
 }

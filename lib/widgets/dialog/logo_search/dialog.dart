@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
+import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
 import 'package:open_authenticator/widgets/dialog/logo_search/widget.dart';
@@ -26,11 +27,11 @@ class LogoPickerDialog extends StatelessWidget {
       ClickableButton(
         variant: .secondary,
         onPress: () => Navigator.pop(context),
-        child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+        child: ButtonText(MaterialLocalizations.of(context).cancelButtonLabel),
       ),
     ],
     children: [
-      LogoSearchWidget(
+      LogoSearch(
         initialSearchKeywords: initialSearchKeywords,
         onLogoClicked: onLogoClicked,
       ),

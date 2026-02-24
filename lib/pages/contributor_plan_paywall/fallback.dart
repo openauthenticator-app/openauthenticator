@@ -1,8 +1,7 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:intl/intl.dart';
 import 'package:open_authenticator/app.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/purchases/clients/client.dart';
@@ -10,11 +9,12 @@ import 'package:open_authenticator/model/purchases/contributor_plan.dart';
 import 'package:open_authenticator/spacing.dart';
 import 'package:open_authenticator/utils/result.dart';
 import 'package:open_authenticator/utils/utils.dart';
+import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/centered_circular_progress_indicator.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/divider_text.dart';
 import 'package:open_authenticator/widgets/sized_scalable_image.dart';
-import 'package:open_authenticator/widgets/title.dart';
+import 'package:open_authenticator/widgets/title_text.dart';
 import 'package:open_authenticator/widgets/waiting_overlay.dart';
 import 'package:purchases_flutter/purchases_flutter.dart' hide Price;
 import 'package:url_launcher/url_launcher_string.dart';
@@ -37,20 +37,23 @@ class ContributorPlanFallbackPaywallHeader extends StatelessWidget {
         onPress: onDismiss,
       ),
     ],
-    title: FittedBox(
-      fit: BoxFit.fitWidth,
-      child: Text.rich(
-        translations.contributorPlan.fallbackPaywall.title(
-          title: (text) => WidgetSpan(
-            child: TitleWidget(
-              text: text,
-              textStyle: context.theme.typography.xl3,
+    title: Padding(
+      padding: const EdgeInsets.only(bottom: 2),
+      child: FittedBox(
+        fit: BoxFit.fitWidth,
+        child: Text.rich(
+          translations.contributorPlan.fallbackPaywall.title(
+            title: (text) => WidgetSpan(
+              child: TitleText(
+                text: text,
+                textStyle: context.theme.typography.xl3,
+              ),
+              alignment: PlaceholderAlignment.middle,
             ),
-            alignment: PlaceholderAlignment.middle,
           ),
+          style: context.theme.typography.xl3,
+          textAlign: TextAlign.center,
         ),
-        style: context.theme.typography.xl3,
-        textAlign: TextAlign.center,
       ),
     ),
   );
@@ -76,7 +79,7 @@ class ContributorPlanFallbackPaywall extends ConsumerWidget {
           [
             .all(
               .delta(
-                fontSize: context.theme.typography.sm.fontSize,
+                fontSize: context.theme.typography.xs.fontSize,
               ),
             ),
           ],
@@ -86,36 +89,46 @@ class ContributorPlanFallbackPaywall extends ConsumerWidget {
     return ListView(
       shrinkWrap: true,
       children: [
-        Container(
-          height: 150,
-          margin: const EdgeInsets.only(bottom: kBigSpace),
-          child: const SizedScalableImageWidget(
-            asset: 'assets/images/logo.si',
+        Padding(
+          padding: const EdgeInsets.all(kSpace),
+          child: Container(
+            height: 150,
+            margin: const EdgeInsets.only(bottom: kBigSpace),
+            child: const SizedScalableImage(
+              asset: 'assets/images/logo.si',
+            ),
           ),
         ),
-        for (String feature in translations.contributorPlan.fallbackPaywall.features)
-          Row(
-            mainAxisSize: MainAxisSize.min,
+        FTile.raw(
+          child: Column(
+            spacing: kSpace / 2,
             children: [
-              Padding(
-                padding: const EdgeInsets.only(right: kSpace / 2),
-                child: Icon(
-                  FIcons.check,
-                  color: context.theme.colors.primary,
+              for (String feature in translations.contributorPlan.fallbackPaywall.features)
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(right: kSpace / 2),
+                      child: Icon(
+                        FIcons.check,
+                        color: context.theme.colors.primary,
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(feature),
+                    ),
+                  ],
                 ),
-              ),
-              Expanded(
-                child: Text(feature),
-              ),
             ],
           ),
+        ),
         Padding(
           padding: const EdgeInsets.only(top: kBigSpace, bottom: kSpace),
           child: DividerText(
             text: Text(
               translations.contributorPlan.fallbackPaywall.packageType.choose,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontWeight: FontWeight.bold),
+              textAlign: .center,
+              style: const TextStyle(fontWeight: .bold),
             ),
           ),
         ),
@@ -129,6 +142,7 @@ class ContributorPlanFallbackPaywall extends ConsumerWidget {
           alignment: WrapAlignment.spaceAround,
           children: [
             ClickableButton(
+              variant: .ghost,
               onPress: () async {
                 if (await canLaunchUrlString(AppContributorPlan.privacyPolicyLink)) {
                   await launchUrlString(AppContributorPlan.privacyPolicyLink);
@@ -136,9 +150,10 @@ class ContributorPlanFallbackPaywall extends ConsumerWidget {
               },
               mainAxisSize: .min,
               style: bottomButtonsStyle,
-              child: Text(translations.contributorPlan.fallbackPaywall.button.privacyPolicy),
+              child: ButtonText(translations.contributorPlan.fallbackPaywall.button.privacyPolicy),
             ),
             ClickableButton(
+              variant: .ghost,
               onPress: () async {
                 if (await canLaunchUrlString(AppContributorPlan.termsOfServiceLink)) {
                   await launchUrlString(AppContributorPlan.termsOfServiceLink);
@@ -146,13 +161,14 @@ class ContributorPlanFallbackPaywall extends ConsumerWidget {
               },
               mainAxisSize: .min,
               style: bottomButtonsStyle,
-              child: Text(translations.contributorPlan.fallbackPaywall.button.termsOfService),
+              child: ButtonText(translations.contributorPlan.fallbackPaywall.button.termsOfService),
             ),
             ClickableButton(
+              variant: .ghost,
               onPress: () => _tryRestorePurchases(context, ref),
               mainAxisSize: .min,
               style: bottomButtonsStyle,
-              child: Text(translations.contributorPlan.fallbackPaywall.button.restorePurchases),
+              child: ButtonText(translations.contributorPlan.fallbackPaywall.button.restorePurchases),
             ),
           ],
         ),
@@ -253,25 +269,21 @@ class _ContributorPlanBillingPlanPickerState extends ConsumerState<_ContributorP
                   textAlign: TextAlign.center,
                 );
               }
-              return IntrinsicHeight(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    for (MapEntry<PackageType, Price> entry in prices.packagesPrice.entries)
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: kSpace),
-                          child: _createTile(
-                            context,
-                            packageType: entry.key,
-                            price: entry.value,
-                            off: prices.promotions[entry.key],
-                          ),
-                        ),
+              return Row(
+                mainAxisAlignment: .spaceEvenly,
+                mainAxisSize: .max,
+                spacing: kBigSpace,
+                children: [
+                  for (MapEntry<PackageType, Price> entry in prices.packagesPrice.entries)
+                    Expanded(
+                      child: _createTile(
+                        context,
+                        packageType: entry.key,
+                        price: entry.value,
+                        off: prices.promotions[entry.key],
                       ),
-                  ],
-                ),
+                    ),
+                ],
               );
             }
             return const CenteredCircularProgressIndicator();
@@ -280,7 +292,7 @@ class _ContributorPlanBillingPlanPickerState extends ConsumerState<_ContributorP
       ),
       ClickableButton(
         onPress: packageType == null ? null : (() => widget.onContinuePress(packageType!)),
-        child: Text(MaterialLocalizations.of(context).continueButtonLabel),
+        child: ButtonText(MaterialLocalizations.of(context).continueButtonLabel),
       ),
     ],
   );
@@ -297,89 +309,65 @@ class _ContributorPlanBillingPlanPickerState extends ConsumerState<_ContributorP
     String? subtitle = translations.contributorPlan.fallbackPaywall.packageType.subtitle[packageType.name];
     return name == null || interval == null || subtitle == null
         ? const SizedBox.shrink()
-        : Stack(
-            fit: StackFit.expand,
-            clipBehavior: Clip.none,
-            children: [
-              FTile.raw(
-                style: .delta(
-                  decoration: .delta(
-                    this.packageType == packageType
-                        ? [
-                            .base(.delta(color: context.theme.tileStyles.base.decoration.base.color?.highlight())),
-                          ]
-                        : [],
-                  ),
-                  contentStyle: const .delta(
-                    padding: EdgeInsets.symmetric(vertical: kSpace, horizontal: kBigSpace),
-                  ),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: kSpace / 2),
-                      child: Text(
-                        name,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    Text.rich(
-                      translations.contributorPlan.fallbackPaywall.packageType.priceSubtitle(
-                        subtitle: TextSpan(text: subtitle),
-                        price: TextSpan(
-                          text: price.formattedAmount,
-                          style: const TextStyle(fontStyle: FontStyle.italic),
-                        ),
-                        interval: TextSpan(
-                          text: interval.toLowerCase(),
-                          style: const TextStyle(fontStyle: FontStyle.italic),
-                        ),
-                      ),
-                      style: TextStyle(color: context.theme.colors.primaryForeground),
-                    ),
-                  ],
-                ),
-                onPress: () {
-                  setState(() => this.packageType = this.packageType == packageType ? null : packageType);
-                },
+        : FTile(
+            style: .delta(
+              decoration: .delta(
+                this.packageType == packageType
+                    ? [
+                        .base(.delta(color: context.theme.tileStyles.base.decoration.base.color?.highlight())),
+                      ]
+                    : [],
               ),
-              if (this.packageType == packageType)
-                Positioned(
-                  top: -kSpace / 2,
-                  right: -kSpace / 2,
-                  child: Icon(
-                    FIcons.circle,
-                    color: context.theme.colors.primaryForeground,
-                  ),
-                ),
-              if (this.packageType == packageType)
-                Positioned(
-                  top: -kSpace / 2,
-                  right: -kSpace / 2,
-                  child: Icon(
-                    FIcons.circleCheck,
-                    color: context.theme.colors.primaryForeground,
-                  ),
-                ),
-              if (off != null)
-                Positioned(
-                  top: -kSpace,
-                  left: -kSpace,
-                  child: Transform.rotate(
-                    angle: -math.pi / 16,
-                    child: FBadge(
+              contentStyle: const .delta(
+                padding: .value(EdgeInsets.symmetric(vertical: kSpace, horizontal: kBigSpace)),
+              ),
+            ),
+            title: Text.rich(
+              TextSpan(
+                children: [
+                  if (off != null)
+                    WidgetSpan(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: kSpace, vertical: kSpace / 2),
-                        child: Text(
-                          '-${off.abs()}%',
-                          style: TextStyle(color: context.theme.colors.primaryForeground),
+                        padding: const EdgeInsets.only(right: kSpace),
+                        child: FBadge(
+                          style: .delta(
+                            contentStyle: .delta(
+                              labelTextStyle: .delta(fontSize: context.theme.typography.xs.fontSize),
+                              padding: const .value(
+                                .symmetric(horizontal: kSpace / 2, vertical: kSpace / 4),
+                              ),
+                            ),
+                          ),
+                          child: Text(
+                            '-${off.abs()}%',
+                          ),
                         ),
                       ),
                     ),
+                  TextSpan(
+                    text: name,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
+                ],
+              ),
+            ),
+            subtitle: Text(subtitle),
+            details: Text.rich(
+              translations.contributorPlan.fallbackPaywall.packageType.price(
+                price: TextSpan(
+                  text: NumberFormat.simpleCurrency(locale: translations.$meta.locale.underscoreTag, name: price.currencyCode).format(price.amount),
+                  style: const TextStyle(fontStyle: FontStyle.italic),
                 ),
-            ],
+                interval: TextSpan(
+                  text: interval.toLowerCase(),
+                  style: const TextStyle(fontStyle: FontStyle.italic),
+                ),
+              ),
+            ),
+            prefix: Icon(this.packageType == packageType ? FIcons.circleCheckBig : FIcons.circle),
+            onPress: () {
+              setState(() => this.packageType = this.packageType == packageType ? null : packageType);
+            },
           );
   }
 }

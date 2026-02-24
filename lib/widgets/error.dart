@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:open_authenticator/app.dart';
 import 'package:open_authenticator/spacing.dart';
+import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// A widget displaying an error with the option to retry.
-class ErrorDisplayWidget extends StatelessWidget {
+class ErrorAlert extends StatelessWidget {
   /// The error.
   final Object error;
 
@@ -17,7 +18,7 @@ class ErrorDisplayWidget extends StatelessWidget {
   final VoidCallback? onRetryPressed;
 
   /// Creates a new error display widget instance.
-  const ErrorDisplayWidget({
+  const ErrorAlert({
     super.key,
     required this.error,
     required this.stackTrace,
@@ -32,7 +33,7 @@ class ErrorDisplayWidget extends StatelessWidget {
         child: FAlert(
           variant: .destructive,
           title: const Text('Erreur'),
-          subtitle: ErrorDetails(error: error, stackTrace: stackTrace),
+          subtitle: ErrorWithStackTrace(error: error, stackTrace: stackTrace),
         ),
       ),
       Padding(
@@ -43,7 +44,7 @@ class ErrorDisplayWidget extends StatelessWidget {
             onPress: asyncSnapshot.data == true ? () => launchUrl(reportIssueUrl) : null,
             variant: .outline,
             prefix: const Icon(FIcons.bug),
-            child: const Text('Signaler'),
+            child: const ButtonText('Signaler'),
           ),
         ),
       ),
@@ -51,7 +52,7 @@ class ErrorDisplayWidget extends StatelessWidget {
         ClickableButton(
           onPress: onRetryPressed,
           prefix: const Icon(FIcons.refreshCcw),
-          child: const Text('Réessayer'),
+          child: const ButtonText('Réessayer'),
         ),
     ],
   );
@@ -61,7 +62,7 @@ class ErrorDisplayWidget extends StatelessWidget {
 }
 
 /// A widget displaying an error.
-class ErrorDetails extends StatefulWidget {
+class ErrorWithStackTrace extends StatefulWidget {
   /// The additional message to display.
   final String? message;
 
@@ -75,7 +76,7 @@ class ErrorDetails extends StatefulWidget {
   final VoidCallback? onRetryPressed;
 
   /// Creates an error widget.
-  const ErrorDetails({
+  const ErrorWithStackTrace({
     super.key,
     this.message,
     this.error,
@@ -84,11 +85,11 @@ class ErrorDetails extends StatefulWidget {
   });
 
   @override
-  State<StatefulWidget> createState() => _ErrorDetailsState();
+  State<StatefulWidget> createState() => _ErrorWithStackTraceState();
 }
 
 /// The error widget state.
-class _ErrorDetailsState extends State<ErrorDetails> with SingleTickerProviderStateMixin<ErrorDetails> {
+class _ErrorWithStackTraceState extends State<ErrorWithStackTrace> with SingleTickerProviderStateMixin<ErrorWithStackTrace> {
   /// The animation controller.
   late final AnimationController controller = AnimationController(
     duration: const Duration(milliseconds: 300),
@@ -123,7 +124,7 @@ class _ErrorDetailsState extends State<ErrorDetails> with SingleTickerProviderSt
           padding: const EdgeInsets.only(bottom: kSpace),
           child: ClickableButton(
             onPress: widget.onRetryPressed,
-            child: const Text('Réessayer'),
+            child: const ButtonText('Réessayer'),
           ),
         ),
       FSwitch(
@@ -131,7 +132,7 @@ class _ErrorDetailsState extends State<ErrorDetails> with SingleTickerProviderSt
         value: expanded,
         onChange: toggleStackTrace,
         style: .delta(
-          childPadding: EdgeInsets.only(right: context.theme.switchStyle.childPadding.horizontal / 2),
+          childPadding: .value(EdgeInsets.only(right: context.theme.switchStyle.childPadding.horizontal / 2)),
           trackColor: .delta(
             [
               .match({.selected}, context.theme.colors.error),

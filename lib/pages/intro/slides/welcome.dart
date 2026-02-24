@@ -3,7 +3,7 @@ import 'package:forui/forui.dart';
 import 'package:open_authenticator/app.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/pages/intro/slides/slide.dart';
-import 'package:open_authenticator/widgets/title.dart';
+import 'package:open_authenticator/widgets/title_text.dart';
 
 /// The very first slide shown to the user.
 class WelcomeIntroPageSlide extends IntroPageSlide {
@@ -15,7 +15,7 @@ class WelcomeIntroPageSlide extends IntroPageSlide {
 
   @override
   Widget createWidget(BuildContext context, int remainingSteps) => IntroPageSlideWidget(
-    titleWidget: const TitleWidget(),
+    titleWidget: const TitleText(),
     slide: this,
     children: [
       IntroPageSlideParagraphWidget(text: translations.intro.welcome.firstParagraph(app: App.appName)),
