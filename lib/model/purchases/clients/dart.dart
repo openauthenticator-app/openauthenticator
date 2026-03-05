@@ -11,15 +11,18 @@ class RevenueCatDartClient extends RevenueCatClient {
   /// Creates a new RevenueCat REST client instance.
   RevenueCatDartClient({
     required super.purchasesConfiguration,
+    required super.backendHost,
   });
 
   @override
   Future<void> initialize() async {
     await _PurchasesDartConfigurator.configure(
-      PurchasesDartConfiguration(
-        webBillingApiKey: purchasesConfiguration.apiKey,
-        appUserId: purchasesConfiguration.appUserID,
-      ),
+      webBillingApiKey: purchasesConfiguration.apiKey,
+      appUserId: purchasesConfiguration.appUserID!,
+      attributes: {
+        '\$email': ?purchasesConfiguration.email,
+        ...attributes,
+      }
     );
   }
 
@@ -53,10 +56,22 @@ class _PurchasesDartConfigurator {
   static bool isConfigured = false;
 
   /// Sets up Purchases with your API key and an app user id.
-  static Future<void> configure(PurchasesDartConfiguration configuration) async {
-    if (!isConfigured) {
-      await PurchasesDart.configure(configuration);
+  static Future<void> configure({
+    required String webBillingApiKey,
+    required String appUserId,
+    Map<String, String> attributes = const {},
+  }) async {
+    if (isConfigured) {
+      await PurchasesDart.updateAppUserId(appUserId);
+    } else {
+      await PurchasesDart.configure(
+        PurchasesDartConfiguration(
+          webBillingApiKey: webBillingApiKey,
+          appUserId: appUserId,
+        ),
+      );
       isConfigured = true;
     }
+    await PurchasesDart.setAttributionID(attributes);
   }
 }

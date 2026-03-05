@@ -11,7 +11,8 @@
     "secret": "Invalid secret entered",
     "totpDigits": "This number should be super or equal than 6",
     "masterPassword": "Invalid password entered",
-    "confirmation": "Confirmation doesn't match"
+    "confirmation": "Confirmation doesn't match",
+    "url": "Invalid URL entered"
   },
   "appUnlock": "Failed to unlock the app. Please try again.",
   "generic": {

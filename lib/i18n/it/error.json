@@ -11,7 +11,8 @@
     "secret": "Secret inserita non valido",
     "totpDigits": "Il numero inserito deve essere uguale o maggiore di 6",
     "masterPassword": "Password inserita non valida",
-    "confirmation": "La conferma non corrisponde"
+    "confirmation": "La conferma non corrisponde",
+    "url": "URL non valido"
   },
   "appUnlock": "Impossibile sbloccare l'app. Riprova.",
   "generic": {

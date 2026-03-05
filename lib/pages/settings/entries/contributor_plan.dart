@@ -4,6 +4,7 @@ import 'package:forui/forui.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/purchases/clients/client.dart';
 import 'package:open_authenticator/model/purchases/contributor_plan.dart';
+import 'package:open_authenticator/model/settings/backend_url.dart';
 import 'package:open_authenticator/utils/contributor_plan.dart';
 import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
@@ -21,7 +22,8 @@ class ContributorPlanEntryWidget extends ConsumerWidget with FTileMixin {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    AsyncValue<ContributorPlanState> state = ref.watch(contributorPlanStateProvider);
+    bool hasBackendUrlChanged = ref.watch(backendUrlSettingsEntryProvider).value?.hasBackendUrlChanged ?? false;
+    AsyncValue<ContributorPlanState> state = hasBackendUrlChanged ? const AsyncData(ContributorPlanState.impossible) : ref.watch(contributorPlanStateProvider);
     switch (state) {
       case AsyncData(:final value):
         switch (value) {

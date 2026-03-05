@@ -1,9 +1,11 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/app.dart';
 import 'package:open_authenticator/model/backend/user.dart';
 import 'package:open_authenticator/model/purchases/clients/dart.dart';
 import 'package:open_authenticator/model/purchases/clients/method_channel.dart';
+import 'package:open_authenticator/model/settings/backend_url.dart';
 import 'package:open_authenticator/utils/platform.dart';
 import 'package:open_authenticator/utils/result.dart';
 import 'package:purchases_flutter/models/purchases_configuration.dart' as rc_purchases_configuration;
@@ -11,6 +13,10 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 
 /// The RevenueCat client provider.
 final revenueCatClientProvider = FutureProvider((ref) async {
+  String? backendHost = Uri.tryParse(await ref.watch(backendUrlSettingsEntryProvider.future))?.host;
+  if (backendHost == null) {
+    return null;
+  }
   User? user = await ref.watch(userProvider.future);
   if (user == null) {
     return null;
@@ -28,7 +34,10 @@ final revenueCatClientProvider = FutureProvider((ref) async {
   configuration = configuration
     ..appUserID = user.id
     ..email = user.email;
-  return RevenueCatClient.fromPlatform(purchasesConfiguration: configuration);
+  return RevenueCatClient.fromPlatform(
+    purchasesConfiguration: configuration,
+    backendHost: backendHost,
+  );
 });
 
 /// A RevenueCat client.
@@ -39,27 +48,37 @@ abstract class RevenueCatClient {
   /// The purchase timeout.
   final Duration? purchaseTimeout;
 
+  /// The backend host.
+  final String backendHost;
+
   /// Creates a new RevenueCat client instance.
   RevenueCatClient({
     required this.purchasesConfiguration,
     this.purchaseTimeout = Duration.zero,
+    required this.backendHost,
   }) : assert(purchasesConfiguration.appUserID != null);
 
   /// Creates a new RevenueCat client instance that corresponds to the given [platform].
   factory RevenueCatClient.fromPlatform({
     required PurchasesConfiguration purchasesConfiguration,
     Platform? platform,
+    required String backendHost,
   }) {
     platform ??= currentPlatform;
-    switch (platform) {
-      case Platform.android:
-      case Platform.iOS:
-      case Platform.macOS:
-        return RevenueCatMethodChannelClient(purchasesConfiguration: purchasesConfiguration);
-      default:
-        return RevenueCatDartClient(purchasesConfiguration: purchasesConfiguration);
-    }
+    return (switch (platform) {
+      Platform.android || Platform.iOS || Platform.macOS => RevenueCatMethodChannelClient.new,
+      _ => RevenueCatDartClient.new,
+    })(
+      purchasesConfiguration: purchasesConfiguration,
+      backendHost: backendHost,
+    );
   }
+
+  /// Returns the user's attributes.
+  @protected
+  Map<String, String> get attributes => {
+    'backend': backendHost,
+  };
 
   /// Initializes this client instance.
   Future<void> initialize() async {}
@@ -126,9 +145,6 @@ abstract class RevenueCatClient {
     CustomerInfo? customerInfo = await getCustomerInfo();
     return customerInfo?.managementURL;
   }
-
-  /// Invalidates the user info.
-  Future<void> invalidateUserInfo() => Future.value();
 }
 
 /// Represents a price.

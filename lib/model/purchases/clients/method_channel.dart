@@ -7,10 +7,12 @@ class RevenueCatMethodChannelClient extends RevenueCatClient {
   /// Creates a new RevenueCat method channel client instance.
   RevenueCatMethodChannelClient({
     required super.purchasesConfiguration,
+    required super.backendHost,
   });
 
   @override
   Future<void> initialize() async {
+    await Purchases.setAttributes(attributes);
     await Purchases.configure(purchasesConfiguration);
     await Purchases.setEmail(purchasesConfiguration.email!);
   }
@@ -36,7 +38,4 @@ class RevenueCatMethodChannelClient extends RevenueCatClient {
     await Purchases.restorePurchases();
     return const ResultSuccess();
   }
-
-  @override
-  Future<void> invalidateUserInfo() => Purchases.invalidateCustomerInfoCache();
 }

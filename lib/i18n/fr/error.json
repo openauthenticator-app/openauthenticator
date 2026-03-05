@@ -11,7 +11,8 @@
     "secret": "Secret invalide",
     "totpDigits": "Le nombre entré doit être supérieur ou égal à 6",
     "masterPassword": "Mot de passe invalide",
-    "confirmation": "La confirmation ne correspond pas"
+    "confirmation": "La confirmation ne correspond pas",
+    "url": "URL invalide"
   },
   "appUnlock": "Impossible de déverrouiller l'application. Veuillez réessayer.",
   "generic": {

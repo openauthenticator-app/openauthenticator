@@ -14,3 +14,9 @@ class BackendUrlSettingsEntry extends SettingsEntry<String> {
         defaultValue: App.defaultBackendUrl,
       );
 }
+
+/// Extension methods for the [String] class.
+extension HasBackendUrlChanged on String {
+  /// Returns true if the value has changed.
+  bool get hasBackendUrlChanged => this != App.defaultBackendUrl;
+}

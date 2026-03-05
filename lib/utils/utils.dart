@@ -147,9 +147,12 @@ Uint8List kTransparentImage = Uint8List.fromList([
   0x82,
 ]);
 
+/// Contains some useful color methods.
 extension ColorUtils on Color {
+  /// Highlights the color.
   Color highlight({double amount = 0.1}) => computeLuminance() > 0.4 ? darken(amount: amount) : lighten(amount: amount);
 
+  /// Lightens the color.
   Color lighten({double amount = 0.1}) {
     assert(amount >= 0 && amount <= 1);
 
@@ -159,6 +162,7 @@ extension ColorUtils on Color {
     return hslDark.toColor();
   }
 
+  /// Darkens the color.
   Color darken({double amount = 0.1}) {
     assert(amount >= 0 && amount <= 1);
 

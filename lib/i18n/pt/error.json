@@ -11,7 +11,8 @@
     "secret": "Segredo inválido inserido",
     "totpDigits": "Este número deve ser maior ou igual a 6",
     "masterPassword": "Senha inválida inserida",
-    "confirmation": "A confirmação não corresponde"
+    "confirmation": "A confirmação não corresponde",
+    "url": "URL inválida"
   },
   "appUnlock": "Falha ao desbloquear o aplicativo. Tente novamente.",
   "generic": {

@@ -66,6 +66,7 @@ class ChangeBackendUrlSettingsEntryWidget extends ConsumerWidget with FTileMixin
         message: translations.settings.dangerZone.changeBackendUrl.inputDialog.message(defaultBackendUrl: App.defaultBackendUrl),
         keyboardType: TextInputType.url,
         initialValue: currentUrl,
+        validator: (string) => Uri.tryParse(string ?? '') == null ? translations.error.validation.url : null,
       );
       if (url == null || !context.mounted) {
         return;

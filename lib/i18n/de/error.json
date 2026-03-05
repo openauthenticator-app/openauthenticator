@@ -6,13 +6,14 @@
   },
   "appUnlock": "Die App konnte nicht entsperrt werden. Bitte versuchen Sie es erneut.",
   "validation": {
-    "number": "Sie müssen eine gültige Zahl eingeben.",
-    "empty": "Dieses Feld ist erforderlich.",
-    "email": "Ungültige E-Mail.",
-    "secret": "Ungültiges Geheimnis eingegeben.",
-    "totpDigits": "Diese Zahl muss mindestens 6 betragen.",
-    "masterPassword": "Ungültiges Passwort eingegeben.",
-    "confirmation": "Die Bestätigung stimmt nicht überein."
+    "number": "Sie müssen eine gültige Zahl eingeben",
+    "empty": "Dieses Feld ist erforderlich",
+    "email": "Ungültige E-Mail",
+    "secret": "Ungültiges Geheimnis eingegeben",
+    "totpDigits": "Diese Zahl muss mindestens 6 betragen",
+    "masterPassword": "Ungültiges Passwort eingegeben",
+    "confirmation": "Die Bestätigung stimmt nicht überein",
+    "url": "Ungültige URL."
   },
   "generic": {
     "noTryAgain": "Ups, da ist etwas schiefgelaufen.",
