@@ -39,7 +39,8 @@ dependencies:
   purchases_flutter: ^9.15.1
   purchases_ui_flutter: ^9.15.1
   purchases_dart:
-    path: ../PurchasesDart/
+    git:
+      url: https://github.com/openauthenticator-app/purchases-dart.git
   window_manager: ^0.5.1
   slang: ^4.14.0
   slang_flutter: ^4.14.0
