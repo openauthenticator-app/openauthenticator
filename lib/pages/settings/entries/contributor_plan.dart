@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
@@ -23,7 +24,7 @@ class ContributorPlanEntryWidget extends ConsumerWidget with FTileMixin {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     bool hasBackendUrlChanged = ref.watch(backendUrlSettingsEntryProvider).value?.hasBackendUrlChanged ?? false;
-    AsyncValue<ContributorPlanState> state = hasBackendUrlChanged ? const AsyncData(ContributorPlanState.impossible) : ref.watch(contributorPlanStateProvider);
+    AsyncValue<ContributorPlanState> state = hasBackendUrlChanged && !kDebugMode ? const AsyncData(.impossible) : ref.watch(contributorPlanStateProvider);
     switch (state) {
       case AsyncData(:final value):
         switch (value) {

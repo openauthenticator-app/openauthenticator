@@ -278,13 +278,13 @@ class _ProviderCircleButton extends ConsumerWidget {
             [
               .match(
                 {.hovered},
-                .delta(color: buttonColor),
+                .boxDelta(color: buttonColor),
               ),
               .base(
-                .delta(color: buttonColor?.lighten(amount: 0.075)),
+                .boxDelta(color: buttonColor?.lighten(amount: 0.075)),
               ),
               .all(
-                .delta(
+                .boxDelta(
                   borderRadius: BorderRadius.circular(size + kBigSpace),
                 ),
               ),

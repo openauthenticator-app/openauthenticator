@@ -192,7 +192,7 @@ class _AppDialogTitle extends StatelessWidget {
             fontWeight: FontWeight.normal,
             height: 1,
           ),
-          padding: .value(AppDialog.kDefaultContentPadding.copyWith(top: kBigSpace, bottom: kBigSpace)),
+          padding: .value(AppDialog.kDefaultContentPadding.copyWith(top: kBigSpace, bottom: kBigSpace - 6)),
         ),
         suffixes: [
           if (currentPlatform.isDesktop && displayCloseButton != false)

@@ -81,7 +81,7 @@ abstract class RevenueCatClient {
   };
 
   /// Initializes this client instance.
-  Future<void> initialize() async {}
+  Future<void> initialize(Ref ref) async {}
 
   /// Returns the customer info.
   Future<CustomerInfo?> getCustomerInfo();
@@ -105,8 +105,8 @@ abstract class RevenueCatClient {
 
   /// Purchases the given [purchasable].
   Future<void> purchase(Purchasable purchasable, PackageType packageType) async {
-    Offerings offerings = await Purchases.getOfferings();
-    Offering? offering = offerings.getOffering(purchasable.offeringId);
+    Offerings? offerings = await getOfferings();
+    Offering? offering = offerings?.getOffering(purchasable.offeringId);
     if (offering == null) {
       return;
     }

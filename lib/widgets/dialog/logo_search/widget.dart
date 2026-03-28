@@ -177,7 +177,7 @@ class _LogoSearchState extends State<LogoSearch> {
             builder: (context, states, child) => Container(
               decoration: BoxDecoration(
                 color: (states.contains(FTappableVariant.hovered) || states.contains(FTappableVariant.pressed)) ? context.theme.colors.secondary : context.theme.colors.background,
-                borderRadius: context.theme.style.borderRadius,
+                borderRadius: context.theme.style.borderRadius.md,
               ),
               padding: const EdgeInsets.all(kSpace),
               child: child!,

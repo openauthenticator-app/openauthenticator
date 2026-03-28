@@ -12,6 +12,9 @@ class BackendRequestError implements Exception {
   /// The invalid session error code.
   static const String kInvalidSessionError = 'invalidSession';
 
+  /// The invalid verification code error code.
+  static const String kInvalidVerificationCodeError = 'invalidVerificationCode';
+
   /// The route.
   final String route;
 

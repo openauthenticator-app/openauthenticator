@@ -118,7 +118,7 @@ class AccountUtils {
         );
         break;
       case ResultError(:final exception, :final stackTrace):
-        if (handleEmailInvalidCodeError && exception is BackendRequestError && exception.errorCode == 'invalidCode') {
+        if (handleEmailInvalidCodeError && exception is BackendRequestError && exception.errorCode == BackendRequestError.kInvalidVerificationCodeError) {
           showErrorToast(
             context,
             text: translations.error.invalidCode,

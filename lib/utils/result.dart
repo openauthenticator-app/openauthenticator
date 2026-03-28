@@ -90,6 +90,7 @@ extension DisplayResult on BuildContext {
             this,
             error: exception,
             stackTrace: stackTrace,
+            allowRetry: false,
           );
           break;
         }

@@ -31,7 +31,7 @@ class ClickableTile extends FTile {
   ClickableTile({
     super.key,
     required super.title,
-    super.variants,
+    super.variant,
     super.style,
     super.enabled,
     super.selected = false,
@@ -57,7 +57,7 @@ class ClickableTile extends FTile {
   ClickableTile.raw({
     super.key,
     required super.child,
-    super.variants,
+    super.variant,
     super.style,
     super.enabled,
     super.selected = false,

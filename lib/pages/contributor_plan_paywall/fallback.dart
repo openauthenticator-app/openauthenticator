@@ -314,12 +314,14 @@ class _ContributorPlanBillingPlanPickerState extends ConsumerState<_ContributorP
               decoration: .delta(
                 this.packageType == packageType
                     ? [
-                        .base(.delta(color: context.theme.tileStyles.base.decoration.base.color?.highlight())),
+                        .base(
+                          .boxDelta(color: context.theme.tileStyles.base.decoration.base.color?.highlight()),
+                        ),
                       ]
                     : [],
               ),
               contentStyle: const .delta(
-                padding: .value(EdgeInsets.symmetric(vertical: kSpace, horizontal: kBigSpace)),
+                unsuffixedPadding: .value(EdgeInsets.symmetric(vertical: kSpace, horizontal: kBigSpace)),
               ),
             ),
             title: Text.rich(

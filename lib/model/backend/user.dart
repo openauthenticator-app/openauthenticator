@@ -160,7 +160,7 @@ class UserNotifier extends AsyncNotifier<User?> {
   }
 
   /// Logs out the user.
-  Future<Result> logoutUser() async {
+  Future<Result> logoutUser({bool forceClearLocally = true}) async {
     try {
       Session? session = await ref.read(storedSessionProvider.future);
       if (session == null) {
@@ -173,16 +173,16 @@ class UserNotifier extends AsyncNotifier<User?> {
               refreshToken: session.refreshToken,
             ),
           );
-      if (result is! ResultSuccess<UserLogoutResponse>) {
-        return result;
-      }
-      await ref.read(storedSessionProvider.notifier).clear();
-      return const ResultSuccess();
+      return result;
     } catch (ex, stackTrace) {
       return ResultError(
         exception: ex,
         stackTrace: stackTrace,
       );
+    } finally {
+      if (forceClearLocally) {
+        await ref.read(storedSessionProvider.notifier).clear();
+      }
     }
   }
 

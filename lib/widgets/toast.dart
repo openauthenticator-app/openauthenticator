@@ -34,7 +34,7 @@ FToasterEntry _showToast(
 }) => showFToast(
   context: context,
   style: .delta(
-    decoration: .delta(
+    decoration: .boxDelta(
       color: background,
     ),
     titleTextStyle: .delta(
@@ -56,7 +56,7 @@ FToasterEntry _showToast(
       decoration: .delta(
         [
           .all(
-            .delta(color: background),
+            .boxDelta(color: background),
           ),
         ],
       ),

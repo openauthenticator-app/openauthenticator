@@ -101,7 +101,7 @@ class TotpTile extends StatelessWidget {
           ),
         Text(
           (totp.isDecrypted ? (totp as DecryptedTotp).label : null) ?? totp.uuid,
-          style: context.theme.typography.base.copyWith(
+          style: context.theme.typography.md.copyWith(
             color: context.theme.colors.mutedForeground,
             overflow: TextOverflow.ellipsis,
           ),

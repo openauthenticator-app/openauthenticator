@@ -112,7 +112,7 @@ class _ConfirmActionPickerDialog extends StatelessWidget {
         onPress: () => Navigator.pop(context, _ConfirmAction.tryConfirm),
       ),
       ClickableTile(
-        variants: {.destructive},
+        variant: .destructive,
         prefix: const Icon(FIcons.x),
         title: Text(translations.settings.synchronization.confirmEmail.confirmActionPickerDialog.cancelConfirmation.title),
         subtitle: Text(translations.settings.synchronization.confirmEmail.confirmActionPickerDialog.cancelConfirmation.subtitle),

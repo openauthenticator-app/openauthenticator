@@ -217,7 +217,7 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
           decoration: .delta(
             [
               .all(
-                const .delta(borderRadius: BorderRadius.zero),
+                const .boxDelta(borderRadius: BorderRadius.zero),
               ),
             ],
           ),

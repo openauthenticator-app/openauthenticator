@@ -18,7 +18,7 @@ class ContributorPlan extends AsyncNotifier<ContributorPlanState> {
     if (client == null) {
       return ContributorPlanState.impossible;
     }
-    await client.initialize();
+    await client.initialize(ref);
     return await client.hasEntitlement(AppContributorPlan.entitlementId) ? ContributorPlanState.active : ContributorPlanState.inactive;
   }
 

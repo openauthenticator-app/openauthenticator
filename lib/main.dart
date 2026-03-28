@@ -136,64 +136,68 @@ class OpenAuthenticatorApp extends ConsumerWidget {
     required Locale locale,
     String? initialRoute,
     Widget? home,
-  }) => MaterialApp(
-    key: ValueKey('materialApp.$showIntroState'),
-    title: App.appName,
-    locale: locale,
-    localizationsDelegates: const [
-      GlobalMaterialLocalizations.delegate,
-      GlobalWidgetsLocalizations.delegate,
-      GlobalCupertinoLocalizations.delegate,
-    ],
-    supportedLocales: AppLocaleUtils.supportedLocales,
-    themeMode: theme.value,
-    darkTheme: greenTheme.dark.toApproximateMaterialTheme(),
-    theme: greenTheme.light.toApproximateMaterialTheme(),
-    builder: (context, child) => AnimatedFTheme(
-      light: greenTheme.light,
-      dark: greenTheme.dark,
-      child: FToaster(
-        child: DesktopWindowFrame(
-          child: child!,
+  }) {
+    FThemeData light = currentPlatform.isDesktop ? greenTheme.light.desktop : greenTheme.light.touch;
+    FThemeData dark = currentPlatform.isDesktop ? greenTheme.dark.desktop : greenTheme.dark.touch;
+    return MaterialApp(
+      key: ValueKey('materialApp.$showIntroState'),
+      title: App.appName,
+      locale: locale,
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: AppLocaleUtils.supportedLocales,
+      themeMode: theme.value,
+      darkTheme: dark.toApproximateMaterialTheme(),
+      theme: light.toApproximateMaterialTheme(),
+      builder: (context, child) => AnimatedFTheme(
+        light: light,
+        dark: dark,
+        child: FToaster(
+          child: DesktopWindowFrame(
+            child: child!,
+          ),
         ),
       ),
-    ),
-    routes: home == null
-        ? {
-            IntroPage.name: (_) => const _RouteWidget(
-              child: IntroPage(),
+      routes: home == null
+          ? {
+        IntroPage.name: (_) => const _RouteWidget(
+          child: IntroPage(),
+        ),
+        HomePage.name: (_) => const _RouteWidget(
+          listen: true,
+          rateMyApp: true,
+          child: HomePage(),
+        ),
+        ScanPage.name: (_) => const _RouteWidget(
+          child: ScanPage(),
+        ),
+        SettingsPage.name: (_) => const _RouteWidget(
+          child: SettingsPage(),
+        ),
+        TotpPage.name: (context) {
+          Map<String, dynamic>? arguments = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
+          return _RouteWidget(
+            child: TotpPage(
+              totp: arguments?[kRouteParameterTotp],
+              add: arguments?[kRouteParameterAddTotp],
             ),
-            HomePage.name: (_) => const _RouteWidget(
-              listen: true,
-              rateMyApp: true,
-              child: HomePage(),
-            ),
-            ScanPage.name: (_) => const _RouteWidget(
-              child: ScanPage(),
-            ),
-            SettingsPage.name: (_) => const _RouteWidget(
-              child: SettingsPage(),
-            ),
-            TotpPage.name: (context) {
-              Map<String, dynamic>? arguments = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
-              return _RouteWidget(
-                child: TotpPage(
-                  totp: arguments?[kRouteParameterTotp],
-                  add: arguments?[kRouteParameterAddTotp],
-                ),
-              );
-            },
-            SyncIssuesPage.name: (_) => const _RouteWidget(
-              child: SyncIssuesPage(),
-            ),
-            ContributorPlanPaywallPage.name: (_) => const _RouteWidget(
-              child: ContributorPlanPaywallPage(),
-            ),
-          }
-        : {},
-    initialRoute: home == null ? initialRoute : null,
-    home: home,
-  );
+          );
+        },
+        SyncIssuesPage.name: (_) => const _RouteWidget(
+          child: SyncIssuesPage(),
+        ),
+        ContributorPlanPaywallPage.name: (_) => const _RouteWidget(
+          child: ContributorPlanPaywallPage(),
+        ),
+      }
+          : {},
+      initialRoute: home == null ? initialRoute : null,
+      home: home,
+    );
+  }
 }
 
 /// A route that allows to listen to dynamic links and [totpLimitExceededProvider].

@@ -50,17 +50,16 @@ class SynchronizeSettingsEntryWidget extends CheckboxSettingsEntryWidget<Storage
       );
     }
     AsyncValue<ContributorPlanState> state = ref.watch(contributorPlanStateProvider);
-    StorageType storageType = value;
     switch (state) {
-      case AsyncData(:final value):
-        switch (value) {
+      case AsyncData():
+        switch (state.value) {
           case ContributorPlanState.inactive:
             return FutureBuilder(
               future: ref.watch(totpLimitProvider.future),
               builder: (context, snapshot) => super.createTile(
                 context,
                 ref,
-                value: storageType,
+                value: value,
                 enabled: snapshot.data?.isExceeded != true,
               ),
             );
@@ -68,7 +67,7 @@ class SynchronizeSettingsEntryWidget extends CheckboxSettingsEntryWidget<Storage
             return super.createTile(
               context,
               ref,
-              value: storageType,
+              value: value,
               enabled: enabled,
             );
           default:
@@ -80,7 +79,7 @@ class SynchronizeSettingsEntryWidget extends CheckboxSettingsEntryWidget<Storage
           context,
           ref,
           value: value,
-          enabled: storageType == StorageType.shared,
+          enabled: value == StorageType.shared,
         );
     }
   }

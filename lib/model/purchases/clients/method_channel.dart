@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/model/purchases/clients/client.dart';
 import 'package:open_authenticator/utils/result.dart';
 import 'package:purchases_flutter/purchases_flutter.dart' hide Price;
@@ -11,7 +12,7 @@ class RevenueCatMethodChannelClient extends RevenueCatClient {
   });
 
   @override
-  Future<void> initialize() async {
+  Future<void> initialize(Ref ref) async {
     await Purchases.setAttributes(attributes);
     await Purchases.configure(purchasesConfiguration);
     await Purchases.setEmail(purchasesConfiguration.email!);

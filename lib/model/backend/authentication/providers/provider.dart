@@ -98,7 +98,7 @@ sealed class AuthenticationProvider {
   Future<Result> onRedirectReceived(Uri uri) async {
     try {
       List<String> path = uri.pathSegments;
-      if (path.lastOrNull != 'code') {
+      if (path.lastOrNull != 'finish') {
         return const ResultCancelled();
       }
       String? authorizationCode = uri.queryParameters['authorizationCode'];

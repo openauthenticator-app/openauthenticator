@@ -15,9 +15,12 @@ import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/error_dialog.dart';
 import 'package:open_authenticator/widgets/waiting_overlay.dart';
 
+/// The widget that asks the user to migrate its data.
 class Migrator extends ConsumerWidget {
+  /// The child.
   final Widget child;
 
+  /// Creates a new migrator widget instance.
   const Migrator({
     super.key,
     required this.child,
@@ -35,13 +38,14 @@ class Migrator extends ConsumerWidget {
               above: Center(
                 child: ListView(
                   shrinkWrap: true,
+                  padding: context.theme.style.pagePadding,
                   children: [
                     Padding(
                       padding: const EdgeInsets.only(bottom: kBigSpace),
                       child: Text(
                         translations.migrator.title,
                         textAlign: TextAlign.center,
-                        style: context.theme.typography.lg,
+                        style: context.theme.typography.xl2,
                       ),
                     ),
                     Padding(
@@ -51,36 +55,15 @@ class Migrator extends ConsumerWidget {
                         textAlign: TextAlign.center,
                       ),
                     ),
-                    SizedBox(
-                      width: math.min(MediaQuery.sizeOf(context).width - kBigSpace, 300),
-                      child: ClickableButton(
-                        onPress: () async {
-                          Result result = await showWaitingOverlay(
-                            context,
-                            future: ref.read(migratorProvider.notifier).migrate(),
-                          );
-                          if (!context.mounted) {
-                            return;
-                          }
-                          switch (result) {
-                            case ResultSuccess():
-                              context.handleResult(result);
-                              await AccountUtils.trySignIn(context);
-                              break;
-                            case ResultError():
-                              await ErrorDialog.openDialog(
-                                context,
-                                message: translations.migrator.error,
-                                error: result.exception,
-                                stackTrace: result.stackTrace,
-                              );
-                              break;
-                            default:
-                              break;
-                          }
-                        },
-                        prefix: const Icon(FIcons.cloudSync),
-                        child: ButtonText(translations.migrator.button.migrate),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: kSpace),
+                      child: SizedBox(
+                        width: math.min(MediaQuery.sizeOf(context).width - kBigSpace, 300),
+                        child: ClickableButton(
+                          onPress: () => _migrate(context, ref),
+                          prefix: const Icon(FIcons.cloudSync),
+                          child: ButtonText(translations.migrator.button.migrate),
+                        ),
                       ),
                     ),
                     SizedBox(
@@ -108,5 +91,35 @@ class Migrator extends ConsumerWidget {
       },
       _ => child,
     };
+  }
+
+  /// Migrates the data.
+  Future<void> _migrate(BuildContext context, WidgetRef ref) async {
+    Result result = await showWaitingOverlay(
+      context,
+      future: ref.read(migratorProvider.notifier).migrate(),
+    );
+    if (!context.mounted) {
+      return;
+    }
+    switch (result) {
+      case ResultSuccess():
+        context.handleResult(result);
+        await AccountUtils.trySignIn(context);
+        break;
+      case ResultError():
+        ErrorDialogResult? errorResult = await ErrorDialog.openDialog(
+          context,
+          message: translations.migrator.error,
+          error: result.exception,
+          stackTrace: result.stackTrace,
+        );
+        if (errorResult == .retry && context.mounted) {
+          await _migrate(context, ref);
+        }
+        break;
+      default:
+        break;
+    }
   }
 }

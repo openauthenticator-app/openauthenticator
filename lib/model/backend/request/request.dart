@@ -189,13 +189,13 @@ class EmailConfirmRequest extends BackendPostRequest<EmailConfirmResponse> {
   /// The email.
   final String email;
 
-  /// The code.
-  final String code;
+  /// The verification code.
+  final String verificationCode;
 
   /// Creates a new email confirm request instance.
   const EmailConfirmRequest({
     required this.email,
-    required this.code,
+    required this.verificationCode,
   }) : super(
          route: '/auth/provider/email/callback',
          needsAuthorization: false,
@@ -204,7 +204,7 @@ class EmailConfirmRequest extends BackendPostRequest<EmailConfirmResponse> {
   @override
   Object? get body => {
     'email': email,
-    'code': code,
+    'verificationCode': verificationCode,
   };
 
   @override

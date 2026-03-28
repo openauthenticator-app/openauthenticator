@@ -22,6 +22,10 @@ class EmailAuthenticationProvider extends AuthenticationProvider {
   @override
   Future<Result> onRedirectReceived(Uri uri) async {
     if (uri.host == 'auth' && uri.path == '/provider/email/sent') {
+      String? cancelCode = uri.queryParameters['cancelCode'];
+      if (cancelCode == null) {
+        return ResultError(exception: uri.queryParameters['previously']?.toLowerCase() == 'true' ? const _EmailAlreadySentException() : const _NoCancelCodeException());
+      }
       _ref.read(emailConfirmationStateProvider.notifier)._markNeedsConfirmation(uri.queryParameters['email']!, uri.queryParameters['cancelCode']!);
       return const ResultSuccess();
     }
@@ -54,7 +58,7 @@ class EmailAuthenticationProvider extends AuthenticationProvider {
   }
 
   /// Confirms the email.
-  Future<Result> confirm(String code) async {
+  Future<Result> confirm(String verificationCode) async {
     try {
       EmailConfirmationData? data = await _ref.read(emailConfirmationStateProvider.future);
       if (data == null) {
@@ -65,7 +69,7 @@ class EmailAuthenticationProvider extends AuthenticationProvider {
           .sendHttpRequest(
             EmailConfirmRequest(
               email: data.email,
-              code: code,
+              verificationCode: verificationCode,
             ),
           );
       if (response is! ResultSuccess<EmailConfirmResponse>) {
@@ -181,4 +185,22 @@ class EmailConfirmationData with EquatableMixin {
     email,
     cancelCode,
   ];
+}
+
+/// Triggered when the email has already been sent.
+class _NoCancelCodeException implements Exception {
+  /// Creates a new no cancel code exception instance.
+  const _NoCancelCodeException();
+
+  @override
+  String toString() => 'No cancel code.';
+}
+
+/// Triggered when the email has already been sent.
+class _EmailAlreadySentException implements Exception {
+  /// Creates a new email already sent exception instance.
+  const _EmailAlreadySentException();
+
+  @override
+  String toString() => 'Email already sent.';
 }

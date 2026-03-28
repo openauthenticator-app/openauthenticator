@@ -6,6 +6,7 @@ import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/settings/backend_url.dart';
 import 'package:open_authenticator/model/settings/storage_type.dart';
 import 'package:open_authenticator/pages/settings/entries/widgets.dart';
+import 'package:open_authenticator/utils/storage_migration.dart';
 import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
@@ -71,9 +72,14 @@ class ChangeBackendUrlSettingsEntryWidget extends ConsumerWidget with FTileMixin
       if (url == null || !context.mounted) {
         return;
       }
+      await StorageMigrationUtils.changeStorageType(context, ref, StorageType.localOnly, logout: true);
+      // TODO: Remove existing email verification
+      if (!context.mounted) {
+        return;
+      }
       await showWaitingOverlay(
         context,
-        future: ref.read(backendUrlSettingsEntryProvider.notifier).changeValue(url),
+        future: ref.read(backendUrlSettingsEntryProvider.notifier).changeValue(BackendUrl(url)),
       );
       if (context.mounted) {
         showSuccessToast(context, text: translations.error.noError);
