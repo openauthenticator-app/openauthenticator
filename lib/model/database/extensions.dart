@@ -30,7 +30,7 @@ extension _ToOpenAuthenticatorBackendPushOperation on _DriftBackendPushOperation
     ),
     PushOperationKind.delete => DeleteTotpsPushOperation.raw(
       uuid: uuid,
-      payload: jsonDecode(jsonPayload),
+      payload: jsonDecode(jsonPayload).cast<String>(),
       createdAt: createdAt,
     ),
   };

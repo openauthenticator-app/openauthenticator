@@ -200,7 +200,7 @@ class SynchronizationController extends Notifier<SynchronizationStatus> {
 
   /// Runs the synchronization.
   Future<void> _run({bool checkSettings = true}) async {
-    bool retry = true;
+    bool hasError = false;
     try {
       if (state.phase is SynchronizationPhaseSyncing) {
         return;
@@ -216,15 +216,17 @@ class SynchronizationController extends Notifier<SynchronizationStatus> {
 
       bool canReachBackend = await ref.read(connectivityStateProvider.future);
       if (canReachBackend) {
-        void onFinish({bool retry = true}) => state = state.update(
+        void onFinish({bool errorOccurred = false}) => state = state.update(
           phase: const SynchronizationPhaseUpToDate(),
-          retryAttempt: retry ? state.retryAttempt : 0,
+          retryAttempt: errorOccurred ? state.retryAttempt : 0,
         );
+
         Result pushResult = await ref.read(pushOperationsQueueProvider.notifier)._push(checkSettings: checkSettings);
         if (pushResult is! ResultSuccess) {
           if (pushResult is ResultCancelled) {
-            onFinish(retry: false);
+            onFinish(errorOccurred: false);
           } else {
+            hasError = true;
             (Object, StackTrace) error = pushResult is ResultError ? (pushResult.exception, pushResult.stackTrace) : (Exception('An error occurred while pushing.'), StackTrace.current);
             Error.throwWithStackTrace(error.$1, error.$2);
           }
@@ -232,24 +234,21 @@ class SynchronizationController extends Notifier<SynchronizationStatus> {
           Result pullResult = await _pull(checkSettings: checkSettings);
           if (pullResult is! ResultSuccess) {
             if (pullResult is ResultCancelled) {
-              onFinish(retry: false);
+              onFinish(errorOccurred: false);
             } else {
+              hasError = true;
               (Object, StackTrace) error = pullResult is ResultError ? (pullResult.exception, pullResult.stackTrace) : (Exception('An error occurred while pulling.'), StackTrace.current);
               Error.throwWithStackTrace(error.$1, error.$2);
             }
           }
 
-          List<PushOperation> pendingAfter = await ref.read(pushOperationsQueueProvider.future);
-          retry = pendingAfter.isNotEmpty;
-          onFinish(retry: retry);
+          onFinish(errorOccurred: false);
         }
       } else {
-        state = state.update(
-          phase: const SynchronizationPhaseOffline(),
-        );
-        retry = false;
+        state = state.update(phase: const SynchronizationPhaseOffline());
       }
     } catch (ex, stackTrace) {
+      hasError = true;
       state = state.update(
         phase: SynchronizationPhaseError(
           exception: ex,
@@ -257,7 +256,8 @@ class SynchronizationController extends Notifier<SynchronizationStatus> {
         ),
       );
     }
-    if (retry) {
+
+    if (hasError) {
       _scheduleRetry();
     } else {
       _retryTimer?.cancel();
