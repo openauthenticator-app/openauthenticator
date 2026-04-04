@@ -1,8 +1,15 @@
 {
   "noError": "Operação realizada com sucesso.",
-  "errorDialog": {
+  "widget": {
     "title": "Erro",
-    "retryButton": "Tentar novamente"
+    "stackTrace": {
+      "show": "Mostrar a pilha",
+      "hide": "Ocultar a pilha"
+    },
+    "button": {
+      "report": "Reportar",
+      "retry": "Tentar novamente"
+    }
   },
   "validation": {
     "number": "Você deve inserir um número válido",
@@ -14,11 +21,34 @@
     "confirmation": "A confirmação não corresponde",
     "url": "URL inválida"
   },
-  "appUnlock": "Falha ao desbloquear o aplicativo. Tente novamente.",
   "generic": {
-    "noTryAgain": "Ops, algo deu errado.",
-    "tryAgain": "Algo deu errado. Tente novamente mais tarde.",
-    "withException": "Ocorreu um erro (exceção: $exception). Tente novamente mais tarde."
+    "noException": "Ops, algo deu errado.",
+    "withException": "Ocorreu um erro (exceção: $exception).",
+    "tryAgain": "Tente novamente mais tarde."
+  },
+  "backup": {
+    "fileDoesNotExist": "O arquivo de backup não existe: $path.",
+    "invalidPassword": "Senha mestra inválida inserida.",
+    "invalidContent": "Conteúdo inválido.",
+    "crypto": "Ocorreu um erro de criptografia."
+  },
+  "appUnlock": {
+    "generic": "Falha ao desbloquear a aplicação. Tente novamente.",
+    "localAuthenticationDeviceNotSupported": "Falha ao desbloquear a aplicação porque seu dispositivo não é suportado por autenticação local. Desative esta método com o botão abaixo.",
+    "noPasswordVerificationMethodAvailable": "Falha ao desbloquear a aplicação com sua senha porque as informações da aplicação foram alteradas. Altere sua senha mestra para continuar.\nNota que seus TOTPs serão descriptografados manualmente."
+  },
+  "backend": {
+    "noEmailToConfirm": "Nenhum e-mail para confirmar.",
+    "invalidSession": "Sua sessão é inválida. Tente novamente para fazer login.",
+    "noSession": "Você deve estar logado para prosseguir.",
+    "emailAlreadySent": "Um e-mail já foi enviado para este endereço. Verifique sua caixa de entrada ou tente novamente em alguns minutos.",
+    "noCancelCode": "Nenhum código de cancelamento foi fornecido pelo servidor. Isso não é normal. Tente novamente mais tarde.",
+    "expiredSession": "Sua sessão expirou. Tente novamente para fazer login.",
+    "invalidPayload": "Seu payload é inválido. Tente novamente mais tarde.",
+    "invalidToken": "Seu token é inválido. Tente novamente para fazer login.",
+    "invalidVerificationCode": "Seu código de verificação é inválido.",
+    "invalidAppVersion": "Sua versão da aplicação é inválida. Atualize para a última versão.",
+    "invalidBackendUrl": "URL do servidor backend inválida."
   },
   "scan": {
     "noUri": "Falha ao ler este código QR. Certifique-se de que é um código QR TOTP válido.",
@@ -26,12 +56,27 @@
     "controllerUninitialized": "Controlador não inicializado (código: $exception).",
     "unsupported": "A digitalização não é suportada neste dispositivo (código: $exception)."
   },
-  "storageMigration(map)": {
+  "storageMigration": {
+    "getTotps": "Ocorreu um erro ao obter seus TOTPs remotos. Tente novamente mais tarde.",
     "backupError": "Ocorreu um erro ao fazer o backup. Tente novamente.",
+    "anotherDeletedTotpPolicyShouldBeUsed": "Outra política de TOTP excluída deve ser usada.",
     "currentStoragePasswordMismatch": "Senha mestra inválida inserida.",
-    "encryptionKeyChangeFailed": "Ocorreu um erro ao criptografar seus dados. Tente novamente mais tarde.",
-    "genericError": "Ocorreu um erro ao migrar seus dados. Tente novamente mais tarde."
+    "generic": "Ocorreu um erro ao migrar seus dados. Tente novamente mais tarde."
   },
-  "totpDecrypt": "Falha ao descriptografar este TOTP. Certifique-se de que inseriu a senha correta.",
-  "invalidCode": "Código inválido."
+  "noRevenueCatClient": "Nenhum cliente RevenueCat disponível.",
+  "totp": {
+    "create": "Este TOTP não pode ser criado.",
+    "decrypt": "Falha ao descriptografar este TOTP. Certifique-se de que você tenha inserido a senha correta.",
+    "changeCryptoStore": {
+      "noCryptoStore": "Não foi possível obter o armazenamento de criptografia atual. Feche e abra novamente a aplicação.",
+      "generic": "Falha ao criptografar este TOTP com o armazenamento de criptografia atual."
+    }
+  },
+  "passwordMismatch": "A senha do armazenamento de criptografia está incorreta.",
+  "migrator": {
+    "idToken": "Não foi possível obter o token de identificação. Tente novamente mais tarde.",
+    "httpError": "Migração falhou. Erro HTTP $statusCode : $body.",
+    "authProviderNotFound": "Não foi possível encontrar o provedor de autenticação $providerId.",
+    "migrationCancelled": "Migração cancelada."
+  }
 }

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
+import 'package:open_authenticator/model/backend/authentication/providers/provider.dart';
 import 'package:open_authenticator/model/backend/user.dart';
-import 'package:open_authenticator/model/settings/storage_type.dart';
 import 'package:open_authenticator/utils/account.dart';
 import 'package:open_authenticator/utils/storage_migration.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
@@ -28,12 +28,17 @@ class _LogInTile extends ConsumerWidget {
   const _LogInTile();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => ClickableTile(
-    prefix: const Icon(FIcons.logIn),
-    title: Text(translations.settings.synchronization.accountLogin.logIn.title),
-    subtitle: Text(translations.settings.synchronization.accountLogin.logIn.subtitle),
-    onPress: () => AccountUtils.trySignIn(context),
-  );
+  Widget build(BuildContext context, WidgetRef ref) {
+    EmailConfirmationData? confirmationData = ref.watch(emailConfirmationStateProvider).value;
+    return confirmationData == null
+        ? ClickableTile(
+            prefix: const Icon(FIcons.logIn),
+            title: Text(translations.settings.synchronization.accountLogin.logIn.title),
+            subtitle: Text(translations.settings.synchronization.accountLogin.logIn.subtitle),
+            onPress: () => AccountUtils.trySignIn(context),
+          )
+        : const SizedBox.shrink();
+  }
 }
 
 /// The logout list tile.
@@ -58,6 +63,6 @@ class _LogOutTile extends ConsumerWidget {
         ),
       ),
     ),
-    onPress: () => StorageMigrationUtils.changeStorageType(context, ref, StorageType.localOnly, logout: true),
+    onPress: () => StorageMigrationUtils.changeStorageType(context, ref, .localOnly, logout: true),
   );
 }

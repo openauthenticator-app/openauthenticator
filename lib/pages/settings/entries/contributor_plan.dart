@@ -47,9 +47,9 @@ class ContributorPlanEntryWidget extends ConsumerWidget with FTileMixin {
               prefix: const Icon(FIcons.userCheck),
               title: Text(translations.settings.application.contributorPlan.title),
               subtitle: Text(translations.settings.application.contributorPlan.subtitle.active),
-              onPress: () => showDialog(
+              onPress: () => showFDialog(
                 context: context,
-                builder: (context) => AppDialog(
+                builder: (context, style, animation) => AppDialog(
                   title: Text(translations.settings.application.contributorPlan.subscriptionDialog.title),
                   actions: [
                     ClickableButton(

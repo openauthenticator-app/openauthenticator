@@ -122,9 +122,9 @@ class _ConfirmActionPickerDialog extends StatelessWidget {
   );
 
   /// Opens the dialog.
-  static Future<_ConfirmAction?> openDialog(BuildContext context) => showDialog<_ConfirmAction>(
+  static Future<_ConfirmAction?> openDialog(BuildContext context) => showFDialog<_ConfirmAction>(
     context: context,
-    builder: (context) => _ConfirmActionPickerDialog(),
+    builder: (context, style, animation) => _ConfirmActionPickerDialog(),
   );
 }
 

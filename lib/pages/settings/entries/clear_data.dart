@@ -99,10 +99,10 @@ class ClearDataSettingsEntryWidget extends ConsumerWidget with FTileMixin {
   /// Shows the dialog that indicates the user he has to restart the app.
   Future<void> _showCloseDialog(BuildContext context) async {
     bool canExitWithConfirmDialog = _canExitWithConfirmDialog;
-    await showDialog(
+    await showFDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AppDialog(
+      builder: (context, style, animation) => AppDialog(
         title: Text(translations.settings.dangerZone.clearData.doneDialog.title),
         displayCloseButton: false,
         actions: canExitWithConfirmDialog

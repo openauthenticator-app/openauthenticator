@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:open_authenticator/i18n/localizable_exception.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/utils/utils.dart';
 import 'package:open_authenticator/widgets/dialog/error_dialog.dart';
@@ -77,24 +78,35 @@ extension DisplayResult on BuildContext {
   /// Display the given [result].
   void handleResult(
     Result result, {
-    bool showDialogIfError = true,
+    bool Function(Object? error)? showDialogIfError,
     String? successMessage,
+    String Function(Object? error)? errorMessage,
   }) {
     switch (result) {
       case ResultSuccess():
-        showSuccessToast(this, text: successMessage ?? translations.error.noError);
+        showSuccessToast(
+          this,
+          text: successMessage ?? translations.error.noError,
+        );
         break;
       case ResultError(:final exception, :final stackTrace):
-        if (showDialogIfError) {
+        String? message = errorMessage?.call(exception);
+        if (showDialogIfError == null || showDialogIfError(exception)) {
           ErrorDialog.openDialog(
             this,
             error: exception,
             stackTrace: stackTrace,
-            allowRetry: false,
+            message: message,
           );
-          break;
+        } else {
+          if (message == null) {
+            if (exception is LocalizableException) {
+              message = exception.localizedErrorMessage;
+            }
+            message ??= translations.error.generic.withException(exception: exception);
+          }
+          showErrorToast(this, text: message);
         }
-        showErrorToast(this, text: translations.error.generic.withException(exception: exception));
         break;
       default:
         break;

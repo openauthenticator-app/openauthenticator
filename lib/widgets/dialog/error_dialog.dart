@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:forui/forui.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
@@ -30,13 +31,13 @@ class ErrorDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AppDialog(
-    title: Text(translations.error.errorDialog.title),
+    title: Text(translations.error.widget.title),
     actions: [
       if (allowRetry)
         ClickableButton(
           variant: .secondary,
           onPress: () => Navigator.pop(context, ErrorDialogResult.retry),
-          child: ButtonText(translations.error.errorDialog.retryButton),
+          child: ButtonText(translations.error.widget.button.retry),
         ),
       ClickableButton(
         variant: .secondary,
@@ -59,10 +60,10 @@ class ErrorDialog extends StatelessWidget {
     String? message,
     Object? error,
     StackTrace? stackTrace,
-    bool allowRetry = true,
-  }) => showDialog<ErrorDialogResult>(
+    bool allowRetry = false,
+  }) => showFDialog<ErrorDialogResult>(
     context: context,
-    builder: (context) => ErrorDialog(
+    builder: (context, style, animation) => ErrorDialog(
       message: message,
       error: error,
       stackTrace: stackTrace ?? StackTrace.current,

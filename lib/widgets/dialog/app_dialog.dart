@@ -47,13 +47,7 @@ class AppDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    EdgeInsets? listViewPadding = contentPadding;
-    if (listViewPadding == null) {
-      listViewPadding = kDefaultContentPadding;
-      if (title != null && currentPlatform.isMobile) {
-        listViewPadding = listViewPadding.copyWith(top: 0);
-      }
-    }
+    EdgeInsets? listViewPadding = contentPadding ?? kDefaultContentPadding;
     List<Widget> children = [
       for (int i = 0; i < this.children.length; i++)
         Padding(
@@ -67,17 +61,15 @@ class AppDialog extends StatelessWidget {
     return FDialog.adaptive(
       title: title == null
           ? null
-          : Transform.translate(
-              offset: const Offset(0, -1),
-              child: _AppDialogTitle(
-                title: title!,
-                displayCloseButton: displayCloseButton,
-              ),
+          : _AppDialogTitle(
+              title: title!,
+              displayCloseButton: displayCloseButton,
             ),
       body: SizedBox(
         width: MediaQuery.sizeOf(context).width,
         child: scrollable
             ? ListView(
+                padding: EdgeInsets.zero,
                 shrinkWrap: true,
                 children: children,
               )
@@ -169,46 +161,64 @@ class _AppDialogTitle extends StatelessWidget {
   final Widget title;
 
   /// Whether to display a close button.
-  final bool? displayCloseButton;
+  final bool displayCloseButton;
 
   /// Creates a new app dialog title instance.
-  const _AppDialogTitle({
+  _AppDialogTitle({
     required this.title,
-    this.displayCloseButton,
-  });
+    bool? displayCloseButton,
+  }) : displayCloseButton = currentPlatform.isDesktop && displayCloseButton != false;
 
   @override
   Widget build(BuildContext context) => Column(
     mainAxisSize: .min,
     children: [
-      FHeader(
-        title: Align(
-          alignment: Alignment.centerLeft,
-          child: title,
-        ),
-        style: .delta(
-          titleTextStyle: .delta(
-            fontSize: context.theme.typography.xl.fontSize,
-            fontWeight: FontWeight.normal,
-            height: 1,
+      MediaQuery.removePadding(
+        removeTop: true,
+        removeRight: true,
+        removeBottom: true,
+        removeLeft: true,
+        context: context,
+        child: FHeader(
+          title: Align(
+            alignment: .centerLeft,
+            child: title,
           ),
-          padding: .value(AppDialog.kDefaultContentPadding.copyWith(top: kBigSpace, bottom: kBigSpace - 6)),
-        ),
-        suffixes: [
-          if (currentPlatform.isDesktop && displayCloseButton != false)
-            Tooltip(
-              message: MaterialLocalizations.of(context).closeButtonLabel,
-              child: ClickableButton.icon(
-                variant: .destructive,
-                child: const Icon(FIcons.x),
-                onPress: () => Navigator.pop(context),
-              ),
+          style: .delta(
+            titleTextStyle: .delta(
+              fontSize: context.theme.typography.xl.fontSize,
+              fontWeight: FontWeight.normal,
+              height: 1,
             ),
-        ],
+            padding: displayCloseButton
+                ? .value(
+                    AppDialog.kDefaultContentPadding.copyWith(
+                      top: kBigSpace,
+                      bottom: kBigSpace - 6,
+                    ),
+                  )
+                : const .value(AppDialog.kDefaultContentPadding),
+          ),
+          suffixes: [
+            if (displayCloseButton)
+              Tooltip(
+                message: MaterialLocalizations.of(context).closeButtonLabel,
+                child: ClickableButton.icon(
+                  variant: .destructive,
+                  child: const Icon(FIcons.x),
+                  onPress: () => Navigator.pop(context),
+                ),
+              ),
+          ],
+        ),
       ),
       const FDivider(
         style: .delta(
-          padding: .value(EdgeInsets.zero),
+          padding: .value(
+            EdgeInsets.only(
+              bottom: kSpace * 3 / 2,
+            ),
+          ),
         ),
       ),
     ],

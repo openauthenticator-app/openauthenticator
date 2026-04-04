@@ -3,15 +3,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:open_authenticator/app.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
+import 'package:open_authenticator/model/backend/authentication/providers/provider.dart';
+import 'package:open_authenticator/model/backend/backend.dart';
+import 'package:open_authenticator/model/backend/request/request.dart';
+import 'package:open_authenticator/model/backend/request/response.dart';
 import 'package:open_authenticator/model/settings/backend_url.dart';
 import 'package:open_authenticator/model/settings/storage_type.dart';
 import 'package:open_authenticator/pages/settings/entries/widgets.dart';
+import 'package:open_authenticator/utils/result.dart';
 import 'package:open_authenticator/utils/storage_migration.dart';
 import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
 import 'package:open_authenticator/widgets/dialog/text_input_dialog.dart';
-import 'package:open_authenticator/widgets/toast.dart';
 import 'package:open_authenticator/widgets/waiting_overlay.dart';
 
 /// Allows to change the backend URL.
@@ -39,7 +43,7 @@ class ChangeBackendUrlSettingsEntryWidget extends ConsumerWidget with FTileMixin
         await showFDialog(
           context: context,
           builder: (context, style, animation) => AppDialog(
-            title: Text(translations.error.errorDialog.title),
+            title: Text(translations.error.widget.title),
             actions: [
               ClickableButton(
                 variant: .secondary,
@@ -72,8 +76,37 @@ class ChangeBackendUrlSettingsEntryWidget extends ConsumerWidget with FTileMixin
       if (url == null || !context.mounted) {
         return;
       }
-      await StorageMigrationUtils.changeStorageType(context, ref, StorageType.localOnly, logout: true);
-      // TODO: Remove existing email verification
+      Result<PingBackendResponse> pingBackendResponse = await ref
+          .read(backendClientProvider.notifier)
+          .sendHttpRequest(
+            const PingBackendRequest(),
+            backendUrl: url,
+          );
+      if (!context.mounted) {
+        return;
+      }
+      if (pingBackendResponse is! ResultSuccess<PingBackendResponse>) {
+        context.handleResult(
+          pingBackendResponse,
+          errorMessage: (_) => translations.error.backend.invalidBackendUrl,
+          showDialogIfError: (_) => false,
+        );
+        return;
+      }
+      StorageType currentStorage = await ref.read(storageTypeSettingsEntryProvider.future);
+      if (!context.mounted) {
+        return;
+      }
+      if (currentStorage == .shared) {
+        await StorageMigrationUtils.changeStorageType(context, ref, .localOnly, logout: true);
+      }
+      if (!context.mounted) {
+        return;
+      }
+      await showWaitingOverlay(
+        context,
+        future: ref.read(emailAuthenticationProvider).cancelConfirmation(),
+      );
       if (!context.mounted) {
         return;
       }
@@ -81,9 +114,6 @@ class ChangeBackendUrlSettingsEntryWidget extends ConsumerWidget with FTileMixin
         context,
         future: ref.read(backendUrlSettingsEntryProvider.notifier).changeValue(BackendUrl(url)),
       );
-      if (context.mounted) {
-        showSuccessToast(context, text: translations.error.noError);
-      }
     },
   );
 }

@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:open_authenticator/i18n/localizable_exception.dart';
+import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/backend/backend.dart';
 import 'package:open_authenticator/model/backend/request/error.dart';
 import 'package:open_authenticator/model/backend/request/request.dart';
@@ -115,12 +117,12 @@ class SessionRefreshManager extends Notifier<SessionRefreshState> {
       return const ResultSuccess();
     } catch (ex, stackTrace) {
       List<String> invalidSessionCodes = [
-        BackendRequestError.kInvalidPayloadError,
-        BackendRequestError.kInvalidTokenError,
-        BackendRequestError.kInvalidSessionError,
-        BackendRequestError.kExpiredSessionError,
+        InvalidPayloadError.kErrorCode,
+        InvalidTokenError.kErrorCode,
+        InvalidSessionError.kErrorCode,
+        ExpiredSessionError.kErrorCode,
       ];
-      if (ex is BackendRequestError && invalidSessionCodes.contains(ex.errorCode)) {
+      if (ex is BackendRequestError && invalidSessionCodes.contains(ex.code)) {
         state = .invalidSession;
       }
       return ResultError(
@@ -135,7 +137,7 @@ class SessionRefreshManager extends Notifier<SessionRefreshState> {
     try {
       session ??= await ref.read(storedSessionProvider.future);
       if (session == null) {
-        throw const NoSessionException();
+        throw NoSessionException();
       }
       Result<RefreshSessionResponse> result = await backend.sendHttpRequest(
         RefreshSessionRequest(
@@ -154,12 +156,12 @@ class SessionRefreshManager extends Notifier<SessionRefreshState> {
 }
 
 /// The no session exception.
-class NoSessionException implements Exception {
+class NoSessionException extends LocalizableException {
   /// Creates a new no session exception instance.
-  const NoSessionException();
-
-  @override
-  String toString() => 'The user must be logged-in to proceed';
+  NoSessionException()
+    : super(
+        localizedErrorMessage: translations.error.backend.noSession,
+      );
 }
 
 /// The session refresh state.

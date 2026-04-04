@@ -95,10 +95,22 @@ class MasterPasswordAppUnlockMethod extends AppUnlockMethod<String> {
 }
 
 /// Indicates that the salt has not been saved on the device.
-class MasterPasswordNoSalt extends CannotUnlockException {}
+class MasterPasswordNoSalt extends CannotUnlockException {
+  /// Creates a new master password no salt exception instance.
+  MasterPasswordNoSalt()
+    : super(
+        localizedErrorMessage: translations.error.appUnlock.noPasswordVerificationMethodAvailable,
+      );
+}
 
 /// Indicates that no password verification method is available.
-class MasterPasswordNoPasswordVerificationMethodAvailable extends CannotUnlockException {}
+class MasterPasswordNoPasswordVerificationMethodAvailable extends CannotUnlockException {
+  /// Creates a new master password no password verification method available exception instance.
+  MasterPasswordNoPasswordVerificationMethodAvailable()
+    : super(
+        localizedErrorMessage: translations.error.appUnlock.noPasswordVerificationMethodAvailable,
+      );
+}
 
 /// Indicates that the master password is invalid.
 class MasterPasswordCheckException extends CannotUnlockException {}

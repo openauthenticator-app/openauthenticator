@@ -31,13 +31,13 @@ dependencies:
   drift_flutter: ^0.2.8
   path: ^1.9.1
   local_auth: ^3.0.1
-  package_info_plus: ^9.0.0
+  package_info_plus: ^9.0.1
   http: ^1.6.0
   qr_flutter: ^4.1.0
   intl: any
   url_launcher: ^6.3.2
-  purchases_flutter: ^9.15.1
-  purchases_ui_flutter: ^9.15.1
+  purchases_flutter: ^9.16.0
+  purchases_ui_flutter: ^9.16.0
   purchases_dart:
     git:
       url: https://github.com/openauthenticator-app/purchases-dart.git
@@ -49,12 +49,12 @@ dependencies:
   hashlib: ^2.3.0
   hashlib_codecs: ^3.0.1
   scrollable_positioned_list: ^0.3.8
-  share_plus: ^12.0.1
+  share_plus: ^12.0.2
   wakelock_plus: ^1.5.1
-  file_picker: ^10.3.10
-  connectivity_plus: ^7.0.0
+  file_picker: ^11.0.0
+  connectivity_plus: ^7.1.0
   sentry_flutter: ^9.16.0
-  forui: ^0.20.3
+  forui: ^0.20.4
   forui_assets: ^0.20.1
   custom_refresh_indicator: ^4.0.1
   # TODO: Remove these dependencies once migration is finished.

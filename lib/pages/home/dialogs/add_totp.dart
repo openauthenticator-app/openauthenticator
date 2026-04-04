@@ -37,9 +37,9 @@ class _AddTotpDialog extends StatelessWidget {
   );
 
   /// Displays the [_AddTotpDialog].
-  static Future<AddTotpDialogResult?> show(BuildContext context) async => await showDialog<AddTotpDialogResult>(
+  static Future<AddTotpDialogResult?> show(BuildContext context) async => await showFDialog<AddTotpDialogResult>(
     context: context,
-    builder: (context) => const _AddTotpDialog(),
+    builder: (context, style, animation) => const _AddTotpDialog(),
   );
 }
 

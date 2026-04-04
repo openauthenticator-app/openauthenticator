@@ -34,9 +34,9 @@ class MasterPasswordUtils {
         return const ResultCancelled();
       }
     }
-    _ChangeMasterPasswordDialogResult? result = await showDialog<_ChangeMasterPasswordDialogResult>(
+    _ChangeMasterPasswordDialogResult? result = await showFDialog<_ChangeMasterPasswordDialogResult>(
       context: context,
-      builder: (context) => _ChangeMasterPasswordDialog(
+      builder: (context, style, animation) => _ChangeMasterPasswordDialog(
         defaultPassword: password,
       ),
     );

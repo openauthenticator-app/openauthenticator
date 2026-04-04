@@ -5,28 +5,36 @@ import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/pages/intro/slides/slide.dart';
 import 'package:open_authenticator/widgets/title_text.dart';
 
-/// The very first slide shown to the user.
-class WelcomeIntroPageSlide extends IntroPageSlide {
-  /// Creates a new welcome intro page content instance.
-  const WelcomeIntroPageSlide()
-    : super(
-        name: 'welcome',
-      );
+/// The welcome intro page slide.
+class WelcomeIntroPageSlide extends StatelessWidget {
+  /// The number of remaining slides.
+  final int remainingSlides;
+
+  /// Creates a new welcome intro page slide instance.
+  const WelcomeIntroPageSlide({
+    super.key,
+    required this.remainingSlides,
+  });
 
   @override
-  Widget createWidget(BuildContext context, int remainingSteps) => IntroPageSlideWidget(
+  Widget build(BuildContext context) => IntroPageSlideWidget(
     titleWidget: const TitleText(),
-    slide: this,
+    slide: .welcome,
     children: [
-      IntroPageSlideParagraphWidget(text: translations.intro.welcome.firstParagraph(app: App.appName)),
-      if (remainingSteps > 0)
+      IntroPageSlideParagraphWidget(
+        text: translations.intro.welcome.firstParagraph(app: App.appName),
+        textAlign: .center,
+      ),
+      if (remainingSlides > 0)
         IntroPageSlideParagraphWidget(
           text: translations.intro.welcome.secondParagraph,
+          textAlign: .center,
         ),
       IntroPageSlideParagraphWidget(
         text: translations.intro.welcome.thirdParagraph,
+        textAlign: .center,
         textStyle: TextStyle(
-          fontWeight: FontWeight.bold,
+          fontWeight: .bold,
           color: context.theme.colors.primary,
         ),
       ),

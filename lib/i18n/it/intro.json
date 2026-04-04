@@ -19,7 +19,7 @@
     "title": "Mantieni i tuoi dati al sicuro",
     "firstParagraph": "Per mantenere i tuoi dati al sicuro, abbiamo bisogno che tu definisca una password principale.",
     "secondParagraph": "Questa password verrà utilizzata per crittografare i tuoi dati e non verrà mai inviata a nessun server remoto.",
-    "thirdParagraph": "Pertanto, se la dimentichi, non saremo in grado di recuperarla per te. Assicurati di conservarla in un luogo sicuro."
+    "thirdParagraph": "Se la dimentichi, non saremo in grado di recuperarla per te. Assicurati di conservarla in un luogo sicuro."
   },
   "button": {
     "next": "Avanti",

@@ -5,6 +5,8 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/app.dart';
+import 'package:open_authenticator/i18n/localizable_exception.dart';
+import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/crypto.dart';
 import 'package:open_authenticator/model/totp/decrypted.dart';
 import 'package:open_authenticator/model/totp/json.dart';
@@ -139,7 +141,7 @@ class Backup implements Comparable<Backup> {
 
       CryptoStore? currentCryptoStore = await _ref.read(cryptoStoreProvider.future);
       if (currentCryptoStore == null) {
-        throw const _EncryptionError(operationName: 'decryption');
+        throw _CryptoError();
       }
 
       List jsonTotps = jsonData[kTotpsKey];
@@ -168,7 +170,7 @@ class Backup implements Comparable<Backup> {
     try {
       CryptoStore? currentCryptoStore = await _ref.read(cryptoStoreProvider.future);
       if (currentCryptoStore == null) {
-        throw const _EncryptionError(operationName: 'encryption');
+        throw _CryptoError();
       }
       CryptoStore newStore = await CryptoStore.fromPassword(password, await Salt.generate());
       List<Totp> totps = await _ref.read(totpRepositoryProvider.future);
@@ -228,41 +230,38 @@ class Backup implements Comparable<Backup> {
 }
 
 /// Thrown when the file does not exist.
-class _BackupFileDoesNotExistException implements Exception {
-  /// The file path.
-  final String path;
-
+class _BackupFileDoesNotExistException extends LocalizableException {
   /// Creates a new backup file doesn't exist exception instance.
-  const _BackupFileDoesNotExistException({
-    required this.path,
-  });
-
-  @override
-  String toString() => 'Backup file does not exist : "$path"';
+  _BackupFileDoesNotExistException({
+    required String path,
+  }) : super(
+         localizedErrorMessage: translations.error.backup.fileDoesNotExist(path: path),
+       );
 }
 
 /// Thrown when an invalid password has been provided.
-class _InvalidPasswordException implements Exception {
-  @override
-  String toString() => 'Invalid password exception';
+class _InvalidPasswordException extends LocalizableException {
+  /// Creates a new invalid password exception instance.
+  _InvalidPasswordException()
+    : super(
+        localizedErrorMessage: translations.error.backup.invalidPassword,
+      );
 }
 
 /// Thrown when the backup content is invalid.
-class _InvalidBackupContentException implements Exception {
-  @override
-  String toString() => 'Invalid backup content';
+class _InvalidBackupContentException extends LocalizableException {
+  /// Creates a new invalid backup content exception instance.
+  _InvalidBackupContentException()
+    : super(
+        localizedErrorMessage: translations.error.backup.invalidContent,
+      );
 }
 
 /// Thrown when there is an encryption error.
-class _EncryptionError implements Exception {
-  /// The operation name.
-  final String operationName;
-
-  /// Creates a new encryption error instance.
-  const _EncryptionError({
-    required this.operationName,
-  });
-
-  @override
-  String toString() => 'Error while doing $operationName.';
+class _CryptoError extends LocalizableException {
+  /// Creates a new crypto error instance.
+  _CryptoError()
+    : super(
+        localizedErrorMessage: translations.error.backup.crypto,
+      );
 }

@@ -215,3 +215,12 @@ class SynchronizationPullResponse extends BackendResponse {
       ),
   ];
 }
+
+/// Represents a ping backend response.
+class PingBackendResponse extends BackendResponse {
+  /// Creates a new ping backend response instance.
+  const PingBackendResponse();
+
+  /// Creates a new ping backend response instance from a JSON map.
+  const PingBackendResponse.fromJson(Map<String, dynamic> json) : this();
+}

@@ -38,7 +38,7 @@ class DeleteAccountSettingsEntryWidget extends ConsumerWidget with FTileMixin {
                 showFDialog(
                   context: context,
                   builder: (context, style, animation) => AppDialog(
-                    title: Text(translations.error.errorDialog.title),
+                    title: Text(translations.error.widget.title),
                     actions: [
                       ClickableButton(
                         variant: .secondary,

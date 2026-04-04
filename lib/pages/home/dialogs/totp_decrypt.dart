@@ -60,9 +60,9 @@ class _TotpDecryptDialog extends StatelessWidget {
   static Future<TotpDecryptDialogResult?> show(
     BuildContext context, {
     required List<DecryptedTotp> decryptedTotps,
-  }) async => await showDialog<TotpDecryptDialogResult>(
+  }) async => await showFDialog<TotpDecryptDialogResult>(
     context: context,
-    builder: (context) => _TotpDecryptDialog(
+    builder: (context, style, animation) => _TotpDecryptDialog(
       decryptedTotps: decryptedTotps,
     ),
   );

@@ -10,7 +10,6 @@ import 'package:intl/intl.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/backup.dart';
 import 'package:open_authenticator/pages/settings/entries/widgets.dart';
-import 'package:open_authenticator/spacing.dart';
 import 'package:open_authenticator/utils/result.dart';
 import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/centered_circular_progress_indicator.dart';
@@ -40,9 +39,9 @@ class ManageBackupSettingsEntryWidget extends ConsumerWidget with FTileMixin {
       subtitle: Text(translations.settings.backups.manageBackups.subtitle(n: backupCount)),
       enabled: backups.hasValue,
       onPress: () {
-        showDialog(
+        showFDialog(
           context: context,
-          builder: (context) => _RestoreBackupDialog(),
+          builder: (context, style, animation) => _RestoreBackupDialog(),
         );
       },
     );
@@ -68,14 +67,11 @@ class _RestoreBackupDialogState extends ConsumerState<_RestoreBackupDialog> {
       case AsyncData(:final value):
         children = [
           if (value.isEmpty)
-            Padding(
+            Text(
               key: shareActionKey,
-              padding: const EdgeInsets.symmetric(vertical: kBigSpace),
-              child: Text(
-                translations.settings.backups.manageBackups.subtitle(n: 0),
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontStyle: FontStyle.italic),
-              ),
+              translations.settings.backups.manageBackups.subtitle(n: 0),
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontStyle: FontStyle.italic),
             ),
           for (Backup backup in value)
             ExpandableTile(
@@ -153,7 +149,7 @@ class _RestoreBackupDialogState extends ConsumerState<_RestoreBackupDialog> {
         context,
         future: (() async {
           Directory directory = await BackupStore.getBackupsDirectory(create: true);
-          return FilePicker.platform.pickFiles(
+          return FilePicker.pickFiles(
             dialogTitle: translations.settings.backups.manageBackups.importBackupDialogTitle,
             initialDirectory: directory.path,
             type: FileType.custom,
@@ -227,7 +223,7 @@ class _RestoreBackupDialogState extends ConsumerState<_RestoreBackupDialog> {
         context,
         future: (() async {
           Directory directory = await BackupStore.getBackupsDirectory(create: true);
-          return FilePicker.platform.saveFile(
+          return FilePicker.saveFile(
             dialogTitle: translations.settings.backups.manageBackups.exportBackupDialogTitle,
             initialDirectory: directory.path,
             fileName: backup.filename,

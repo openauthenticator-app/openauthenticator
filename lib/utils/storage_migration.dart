@@ -11,7 +11,6 @@ import 'package:open_authenticator/utils/result.dart';
 import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
-import 'package:open_authenticator/widgets/dialog/error_dialog.dart';
 import 'package:open_authenticator/widgets/dialog/text_input_dialog.dart';
 import 'package:open_authenticator/widgets/form/password_form_field.dart';
 import 'package:open_authenticator/widgets/waiting_overlay.dart';
@@ -20,7 +19,7 @@ import 'package:open_authenticator/widgets/waiting_overlay.dart';
 class StorageMigrationUtils {
   /// Changes the storage type.
   /// Gives some feedback to the user thanks to the [context].
-  static Future<bool> changeStorageType(
+  static Future<Result> changeStorageType(
     BuildContext context,
     WidgetRef ref,
     StorageType newType, {
@@ -28,28 +27,29 @@ class StorageMigrationUtils {
     String? backupPassword,
     bool logout = false,
     String currentStorageMasterPassword = '',
-    StorageMigrationDeletedTotpPolicy storageMigrationDeletedTotpPolicy = StorageMigrationDeletedTotpPolicy.ask,
+    StorageMigrationDeletedTotpPolicy storageMigrationDeletedTotpPolicy = .ask,
+    bool handleResult = true,
   }) async {
     if (showConfirmation) {
-      _ConfirmationResult? result = await _ConfirmationDialog.ask(context, newType == StorageType.shared);
+      _ConfirmationResult? result = await _ConfirmationDialog.ask(context, newType == .shared);
       if (result == null || !result.confirm || !context.mounted) {
-        return false;
+        return const ResultCancelled();
       }
       backupPassword ??= result.backupPassword;
     }
     Result<bool> passwordCheckResult = await (await ref.read(passwordVerificationProvider.future)).isPasswordValid(currentStorageMasterPassword);
     if (passwordCheckResult is! ResultSuccess<bool> || !passwordCheckResult.value) {
       if (!context.mounted) {
-        return false;
+        return const ResultCancelled();
       }
       String? enteredCurrentStorageMasterPassword = await MasterPasswordInputDialog.prompt(context);
       if (enteredCurrentStorageMasterPassword == null || !context.mounted) {
-        return false;
+        return const ResultCancelled();
       }
       currentStorageMasterPassword = enteredCurrentStorageMasterPassword;
     }
     if (!context.mounted) {
-      return false;
+      return const ResultCancelled();
     }
     Result result = await showWaitingOverlay(
       context,
@@ -63,31 +63,8 @@ class StorageMigrationUtils {
           ),
     );
     if (!context.mounted) {
-      return false;
+      return const ResultCancelled();
     }
-    return await _handleResult(
-      result,
-      context,
-      ref,
-      newType,
-      logout,
-      backupPassword,
-      currentStorageMasterPassword,
-      storageMigrationDeletedTotpPolicy,
-    );
-  }
-
-  /// Handles the [result] by returning a message if there is an error.
-  static Future<bool> _handleResult(
-    Result result,
-    BuildContext context,
-    WidgetRef ref,
-    StorageType newType,
-    bool logout,
-    String? backupPassword,
-    String currentStorageMasterPassword,
-    StorageMigrationDeletedTotpPolicy storageMigrationDeletedTotpPolicy,
-  ) async {
     switch (result) {
       case ResultSuccess():
         if (logout) {
@@ -95,51 +72,33 @@ class StorageMigrationUtils {
             context,
             future: ref.read(userProvider.notifier).logoutUser(),
           );
-          if (context.mounted) {
-            context.handleResult(logoutResult);
-          }
-          return logoutResult is ResultSuccess;
-        } else {
-          if (context.mounted) {
-            context.handleResult(result);
-          }
-          return true;
+          result = logoutResult;
         }
+        break;
       case ResultError(:final exception):
-        if (exception is! StorageMigrationException) {
-          context.handleResult(result);
-          return false;
-        }
-        switch (exception) {
-          case ShouldAskForDifferentDeletedTotpPolicyException():
-            StorageMigrationDeletedTotpPolicy? enteredStorageMigrationDeletedTotpPolicy = await _StorageMigrationDeletedTotpPolicyPickerDialog.openDialog(context);
-            if (enteredStorageMigrationDeletedTotpPolicy == null || !context.mounted) {
-              break;
-            }
-            return await changeStorageType(
-              context,
-              ref,
-              newType,
-              showConfirmation: false,
-              logout: logout,
-              backupPassword: backupPassword,
-              currentStorageMasterPassword: currentStorageMasterPassword,
-              storageMigrationDeletedTotpPolicy: enteredStorageMigrationDeletedTotpPolicy,
-            );
-          case BackupException():
-          case CurrentStoragePasswordMismatchException():
-          case EncryptionKeyChangeFailedError():
-          case GenericMigrationError():
-            ErrorDialog.openDialog(
-              context,
-              message: translations.error.storageMigration[exception.code],
-            );
-            return false;
+        if (exception is ShouldAskForDifferentDeletedTotpPolicyException) {
+          StorageMigrationDeletedTotpPolicy? enteredStorageMigrationDeletedTotpPolicy = await _StorageMigrationDeletedTotpPolicyPickerDialog.openDialog(context);
+          if (enteredStorageMigrationDeletedTotpPolicy == null || !context.mounted) {
+            return result;
+          }
+          return await changeStorageType(
+            context,
+            ref,
+            newType,
+            showConfirmation: false,
+            logout: logout,
+            backupPassword: backupPassword,
+            currentStorageMasterPassword: currentStorageMasterPassword,
+            storageMigrationDeletedTotpPolicy: enteredStorageMigrationDeletedTotpPolicy,
+          );
         }
       default:
         break;
     }
-    return false;
+    if (handleResult && context.mounted) {
+      context.handleResult(result);
+    }
+    return result;
   }
 }
 
@@ -157,9 +116,9 @@ class _ConfirmationDialog extends StatefulWidget {
   State<StatefulWidget> createState() => _ConfirmationDialogState();
 
   /// Asks for the confirmation.
-  static Future<_ConfirmationResult?> ask(BuildContext context, bool enable) => showDialog<_ConfirmationResult>(
+  static Future<_ConfirmationResult?> ask(BuildContext context, bool enable) => showFDialog<_ConfirmationResult>(
     context: context,
-    builder: (context) => _ConfirmationDialog(
+    builder: (context, style, animation) => _ConfirmationDialog(
       enable: enable,
     ),
   );
@@ -289,8 +248,8 @@ class _StorageMigrationDeletedTotpPolicyPickerDialog extends StatelessWidget {
   );
 
   /// Opens the dialog.
-  static Future<StorageMigrationDeletedTotpPolicy?> openDialog(BuildContext context) => showDialog<StorageMigrationDeletedTotpPolicy>(
+  static Future<StorageMigrationDeletedTotpPolicy?> openDialog(BuildContext context) => showFDialog<StorageMigrationDeletedTotpPolicy>(
     context: context,
-    builder: (context) => _StorageMigrationDeletedTotpPolicyPickerDialog(),
+    builder: (context, style, animation) => _StorageMigrationDeletedTotpPolicyPickerDialog(),
   );
 }

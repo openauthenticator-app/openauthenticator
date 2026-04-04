@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:open_authenticator/i18n/localizable_exception.dart';
+import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/backend/authentication/session.dart';
 import 'package:open_authenticator/model/backend/backend.dart';
 import 'package:open_authenticator/model/backend/request/request.dart';
@@ -11,6 +13,7 @@ import 'package:open_authenticator/model/settings/backend_url.dart';
 import 'package:open_authenticator/model/settings/entry.dart';
 import 'package:open_authenticator/utils/result.dart';
 import 'package:open_authenticator/utils/shared_preferences_with_prefix.dart';
+import 'package:open_authenticator/utils/uri_builder.dart';
 import 'package:open_authenticator/utils/utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -157,15 +160,19 @@ mixin OAuthenticationProvider on AuthenticationProvider {
   /// Requests a login for either signing in or linking.
   Future<Result> _requestLogin({bool link = false}) async {
     String backendUrl = await _ref.read(backendUrlSettingsEntryProvider.future);
-    String uriPrefix = '$backendUrl/auth/provider/$id/redirect';
-    Uri uri;
+    UriBuilder uriBuilder = UriBuilder.prefix(
+      prefix: backendUrl,
+      path: '/auth/provider/$id/redirect',
+    );
     if (link) {
       User? user = await _ref.read(userProvider.future);
-      uri = Uri.parse('$uriPrefix?mode=link&userId=${user!.id}');
+      uriBuilder.appendQueryParameter('userId', user!.id);
+      uriBuilder.appendQueryParameter('mode', 'link');
     } else {
-      uri = Uri.parse('$uriPrefix?mode=login');
+      uriBuilder.appendQueryParameter('mode', 'login');
     }
-    await launchUrl(uri);
+    uriBuilder.appendQueryParameter('timestamp', DateTime.now().millisecondsSinceEpoch.toString());
+    await launchUrl(uriBuilder.build());
     return const ResultSuccess();
   }
 }

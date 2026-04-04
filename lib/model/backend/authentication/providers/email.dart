@@ -24,7 +24,9 @@ class EmailAuthenticationProvider extends AuthenticationProvider {
     if (uri.host == 'auth' && uri.path == '/provider/email/sent') {
       String? cancelCode = uri.queryParameters['cancelCode'];
       if (cancelCode == null) {
-        return ResultError(exception: uri.queryParameters['previously']?.toLowerCase() == 'true' ? const _EmailAlreadySentException() : const _NoCancelCodeException());
+        return ResultError(
+          exception: uri.queryParameters['previously']?.toLowerCase() == 'true' ? _EmailAlreadySentException() : _NoCancelCodeException(),
+        );
       }
       _ref.read(emailConfirmationStateProvider.notifier)._markNeedsConfirmation(uri.queryParameters['email']!, uri.queryParameters['cancelCode']!);
       return const ResultSuccess();
@@ -45,15 +47,22 @@ class EmailAuthenticationProvider extends AuthenticationProvider {
   /// Requests a login for either signing in or linking.
   Future<Result> _requestLogin(String email, {bool link = false}) async {
     String backendUrl = await _ref.read(backendUrlSettingsEntryProvider.future);
-    String uriPrefix = '$backendUrl/auth/provider/$id/redirect?email=$email';
-    Uri uri;
+    UriBuilder uriBuilder = UriBuilder.prefix(
+      prefix: backendUrl,
+      path: '/auth/provider/$id/redirect',
+      queryParameters: {
+        'email': email,
+      },
+    );
     if (link) {
       User? user = await _ref.read(userProvider.future);
-      uri = Uri.parse('$uriPrefix&mode=link&userId=${user!.id}');
+      uriBuilder.appendQueryParameter('userId', user!.id);
+      uriBuilder.appendQueryParameter('mode', 'link');
     } else {
-      uri = Uri.parse('$uriPrefix&mode=login');
+      uriBuilder.appendQueryParameter('mode', 'login');
     }
-    await launchUrl(uri);
+    uriBuilder.appendQueryParameter('timestamp', DateTime.now().millisecondsSinceEpoch.toString());
+    await launchUrl(uriBuilder.build());
     return const ResultSuccess();
   }
 
@@ -62,7 +71,7 @@ class EmailAuthenticationProvider extends AuthenticationProvider {
     try {
       EmailConfirmationData? data = await _ref.read(emailConfirmationStateProvider.future);
       if (data == null) {
-        throw Exception('No email to confirm.');
+        throw _NoEmailToConfirmException();
       }
       Result<EmailConfirmResponse> response = await _ref
           .read(backendClientProvider.notifier)
@@ -187,20 +196,29 @@ class EmailConfirmationData with EquatableMixin {
   ];
 }
 
-/// Triggered when the email has already been sent.
-class _NoCancelCodeException implements Exception {
-  /// Creates a new no cancel code exception instance.
-  const _NoCancelCodeException();
-
-  @override
-  String toString() => 'No cancel code.';
+/// Triggered when there is no email to confirm.
+class _NoEmailToConfirmException extends LocalizableException {
+  /// Creates a new no email to confirm exception instance.
+  _NoEmailToConfirmException()
+    : super(
+        localizedErrorMessage: translations.error.backend.noEmailToConfirm,
+      );
 }
 
 /// Triggered when the email has already been sent.
-class _EmailAlreadySentException implements Exception {
+class _EmailAlreadySentException extends LocalizableException {
   /// Creates a new email already sent exception instance.
-  const _EmailAlreadySentException();
+  _EmailAlreadySentException()
+    : super(
+        localizedErrorMessage: translations.error.backend.emailAlreadySent,
+      );
+}
 
-  @override
-  String toString() => 'Email already sent.';
+/// Triggered when no cancel code has been provided by the server.
+class _NoCancelCodeException extends LocalizableException {
+  /// Creates a new no cancel code exception instance.
+  _NoCancelCodeException()
+    : super(
+        localizedErrorMessage: translations.error.backend.noCancelCode,
+      );
 }

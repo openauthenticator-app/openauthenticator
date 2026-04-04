@@ -31,6 +31,7 @@ class _TotpsListWidget extends ConsumerWidget {
     return totps.isEmpty
         ? Center(
             child: SingleChildScrollView(
+              padding: context.theme.scaffoldStyle.childPadding,
               child: ImageTextActions.asset(
                 asset: 'assets/images/home.si',
                 text: translations.home.empty,
@@ -166,7 +167,7 @@ class _TotpsListWidget extends ConsumerWidget {
     if (decryptedTotps.$2.isEmpty) {
       ErrorDialog.openDialog(
         context,
-        message: translations.error.totpDecrypt,
+        message: translations.error.totp.decrypt,
       );
       return;
     }
@@ -184,13 +185,13 @@ class _TotpsListWidget extends ConsumerWidget {
       try {
         CryptoStore? currentCryptoStore = await ref.read(cryptoStoreProvider.future);
         if (currentCryptoStore == null) {
-          throw Exception('Unable to get current crypto store.');
+          throw _NoCryptoStoreException();
         }
         List<DecryptedTotp> toUpdate = [];
         for (DecryptedTotp totp in totps) {
           DecryptedTotp? decryptedTotpWithNewKey = await totp.changeEncryptionKey(oldCryptoStore, currentCryptoStore);
           if (decryptedTotpWithNewKey == null || !decryptedTotpWithNewKey.isDecrypted) {
-            throw Exception('Failed to encrypt TOTP with current crypto store.');
+            throw _CryptoStoreChangeException();
           }
           toUpdate.add(decryptedTotpWithNewKey);
         }
@@ -240,4 +241,22 @@ class _ScrollBehavior extends MaterialScrollBehavior {
           PointerDeviceKind.mouse,
         }
       : super.dragDevices;
+}
+
+/// Thrown when we cannot get the current crypto store.
+class _NoCryptoStoreException extends LocalizableException {
+  /// Creates a new no crypto store exception instance.
+  _NoCryptoStoreException()
+    : super(
+        localizedErrorMessage: translations.error.totp.changeCryptoStore.noCryptoStore,
+      );
+}
+
+/// Thrown when we cannot change a TOTP's encryption key.
+class _CryptoStoreChangeException extends LocalizableException {
+  /// Creates a new crypto store change exception instance.
+  _CryptoStoreChangeException()
+    : super(
+        localizedErrorMessage: translations.error.totp.changeCryptoStore.generic,
+      );
 }

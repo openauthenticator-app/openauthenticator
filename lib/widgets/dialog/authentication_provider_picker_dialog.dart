@@ -23,6 +23,7 @@ class AuthenticationProviderPickerDialog extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     List<AuthenticationProvider> providers = ref.watch(authenticationProviders);
     List<AuthenticationProvider> currentProviders = ref.watch(userAuthenticationProviders);
+    EmailConfirmationData? confirmationData = ref.watch(emailConfirmationStateProvider).value;
     Widget createTile(AuthenticationProvider provider) {
       bool unlink = currentProviders.contains(provider);
       return _ProviderTile(
@@ -68,15 +69,16 @@ class AuthenticationProviderPickerDialog extends ConsumerWidget {
       ],
       children: [
         for (AuthenticationProvider provider in providers)
-          if (currentProviders.length != 1 || provider != currentProviders.first) createTile(provider),
+          if (currentProviders.length != 1 || provider != currentProviders.first)
+            if (provider is! EmailAuthenticationProvider || confirmationData == null) createTile(provider),
       ],
     );
   }
 
   /// Opens the dialog.
-  static Future<AuthenticationProviderToggleLinkResult?> openDialog(BuildContext context) => showDialog<AuthenticationProviderToggleLinkResult>(
+  static Future<AuthenticationProviderToggleLinkResult?> openDialog(BuildContext context) => showFDialog<AuthenticationProviderToggleLinkResult>(
     context: context,
-    builder: (context) => const AuthenticationProviderPickerDialog(),
+    builder: (context, style, animation) => const AuthenticationProviderPickerDialog(),
   );
 }
 

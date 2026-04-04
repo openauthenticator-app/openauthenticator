@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/spacing.dart';
 import 'package:open_authenticator/widgets/sized_scalable_image.dart';
 import 'package:open_authenticator/widgets/title_text.dart';
@@ -13,7 +12,7 @@ class ImageTextActions extends StatelessWidget {
   final Widget image;
 
   /// The message to display.
-  final String? text;
+  final String text;
 
   /// The actions.
   final List<Widget> actions;
@@ -22,7 +21,7 @@ class ImageTextActions extends StatelessWidget {
   const ImageTextActions({
     super.key,
     required this.image,
-    this.text,
+    required this.text,
     this.actions = const [],
   });
 
@@ -30,7 +29,7 @@ class ImageTextActions extends StatelessWidget {
   const ImageTextActions.asset({
     Key? key,
     required String asset,
-    String? text,
+    required String text,
     List<Widget> actions = const [],
   }) : this(
          key: key,
@@ -46,7 +45,7 @@ class ImageTextActions extends StatelessWidget {
   ImageTextActions.icon({
     Key? key,
     required IconData icon,
-    String? text,
+    required String text,
     List<Widget> actions = const [],
   }) : this(
          key: key,
@@ -71,7 +70,7 @@ class ImageTextActions extends StatelessWidget {
       Padding(
         padding: EdgeInsets.only(bottom: actions.isEmpty ? 0 : kBigSpace),
         child: Text(
-          text ?? translations.error.generic.noTryAgain,
+          text,
           textAlign: TextAlign.center,
         ),
       ),

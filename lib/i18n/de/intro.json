@@ -19,7 +19,7 @@
     "title": "Schützen Sie Ihre Daten",
     "firstParagraph": "Um die Sicherheit Ihrer Daten zu gewährleisten, müssen Sie ein Master-Passwort festlegen.",
     "secondParagraph": "Dieses Passwort wird verwendet, um Ihre Daten zu verschlüsseln, und wird niemals an einen entfernten Server gesendet.",
-    "thirdParagraph": "Falls Sie es vergessen, können wir es nicht wiederherstellen. Bewahren Sie es daher an einem sicheren Ort auf."
+    "thirdParagraph": "Sie es vergessen, können wir es nicht wiederherstellen. Bewahren Sie es daher an einem sicheren Ort auf."
   },
   "button": {
     "next": "Weiter",

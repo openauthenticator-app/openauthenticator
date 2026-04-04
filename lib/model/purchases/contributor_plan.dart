@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/app.dart';
+import 'package:open_authenticator/i18n/localizable_exception.dart';
+import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/purchases/clients/client.dart';
 import 'package:open_authenticator/utils/result.dart';
 import 'package:purchases_flutter/purchases_flutter.dart' hide Price;
@@ -171,7 +173,10 @@ enum ContributorPlanState {
 }
 
 /// Thrown when no RevenueCat client is available.
-class _NoRevenueCatClientException implements Exception {
-  @override
-  String toString() => 'No RevenueCat client available';
+class _NoRevenueCatClientException extends LocalizableException {
+  /// Creates a new no RevenueCat client exception instance.
+  _NoRevenueCatClientException()
+    : super(
+        localizedErrorMessage: translations.error.noRevenueCatClient,
+      );
 }

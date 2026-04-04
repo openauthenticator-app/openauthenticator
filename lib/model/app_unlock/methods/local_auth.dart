@@ -33,4 +33,10 @@ class LocalAuthenticationAppUnlockMethod extends AppUnlockMethod {
 }
 
 /// Indicates that local authentication is not supported by the device.
-class LocalAuthenticationDeviceNotSupported extends CannotUnlockException {}
+class LocalAuthenticationDeviceNotSupported extends CannotUnlockException {
+  /// Creates a new local authentication device not supported exception instance.
+  LocalAuthenticationDeviceNotSupported()
+    : super(
+        localizedErrorMessage: translations.error.appUnlock.localAuthenticationDeviceNotSupported,
+      );
+}

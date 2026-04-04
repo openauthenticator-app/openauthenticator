@@ -1,65 +1,148 @@
+import 'dart:async';
+
 import 'package:animations/animations.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
-import 'package:open_authenticator/pages/intro/slides/log_in.dart';
-import 'package:open_authenticator/pages/intro/slides/password.dart';
-import 'package:open_authenticator/pages/intro/slides/welcome.dart';
+import 'package:open_authenticator/model/crypto.dart';
+import 'package:open_authenticator/model/totp/repository.dart';
 import 'package:open_authenticator/spacing.dart';
-import 'package:open_authenticator/utils/brightness_listener.dart';
 import 'package:open_authenticator/widgets/sized_scalable_image.dart';
 
-/// A "slide" of the intro page.
-class IntroPageSlide {
-  /// The slide name.
-  final String name;
+/// The current intro page slide provider.
+final currentIntroPageSlideProvider = AsyncNotifierProvider.autoDispose<CurrentIntroPageSlideNotifier, CurrentIntroSlideState>(CurrentIntroPageSlideNotifier.new);
 
-  /// Creates a new intro page content instance.
-  const IntroPageSlide({
-    required this.name,
-  });
+/// The current intro page slide notifier.
+class CurrentIntroPageSlideNotifier extends AsyncNotifier<CurrentIntroSlideState> {
+  @override
+  Future<CurrentIntroSlideState> build() async {
+    List<IntroPageSlide> slides = [
+      for (IntroPageSlide slide in IntroPageSlide.values)
+        if (!(await _shouldSkipSlide(slide))) slide,
+    ];
+    return CurrentIntroSlideState._(
+      slides: slides,
+      slideIndex: 0,
+    );
+  }
 
-  /// Whether this page content can be skipped.
-  bool get canSkip => true;
+  /// Returns `true` if the slide should be skipped.
+  Future<bool> _shouldSkipSlide(IntroPageSlide slide) async => switch (slide) {
+    IntroPageSlide.password => (await ref.read(cryptoStoreProvider.future)) != null,
+    IntroPageSlide.logIn => (await ref.read(totpRepositoryProvider.future)).isNotEmpty,
+    _ => false,
+  };
 
-  /// Whether this page content should be skipped.
-  Future<bool> shouldSkip(WidgetRef ref) => Future.value(false);
+  /// Goes to the next slide.
+  /// Returns `true` if the intro should finish.
+  Future<bool> goToNextSlide() async {
+    CurrentIntroSlideState slideState = await future;
+    if (slideState.slide == .password) {
+      String? password = (slideState as PasswordIntroPageSlideState).password;
+      if (password == null) {
+        return false;
+      }
+      StoredCryptoStore currentCryptoStore = ref.read(cryptoStoreProvider.notifier);
+      await currentCryptoStore.changeCryptoStore(password);
+    }
+    CurrentIntroSlideState? next = slideState._createNextSlideState();
+    if (next == null) {
+      return true;
+    }
+    updateState(next);
+    return false;
+  }
 
-  /// Returns the image SVG path.
-  String get imagePath => 'assets/images/intro/${name.toLowerCase()}.si';
-
-  /// Triggered when the user clicks on "Next".
-  Future<bool> onGoToNextSlide(BuildContext context, WidgetRef ref) => Future.value(true);
-
-  /// Creates the widget for showing this slide.
-  Widget createWidget(BuildContext context, int remainingSteps) => IntroPageSlideWidget(
-    slide: this,
-  );
+  /// Updates the state.
+  void updateState(CurrentIntroSlideState slideState) => state = AsyncData(slideState);
 }
 
-/// Contains all intro page slide types.
-enum IntroPageSlideType {
+/// The current intro page slide state.
+class CurrentIntroSlideState with EquatableMixin {
+  /// The slides to display.
+  final List<IntroPageSlide> _slides;
+
+  /// The current slide index.
+  final int slideIndex;
+
+  /// Creates a new current intro slide state.
+  const CurrentIntroSlideState._({
+    required List<IntroPageSlide> slides,
+    required this.slideIndex,
+  }) : _slides = slides;
+
+  /// Returns the next slide state.
+  CurrentIntroSlideState? _createNextSlideState() {
+    if (slideIndex == slideCount - 1) {
+      return null;
+    }
+    IntroPageSlide slide = _slides[slideIndex + 1];
+    return (slide == .password ? PasswordIntroPageSlideState._ : CurrentIntroSlideState._)(
+      slides: _slides,
+      slideIndex: slideIndex + 1,
+    );
+  }
+
+  /// Returns the current slide.
+  IntroPageSlide get slide => _slides[slideIndex];
+
+  /// Returns the remaining slide.
+  int get remainingSlideCount => _slides.length - slideIndex - 1;
+
+  /// Returns the slide count.
+  int get slideCount => _slides.length;
+
+  /// Returns `true` if the user can go to the next slide.
+  bool get canGoToNextSlide => true;
+
+  @override
+  List<Object?> get props => [slide];
+}
+
+/// The password intro page slide state.
+class PasswordIntroPageSlideState extends CurrentIntroSlideState {
+  /// The password.
+  final String? password;
+
+  /// Creates a new password intro slide state.
+  const PasswordIntroPageSlideState._({
+    required super.slideIndex,
+    required super.slides,
+    this.password,
+  }) : super._();
+
+  /// Creates a new password intro slide state from the current state.
+  PasswordIntroPageSlideState.fromCurrent({
+    String? password,
+    required CurrentIntroSlideState current,
+  }) : this._(
+         password: password,
+         slides: current._slides,
+         slideIndex: current.slideIndex,
+       );
+
+  @override
+  bool get canGoToNextSlide => password != null;
+
+  @override
+  List<Object?> get props => [slide, password];
+}
+
+/// A "slide" of the intro page.
+enum IntroPageSlide {
   /// The very first slide shown to the user.
-  welcome(create: WelcomeIntroPageSlide.new),
+  welcome,
 
   /// The slide that allows the user to define a master password.
-  password(create: PasswordIntroPageSlide.new),
+  password,
 
   /// The slide that allows the user to login to Firebase.
-  logIn(create: LogInIntroPageSlide.new)
-  ;
-
-  /// Allows to create a new intro page slide instance.
-  final IntroPageSlide Function() create;
-
-  /// Creates a new intro page slide type instance.
-  const IntroPageSlideType({
-    required this.create,
-  });
+  logIn,
 }
 
 /// An intro page slide widget.
-class IntroPageSlideWidget extends ConsumerStatefulWidget {
+class IntroPageSlideWidget extends StatefulWidget {
   /// The slide instance.
   final IntroPageSlide slide;
 
@@ -82,11 +165,11 @@ class IntroPageSlideWidget extends ConsumerStatefulWidget {
            );
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => IntroPageSlideWidgetState();
+  State<StatefulWidget> createState() => IntroPageSlideWidgetState();
 }
 
 /// An intro page slide widget state.
-class IntroPageSlideWidgetState extends ConsumerState<IntroPageSlideWidget> with TickerProviderStateMixin, BrightnessListener {
+class IntroPageSlideWidgetState extends State<IntroPageSlideWidget> with TickerProviderStateMixin {
   /// The image animation controller.
   late final AnimationController _imageAnimationController =
       AnimationController(
@@ -119,49 +202,39 @@ class IntroPageSlideWidgetState extends ConsumerState<IntroPageSlideWidget> with
   );
 
   @override
-  Widget build(BuildContext context) => DefaultTextStyle.merge(
-    style: TextStyle(color: currentBrightness == Brightness.dark ? Colors.white60 : Colors.grey.shade700),
-    textAlign: TextAlign.center,
-    child: Center(
-      child: ListView(
+  Widget build(BuildContext context) => Column(
+    children: [
+      Padding(
         padding: EdgeInsets.only(
-          top: MediaQuery.sizeOf(context).width <= context.theme.breakpoints.md ? (kBigSpace * 2) : kBigSpace,
-          right: kBigSpace,
-          left: kBigSpace,
-          bottom: kBigSpace,
+          top: MediaQuery.paddingOf(context).top,
+          bottom: kBigSpace * 2,
         ),
-        shrinkWrap: true,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: kBigSpace * 2),
-            child: DefaultTextStyle.merge(
-              child: FadeTransition(
-                opacity: _textAnimation,
-                child: widget.titleWidget,
-              ),
-              style: context.theme.typography.xl2,
-            ),
+        child: DefaultTextStyle.merge(
+          child: FadeTransition(
+            opacity: _textAnimation,
+            child: widget.titleWidget,
           ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: kBigSpace * 2),
-            child: FadeScaleTransition(
-              animation: _imageAnimation,
-              child: SizedBox(
-                height: 200,
-                child: SizedScalableImage(
-                  asset: widget.slide.imagePath,
-                ),
-              ),
-            ),
-          ),
-          for (int i = 0; i < widget.children.length; i++)
-            FadeTransition(
-              opacity: _textAnimation,
-              child: i == widget.children.length - 1 && widget.children[i] is IntroPageSlideParagraphWidget ? (widget.children[i] as IntroPageSlideParagraphWidget).withoutPadding : widget.children[i],
-            ),
-        ],
+          style: context.theme.typography.xl3,
+        ),
       ),
-    ),
+      Padding(
+        padding: const EdgeInsets.only(bottom: kBigSpace * 2),
+        child: FadeScaleTransition(
+          animation: _imageAnimation,
+          child: SizedBox(
+            height: 200,
+            child: SizedScalableImage(
+              asset: 'assets/images/intro/${widget.slide.name}.si',
+            ),
+          ),
+        ),
+      ),
+      for (int i = 0; i < widget.children.length; i++)
+        FadeTransition(
+          opacity: _textAnimation,
+          child: i == widget.children.length - 1 && widget.children[i] is IntroPageSlideParagraphWidget ? (widget.children[i] as IntroPageSlideParagraphWidget).withoutPadding : widget.children[i],
+        ),
+    ],
   );
 
   @override
@@ -189,11 +262,11 @@ class IntroPageSlideTitleWidget extends StatelessWidget {
 
 /// A paragraph text, with a separator.
 class IntroPageSlideParagraphWidget extends StatelessWidget {
-  /// The paragraph padding.
-  static const double kDefaultPadding = 10;
-
   /// The text span.
   final TextSpan textSpan;
+
+  /// The text alignment.
+  final TextAlign? textAlign;
 
   /// The bottom padding.
   final double padding;
@@ -203,15 +276,15 @@ class IntroPageSlideParagraphWidget extends StatelessWidget {
     Key? key,
     required String text,
     TextStyle? textStyle,
-    double padding = kDefaultPadding,
+    TextAlign? textAlign = .center,
+    double padding = kSpace,
   }) : this.rich(
          key: key,
          textSpan: TextSpan(
            text: text,
-           style: (textStyle ?? const TextStyle()).copyWith(
-             height: 1.25,
-           ),
+           style: textStyle,
          ),
+         textAlign: textAlign,
          padding: padding,
        );
 
@@ -219,18 +292,23 @@ class IntroPageSlideParagraphWidget extends StatelessWidget {
   const IntroPageSlideParagraphWidget.rich({
     super.key,
     required this.textSpan,
-    this.padding = kDefaultPadding,
+    this.textAlign = .center,
+    this.padding = kSpace,
   });
 
   @override
   Widget build(BuildContext context) => Padding(
     padding: EdgeInsets.only(bottom: padding),
-    child: Text.rich(textSpan),
+    child: Text.rich(
+      textSpan,
+      textAlign: textAlign,
+    ),
   );
 
   /// Returns the same paragraph without padding.
   IntroPageSlideParagraphWidget get withoutPadding => IntroPageSlideParagraphWidget.rich(
     textSpan: textSpan,
     padding: 0,
+    textAlign: textAlign,
   );
 }

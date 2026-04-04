@@ -129,7 +129,6 @@ class _SyncHeaderAction extends ConsumerWidget {
             } else {
               ErrorDialogResult? result = await ErrorDialog.openDialog(
                 context,
-                message: 'An error occurred while synchronizing your TOTPs.',
                 error: exception,
                 stackTrace: stackTrace,
                 allowRetry: true,

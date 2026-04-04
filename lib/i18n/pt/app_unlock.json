@@ -1,8 +1,5 @@
 {
-  "widget": {
-    "text": "$app está bloqueado.",
-    "button": "Desbloquear"
-  },
+  "widget": "$app está bloqueado.",
   "authenticationRequired": "Autenticação necessária",
   "localAuthentication(map)": {
     "openApp": "Autentique-se para acessar o app.",
@@ -11,14 +8,9 @@
     "disable": "Autentique-se para desativar a autenticação local."
   },
   "masterPasswordDialogMessage": "Digite sua senha mestra para desbloquear o app.",
-  "cannotUnlock": {
-    "localAuthentication": {
-      "deviceNotSupported": "Não é possível desbloquear o app porque seu dispositivo não é compatível com a autenticação local. Desative este método de bloqueio com o botão abaixo.",
-      "button": "Desativar"
-    },
-    "masterPassword": {
-      "noPasswordVerificationMethodAvailable": "Não é possível desbloquear o app com sua senha porque a integridade dos dados do aplicativo foi alterada. Altere sua senha mestra para continuar.\nObserve que seus TOTPs ainda precisarão ser descriptografados manualmente.",
-      "button": "Alterar senha mestra"
-    }
+  "button": {
+    "disable": "Desativar",
+    "changeMasterPassword": "Alterar a senha mestra",
+    "unlock": "Desbloquear"
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:open_authenticator/i18n/localizable_exception.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/main.dart';
 import 'package:open_authenticator/model/crypto.dart';
@@ -492,7 +493,7 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
 
     DecryptedTotp? totp = await _createTotp();
     if (totp == null) {
-      return ResultError(exception: const _TotpCreationFailed());
+      return ResultError(exception: _TotpCreationFailed());
     }
     return await ref.read(totpRepositoryProvider.notifier).addTotp(totp);
   }
@@ -501,7 +502,7 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
   Future<Result> updateTotp() async {
     DecryptedTotp? totp = await _createTotp();
     if (totp == null) {
-      return ResultError(exception: const _TotpCreationFailed());
+      return ResultError(exception: _TotpCreationFailed());
     }
     return await ref.read(totpRepositoryProvider.notifier).updateTotp(totp);
   }
@@ -521,9 +522,10 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
 }
 
 /// Triggered when TOTP creation has failed.
-class _TotpCreationFailed implements Exception {
-  const _TotpCreationFailed();
-
-  @override
-  String toString() => 'The TOTP could not be created';
+class _TotpCreationFailed extends LocalizableException {
+  /// Creates a new TOTP creation failed exception instance.
+  _TotpCreationFailed()
+    : super(
+        localizedErrorMessage: translations.error.totp.create,
+      );
 }

@@ -6,6 +6,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hashlib/hashlib.dart';
 import 'package:open_authenticator/app.dart';
+import 'package:open_authenticator/i18n/localizable_exception.dart';
+import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/app_unlock/methods/method.dart';
 import 'package:open_authenticator/model/password_verification/methods/password_signature.dart';
 import 'package:open_authenticator/model/settings/app_unlock_method.dart';
@@ -61,7 +63,7 @@ class StoredCryptoStore extends AsyncNotifier<CryptoStore?> {
       newCryptoStore = await CryptoStore.fromPassword(newPassword, salt);
     } else {
       if (!(await newCryptoStore.checkPasswordValidity(newPassword))) {
-        throw Exception('Password mismatch.');
+        throw _PasswordMismatchException();
       }
     }
     Future<void> saveCryptoStoreOnLocalStorage() async => await SimpleSecureStorage.write(_kPasswordDerivedKeyKey, base64.encode(await newCryptoStore!.key.exportRawKey()));
@@ -206,4 +208,13 @@ class Salt {
 
   @override
   String toString() => base64.encode(value);
+}
+
+/// Thrown when the password entered for a new crypto store is incorrect.
+class _PasswordMismatchException extends LocalizableException {
+  /// Creates a new password mismatch exception instance.
+  _PasswordMismatchException()
+    : super(
+        localizedErrorMessage: translations.error.passwordMismatch,
+      );
 }

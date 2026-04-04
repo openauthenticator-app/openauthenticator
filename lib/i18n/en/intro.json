@@ -19,7 +19,7 @@
     "title": "Keep your data safe",
     "firstParagraph": "In order to keep your data safe and secure, we need you to define a master password.",
     "secondParagraph": "This password will be used to encrypt your data and will never be sent to any remote server.",
-    "thirdParagraph": "Therefore, if you forget it we will not be able to recover it for you. Make sure to store it somewhere safe."
+    "thirdParagraph": "If you forget it we will not be able to recover it for you. Make sure to store it somewhere safe."
   },
   "button": {
     "next": "Next",

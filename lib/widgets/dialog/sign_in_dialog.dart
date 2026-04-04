@@ -26,9 +26,9 @@ class SignInDialog extends ConsumerStatefulWidget {
   ConsumerState<ConsumerStatefulWidget> createState() => _SignInDialogState();
 
   /// Opens the dialog.
-  static Future<SignInDialogResult?> openDialog(BuildContext context) => showDialog<SignInDialogResult>(
+  static Future<SignInDialogResult?> openDialog(BuildContext context) => showFDialog<SignInDialogResult>(
     context: context,
-    builder: (context) => const SignInDialog(),
+    builder: (context, style, animation) => const SignInDialog(),
   );
 }
 
@@ -53,6 +53,7 @@ class _SignInDialogState extends ConsumerState<SignInDialog> {
               context,
               SignInDialogResult(
                 action: () => ref.read(emailAuthenticationProvider).requestSignIn(email),
+                willNeedConfirmation: true,
               ),
             );
           },
@@ -83,9 +84,13 @@ class SignInDialogResult {
   /// The action.
   final Future<Result> Function() action;
 
+  /// Whether the sign-in will need confirmation.
+  final bool willNeedConfirmation;
+
   /// Creates a new sign-in dialog result instance.
   const SignInDialogResult({
     required this.action,
+    this.willNeedConfirmation = false,
   });
 }
 

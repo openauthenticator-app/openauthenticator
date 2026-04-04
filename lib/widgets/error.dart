@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:forui/forui.dart';
 import 'package:open_authenticator/app.dart';
+import 'package:open_authenticator/i18n/localizable_exception.dart';
+import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/spacing.dart';
+import 'package:open_authenticator/utils/uri_builder.dart';
 import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
+import 'package:open_authenticator/widgets/toast.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// A widget displaying an error with the option to retry.
@@ -32,8 +37,11 @@ class ErrorAlert extends StatelessWidget {
         padding: const EdgeInsets.only(bottom: kSpace),
         child: FAlert(
           variant: .destructive,
-          title: const Text('Erreur'),
-          subtitle: ErrorWithStackTrace(error: error, stackTrace: stackTrace),
+          title: Text(translations.error.widget.title),
+          subtitle: ErrorWithStackTrace(
+            error: error,
+            stackTrace: stackTrace,
+          ),
         ),
       ),
       Padding(
@@ -44,7 +52,7 @@ class ErrorAlert extends StatelessWidget {
             onPress: asyncSnapshot.data == true ? () => launchUrl(reportIssueUrl) : null,
             variant: .outline,
             prefix: const Icon(FIcons.bug),
-            child: const ButtonText('Signaler'),
+            child: ButtonText(translations.error.widget.button.report),
           ),
         ),
       ),
@@ -52,13 +60,16 @@ class ErrorAlert extends StatelessWidget {
         ClickableButton(
           onPress: onRetryPressed,
           prefix: const Icon(FIcons.refreshCcw),
-          child: const ButtonText('Réessayer'),
+          child: ButtonText(translations.error.widget.button.retry),
         ),
     ],
   );
 
   /// The issues URL.
-  Uri get reportIssueUrl => Uri.parse('${App.githubRepositoryUrl}/issues');
+  Uri get reportIssueUrl => UriBuilder.prefix(
+    prefix: App.githubRepositoryUrl,
+    path: '/issues',
+  ).build();
 }
 
 /// A widget displaying an error.
@@ -112,33 +123,69 @@ class _ErrorWithStackTraceState extends State<ErrorWithStackTrace> with SingleTi
     children: [
       Padding(
         padding: const EdgeInsets.only(bottom: kSpace),
-        child: Text(widget.error == null ? 'Une erreur est survenue.' : 'Une erreur est survenue : "$truncatedError".'),
+        child: Text(description),
       ),
-      if (widget.message != null)
+      if (message != null)
         Padding(
           padding: const EdgeInsets.only(bottom: kSpace),
-          child: Text(widget.message!),
+          child: Text(message!),
         ),
       if (widget.onRetryPressed != null)
         Padding(
           padding: const EdgeInsets.only(bottom: kSpace),
           child: ClickableButton(
             onPress: widget.onRetryPressed,
-            child: const ButtonText('Réessayer'),
+            child: ButtonText(translations.error.widget.button.retry),
           ),
         ),
-      FSwitch(
-        label: Text(expanded ? 'Masquer la trace' : 'Afficher la trace'),
-        value: expanded,
-        onChange: toggleStackTrace,
-        style: .delta(
-          childPadding: .value(EdgeInsets.only(right: context.theme.switchStyle.childPadding.horizontal / 2)),
-          trackColor: .delta(
-            [
-              .match({.selected}, context.theme.colors.error),
-            ],
+      Row(
+        mainAxisSize: .max,
+        children: [
+          Expanded(
+            child: FSwitch(
+              label: Text(expanded ? translations.error.widget.stackTrace.hide : translations.error.widget.stackTrace.show),
+              value: expanded,
+              onChange: toggleStackTrace,
+              style: .delta(
+                childPadding: .value(EdgeInsets.only(right: context.theme.switchStyle.childPadding.horizontal / 2)),
+                trackColor: .delta(
+                  [
+                    .match({.selected}, context.theme.colors.error),
+                  ],
+                ),
+              ),
+            ),
           ),
-        ),
+          if (expanded)
+            ClickableButton.icon(
+              onPress: () async {
+                try {
+                  await Clipboard.setData(
+                    ClipboardData(
+                      text: details,
+                    ),
+                  );
+                  if (context.mounted) {
+                    showSuccessToast(
+                      context,
+                      text: translations.error.noError,
+                    );
+                  }
+                } catch (ex) {
+                  if (context.mounted) {
+                    showErrorToast(
+                      context,
+                      text: translations.error.generic.withException(
+                        exception: ex,
+                      ),
+                    );
+                  }
+                }
+              },
+              variant: .ghost,
+              child: const Icon(FIcons.copy),
+            ),
+        ],
       ),
       AnimatedBuilder(
         animation: animation,
@@ -146,10 +193,12 @@ class _ErrorWithStackTraceState extends State<ErrorWithStackTrace> with SingleTi
           value: animation.value,
           child: child!,
         ),
-        child: Text(
-          '${widget.error}\n${widget.stackTrace ?? StackTrace.current}',
-          style: TextStyle(fontSize: context.theme.typography.xs.fontSize),
-          textAlign: TextAlign.left,
+        child: FCard(
+          child: SelectableText(
+            details,
+            style: TextStyle(fontSize: context.theme.typography.xs.fontSize),
+            textAlign: TextAlign.left,
+          ),
         ),
       ),
     ],
@@ -161,14 +210,40 @@ class _ErrorWithStackTraceState extends State<ErrorWithStackTrace> with SingleTi
     super.dispose();
   }
 
-  /// The truncated error.
-  String get truncatedError {
-    if (widget.error == null) {
-      return '';
+  /// Returns the description to display.
+  String get description {
+    String description;
+    if (widget.error != null) {
+      String exception;
+      if (widget.error is LocalizableException) {
+        exception = widget.error.runtimeType.toString();
+      } else {
+        String error = widget.error.toString();
+        exception = error.length > 20 ? '${error.substring(0, 20)}...' : error;
+      }
+      description = translations.error.generic.withException(exception: exception);
+    } else {
+      description = translations.error.generic.noException;
     }
-    String error = widget.error.toString();
-    return error.length > 20 ? '${error.substring(0, 20)}...' : error;
+    if (message == null) {
+      description += ' ${translations.error.generic.tryAgain}';
+    }
+    return description;
   }
+
+  /// Returns the message to display.
+  String? get message {
+    if (widget.message != null) {
+      return widget.message;
+    }
+    if (widget.error is LocalizableException) {
+      return (widget.error as LocalizableException).localizedErrorMessage;
+    }
+    return null;
+  }
+
+  /// Returns the details to display.
+  String get details => '${widget.error}\n${widget.stackTrace ?? StackTrace.current}';
 
   /// Toggles the stacktrace.
   void toggleStackTrace([bool? value]) {

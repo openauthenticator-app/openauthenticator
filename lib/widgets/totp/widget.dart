@@ -176,9 +176,9 @@ class TotpTile extends StatelessWidget {
     VoidCallback? onEditPress,
     VoidCallback? onDeletePress,
   }) async {
-    _MobileActionsDialogResult? choice = await showDialog<_MobileActionsDialogResult>(
+    _MobileActionsDialogResult? choice = await showFDialog<_MobileActionsDialogResult>(
       context: context,
-      builder: (context) => _MobileActionsDialog(
+      builder: (context, style, animation) => _MobileActionsDialog(
         canEdit: totp.isDecrypted,
         editButtonEnabled: onEditPress != null,
         deleteButtonEnabled: onDeletePress != null,

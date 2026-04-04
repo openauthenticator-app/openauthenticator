@@ -19,7 +19,6 @@ import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/text_input_dialog.dart';
 import 'package:open_authenticator/widgets/title_text.dart';
-import 'package:open_authenticator/widgets/toast.dart';
 
 /// The unlock challenge widget.
 class UnlockChallenge extends ConsumerStatefulWidget {
@@ -61,10 +60,10 @@ class _UnlockChallengeState extends ConsumerState<UnlockChallenge> {
                 children: [
                   Blur(
                     above: switch (cannotUnlockException) {
-                      LocalAuthenticationDeviceNotSupported() => _UnlockChallengeContent(
-                        text: translations.appUnlock.cannotUnlock.localAuthentication.deviceNotSupported,
+                      LocalAuthenticationDeviceNotSupported(:final localizedErrorMessage) => _UnlockChallengeContent(
+                        text: localizedErrorMessage,
                         buttonIcon: FIcons.x,
-                        buttonLabel: translations.appUnlock.cannotUnlock.localAuthentication.button,
+                        buttonLabel: translations.appUnlock.button.disable,
                         onButtonPress: () async {
                           List<PasswordVerificationMethod> passwordVerificationMethod = await ref.read(passwordVerificationProvider.future);
                           if (passwordVerificationMethod.isNotEmpty) {
@@ -77,10 +76,10 @@ class _UnlockChallengeState extends ConsumerState<UnlockChallenge> {
                           await tryUnlockIfNeeded();
                         },
                       ),
-                      MasterPasswordNoPasswordVerificationMethodAvailable() || MasterPasswordNoSalt() => _UnlockChallengeContent(
-                        text: translations.appUnlock.cannotUnlock.masterPassword.noPasswordVerificationMethodAvailable,
+                      MasterPasswordNoPasswordVerificationMethodAvailable(:final localizedErrorMessage) || MasterPasswordNoSalt(:final localizedErrorMessage) => _UnlockChallengeContent(
+                        text: localizedErrorMessage,
                         buttonIcon: FIcons.keyRound,
-                        buttonLabel: translations.appUnlock.cannotUnlock.masterPassword.button,
+                        buttonLabel: translations.appUnlock.button.changeMasterPassword,
                         onButtonPress: () async {
                           Result<String> changeResult = await MasterPasswordUtils.changeMasterPassword(context, ref, askForUnlock: false);
                           if (changeResult is ResultSuccess<String>) {
@@ -90,9 +89,9 @@ class _UnlockChallengeState extends ConsumerState<UnlockChallenge> {
                         },
                       ),
                       _ => _UnlockChallengeContent(
-                        text: translations.appUnlock.widget.text(app: App.appName),
+                        text: translations.appUnlock.widget(app: App.appName),
                         buttonIcon: FIcons.keyRound,
-                        buttonLabel: translations.appUnlock.widget.button,
+                        buttonLabel: translations.appUnlock.button.unlock,
                         onButtonPress: value == AppLockState.unlockChallengedStarted ? null : tryUnlockIfNeeded,
                       ),
                     },
@@ -116,8 +115,8 @@ class _UnlockChallengeState extends ConsumerState<UnlockChallenge> {
     }
     if (result.exception is CannotUnlockException) {
       setState(() => cannotUnlockException = result.exception as CannotUnlockException);
-    } else if (mounted) {
-      showErrorToast(context, text: translations.error.appUnlock);
+    } else {
+      context.handleResult(result, showDialogIfError: (_) => false);
     }
   }
 }

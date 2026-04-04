@@ -6,11 +6,14 @@ import 'package:forui/forui.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/settings/show_intro.dart';
 import 'package:open_authenticator/pages/home/page.dart';
+import 'package:open_authenticator/pages/intro/slides/log_in.dart';
+import 'package:open_authenticator/pages/intro/slides/password.dart';
 import 'package:open_authenticator/pages/intro/slides/slide.dart';
+import 'package:open_authenticator/pages/intro/slides/welcome.dart';
 import 'package:open_authenticator/spacing.dart';
 import 'package:open_authenticator/utils/brightness_listener.dart';
+import 'package:open_authenticator/widgets/app_scaffold.dart';
 import 'package:open_authenticator/widgets/button_text.dart';
-import 'package:open_authenticator/widgets/centered_circular_progress_indicator.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/step_progress_indicator.dart';
 
@@ -25,43 +28,11 @@ class IntroPage extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<IntroPage> createState() => IntroPageState();
+  ConsumerState<IntroPage> createState() => _IntroPageState();
 }
 
 /// The intro page state.
-class IntroPageState extends ConsumerState<IntroPage> with BrightnessListener {
-  /// The slides to display.
-  List<IntroPageSlide> _slides = [];
-
-  /// The current slide index.
-  int _slideIndex = 0;
-
-  /// Whether the "Next" button is enabled.
-  bool _canGoToNextSlide = false;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      List<IntroPageSlide> slides = [];
-      for (IntroPageSlideType type in IntroPageSlideType.values) {
-        IntroPageSlide slide = type.create();
-        if (await slide.shouldSkip(ref)) {
-          continue;
-        }
-        slides.add(slide);
-      }
-      if (mounted) {
-        setState(() {
-          _slides = slides;
-          if (slides.isNotEmpty) {
-            _canGoToNextSlide = _slides.first.canSkip;
-          }
-        });
-      }
-    });
-  }
-
+class _IntroPageState extends ConsumerState<IntroPage> with BrightnessListener {
   @override
   void onBrightnessChange(Brightness brightness) {
     super.onBrightnessChange(brightness);
@@ -87,83 +58,81 @@ class IntroPageState extends ConsumerState<IntroPage> with BrightnessListener {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    bottomNavigationBar: Padding(
-      padding: EdgeInsets.only(
-        top: kSpace,
-        right: kBigSpace,
-        bottom: kSpace + MediaQuery.paddingOf(context).bottom,
-        left: kBigSpace,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          StepProgressIndicator(
-            steps: _slides.length,
-            currentStep: _slideIndex + 1,
+  Widget build(BuildContext context) => PopScope(
+    canPop: false,
+    child: AppScaffold.asyncValue(
+      center: true,
+      asyncValue: ref.watch(currentIntroPageSlideProvider),
+      footerBuilder: (slideState) {
+        bool hasFinished = slideState.slideIndex == slideState.slideCount - 1;
+        return Padding(
+          padding: EdgeInsets.only(
+            top: kSpace,
+            right: kBigSpace,
+            bottom: kSpace + MediaQuery.paddingOf(context).bottom,
+            left: kBigSpace,
           ),
-          ClickableButton(
-            onPress: canGoToNextSlide
-                ? () {
-                    if (hasFinished) {
-                      _finish();
-                    } else {
-                      _goToNextSlide();
-                    }
-                  }
-                : null,
-            prefix: Icon(hasFinished ? FIcons.check : FIcons.chevronRight),
-            child: ButtonText(hasFinished ? translations.intro.button.finish : translations.intro.button.next),
-          ),
-        ],
-      ),
-    ),
-    body: _slides.isEmpty
-        ? const CenteredCircularProgressIndicator()
-        : PageTransitionSwitcher(
-            transitionBuilder: (child, primaryAnimation, secondaryAnimation) => SharedAxisTransition(
-              animation: primaryAnimation,
-              secondaryAnimation: secondaryAnimation,
-              transitionType: SharedAxisTransitionType.horizontal,
-              child: child,
+          child: SizedBox(
+            width: MediaQuery.sizeOf(context).width,
+            child: Row(
+              mainAxisSize: .min,
+              mainAxisAlignment: .spaceBetween,
+              children: [
+                StepProgressIndicator(
+                  steps: slideState.slideCount,
+                  currentStep: slideState.slideIndex + 1,
+                ),
+                ClickableButton(
+                  mainAxisSize: .min,
+                  onPress: slideState.canGoToNextSlide
+                      ? () async {
+                          bool shouldFinish = await ref.read(currentIntroPageSlideProvider.notifier).goToNextSlide();
+                          if (shouldFinish) {
+                            finish();
+                          }
+                        }
+                      : null,
+                  prefix: Icon(hasFinished ? FIcons.check : FIcons.chevronRight),
+                  child: ButtonText(hasFinished ? translations.intro.button.finish : translations.intro.button.next),
+                ),
+              ],
             ),
-            child: _slides[_slideIndex].createWidget(context, _slides.length - (_slideIndex + 1)),
           ),
+        );
+      },
+      builder: (slideState) => [
+        PageTransitionSwitcher(
+          transitionBuilder: (child, primaryAnimation, secondaryAnimation) => SharedAxisTransition(
+            animation: primaryAnimation,
+            secondaryAnimation: secondaryAnimation,
+            transitionType: SharedAxisTransitionType.horizontal,
+            child: child,
+          ),
+          child: switch (slideState.slide) {
+            .welcome => WelcomeIntroPageSlide(
+              remainingSlides: slideState.remainingSlideCount,
+            ),
+            .password => PasswordIntroPageSlide(
+              onPasswordChanged: (password) => ref
+                  .read(currentIntroPageSlideProvider.notifier)
+                  .updateState(
+                    PasswordIntroPageSlideState.fromCurrent(
+                      current: slideState,
+                      password: password,
+                    ),
+                  ),
+            ),
+            .logIn => const LogInIntroPageSlide(),
+          },
+        ),
+      ],
+    ),
   );
 
-  /// Returns whether the intro is finished.
-  bool get hasFinished => _slideIndex == _slides.length - 1;
-
-  /// Returns whether the "Next" button is enabled.
-  bool get canGoToNextSlide => _canGoToNextSlide;
-
-  /// Sets whether the "Next" button is enabled.
-  set canGoToNextSlide(bool canGoToNextSlide) {
-    if (mounted) {
-      setState(() => _canGoToNextSlide = canGoToNextSlide);
-    } else {
-      _canGoToNextSlide = canGoToNextSlide;
-    }
-  }
-
   /// Finishes the intro.
-  Future<void> _finish() async {
+  Future<void> finish() async {
     SystemChrome.restoreSystemUIOverlays();
-    if (mounted) {
-      _slides[_slideIndex].onGoToNextSlide(context, ref);
-      Navigator.pushNamedAndRemoveUntil(context, HomePage.name, (_) => false);
-      ref.read(showIntroSettingsEntryProvider.notifier).changeValue(false);
-    }
-  }
-
-  /// Goes to the next slide.
-  void _goToNextSlide() {
-    if (mounted) {
-      _slides[_slideIndex].onGoToNextSlide(context, ref);
-      setState(() {
-        _slideIndex++;
-        _canGoToNextSlide = _slides[_slideIndex].canSkip;
-      });
-    }
+    Navigator.pushNamedAndRemoveUntil(context, HomePage.name, (_) => false);
+    ref.read(showIntroSettingsEntryProvider.notifier).changeValue(false);
   }
 }

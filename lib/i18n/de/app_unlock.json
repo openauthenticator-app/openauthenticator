@@ -1,9 +1,5 @@
 {
-  "masterPasswordDialogMessage": "Bitte geben Sie Ihr Master-Passwort ein, um die App zu entsperren.",
-  "widget": {
-    "text": "$app ist gesperrt.",
-    "button": "Entsperren"
-  },
+  "widget": "$app ist gesperrt.",
   "authenticationRequired": "Authentifizierung erforderlich",
   "localAuthentication(map)": {
     "openApp": "Authentifizieren Sie sich, um auf die App zuzugreifen.",
@@ -11,14 +7,10 @@
     "enable": "Authentifizieren Sie sich, um die lokale Authentifizierung zu aktivieren.",
     "disable": "Authentifizieren Sie sich, um die lokale Authentifizierung zu deaktivieren."
   },
-  "cannotUnlock": {
-    "localAuthentication": {
-      "deviceNotSupported": "Die App kann nicht entsperrt werden, da Ihr Gerät die lokale Authentifizierung nicht unterstützt. Deaktivieren Sie diese Sperrmethode mit der Schaltfläche unten.",
-      "button": "Deaktivieren"
-    },
-    "masterPassword": {
-      "noPasswordVerificationMethodAvailable": "Die App kann nicht mit Ihrem Passwort entsperrt werden, da die Integrität der App-Daten verändert wurde. Bitte ändern Sie Ihr Master-Passwort, um fortzufahren.\nBeachten Sie, dass Ihre TOTP-Codes weiterhin manuell entschlüsselt werden müssen.",
-      "button": "Master-Passwort ändern"
-    }
+  "masterPasswordDialogMessage": "Bitte geben Sie Ihr Master-Passwort ein, um die App zu entsperren.",
+  "button": {
+    "disable": "Deaktivieren",
+    "changeMasterPassword": "Master-Passwort ändern",
+    "unlock": "Entsperren"
   }
 }

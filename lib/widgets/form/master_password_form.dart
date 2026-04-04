@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/utils/form_label.dart';
+import 'package:open_authenticator/utils/utils.dart';
 import 'package:open_authenticator/widgets/form/password_form_field.dart';
 
 /// A form to prompt for the master password.
@@ -87,7 +88,7 @@ class _MasterPasswordFormState extends State<MasterPasswordForm> {
           child: Text(
             translations.masterPassword.form.securityScore(score: '$securityScore/40'),
             style: context.theme.typography.sm.copyWith(
-              fontWeight: FontWeight.bold,
+              fontWeight: .bold,
               color: securityScoreColor,
             ),
             textAlign: TextAlign.right,
@@ -171,13 +172,13 @@ class _MasterPasswordFormState extends State<MasterPasswordForm> {
   Color get securityScoreColor {
     int securityScore = this.securityScore;
     if (securityScore <= 5) {
-      return Colors.red.shade900;
+      return context.theme.colors.error.darken(amount: 0.25);
     }
     if (securityScore <= 10) {
-      return Colors.red.shade700;
+      return context.theme.colors.error.darken(amount: 0.125);
     }
-    if (securityScore <= 10) {
-      return Colors.red;
+    if (securityScore <= 15) {
+      return context.theme.colors.error;
     }
     if (securityScore <= 20) {
       return Colors.orange.shade800;
@@ -186,11 +187,11 @@ class _MasterPasswordFormState extends State<MasterPasswordForm> {
       return Colors.orange;
     }
     if (securityScore <= 30) {
-      return Colors.green;
+      return context.theme.colors.primary.lighten(amount: 0.125);
     }
     if (securityScore <= 35) {
-      return Colors.green.shade600;
+      return context.theme.colors.primary;
     }
-    return Colors.green.shade800;
+    return context.theme.colors.primary.darken(amount: 0.125);
   }
 }

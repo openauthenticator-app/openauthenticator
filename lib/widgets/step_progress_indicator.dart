@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:open_authenticator/utils/utils.dart';
 
 /// Allows to display the current progress of an operation.
 class StepProgressIndicator extends StatelessWidget {
@@ -39,7 +40,7 @@ class StepProgressIndicator extends StatelessWidget {
             )
           else
             Container(
-              color: context.theme.colors.secondary,
+              color: context.theme.colors.secondary.highlight(amount: 0.25),
               width: stepsSize,
               height: stepsSize,
             ),

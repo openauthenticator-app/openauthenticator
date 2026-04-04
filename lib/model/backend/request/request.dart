@@ -27,11 +27,10 @@ sealed class BackendRequest<T extends BackendResponse> {
   T toResponse(http.Response response) {
     Map<String, dynamic> json = jsonDecode(response.body);
     if (!json['success']) {
-      throw BackendRequestError(
+      throw BackendRequestError.fromJson(
         route: route,
         statusCode: response.statusCode,
-        errorCode: json['data']['errorCode'],
-        message: json['data']['message'],
+        json: json,
       );
     }
     return _toResponseIfNoError(json['data']);
@@ -349,4 +348,16 @@ class SynchronizationPullRequest extends BackendPostRequest<SynchronizationPullR
 
   @override
   SynchronizationPullResponse _toResponseIfNoError(dynamic data) => SynchronizationPullResponse.fromJson(data);
+}
+
+/// A request that allows to ping the backend.
+class PingBackendRequest extends BackendGetRequest<PingBackendResponse> {
+  /// Creates a new ping backend request instance.
+  const PingBackendRequest()
+    : super(
+        route: '/ping',
+      );
+
+  @override
+  PingBackendResponse _toResponseIfNoError(dynamic data) => PingBackendResponse.fromJson(data);
 }

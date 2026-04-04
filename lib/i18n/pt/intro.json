@@ -19,7 +19,7 @@
     "title": "Mantenha seus dados seguros",
     "firstParagraph": "Para manter seus dados seguros, precisamos que você defina uma senha mestra.",
     "secondParagraph": "Essa senha será usada para criptografar seus dados e nunca será enviada para nenhum servidor remoto.",
-    "thirdParagraph": "Portanto, se você esquecê-la, não poderemos recuperá-la para você. Certifique-se de armazená-la em um local seguro."
+    "thirdParagraph": "Se você esquecê-la, não poderemos recuperá-la para você. Certifique-se de armazená-la em um local seguro."
   },
   "button": {
     "next": "Próximo",

@@ -19,7 +19,7 @@
     "title": "Gardez vos données au chaud",
     "firstParagraph": "Pour que vos données restent sécurisées, nous devons vous demander de définir un mot de passe maître.",
     "secondParagraph": "Ce mot de passe sera utilisé pour chiffrer vos données et ne sera jamais envoyé à aucun serveur distant.",
-    "thirdParagraph": "Ainsi, si vous l'oubliez, nous ne pourrons pas le retrouver pour vous. Assurez-vous de l'enregistrer dans un endroit sécurisé."
+    "thirdParagraph": "Si vous l'oubliez, nous ne pourrons pas le retrouver pour vous. Assurez-vous de l'enregistrer dans un endroit sécurisé."
   },
   "button": {
     "next": "Suivant",

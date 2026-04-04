@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:forui/forui.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/backend/user.dart';
 import 'package:open_authenticator/model/purchases/contributor_plan.dart';
 import 'package:open_authenticator/model/settings/storage_type.dart';
 import 'package:open_authenticator/utils/contributor_plan.dart';
+import 'package:open_authenticator/utils/result.dart';
 import 'package:open_authenticator/utils/storage_migration.dart';
 import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/centered_circular_progress_indicator.dart';
@@ -73,9 +75,9 @@ class TotpLimitDialog extends ConsumerWidget {
   }
 
   /// Waits for the [action] result before closing the dialog in case of success.
-  Future<void> _returnIfSucceeded(BuildContext context, Future<bool> action) async {
-    bool result = await action;
-    if (context.mounted && result) {
+  Future<void> _returnIfSucceeded(BuildContext context, Future<Result> action) async {
+    Result result = await action;
+    if (context.mounted && result is ResultSuccess) {
       Navigator.pop(context, true);
     }
   }
@@ -99,9 +101,9 @@ class TotpLimitDialog extends ConsumerWidget {
     BuildContext context, {
     bool autoDialog = false,
   }) async =>
-      (await showDialog<bool>(
+      (await showFDialog<bool>(
         context: context,
-        builder: (context) => TotpLimitDialog(
+        builder: (context, style, animation) => TotpLimitDialog(
           autoDialog: autoDialog,
         ),
         barrierDismissible: false,

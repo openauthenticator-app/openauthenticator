@@ -57,9 +57,9 @@ class TextInputDialog extends StatefulWidget {
     TextInputType? keyboardType,
     String? initialValue,
     List<Widget>? children,
-  }) => showDialog<String>(
+  }) => showFDialog<String>(
     context: context,
-    builder: (context) => TextInputDialog(
+    builder: (context, style, animation) => TextInputDialog(
       title: title,
       message: message,
       password: password,
@@ -176,9 +176,9 @@ class MasterPasswordInputDialog extends ConsumerStatefulWidget {
     BuildContext context, {
     String? title,
     String? message,
-  }) => showDialog<String>(
+  }) => showFDialog<String>(
     context: context,
-    builder: (context) => MasterPasswordInputDialog(
+    builder: (context, style, animation) => MasterPasswordInputDialog(
       title: title,
       message: message,
     ),

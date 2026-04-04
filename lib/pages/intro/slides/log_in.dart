@@ -4,50 +4,50 @@ import 'package:forui/forui.dart';
 import 'package:open_authenticator/app.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/backend/user.dart';
-import 'package:open_authenticator/model/totp/repository.dart';
-import 'package:open_authenticator/model/totp/totp.dart';
 import 'package:open_authenticator/pages/intro/slides/slide.dart';
 import 'package:open_authenticator/pages/settings/entries/synchronize.dart';
+import 'package:open_authenticator/spacing.dart';
 import 'package:open_authenticator/utils/account.dart';
 import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 
-/// The slide that allows the user to login to Firebase.
-class LogInIntroPageSlide extends IntroPageSlide {
-  /// Creates a new login intro page content instance.
-  LogInIntroPageSlide()
-    : super(
-        name: 'logIn',
-      );
+/// The log-in intro page.
+class LogInIntroPageSlide extends StatelessWidget {
+  /// Creates a new log-in intro page instance.
+  const LogInIntroPageSlide({
+    super.key,
+  });
 
   @override
-  Widget createWidget(BuildContext context, int remainingSteps) => IntroPageSlideWidget(
+  Widget build(BuildContext context) => IntroPageSlideWidget(
     titleWidget: Text(translations.intro.logIn.title),
-    slide: this,
+    slide: .logIn,
     children: [
-      IntroPageSlideParagraphWidget(text: translations.intro.logIn.firstParagraph),
+      IntroPageSlideParagraphWidget(
+        text: translations.intro.logIn.firstParagraph,
+        padding: kBigSpace,
+      ),
       IntroPageSlideParagraphWidget(
         text: translations.intro.logIn.secondParagraph,
         textStyle: const TextStyle(fontStyle: FontStyle.italic),
       ),
       Padding(
-        padding: const EdgeInsets.only(bottom: IntroPageSlideParagraphWidget.kDefaultPadding),
+        padding: const EdgeInsets.only(bottom: kBigSpace),
         child: _LogInButton(),
       ),
       SynchronizeSettingsEntryWidget.intro(),
-      IntroPageSlideParagraphWidget(text: translations.intro.logIn.thirdParagraph),
       IntroPageSlideParagraphWidget(
-        text: translations.intro.logIn.fourthParagraph(app: App.appName),
-        padding: 0,
+        text: translations.intro.logIn.thirdParagraph,
+        padding: kBigSpace,
+      ),
+      FAlert(
+        title: Text(translations.settings.application.contributorPlan.title),
+        subtitle: Text(
+          translations.intro.logIn.fourthParagraph(app: App.appName),
+        ),
       ),
     ],
   );
-
-  @override
-  Future<bool> shouldSkip(WidgetRef ref) async {
-    List<Totp> totps = await ref.read(totpRepositoryProvider.future);
-    return totps.isNotEmpty;
-  }
 }
 
 /// The log-in button.

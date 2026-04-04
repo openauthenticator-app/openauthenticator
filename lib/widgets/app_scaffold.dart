@@ -46,17 +46,28 @@ class AppScaffold extends StatelessWidget {
   /// Creates a new app scaffold instance from an [asyncValue].
   static AppScaffold asyncValue<T>({
     Widget? header,
+    Widget Function(T value)? headerBuilder,
     Widget? footer,
+    Widget Function(T value)? footerBuilder,
     bool scrollable = true,
+    bool? center,
     FScaffoldStyleDelta scaffoldStyle = const .context(),
     required AsyncValue<T> asyncValue,
     required List<Widget> Function(T value) builder,
     VoidCallback? onRetryPressed,
   }) => (scrollable ? AppScaffold.scrollable : AppScaffold.new)(
-    header: header,
-    footer: footer,
+    header: switch (asyncValue) {
+      AsyncValue(:final value, hasValue: true) => headerBuilder?.call(value!) ?? header,
+      AsyncError() => header,
+      _ => header,
+    },
+    footer: switch (asyncValue) {
+      AsyncValue(:final value, hasValue: true) => footerBuilder?.call(value!) ?? footer,
+      AsyncError() => footer,
+      _ => footer,
+    },
     scaffoldStyle: scaffoldStyle,
-    center: !asyncValue.hasValue || (asyncValue is Iterable ? (asyncValue.value as Iterable).isEmpty : asyncValue.value == null),
+    center: center ?? (!asyncValue.hasValue || (asyncValue is Iterable ? (asyncValue.value as Iterable).isEmpty : asyncValue.value == null)),
     children: switch (asyncValue) {
       AsyncValue(:final value, hasValue: true) => builder(value!),
       AsyncError(:final error, :final stackTrace) => [

@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:open_authenticator/i18n/localizable_exception.dart';
+import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/backend/backend.dart';
 import 'package:open_authenticator/model/backend/request/request.dart';
 import 'package:open_authenticator/model/backend/request/response.dart';
@@ -40,8 +42,11 @@ class StorageTypeSettingsEntry extends EnumSettingsEntry<StorageType> {
     try {
       if (masterPassword != null) {
         Result<bool> passwordCheckResult = await (await ref.read(passwordVerificationProvider.future)).isPasswordValid(masterPassword);
-        if (passwordCheckResult is! ResultSuccess || !(passwordCheckResult as ResultSuccess<bool>).value) {
+        if (passwordCheckResult is! ResultSuccess) {
           throw (passwordCheckResult as ResultError).exception;
+        }
+        if (!(passwordCheckResult as ResultSuccess<bool>).value) {
+          throw _CurrentStoragePasswordMismatchException();
         }
       }
 
@@ -53,7 +58,7 @@ class StorageTypeSettingsEntry extends EnumSettingsEntry<StorageType> {
       if (backupPassword != null) {
         Result<Backup> backupResult = await ref.read(backupStoreProvider.notifier).doBackup(backupPassword);
         if (backupResult is! ResultSuccess) {
-          throw BackupException();
+          throw _BackupException();
         }
       }
 
@@ -65,7 +70,7 @@ class StorageTypeSettingsEntry extends EnumSettingsEntry<StorageType> {
             const GetUserTotpsRequest(),
           );
       if (result is! ResultSuccess<GetUserTotpsResponse>) {
-        throw GenericMigrationError();
+        throw _GetTotpsError();
       }
 
       GetUserTotpsResponse response = result.value;
@@ -153,89 +158,49 @@ enum StorageType {
 }
 
 /// Allows to return various results from the storage migration.
-sealed class StorageMigrationException implements Exception {
-  /// The exception code.
-  final String code;
-
+sealed class _StorageMigrationException extends LocalizableException {
   /// Creates a new storage migration exception instance.
-  const StorageMigrationException({
-    required this.code,
-  });
+  _StorageMigrationException({
+    String? localizedErrorMessage,
+  }) : super(
+         localizedErrorMessage: localizedErrorMessage ?? translations.error.storageMigration.generic,
+       );
 }
 
-/// An generic error occurred.
-class GenericMigrationError extends StorageMigrationException {
-  /// The error code.
-  static const String _code = 'genericError';
-
+/// Thrown when we're not able to get the user TOTPs.
+class _GetTotpsError extends _StorageMigrationException {
   /// Creates a new generic migration error instance.
-  GenericMigrationError()
+  _GetTotpsError()
     : super(
-        code: _code,
+        localizedErrorMessage: translations.error.storageMigration.getTotps,
       );
-
-  @override
-  String toString() => 'Generic exception occurred';
 }
 
 /// Whether we should ask for a different [StorageMigrationDeletedTotpPolicy].
-class ShouldAskForDifferentDeletedTotpPolicyException extends StorageMigrationException {
-  /// The error code.
-  static const String _code = 'shouldAskForDifferentDeletedTotpPolicy';
-
+class ShouldAskForDifferentDeletedTotpPolicyException extends _StorageMigrationException {
   /// Creates a new storage migration policy exception instance.
   ShouldAskForDifferentDeletedTotpPolicyException()
     : super(
-        code: _code,
+        localizedErrorMessage: translations.error.storageMigration.anotherDeletedTotpPolicyShouldBeUsed,
       );
-
-  @override
-  String toString() => 'Another deleted TOTP policy should be used';
 }
 
 /// When we haven't succeeded to do the asked backup.
-class BackupException extends StorageMigrationException {
-  /// The error code.
-  static const String _code = 'backupError';
-
+class _BackupException extends _StorageMigrationException {
   /// Creates a new backup exception instance.
-  BackupException()
+  _BackupException()
     : super(
-        code: _code,
+        localizedErrorMessage: translations.error.storageMigration.backupError,
       );
-
-  @override
-  String toString() => 'Exception while doing the backup';
 }
 
 /// When the provided password don't match the one that has been using on the old storage.
-class CurrentStoragePasswordMismatchException extends StorageMigrationException {
-  /// The error code.
-  static const String _code = 'currentStoragePasswordMismatch';
-
+class _CurrentStoragePasswordMismatchException extends _StorageMigrationException {
   /// Creates a new current storage password mismatch exception instance.
-  CurrentStoragePasswordMismatchException()
+  _CurrentStoragePasswordMismatchException()
     : super(
-        code: _code,
+        localizedErrorMessage: translations.error.storageMigration.currentStoragePasswordMismatch,
       );
-
-  @override
-  String toString() => 'Current storage password is incorrect';
-}
-
-/// When there is an error while trying to change the encryption key of the old storage.
-class EncryptionKeyChangeFailedError extends StorageMigrationException {
-  /// The error code.
-  static const String _code = 'encryptionKeyChangeFailed';
-
-  /// Creates a new encryption key change error instance.
-  EncryptionKeyChangeFailedError()
-    : super(
-        code: _code,
-      );
-
-  @override
-  String toString() => 'Failed to change encryption key';
 }
 
 /// Allows to control the behavior when a TOTP has locally been deleted, but not on a different storage.

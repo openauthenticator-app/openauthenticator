@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:forui/forui.dart';
 import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
@@ -43,9 +44,9 @@ class ConfirmationDialog extends StatelessWidget {
     required String title,
     required String message,
   }) async =>
-      (await showDialog<bool>(
+      (await showFDialog<bool>(
         context: context,
-        builder: (context) => ConfirmationDialog(
+        builder: (context, style, animation) => ConfirmationDialog(
           title: title,
           message: message,
         ),

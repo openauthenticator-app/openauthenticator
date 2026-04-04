@@ -4,9 +4,9 @@ import 'package:forui/forui.dart';
 import 'package:open_authenticator/model/purchases/contributor_plan.dart';
 
 /// Allows to change the Contributor Plan state for debugging purposes.
-class ContributorPlanStateEntryWidget extends ConsumerWidget with FTileMixin {
+class ContributorPlanStateSettingsEntryWidget extends ConsumerWidget with FTileMixin {
   /// Creates a new Contributor Plan state entry widget instance.
-  const ContributorPlanStateEntryWidget({
+  const ContributorPlanStateSettingsEntryWidget({
     super.key,
   });
 
@@ -17,10 +17,8 @@ class ContributorPlanStateEntryWidget extends ConsumerWidget with FTileMixin {
       {
         for (ContributorPlanState state in ContributorPlanState.values) state.name: state,
       },
-      selectControl: FMultiValueControl.managed(
-        initial: {state.value ?? ContributorPlanState.impossible},
-        min: 1,
-        max: 1,
+      selectControl: FMultiValueControl.managedRadio(
+        initial: state.value ?? ContributorPlanState.impossible,
         onChange: (choices) => ref.read(contributorPlanStateProvider.notifier).debugChangeState(choices.first),
       ),
       enabled: state.hasValue,

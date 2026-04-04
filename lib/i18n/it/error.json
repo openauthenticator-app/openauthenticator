@@ -1,8 +1,15 @@
 {
   "noError": "Operazione eseguita con successo.",
-  "errorDialog": {
+  "widget": {
     "title": "Errore",
-    "retryButton": "Riprova"
+    "stackTrace": {
+      "show": "Mostra traccia",
+      "hide": "Nascondi traccia"
+    },
+    "button": {
+      "report": "Riportare",
+      "retry": "Riprova"
+    }
   },
   "validation": {
     "number": "Devi inserire un numero valido",
@@ -14,11 +21,34 @@
     "confirmation": "La conferma non corrisponde",
     "url": "URL non valido"
   },
-  "appUnlock": "Impossibile sbloccare l'app. Riprova.",
   "generic": {
-    "noTryAgain": "Ops, qualcosa è andato storto.",
-    "tryAgain": "Qualcosa è andato storto. Riprova più tardi.",
-    "withException": "Si è verificato un errore (eccezione: $exception). Riprova più tardi."
+    "noException": "Ops, qualcosa è andato storto.",
+    "withException": "Si è verificato un errore (eccezione: $exception).",
+    "tryAgain": "Riprova più tardi."
+  },
+  "backup": {
+    "fileDoesNotExist": "Il file di backup non esiste: $path.",
+    "invalidPassword": "Password inserita non valida.",
+    "invalidContent": "Contenuto non valido.",
+    "crypto": "Si è verificato un errore di crittografia."
+  },
+  "appUnlock": {
+    "generic": "Impossibile sbloccare l'applicazione. Riprova.",
+    "localAuthenticationDeviceNotSupported": "Impossibile sbloccare l'applicazione perché il tuo dispositivo non è supportato dall'autenticazione locale. Disattiva questa modalità con il pulsante sotto.",
+    "noPasswordVerificationMethodAvailable": "Impossibile sbloccare l'applicazione con la tua password perché le informazioni sull'applicazione sono state alterate. Cambia la tua password principale per continuare.\nNota che i tuoi TOTPs dovranno essere decifrati manualmente."
+  },
+  "backend": {
+    "noEmailToConfirm": "Nessun email da confermare.",
+    "invalidSession": "La tua sessione non è valida. Riprova a effettuare il login.",
+    "noSession": "Devi effettuare il login per continuare.",
+    "emailAlreadySent": "Un email è già stata inviata a questa indirizzo. Controlla la tua posta elettronica o riprova tra qualche minuto.",
+    "noCancelCode": "Nessun codice di annullamento è stato fornito dal server. Questo non è un caso normale. Riprova più tardi.",
+    "expiredSession": "La tua sessione è scaduta. Riprova a effettuare il login.",
+    "invalidPayload": "Il tuo payload non è valido. Riprova più tardi.",
+    "invalidToken": "Il tuo token non è valido. Riprova a effettuare il login.",
+    "invalidVerificationCode": "Il tuo codice di verifica non è valido.",
+    "invalidAppVersion": "La tua versione dell'applicazione non è valida. Aggiorna alla versione più recente.",
+    "invalidBackendUrl": "URL del server backend non valido."
   },
   "scan": {
     "noUri": "Impossibile leggere questo codice QR. Assicurati che sia un codice QR TOTP valido.",
@@ -26,12 +56,27 @@
     "controllerUninitialized": "Controller non inizializzato (codice: $exception).",
     "unsupported": "La scansione non è supportata su questo dispositivo (codice: $exception)."
   },
-  "storageMigration(map)": {
+  "storageMigration": {
+    "getTotps": "Si è verificato un errore durante il recupero dei tuoi TOTPs. Riprova.",
     "backupError": "Si è verificato un errore durante l'esecuzione del backup. Riprova.",
-    "currentStoragePasswordMismatch": "Password principale inserita non valida.",
-    "encryptionKeyChangeFailed": "Si è verificato un errore durante la cifratura dei tuoi dati. Riprova più tardi.",
-    "genericError": "Si è verificato un errore durante la migrazione dei tuoi dati. Riprova più tardi."
+    "anotherDeletedTotpPolicyShouldBeUsed": "Una altra politica di eliminazione TOTP dovrebbe essere usata.",
+    "currentStoragePasswordMismatch": "Password inserita non valida.",
+    "generic": "Si è verificato un errore durante la migrazione dei tuoi dati. Riprova."
   },
-  "totpDecrypt": "Impossibile decifrare questo TOTP. Assicurati di aver inserito la password corretta.",
-  "invalidCode": "Codice non valido."
+  "noRevenueCatClient": "Nessun client RevenueCat disponibile.",
+  "totp": {
+    "create": "Questo TOTP non può essere creato.",
+    "decrypt": "Impossibile decifrare questo TOTP. Assicurati di aver inserito la password corretta.",
+    "changeCryptoStore": {
+      "noCryptoStore": "Impossibile ottenere lo store di crittografia corrente. Chiudi e riapri l'applicazione.",
+      "generic": "Impossibile crittografare il TOTP con lo store di crittografia corrente."
+    }
+  },
+  "passwordMismatch": "La password del store di crittografia è errata",
+  "migrator": {
+    "idToken": "Impossibile ottenere il token di identificazione. Riprova più tardi.",
+    "httpError": "Migrazione fallita. Errore HTTP $statusCode: $body.",
+    "authProviderNotFound": "Impossibile trovare il fornitore di autenticazione $providerId.",
+    "migrationCancelled": "Migrazione annullata."
+  }
 }

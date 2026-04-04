@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_auth/local_auth.dart' hide LocalAuthentication;
+import 'package:open_authenticator/i18n/localizable_exception.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/app_unlock/reason.dart';
 import 'package:open_authenticator/model/crypto.dart';
@@ -108,4 +109,11 @@ enum AppLockState {
 }
 
 /// Will be used if the app cannot be unlocked.
-sealed class CannotUnlockException implements Exception {}
+sealed class CannotUnlockException extends LocalizableException {
+  /// Creates a new cannot unlock exception instance.
+  CannotUnlockException({
+    String? localizedErrorMessage,
+  }) : super(
+         localizedErrorMessage: localizedErrorMessage ?? translations.error.appUnlock.generic,
+       );
+}

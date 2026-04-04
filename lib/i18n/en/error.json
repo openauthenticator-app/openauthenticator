@@ -1,8 +1,15 @@
 {
   "noError": "Operation done with success.",
-  "errorDialog": {
+  "widget": {
     "title": "Error",
-    "retryButton": "Retry"
+    "stackTrace": {
+      "show": "Show stacktrace",
+      "hide": "Hide stacktrace"
+    },
+    "button": {
+      "report": "Report",
+      "retry": "Retry"
+    }
   },
   "validation": {
     "number": "You should enter a valid number",
@@ -14,11 +21,34 @@
     "confirmation": "Confirmation doesn't match",
     "url": "Invalid URL entered"
   },
-  "appUnlock": "Failed to unlock the app. Please try again.",
   "generic": {
-    "noTryAgain": "Oops, something went wrong.",
-    "tryAgain": "Something went wrong. Please try again later.",
-    "withException": "An error occurred (exception : $exception). Please try again later."
+    "noException": "Oops, something went wrong.",
+    "withException": "An error occurred (exception : $exception).",
+    "tryAgain": "Please try again later."
+  },
+  "backup": {
+    "fileDoesNotExist": "Backup file does not exist : $path.",
+    "invalidPassword": "Invalid password entered.",
+    "invalidContent": "Invalid backup content.",
+    "crypto": "A cryptographic error occurred."
+  },
+  "appUnlock": {
+    "generic": "Failed to unlock the app. Please try again.",
+    "localAuthenticationDeviceNotSupported": "Cannot unlock the app because your device is not supported by local authentication. Disable this locking method with the button below.",
+    "noPasswordVerificationMethodAvailable": "Cannot unlock the app with your password because the app data integrity has been altered. Please change your master password to continue.\nNote that your TOTPs will still need to be decrypted manually."
+  },
+  "backend": {
+    "noEmailToConfirm": "No email to confirm.",
+    "invalidSession": "Your session is invalid. Please try to log-in again.",
+    "noSession": "You must be logged-in to proceed.",
+    "emailAlreadySent": "An email has already been sent to this address. Please check your inbox or wait a few minutes before retrying.",
+    "noCancelCode": "No cancel code has been provided by the server. This is not normal. Please try again later.",
+    "expiredSession": "Your current session has expired. Please try to log-in again.",
+    "invalidPayload": "Your payload is invalid. Please try again later.",
+    "invalidToken": "Your token is invalid. Please try to log-in again.",
+    "invalidVerificationCode": "Your verification code is invalid.",
+    "invalidAppVersion": "Your app version is invalid. Please update to the latest version.",
+    "invalidBackendUrl": "Invalid backend URL entered."
   },
   "scan": {
     "noUri": "Failed to read this QR code. Please ensure it is a valid TOTP QR code.",
@@ -26,12 +56,27 @@
     "controllerUninitialized": "Uninitialized controller (code : $exception).",
     "unsupported": "Scanning is not supported on this device (code : $exception)."
   },
-  "storageMigration(map)": {
+  "storageMigration": {
+    "getTotps": "An error occurred while getting your remote TOTPs. Please try again later.",
     "backupError": "An error occurred while doing the backup. Please try again.",
+    "anotherDeletedTotpPolicyShouldBeUsed": "Another deleted TOTP policy should be used.",
     "currentStoragePasswordMismatch": "Invalid master password entered.",
-    "encryptionKeyChangeFailed": "An error occurred while encrypting your data. Please try again later.",
-    "genericError": "An error occurred while migrating your data. Please try again later."
+    "generic": "An error occurred while migrating your data. Please try again later."
   },
-  "totpDecrypt": "Failed to decrypt this TOTP. Please ensure you have entered the correct password.",
-  "invalidCode": "Invalid code."
+  "noRevenueCatClient": "No RevenueCat client available.",
+  "totp": {
+    "create": "This TOTP could not be created.",
+    "decrypt": "Failed to decrypt this TOTP. Please ensure you have entered the correct password.",
+    "changeCryptoStore": {
+      "noCryptoStore": "Unable to get current crypto store. Please close and reopen the app.",
+      "generic": "Failed to encrypt TOTP with current crypto store."
+    }
+  },
+  "passwordMismatch": "The new crypto store password is incorrect.",
+  "migrator": {
+    "idToken": "Could not get ID token. Please try again later.",
+    "httpError": "Migration failed. HTTP Error $statusCode : $body.",
+    "authProviderNotFound": "Could not find authentication provider $providerId.",
+    "migrationCancelled": "Migration cancelled."
+  }
 }
