@@ -18,10 +18,10 @@ class ContributorPlan extends AsyncNotifier<ContributorPlanState> {
   FutureOr<ContributorPlanState> build() async {
     RevenueCatClient? client = await ref.watch(revenueCatClientProvider.future);
     if (client == null) {
-      return ContributorPlanState.impossible;
+      return .impossible;
     }
     await client.initialize(ref);
-    return await client.hasEntitlement(AppContributorPlan.entitlementId) ? ContributorPlanState.active : ContributorPlanState.inactive;
+    return await client.hasEntitlement(AppContributorPlan.entitlementId) ? .active : .inactive;
   }
 
   /// Changes the state to [newState].

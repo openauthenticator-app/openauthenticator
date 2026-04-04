@@ -13,8 +13,8 @@ class RevenueCatMethodChannelClient extends RevenueCatClient {
 
   @override
   Future<void> initialize(Ref ref) async {
-    await Purchases.setAttributes(attributes);
     await Purchases.configure(purchasesConfiguration);
+    await Purchases.setAttributes(attributes);
     await Purchases.setEmail(purchasesConfiguration.email!);
   }
 
