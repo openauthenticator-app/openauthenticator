@@ -84,7 +84,7 @@
       },
       "logOut": {
         "title": "Sair",
-        "subtitle(rich)": "Saia para interromper a sincronização dos seus TOTPs com este dispositivo.\nAtualmente conectado como: $email."
+        "subtitle(rich)": "Saia para interromper a sincronização dos seus TOTPs com este dispositivo.\nAtualmente conectado como $user."
       }
     },
     "confirmEmail": {

@@ -79,7 +79,7 @@ class SynchronizeSettingsEntryWidget extends CheckboxSettingsEntryWidget<Storage
           context,
           ref,
           value: value,
-          enabled: value == StorageType.shared,
+          enabled: value == .shared,
         );
     }
   }

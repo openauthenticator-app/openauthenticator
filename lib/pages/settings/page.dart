@@ -44,124 +44,120 @@ class SettingsPage extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => DefaultTextStyle(
-    maxLines: 10,
-    style: const TextStyle(),
-    child: AppScaffold.scrollable(
-      header: FHeader.nested(
-        prefixes: [
-          ClickableHeaderAction.back(
-            onPress: () => Navigator.pop(context),
-          ),
-        ],
-        title: Text(translations.settings.title),
+  Widget build(BuildContext context, WidgetRef ref) => AppScaffold.scrollable(
+    header: FHeader.nested(
+      prefixes: [
+        ClickableHeaderAction.back(
+          onPress: () => Navigator.pop(context),
+        ),
+      ],
+      title: Text(translations.settings.title),
+    ),
+    children: [
+      Padding(
+        padding: const EdgeInsets.only(bottom: kSpace),
+        child: FTileGroup(
+          label: Text(translations.settings.application.title),
+          children: [
+            const ContributorPlanEntryWidget(),
+            const ThemeSettingsEntryWidget(),
+            CacheTotpPicturesSettingsEntryWidget(),
+            if (currentPlatform.isMobile || kDebugMode) //
+            ...[
+              DisplayCopyButtonSettingsEntryWidget(),
+              DisplaySearchButtonSettingsEntryWidget(),
+            ],
+          ],
+        ),
       ),
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(bottom: kSpace),
-          child: FTileGroup(
-            label: Text(translations.settings.application.title),
-            children: [
-              const ContributorPlanEntryWidget(),
-              const ThemeSettingsEntryWidget(),
-              CacheTotpPicturesSettingsEntryWidget(),
-              if (currentPlatform.isMobile || kDebugMode) //
-              ...[
-                DisplayCopyButtonSettingsEntryWidget(),
-                DisplaySearchButtonSettingsEntryWidget(),
-              ],
-            ],
-          ),
+      Padding(
+        padding: const EdgeInsets.only(bottom: kSpace),
+        child: FTileGroup(
+          label: Text(translations.settings.security.title),
+          children: [
+            EnableLocalAuthSettingsEntryWidget(),
+            SaveDerivedKeySettingsEntryWidget(),
+            const ChangeMasterPasswordSettingsEntryWidget(),
+          ],
         ),
-        Padding(
-          padding: const EdgeInsets.only(bottom: kSpace),
-          child: FTileGroup(
-            label: Text(translations.settings.security.title),
-            children: [
-              EnableLocalAuthSettingsEntryWidget(),
-              SaveDerivedKeySettingsEntryWidget(),
-              const ChangeMasterPasswordSettingsEntryWidget(),
-            ],
-          ),
+      ),
+      Padding(
+        padding: const EdgeInsets.only(bottom: kSpace),
+        child: FTileGroup(
+          label: Text(translations.settings.synchronization.title),
+          children: [
+            const ConfirmEmailSettingsEntryWidget(),
+            const AccountLinkSettingsEntryWidget(),
+            SynchronizeSettingsEntryWidget(),
+            const AccountLogInSettingsEntryWidget(),
+          ],
         ),
-        Padding(
-          padding: const EdgeInsets.only(bottom: kSpace),
-          child: FTileGroup(
-            label: Text(translations.settings.synchronization.title),
-            children: [
-              const ConfirmEmailSettingsEntryWidget(),
-              const AccountLinkSettingsEntryWidget(),
-              SynchronizeSettingsEntryWidget(),
-              const AccountLogInSettingsEntryWidget(),
-            ],
-          ),
+      ),
+      Padding(
+        padding: const EdgeInsets.only(bottom: kSpace),
+        child: FTileGroup(
+          label: Text(translations.settings.backups.title),
+          children: [
+            const BackupNowSettingsEntryWidget(),
+            const ManageBackupSettingsEntryWidget(),
+          ],
         ),
-        Padding(
-          padding: const EdgeInsets.only(bottom: kSpace),
-          child: FTileGroup(
-            label: Text(translations.settings.backups.title),
-            children: [
-              const BackupNowSettingsEntryWidget(),
-              const ManageBackupSettingsEntryWidget(),
-            ],
-          ),
+      ),
+      Padding(
+        padding: const EdgeInsets.only(bottom: kSpace),
+        child: FTileGroup(
+          label: Text(translations.settings.about.title),
+          children: [
+            TranslateSettingsEntryWidget(),
+            GithubSettingsEntryWidget(),
+            const AboutSettingsEntryWidget(),
+          ],
         ),
-        Padding(
-          padding: const EdgeInsets.only(bottom: kSpace),
-          child: FTileGroup(
-            label: Text(translations.settings.about.title),
-            children: [
-              TranslateSettingsEntryWidget(),
-              GithubSettingsEntryWidget(),
-              const AboutSettingsEntryWidget(),
-            ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(bottom: kDebugMode ? kSpace : 0),
-          child: FTileGroup(
-            style: .delta(
-              labelTextStyle: .delta([
-                .all(
-                  .delta(color: context.theme.colors.destructive),
-                ),
-              ]),
-              tileStyles: .delta([
-                .all(
-                  .delta(
-                    contentStyle: .delta(
-                      prefixIconStyle: .delta(
-                        [
-                          .all(
-                            .delta(color: context.theme.colors.destructive),
-                          ),
-                        ],
-                      ),
+      ),
+      Padding(
+        padding: const EdgeInsets.only(bottom: kDebugMode ? kSpace : 0),
+        child: FTileGroup(
+          style: .delta(
+            labelTextStyle: .delta([
+              .all(
+                .delta(color: context.theme.colors.destructive),
+              ),
+            ]),
+            tileStyles: .delta([
+              .all(
+                .delta(
+                  contentStyle: .delta(
+                    prefixIconStyle: .delta(
+                      [
+                        .all(
+                          .delta(color: context.theme.colors.destructive),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ]),
-            ),
-            label: Text(translations.settings.dangerZone.title),
-            children: [
-              const ChangeBackendUrlSettingsEntryWidget(),
-              const DeleteAccountSettingsEntryWidget(),
-              const ClearDataSettingsEntryWidget(),
-            ],
+              ),
+            ]),
           ),
+          label: Text(translations.settings.dangerZone.title),
+          children: [
+            const ChangeBackendUrlSettingsEntryWidget(),
+            const DeleteAccountSettingsEntryWidget(),
+            const ClearDataSettingsEntryWidget(),
+          ],
         ),
-        if (kDebugMode)
-          FTileGroup(
-            label: const Text('Debug'),
-            children: [
-              const ShowIntroPageSettingsEntryWidget(),
-              const ContributorPlanStateSettingsEntryWidget(),
-              const MigrationStateSettingsEntryWidget(),
-              const LocaleSettingsEntryWidget(),
-              const LinkInputSettingsEntryWidget(),
-            ],
-          ),
-      ],
-    ),
+      ),
+      if (kDebugMode)
+        FTileGroup(
+          label: const Text('Debug'),
+          children: [
+            const ShowIntroPageSettingsEntryWidget(),
+            const ContributorPlanStateSettingsEntryWidget(),
+            const MigrationStateSettingsEntryWidget(),
+            const LocaleSettingsEntryWidget(),
+            const LinkInputSettingsEntryWidget(),
+          ],
+        ),
+    ],
   );
 }

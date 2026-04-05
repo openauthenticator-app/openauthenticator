@@ -20,5 +20,5 @@ class MicrosoftAuthenticationProvider extends AuthenticationProvider with OAuthe
        );
 
   @override
-  User _changeId(User user, String providerUserId) => user.copyWith(microsoftId: providerUserId);
+  User _changeId(User user, String? providerUserId) => user.updateMicrosoftId(providerUserId);
 }

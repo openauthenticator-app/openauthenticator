@@ -51,7 +51,7 @@ dependencies:
   scrollable_positioned_list: ^0.3.8
   share_plus: ^12.0.2
   wakelock_plus: ^1.5.1
-  file_picker: ^11.0.0
+  file_picker: ^11.0.1
   connectivity_plus: ^7.1.0
   sentry_flutter: ^9.16.0
   forui: ^0.20.4

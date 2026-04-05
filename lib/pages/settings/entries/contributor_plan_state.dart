@@ -24,6 +24,7 @@ class ContributorPlanStateSettingsEntryWidget extends ConsumerWidget with FTileM
       enabled: state.hasValue,
       prefix: const Icon(FIcons.bug),
       title: const Text('Contributor Plan state'),
+      subtitle: const Text('Change the Contributor Plan state for debugging purposes.'),
       detailsBuilder: (_, values, _) => Text(values.first.name),
     );
   }

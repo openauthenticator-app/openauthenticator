@@ -84,7 +84,7 @@
       },
       "logOut": {
         "title": "Déconnexion",
-        "subtitle(rich)": "Se déconnecter pour arrêter la synchronisation des TOTPs avec cet appareil.\nActuellement connecté en tant que : $email."
+        "subtitle(rich)": "Se déconnecter pour arrêter la synchronisation des TOTPs avec cet appareil.\nActuellement connecté en tant que $user."
       }
     },
     "confirmEmail": {

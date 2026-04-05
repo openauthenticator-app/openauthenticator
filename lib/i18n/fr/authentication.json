@@ -13,7 +13,7 @@
     "unlinkSuccess": "Fournisseur délié avec succès.",
     "unlinkConfirmationDialog": {
       "title": "Supprimer la liaison au fournisseur",
-      "message": "Voulez-vous vraiment supprimer la liaison e votre compte à ce fournisseur d'authentification ?"
+      "message": "Voulez-vous vraiment supprimer la liaison de votre compte à ce fournisseur d'authentification ?"
     }
   },
   "deleteConfirmationDialog": {

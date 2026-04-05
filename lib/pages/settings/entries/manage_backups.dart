@@ -10,6 +10,7 @@ import 'package:intl/intl.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/backup.dart';
 import 'package:open_authenticator/pages/settings/entries/widgets.dart';
+import 'package:open_authenticator/utils/platform.dart';
 import 'package:open_authenticator/utils/result.dart';
 import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/centered_circular_progress_indicator.dart';
@@ -121,12 +122,13 @@ class _RestoreBackupDialogState extends ConsumerState<_RestoreBackupDialog> {
       prefix: const Icon(FIcons.upload),
       child: ButtonText(translations.settings.backups.manageBackups.button.restore),
     ),
-    ClickableButton(
-      variant: .secondary,
-      onPress: () => shareBackup(backup),
-      prefix: const Icon(FIcons.share),
-      child: ButtonText(translations.settings.backups.manageBackups.button.share),
-    ),
+    if (currentPlatform != .linux)
+      ClickableButton(
+        variant: .secondary,
+        onPress: () => shareBackup(backup),
+        prefix: const Icon(FIcons.share),
+        child: ButtonText(translations.settings.backups.manageBackups.button.share),
+      ),
     ClickableButton(
       variant: .secondary,
       onPress: () => exportBackup(backup),
@@ -191,8 +193,13 @@ class _RestoreBackupDialogState extends ConsumerState<_RestoreBackupDialog> {
       future: backup.restore(password),
     );
     if (mounted) {
-      context.handleResult(result);
-      Navigator.pop(context);
+      context.handleResult(
+        result,
+        showDialogIfError: (error) => error is! InvalidPasswordException,
+      );
+      if (result is ResultSuccess) {
+        Navigator.pop(context);
+      }
     }
   }
 

@@ -72,7 +72,7 @@ class _HomePageHeader extends ConsumerWidget {
 /// The app bar title.
 class _AppBarTitle extends StatelessWidget {
   /// The text max width.
-  /// Above this value, the app logo will be displayed.
+  /// Above this value, nothing will be displayed.
   final double? textMaxWidth;
 
   /// Creates a new app bar title instance.
@@ -84,14 +84,16 @@ class _AppBarTitle extends StatelessWidget {
   Widget build(BuildContext context) => LayoutBuilder(
     builder: (context, constraints) {
       if (textMaxWidth != null && constraints.maxWidth <= textMaxWidth!) {
-        double size = context.theme.typography.xl3.fontSize ?? 32;
-        return SizedScalableImage(
-          height: size,
-          width: size,
-          asset: 'assets/images/logo.si',
-        );
+        return const SizedBox.shrink();
       }
-      return const TitleText();
+      Widget title = const TitleText();
+      if (currentPlatform.isDesktop) {
+        title = GestureDetector(
+          onTap: () => AboutAppDialog.showForApp(context),
+          child: title,
+        ).clickable();
+      }
+      return title;
     },
   );
 }

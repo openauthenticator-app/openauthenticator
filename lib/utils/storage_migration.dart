@@ -159,7 +159,7 @@ class _ConfirmationDialogState extends State<_ConfirmationDialog> {
     ],
     children: [
       Text(widget.enable ? translations.storageMigration.confirmDialog.message.enable : translations.storageMigration.confirmDialog.message.disable),
-      FTile(
+      ClickableTile(
         title: Text(translations.miscellaneous.backupCheckbox.checkbox),
         onPress: () {
           setState(() => createBackup = !createBackup);

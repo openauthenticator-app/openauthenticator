@@ -84,7 +84,7 @@
       },
       "logOut": {
         "title": "Ausloggen",
-        "subtitle(rich)": "Melden Sie sich ab, um die Synchronisierung mit diesem Gerät zu beenden. Angemeldet als: $email."
+        "subtitle(rich)": "Melden Sie sich ab, um die Synchronisierung mit diesem Gerät zu beenden. Angemeldet als $user."
       }
     },
     "confirmEmail": {

@@ -197,7 +197,7 @@ FVariantsDelta<FItemVariantConstraint, FItemVariant, FTileStyle, FTileStyleDelta
   List<BoxShadow>? boxShadow,
 }) => .delta(
   [
-    .base(
+    .all(
       .delta(
         focusedOutlineStyle: () => null,
         backgroundColor: .delta(
@@ -226,6 +226,16 @@ FVariantsDelta<FItemVariantConstraint, FItemVariant, FTileStyle, FTileStyleDelta
               .match(
                 {.disabled},
                 .delta(color: hoveredBackgroundColor),
+              ),
+            ],
+          ),
+          subtitleTextStyle: .delta(
+            [
+
+                  .base(
+                    .delta(
+                  fontSize: 12,
+                ),
               ),
             ],
           ),

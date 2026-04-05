@@ -73,7 +73,7 @@ sealed class AuthenticationProvider {
   }) : _ref = ref;
 
   /// Changes the provider id of the user.
-  User _changeId(User user, String providerUserId);
+  User _changeId(User user, String? providerUserId);
 
   /// Unlinks the provider.
   Future<Result> unlink() async {
@@ -82,13 +82,17 @@ sealed class AuthenticationProvider {
       if (user == null) {
         return const ResultCancelled();
       }
-      return await _ref
+      Result result = await _ref
           .read(backendClientProvider.notifier)
           .sendHttpRequest(
             ProviderUnlinkRequest(
               provider: this,
             ),
           );
+      if (result is ResultSuccess) {
+        await _ref.read(userProvider.notifier).changeUser(_changeId(user, null));
+      }
+      return result;
     } catch (ex, stackTrace) {
       return ResultError(
         exception: ex,

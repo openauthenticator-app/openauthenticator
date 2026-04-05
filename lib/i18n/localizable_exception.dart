@@ -9,5 +9,5 @@ class LocalizableException implements Exception {
   });
 
   @override
-  String toString() => 'An error occurred : $runtimeType. Localized error message : $localizedErrorMessage.';
+  String toString() => 'An error occurred : $runtimeType. Localized error message : "$localizedErrorMessage".';
 }

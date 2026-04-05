@@ -93,22 +93,59 @@ class User {
     await file.writeAsString(jsonEncode(toJson()));
   }
 
-  /// Creates a copy of the user.
-  User copyWith({
-    int? totpsLimit,
-    String? email,
-    String? googleId,
-    String? githubId,
-    String? microsoftId,
-    String? appleId,
-  }) => User._(
+  /// Updates the user email.
+  User updateEmail(String? email) => User._(
     id: id,
-    totpsLimit: totpsLimit ?? this.totpsLimit,
-    email: email ?? this.email,
-    googleId: googleId ?? this.googleId,
-    githubId: githubId ?? this.githubId,
-    microsoftId: microsoftId ?? this.microsoftId,
-    appleId: appleId ?? this.appleId,
+    totpsLimit: totpsLimit,
+    email: email,
+    googleId: googleId,
+    githubId: githubId,
+    microsoftId: microsoftId,
+    appleId: appleId,
+  );
+
+  /// Updates the user Google ID.
+  User updateGoogleId(String? googleId) => User._(
+    id: id,
+    totpsLimit: totpsLimit,
+    email: email,
+    googleId: googleId,
+    githubId: githubId,
+    microsoftId: microsoftId,
+    appleId: appleId,
+  );
+
+  /// Updates the user GitHub ID.
+  User updateGithubId(String? githubId) => User._(
+    id: id,
+    totpsLimit: totpsLimit,
+    email: email,
+    googleId: googleId,
+    githubId: githubId,
+    microsoftId: microsoftId,
+    appleId: appleId,
+  );
+
+  /// Updates the user Microsoft ID.
+  User updateMicrosoftId(String? microsoftId) => User._(
+    id: id,
+    totpsLimit: totpsLimit,
+    email: email,
+    googleId: googleId,
+    githubId: githubId,
+    microsoftId: microsoftId,
+    appleId: appleId,
+  );
+
+  /// Updates the user Apple ID.
+  User updateAppleId(String? appleId) => User._(
+    id: id,
+    totpsLimit: totpsLimit,
+    email: email,
+    googleId: googleId,
+    githubId: githubId,
+    microsoftId: microsoftId,
+    appleId: appleId,
   );
 
   /// Converts the user to a JSON map.

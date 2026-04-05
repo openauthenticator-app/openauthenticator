@@ -237,7 +237,7 @@ class _ContributorPlanBillingPlanPickerState extends ConsumerState<_ContributorP
     mainAxisSize: MainAxisSize.min,
     children: [
       Padding(
-        padding: const EdgeInsets.only(bottom: 20),
+        padding: const EdgeInsets.only(bottom: kBigSpace),
         child: FutureBuilder(
           future: ref.read(contributorPlanStateProvider.notifier).getPrices(),
           builder: (context, snapshot) {
@@ -309,7 +309,7 @@ class _ContributorPlanBillingPlanPickerState extends ConsumerState<_ContributorP
     String? subtitle = translations.contributorPlan.fallbackPaywall.packageType.subtitle[packageType.name];
     return name == null || interval == null || subtitle == null
         ? const SizedBox.shrink()
-        : FTile(
+        : ClickableTile(
             style: .delta(
               decoration: .delta(
                 this.packageType == packageType

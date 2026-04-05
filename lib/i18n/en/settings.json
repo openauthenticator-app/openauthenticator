@@ -84,7 +84,7 @@
       },
       "logOut": {
         "title": "Log out",
-        "subtitle(rich)": "Log out to stop synchronizing your TOTPs with this device.\nCurrently signed in as : $email."
+        "subtitle(rich)": "Log out to stop synchronizing your TOTPs with this device.\nCurrently signed in as $user."
       }
     },
     "confirmEmail": {

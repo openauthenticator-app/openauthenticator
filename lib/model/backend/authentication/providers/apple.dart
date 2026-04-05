@@ -20,5 +20,5 @@ class AppleAuthenticationProvider extends AuthenticationProvider with OAuthentic
        );
 
   @override
-  User _changeId(User user, String providerUserId) => user.copyWith(appleId: providerUserId);
+  User _changeId(User user, String? providerUserId) => user.updateAppleId(providerUserId);
 }

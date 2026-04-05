@@ -20,5 +20,5 @@ class GoogleAuthenticationProvider extends AuthenticationProvider with OAuthenti
        );
 
   @override
-  User _changeId(User user, String providerUserId) => user.copyWith(googleId: providerUserId);
+  User _changeId(User user, String? providerUserId) => user.updateGoogleId(providerUserId);
 }

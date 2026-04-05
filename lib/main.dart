@@ -163,36 +163,36 @@ class OpenAuthenticatorApp extends ConsumerWidget {
       ),
       routes: home == null
           ? {
-        IntroPage.name: (_) => const _RouteWidget(
-          child: IntroPage(),
-        ),
-        HomePage.name: (_) => const _RouteWidget(
-          listen: true,
-          rateMyApp: true,
-          child: HomePage(),
-        ),
-        ScanPage.name: (_) => const _RouteWidget(
-          child: ScanPage(),
-        ),
-        SettingsPage.name: (_) => const _RouteWidget(
-          child: SettingsPage(),
-        ),
-        TotpPage.name: (context) {
-          Map<String, dynamic>? arguments = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
-          return _RouteWidget(
-            child: TotpPage(
-              totp: arguments?[kRouteParameterTotp],
-              add: arguments?[kRouteParameterAddTotp],
-            ),
-          );
-        },
-        SyncIssuesPage.name: (_) => const _RouteWidget(
-          child: SyncIssuesPage(),
-        ),
-        ContributorPlanPaywallPage.name: (_) => const _RouteWidget(
-          child: ContributorPlanPaywallPage(),
-        ),
-      }
+              IntroPage.name: (_) => const _RouteWidget(
+                child: IntroPage(),
+              ),
+              HomePage.name: (_) => const _RouteWidget(
+                listen: true,
+                rateMyApp: true,
+                child: HomePage(),
+              ),
+              ScanPage.name: (_) => const _RouteWidget(
+                child: ScanPage(),
+              ),
+              SettingsPage.name: (_) => const _RouteWidget(
+                child: SettingsPage(),
+              ),
+              TotpPage.name: (context) {
+                Map<String, dynamic>? arguments = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
+                return _RouteWidget(
+                  child: TotpPage(
+                    totp: arguments?[kRouteParameterTotp],
+                    add: arguments?[kRouteParameterAddTotp],
+                  ),
+                );
+              },
+              SyncIssuesPage.name: (_) => const _RouteWidget(
+                child: SyncIssuesPage(),
+              ),
+              ContributorPlanPaywallPage.name: (_) => const _RouteWidget(
+                child: ContributorPlanPaywallPage(),
+              ),
+            }
           : {},
       initialRoute: home == null ? initialRoute : null,
       home: home,

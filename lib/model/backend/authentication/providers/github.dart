@@ -20,5 +20,5 @@ class GithubAuthenticationProvider extends AuthenticationProvider with OAuthenti
        );
 
   @override
-  User _changeId(User user, String providerUserId) => user.copyWith(githubId: providerUserId);
+  User _changeId(User user, String? providerUserId) => user.updateGithubId(providerUserId);
 }

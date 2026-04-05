@@ -3,12 +3,16 @@ import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:open_authenticator/app.dart';
+import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/spacing.dart';
 import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/centered_circular_progress_indicator.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
 import 'package:open_authenticator/widgets/error.dart';
+import 'package:open_authenticator/widgets/sized_scalable_image.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 /// Allows to show an about dialog.
 class AboutAppDialog extends StatelessWidget {
@@ -92,6 +96,27 @@ class AboutAppDialog extends StatelessWidget {
       applicationVersion: applicationVersion,
       applicationIcon: applicationIcon,
       applicationLegalese: applicationLegalese,
+    ),
+  );
+
+  /// Opens the about dialog for the app.
+  static Future<void> showForApp(BuildContext context) => showFDialog(
+    context: context,
+    builder: (context, style, animation) => FutureBuilder(
+      future: PackageInfo.fromPlatform().then((value) => value.version),
+      builder: (context, snapshot) => AboutAppDialog(
+        applicationName: App.appName,
+        applicationVersion: snapshot.data == null ? null : 'v${snapshot.data}',
+        applicationIcon: const SizedScalableImage(
+          asset: 'assets/images/logo.si',
+          height: 90,
+          width: 90,
+        ),
+        applicationLegalese: translations.settings.about.aboutApp.dialogLegalese(
+          appName: App.appName,
+          appAuthor: App.appAuthor,
+        ),
+      ),
     ),
   );
 }

@@ -123,7 +123,7 @@ class EmailAuthenticationProvider extends AuthenticationProvider {
   }
 
   @override
-  User _changeId(User user, String providerUserId) => user.copyWith(email: providerUserId);
+  User _changeId(User user, String? providerUserId) => user.updateEmail(providerUserId);
 }
 
 /// The email confirmation state provider.

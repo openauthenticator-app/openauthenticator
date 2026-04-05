@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
+import 'package:open_authenticator/spacing.dart';
 import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
@@ -87,7 +88,11 @@ class _WaitingDialog extends StatelessWidget {
         Row(
           children: [
             const Padding(
-              padding: EdgeInsets.only(right: 24),
+              padding: EdgeInsets.only(
+                top: kSpace,
+                right: kBigSpace,
+                bottom: kSpace,
+              ),
               child: CircularProgressIndicator(),
             ),
             Expanded(

@@ -84,7 +84,7 @@
       },
       "logOut": {
         "title": "Disconnetti",
-        "subtitle(rich)": "Disconnetti per interrompere la sincronizzazione dei tuoi TOTP con questo dispositivo.\nAttualmente connesso come: $email."
+        "subtitle(rich)": "Disconnetti per interrompere la sincronizzazione dei tuoi TOTP con questo dispositivo.\nAttualmente connesso come $user."
       }
     },
     "confirmEmail": {

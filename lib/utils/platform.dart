@@ -40,7 +40,8 @@ enum Platform {
   linux(isDesktop: true),
 
   /// The Web platform.
-  web;
+  web
+  ;
 
   /// Whether this is a mobile platform.
   final bool isMobile;

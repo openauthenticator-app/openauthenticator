@@ -13,19 +13,22 @@ class MigrationStateSettingsEntryWidget extends ConsumerWidget with FTileMixin {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     MigrationState? migrationState = ref.watch(migratorProvider).value;
-    return migrationState == null ? const SizedBox.shrink() : FSelectMenuTile<MigrationState>.fromMap(
-      {
-        'Not needed': .notNeeded,
-        'Needed': .needed,
-        'Done': .done,
-      },
-      selectControl: FMultiValueControl.managedRadio(
-        initial: migrationState,
-        onChange: (choices) => ref.read(migratorProvider.notifier).changeValue(choices.first),
-      ),
-      prefix: const Icon(FIcons.send),
-      title: const Text('Migration state'),
-      detailsBuilder: (_, values, _) => Text(values.first.name),
-    );
+    return migrationState == null
+        ? const SizedBox.shrink()
+        : FSelectMenuTile<MigrationState>.fromMap(
+            {
+              'Not needed': .notNeeded,
+              'Needed': .needed,
+              'Done': .done,
+            },
+            selectControl: FMultiValueControl.managedRadio(
+              initial: migrationState,
+              onChange: (choices) => ref.read(migratorProvider.notifier).changeValue(choices.first),
+            ),
+            prefix: const Icon(FIcons.send),
+            title: const Text('Migration state'),
+            subtitle: const Text('Change the migration state.'),
+            detailsBuilder: (_, values, _) => Text(values.first.name),
+          );
   }
 }

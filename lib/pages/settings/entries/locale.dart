@@ -21,6 +21,7 @@ class LocaleSettingsEntryWidget extends ConsumerWidget with FTileMixin {
     ),
     prefix: const Icon(FIcons.languages),
     title: const Text('Language'),
+    subtitle: const Text('Change the app language.'),
     detailsBuilder: (_, values, _) => Text(values.first.name),
   );
 }

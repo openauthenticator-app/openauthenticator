@@ -48,10 +48,19 @@ class ClickableTile extends FTile {
     super.shortcuts,
     super.actions,
     super.prefix,
-    super.subtitle,
+    Widget? subtitle,
     super.details,
     super.suffix,
-  });
+    int? maxDescriptionLines = 10,
+  }) : super(
+         subtitle: maxDescriptionLines == null || subtitle == null
+             ? subtitle
+             : DefaultTextStyle.merge(
+                 maxLines: 10,
+                 textAlign: .left,
+                 child: subtitle,
+               ),
+       );
 
   /// Creates a new clickable raw tile instance.
   ClickableTile.raw({
@@ -73,7 +82,7 @@ class ClickableTile extends FTile {
     super.onSecondaryLongPress,
     super.shortcuts,
     super.actions,
-    Widget? prefix,
+    super.prefix,
   }) : super.raw();
 
   @override

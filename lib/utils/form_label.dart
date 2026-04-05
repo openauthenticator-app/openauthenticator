@@ -19,25 +19,25 @@ class FormLabelWithIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-      padding: const EdgeInsets.only(bottom: kSpace / 2),
-      child: Row(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 2, right: kSpace / 2),
-            child: Icon(
-              icon,
-              color: DefaultTextStyle.of(context).style.color == context.theme.colors.destructive ? context.theme.colors.destructive : context.theme.colors.primary,
-              size: 12,
-            ),
+    padding: const EdgeInsets.only(bottom: kSpace / 2),
+    child: Row(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 2, right: kSpace / 2),
+          child: Icon(
+            icon,
+            color: DefaultTextStyle.of(context).style.color == context.theme.colors.destructive ? context.theme.colors.destructive : context.theme.colors.primary,
+            size: 12,
           ),
-          Expanded(
-            child: Text(
-              text,
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-            ),
+        ),
+        Expanded(
+          child: Text(
+            text,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
           ),
-        ],
-      ),
-    );
+        ),
+      ],
+    ),
+  );
 }

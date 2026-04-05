@@ -57,7 +57,7 @@ class _LogOutTile extends ConsumerWidget {
     title: Text(translations.settings.synchronization.accountLogin.logOut.title),
     subtitle: Text.rich(
       translations.settings.synchronization.accountLogin.logOut.subtitle(
-        email: TextSpan(
+        user: TextSpan(
           text: user,
           style: const TextStyle(fontStyle: FontStyle.italic),
         ),
