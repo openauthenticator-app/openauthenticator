@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/app.dart';
 import 'package:open_authenticator/i18n/localizable_exception.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
+import 'package:open_authenticator/model/backend/user.dart';
 import 'package:open_authenticator/model/purchases/clients/client.dart';
 import 'package:open_authenticator/utils/result.dart';
 import 'package:purchases_flutter/purchases_flutter.dart' hide Price;
@@ -91,13 +92,16 @@ class ContributorPlan extends AsyncNotifier<ContributorPlanState> {
   }
 
   /// Tries to refresh the subscription state.
-  Future<Result<ContributorPlanState>> refresh() async {
+  Future<Result<ContributorPlanState>> refresh({ bool refreshUser = true }) async {
     try {
       RevenueCatClient? revenueCatClient = await ref.read(revenueCatClientProvider.future);
       if (revenueCatClient == null) {
         throw _NoRevenueCatClientException();
       }
       ContributorPlanState contributorPlanState = await revenueCatClient.hasEntitlement(AppContributorPlan.entitlementId) ? ContributorPlanState.active : ContributorPlanState.inactive;
+      if (contributorPlanState != state.value && refreshUser) {
+        await ref.read(userProvider.notifier).refreshUserInfo();
+      }
       state = AsyncData(contributorPlanState);
       return ResultSuccess(value: contributorPlanState);
     } catch (ex, stackTrace) {

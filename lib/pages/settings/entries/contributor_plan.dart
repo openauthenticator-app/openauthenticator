@@ -40,7 +40,7 @@ class ContributorPlanEntryWidget extends ConsumerWidget with FTileMixin {
               prefix: const Icon(FIcons.userLock),
               title: Text(translations.settings.application.contributorPlan.title),
               subtitle: Text(translations.settings.application.contributorPlan.subtitle.inactive),
-              onPress: () => ContributorPlanUtils.purchase(context),
+              onPress: () => ContributorPlanUtils.purchase(context, ref),
             );
           case ContributorPlanState.active:
             return ClickableTile(

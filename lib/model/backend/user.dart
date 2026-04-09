@@ -177,23 +177,25 @@ class UserNotifier extends AsyncNotifier<User?> {
   }
 
   /// Refreshes the user info.
-  Future<Result> refreshUserInfo() async {
+  Future<Result<User>> refreshUserInfo() async {
     Result<GetUserInfoResponse> result = await ref
         .read(backendClientProvider.notifier)
         .sendHttpRequest(
           const GetUserInfoRequest(),
         );
     if (result is! ResultSuccess<GetUserInfoResponse>) {
-      return result;
+      return result.to((_) => null);
     }
     await changeUser(result.value.user);
-    return const ResultSuccess();
+    return ResultSuccess(value: result.value.user);
   }
 
   /// Changes the user.
   Future<void> changeUser(User user) async {
     await user._saveToCache();
-    state = AsyncData(user);
+    if (ref.mounted) {
+      state = AsyncData(user);
+    }
   }
 
   /// Logs out the user.
