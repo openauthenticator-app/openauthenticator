@@ -67,7 +67,7 @@ class ConfirmEmailSettingsEntryWidget extends ConsumerWidget with FTileMixin {
     }
     Result result = await showWaitingOverlay(
       context,
-      future: ref.read(emailAuthenticationProvider).cancelConfirmation(),
+      future: ref.read(authenticationProviders).email.cancelConfirmation(),
     );
     if (context.mounted) {
       context.handleResult(result);
@@ -85,7 +85,7 @@ class ConfirmEmailSettingsEntryWidget extends ConsumerWidget with FTileMixin {
     if (code == null || !context.mounted) {
       return;
     }
-    Result result = await ref.read(emailAuthenticationProvider).confirm(code);
+    Result result = await ref.read(authenticationProviders).email.confirm(code);
     if (context.mounted) {
       AccountUtils.handleAuthenticationResult(context, result);
     }

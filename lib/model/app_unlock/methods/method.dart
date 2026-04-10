@@ -12,7 +12,6 @@ import 'package:open_authenticator/model/totp/repository.dart';
 import 'package:open_authenticator/model/totp/totp.dart';
 import 'package:open_authenticator/utils/local_authentication/local_authentication.dart';
 import 'package:open_authenticator/utils/result.dart';
-import 'package:open_authenticator/utils/utils.dart';
 import 'package:open_authenticator/widgets/dialog/text_input_dialog.dart';
 
 part 'local_auth.dart';
@@ -20,23 +19,13 @@ part 'master_password.dart';
 part 'none.dart';
 
 /// The app unlock method provider.
-final appUnlockMethodProvider = Provider.family<AppUnlockMethod?, String>(
-  (ref, id) => ref.watch(
-    appUnlockMethodsProvider.select(
-      (providers) => providers.firstWhereOrNull(
-        (provider) => provider.id == id,
-      ),
-    ),
-  ),
-);
-
-/// The app unlock methods provider.
-final appUnlockMethodsProvider = Provider<List<AppUnlockMethod>>(
-  (ref) => [
-    ref.watch(localAuthenticationAppUnlockMethodProvider),
-    ref.watch(masterPasswordAppUnlockMethodProvider),
-    ref.watch(noneAppUnlockMethodProvider),
-  ],
+final appUnlockMethodProvider = Provider.autoDispose.family<AppUnlockMethod?, String>(
+  (ref, id) => switch (id) {
+    LocalAuthenticationAppUnlockMethod.kMethodId => LocalAuthenticationAppUnlockMethod._(ref: ref),
+    MasterPasswordAppUnlockMethod.kMethodId => MasterPasswordAppUnlockMethod._(ref: ref),
+    NoneAppUnlockMethod.kMethodId => NoneAppUnlockMethod._(ref: ref),
+    _ => null,
+  },
 );
 
 /// Allows to unlock the app.

@@ -1,13 +1,6 @@
 part of 'provider.dart';
 
 /// The email authentication provider.
-final emailAuthenticationProvider = Provider<EmailAuthenticationProvider>(
-  (ref) => EmailAuthenticationProvider._(
-    ref: ref,
-  ),
-);
-
-/// The email authentication provider.
 class EmailAuthenticationProvider extends AuthenticationProvider {
   /// The email authentication provider id.
   static const String kProviderId = 'email';
@@ -127,7 +120,7 @@ class EmailAuthenticationProvider extends AuthenticationProvider {
 }
 
 /// The email confirmation state provider.
-final emailConfirmationStateProvider = AsyncNotifierProvider<EmailConfirmationStateNotifier, EmailConfirmationData?>(EmailConfirmationStateNotifier.new);
+final emailConfirmationStateProvider = AsyncNotifierProvider.autoDispose<EmailConfirmationStateNotifier, EmailConfirmationData?>(EmailConfirmationStateNotifier.new);
 
 /// The email confirmation state notifier.
 class EmailConfirmationStateNotifier extends AsyncNotifier<EmailConfirmationData?> {
@@ -158,12 +151,14 @@ class EmailConfirmationStateNotifier extends AsyncNotifier<EmailConfirmationData
     SharedPreferencesWithPrefix preferences = await ref.read(sharedPreferencesProvider.future);
     await preferences.setString(_kAuthenticationEmailKey, email);
     await preferences.setString(_kAuthenticationEmailCancelCodeKey, cancelCode);
-    state = AsyncData(
-      EmailConfirmationData(
-        email: email,
-        cancelCode: cancelCode,
-      ),
-    );
+    if (ref.mounted) {
+      state = AsyncData(
+        EmailConfirmationData(
+          email: email,
+          cancelCode: cancelCode,
+        ),
+      );
+    }
   }
 
   /// Cancels the confirmation.
@@ -171,7 +166,9 @@ class EmailConfirmationStateNotifier extends AsyncNotifier<EmailConfirmationData
     SharedPreferencesWithPrefix preferences = await ref.read(sharedPreferencesProvider.future);
     await preferences.remove(_kAuthenticationEmailKey);
     await preferences.remove(_kAuthenticationEmailCancelCodeKey);
-    state = const AsyncData(null);
+    if (ref.mounted) {
+      state = const AsyncData(null);
+    }
   }
 }
 

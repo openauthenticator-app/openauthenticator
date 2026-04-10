@@ -48,7 +48,8 @@
     "invalidToken": "Your token is invalid. Please try to log-in again.",
     "invalidVerificationCode": "Your verification code is invalid.",
     "invalidAppVersion": "Your app version is invalid. Please update to the latest version.",
-    "invalidBackendUrl": "Invalid backend URL entered."
+    "invalidBackendUrl": "Invalid backend URL entered.",
+    "providerUserAlreadyExists": "An user with the same provider already exists, so it's not possible to link it to your account."
   },
   "scan": {
     "noUri": "Failed to read this QR code. Please ensure it is a valid TOTP QR code.",
@@ -63,7 +64,10 @@
     "currentStoragePasswordMismatch": "Invalid master password entered.",
     "generic": "An error occurred while migrating your data. Please try again later."
   },
-  "noRevenueCatClient": "No RevenueCat client available.",
+  "revenueCat": {
+    "noClient": "No RevenueCat client available.",
+    "cannotRestorePurchases": "This RevenueCat client cannot restore purchases."
+  },
   "totp": {
     "create": "This TOTP could not be created.",
     "decrypt": "Failed to decrypt this TOTP. Please ensure you have entered the correct password.",

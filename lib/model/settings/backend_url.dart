@@ -4,7 +4,7 @@ import 'package:open_authenticator/model/settings/entry.dart';
 import 'package:open_authenticator/utils/shared_preferences_with_prefix.dart';
 
 /// The backend URL settings entry provider.
-final backendUrlSettingsEntryProvider = AsyncNotifierProvider<BackendUrlSettingsEntry, BackendUrl>(BackendUrlSettingsEntry.new);
+final backendUrlSettingsEntryProvider = AsyncNotifierProvider.autoDispose<BackendUrlSettingsEntry, BackendUrl>(BackendUrlSettingsEntry.new);
 
 /// A settings entry that allows to configure the backend URL.
 class BackendUrlSettingsEntry extends SettingsEntry<BackendUrl> {

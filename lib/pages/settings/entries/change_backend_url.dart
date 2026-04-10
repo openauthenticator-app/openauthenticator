@@ -105,7 +105,7 @@ class ChangeBackendUrlSettingsEntryWidget extends ConsumerWidget with FTileMixin
       }
       await showWaitingOverlay(
         context,
-        future: ref.read(emailAuthenticationProvider).cancelConfirmation(),
+        future: ref.read(authenticationProviders).email.cancelConfirmation(),
       );
       if (!context.mounted) {
         return;

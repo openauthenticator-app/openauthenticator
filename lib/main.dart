@@ -298,7 +298,7 @@ class _RouteWidgetState extends ConsumerState<_RouteWidget> {
   Future<void> handleAppLink(Uri appLink) async {
     if (appLink.host == 'auth' && appLink.path.startsWith('/provider/') && appLink.pathSegments.length >= 2) {
       String? providerId = appLink.pathSegments[1];
-      AuthenticationProvider? provider = ref.read(authenticationProvider(providerId));
+      AuthenticationProvider? provider = ref.read(authenticationProviders).findProvider(providerId);
       if (provider == null) {
         return;
       }

@@ -55,7 +55,11 @@ class CurrentIntroPageSlideNotifier extends AsyncNotifier<CurrentIntroSlideState
   }
 
   /// Updates the state.
-  void updateState(CurrentIntroSlideState slideState) => state = AsyncData(slideState);
+  void updateState(CurrentIntroSlideState slideState) {
+    if (ref.mounted) {
+      state = AsyncData(slideState);
+    }
+  }
 }
 
 /// The current intro page slide state.

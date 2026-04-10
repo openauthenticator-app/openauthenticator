@@ -52,7 +52,7 @@ class _SignInDialogState extends ConsumerState<SignInDialog> {
             Navigator.pop(
               context,
               SignInDialogResult(
-                action: () => ref.read(emailAuthenticationProvider).requestSignIn(email),
+                action: () => ref.read(authenticationProviders).email.requestSignIn(email),
                 willNeedConfirmation: true,
               ),
             );
@@ -124,7 +124,7 @@ class _EmailFormState extends ConsumerState<_EmailForm> {
   @override
   Widget build(BuildContext context) {
     User? user = ref.watch(userProvider).value;
-    EmailAuthenticationProvider provider = ref.watch(emailAuthenticationProvider);
+    EmailAuthenticationProvider provider = ref.watch(authenticationProviders.select((providers) => providers.email));
     bool hasEmailProvider = user != null && user.hasAuthenticationProvider(provider.id);
 
     String? emailToConfirm = ref.watch(emailConfirmationStateProvider).value?.email;
@@ -141,7 +141,7 @@ class _EmailFormState extends ConsumerState<_EmailForm> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Padding(
-          padding: const EdgeInsets.only(bottom: kSpace / 2),
+          padding: const EdgeInsets.only(bottom: kSpace),
           child: FTextFormField(
             control: .managed(controller: emailController),
             enabled: canAuthenticateByEmail,

@@ -39,7 +39,11 @@ class Migrator extends AsyncNotifier<MigrationState> {
   }
 
   /// Changes the migration state.
-  void changeValue(MigrationState value) => state = AsyncData(value);
+  void changeValue(MigrationState value) {
+    if (ref.mounted) {
+      state = AsyncData(value);
+    }
+  }
 
   /// Gets the path to the database file.
   Future<File> _getDatabaseFile(String dbFileName, {bool addDebugModeSuffix = true}) async {
@@ -95,7 +99,7 @@ class Migrator extends AsyncNotifier<MigrationState> {
           throw _HttpErrorException(response: response);
         }
         Map<String, dynamic> data = jsonDecode(response.body);
-        AuthenticationProvider? provider = ref.read(authenticationProvider(data['providerId']));
+        AuthenticationProvider? provider = ref.read(authenticationProviders).findProvider(data['providerId']);
         if (provider == null) {
           throw _AuthProviderNotFoundException(providerId: data['providerId']);
         }
@@ -112,7 +116,9 @@ class Migrator extends AsyncNotifier<MigrationState> {
       await markMigrated();
       return const ResultSuccess();
     } catch (ex, stackTrace) {
-      state = AsyncError(ex, stackTrace);
+      if (ref.mounted) {
+        state = AsyncError(ex, stackTrace);
+      }
       return ResultError(
         exception: ex,
         stackTrace: stackTrace,
@@ -124,7 +130,9 @@ class Migrator extends AsyncNotifier<MigrationState> {
   Future<void> markMigrated() async {
     SharedPreferencesWithPrefix preferences = await ref.read(sharedPreferencesProvider.future);
     await preferences.setInt('migratorVersion', 2);
-    state = const AsyncData(.done);
+    if (ref.mounted) {
+      state = const AsyncData(.done);
+    }
   }
 }
 

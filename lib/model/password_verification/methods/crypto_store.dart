@@ -5,7 +5,7 @@ import 'package:open_authenticator/model/crypto.dart';
 import 'package:open_authenticator/model/password_verification/methods/method.dart';
 
 /// The provider instance.
-final cryptoStoreVerificationMethodProvider = FutureProvider<CryptoStoreVerificationMethod>((ref) async {
+final cryptoStoreVerificationMethodProvider = FutureProvider.autoDispose<CryptoStoreVerificationMethod>((ref) async {
   CryptoStore? cryptoStore = await ref.watch(cryptoStoreProvider.future);
   return CryptoStoreVerificationMethod(
     cryptoStore: cryptoStore,

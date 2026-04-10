@@ -28,21 +28,21 @@ class ContributorPlanEntryWidget extends ConsumerWidget with FTileMixin {
     switch (state) {
       case AsyncData(:final value):
         switch (value) {
-          case ContributorPlanState.impossible:
+          case .impossible:
             return ClickableTile(
               prefix: const Icon(FIcons.userX),
               title: Text(translations.settings.application.contributorPlan.title),
               subtitle: Text(translations.settings.application.contributorPlan.subtitle.inactive),
               enabled: false,
             );
-          case ContributorPlanState.inactive:
+          case .inactive:
             return ClickableTile(
               prefix: const Icon(FIcons.userLock),
               title: Text(translations.settings.application.contributorPlan.title),
               subtitle: Text(translations.settings.application.contributorPlan.subtitle.inactive),
               onPress: () => ContributorPlanUtils.purchase(context, ref),
             );
-          case ContributorPlanState.active:
+          case .active:
             return ClickableTile(
               prefix: const Icon(FIcons.userCheck),
               title: Text(translations.settings.application.contributorPlan.title),

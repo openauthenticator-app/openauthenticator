@@ -1,10 +1,5 @@
 part of 'method.dart';
 
-/// The none app unlock method provider.
-final noneAppUnlockMethodProvider = Provider<NoneAppUnlockMethod>(
-  (ref) => NoneAppUnlockMethod._(ref: ref),
-);
-
 /// No unlock.
 class NoneAppUnlockMethod extends AppUnlockMethod {
   /// The none app unlock method id.

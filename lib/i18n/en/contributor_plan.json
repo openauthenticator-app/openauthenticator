@@ -1,5 +1,8 @@
 {
-  "subscribeSuccess": "You have successfully subscribed to the Contributor Plan. Thanks a lot !",
+  "subscribeSuccess": {
+    "immediate": "You have successfully subscribed to the Contributor Plan. Thanks a lot !",
+    "delayed": "The purchase was successful ! You may have to wait a few minutes or restart the app."
+  },
   "fallbackPaywall": {
     "title(rich)": "${title(Contributor)} Plan",
     "features": [

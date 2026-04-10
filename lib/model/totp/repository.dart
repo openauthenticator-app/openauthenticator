@@ -29,9 +29,15 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
   /// Returns all newly decrypted TOTPs.
   Future<Set<DecryptedTotp>> tryDecryptAll(CryptoStore? cryptoStore) async {
     List<Totp> totpsList = await future;
+    if (!ref.mounted) {
+      return {};
+    }
     state = const AsyncLoading();
     List<Totp> newTotpsList = await totpsList.decrypt(cryptoStore);
     Set<DecryptedTotp> difference = newTotpsList.decryptedTotps.toSet().difference(totpsList.decryptedTotps.toSet());
+    if (!ref.mounted) {
+      return {};
+    }
     state = AsyncData(newTotpsList);
     return difference;
   }
@@ -81,6 +87,9 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
       }
       ref.read(totpImageCacheManagerProvider.notifier).fillCache(totps: totps);
       CryptoStore? cryptoStore = await ref.read(cryptoStoreProvider.future);
+      if (!ref.mounted) {
+        return const ResultCancelled();
+      }
       state = AsyncData(totpsList.createMergedList(totps: await totps.decrypt(cryptoStore)));
       return const ResultSuccess();
     } catch (ex, stackTrace) {
@@ -116,6 +125,9 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
       CryptoStore? cryptoStore = await ref.read(cryptoStoreProvider.future);
       List<Totp> decrypted = await totps.decrypt(cryptoStore);
       await ref.read(totpImageCacheManagerProvider.notifier).fillCache(totps: decrypted);
+      if (!ref.mounted) {
+        return const ResultCancelled();
+      }
       state = AsyncData(totpsList.createMergedList(totps: decrypted));
       return const ResultSuccess();
     } catch (ex, stackTrace) {
@@ -170,6 +182,9 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
         );
       }
       await ref.read(totpImageCacheManagerProvider.notifier).fillCache(totps: totps);
+      if (!ref.mounted) {
+        return const ResultCancelled();
+      }
       state = AsyncData(totpsList.createMergedList(totps: totps));
       return const ResultSuccess();
     } catch (ex, stackTrace) {
@@ -208,6 +223,9 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
         );
       }
       ref.read(totpImageCacheManagerProvider.notifier).deleteCachedImages(uuids);
+      if (!ref.mounted) {
+        return const ResultCancelled();
+      }
       state = AsyncData(
         [
           for (Totp totp in totpsList)

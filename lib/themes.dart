@@ -231,10 +231,10 @@ FVariantsDelta<FItemVariantConstraint, FItemVariant, FTileStyle, FTileStyleDelta
           ),
           subtitleTextStyle: .delta(
             [
-
-                  .base(
-                    .delta(
+              .base(
+                const .delta(
                   fontSize: 12,
+                  height: 1.25,
                 ),
               ),
             ],

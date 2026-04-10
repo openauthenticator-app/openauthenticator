@@ -1,13 +1,6 @@
 part of 'provider.dart';
 
 /// The Google authentication provider.
-final googleAuthenticationProvider = Provider<GoogleAuthenticationProvider>(
-  (ref) => GoogleAuthenticationProvider._(
-    ref: ref,
-  ),
-);
-
-/// The Google authentication provider.
 class GoogleAuthenticationProvider extends AuthenticationProvider with OAuthenticationProvider {
   /// The Google authentication provider id.
   static const String kProviderId = 'google';

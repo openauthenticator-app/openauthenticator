@@ -17,5 +17,9 @@ class AppLinksListener extends AsyncNotifier<Uri?> {
   }
 
   /// Manually provides the [uri].
-  void provideLink(Uri uri) => state = AsyncData(uri);
+  void provideLink(Uri uri) {
+    if (ref.mounted) {
+      state = AsyncData(uri);
+    }
+  }
 }

@@ -23,25 +23,14 @@ part 'github.dart';
 part 'google.dart';
 part 'microsoft.dart';
 
-/// The authentication provider provider.
-final authenticationProvider = Provider.family<AuthenticationProvider?, String>(
-  (ref, id) => ref.watch(
-    authenticationProviders.select(
-      (providers) => providers.firstWhereOrNull(
-        (provider) => provider.id == id,
-      ),
-    ),
-  ),
-);
-
 /// The authentication providers provider.
 final authenticationProviders = Provider<List<AuthenticationProvider>>(
   (ref) => List.unmodifiable([
-    ref.watch(emailAuthenticationProvider),
-    ref.watch(googleAuthenticationProvider),
-    ref.watch(githubAuthenticationProvider),
-    ref.watch(microsoftAuthenticationProvider),
-    ref.watch(appleAuthenticationProvider),
+    EmailAuthenticationProvider._(ref: ref),
+    GoogleAuthenticationProvider._(ref: ref),
+    GithubAuthenticationProvider._(ref: ref),
+    MicrosoftAuthenticationProvider._(ref: ref),
+    AppleAuthenticationProvider._(ref: ref),
   ]),
 );
 
@@ -179,4 +168,13 @@ mixin OAuthenticationProvider on AuthenticationProvider {
     await launchUrl(uriBuilder.build());
     return const ResultSuccess();
   }
+}
+
+/// Allows to find a provider in an authentication providers list.
+extension FindProvider on List<AuthenticationProvider> {
+  /// Finds the provider with the given id.
+  AuthenticationProvider? findProvider(String id) => firstWhereOrNull((provider) => provider.id == id);
+
+  /// Finds the email provider.
+  EmailAuthenticationProvider get email => findProvider(EmailAuthenticationProvider.kProviderId)! as EmailAuthenticationProvider;
 }

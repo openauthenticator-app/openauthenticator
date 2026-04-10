@@ -58,16 +58,16 @@ class ContributorPlanPaywall extends ConsumerWidget {
               context.handleResult(result);
               return;
             }
-            if (result.value == ContributorPlanState.active) {
+            if (result.value == .active) {
               showSuccessToast(
                 context,
-                text: translations.contributorPlan.subscribeSuccess,
+                text: translations.contributorPlan.subscribeSuccess.immediate,
               );
               onPurchaseCompleted();
             } else {
-              showErrorToast(
+              showSuccessToast(
                 context,
-                text: translations.error.generic.tryAgain,
+                text: translations.contributorPlan.subscribeSuccess.delayed,
               );
             }
           }

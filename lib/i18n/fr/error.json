@@ -48,7 +48,8 @@
     "invalidToken": "Votre jeton est invalide. Veuillez réessayer de vous connecter.",
     "invalidVerificationCode": "Votre code de vérification est invalide.",
     "invalidAppVersion": "Votre version de l'application est invalide. Veuillez mettre à jour à la dernière version.",
-    "invalidBackendUrl": "URL de serveur backend invalide."
+    "invalidBackendUrl": "URL de serveur backend invalide.",
+    "providerUserAlreadyExists": "Un utilisateur avec le même fournisseur existe déjà, il est donc impossible de le lier à votre compte."
   },
   "scan": {
     "noUri": "Impossible de lire ce QR code. Assurez-vous qu'il s'agit d'un QR code de TOTP valide.",
@@ -63,7 +64,10 @@
     "currentStoragePasswordMismatch": "Mot de passe invalide.",
     "generic": "Une erreur est survenue pendant la migration de vos données. Veuillez réessayer plus tard."
   },
-  "noRevenueCatClient": "Aucun client RevenueCat disponible.",
+  "revenueCat": {
+    "noClient": "Aucun client RevenueCat disponible.",
+    "cannotRestorePurchases": "Ce client RevenueCat ne peut pas restaurer les achats."
+  },
   "totp": {
     "create": "Ce TOTP ne peut pas être créé.",
     "decrypt": "Impossible de déchiffrer ce TOTP. Assurez-vous d'avoir entré le bon mot de passe.",

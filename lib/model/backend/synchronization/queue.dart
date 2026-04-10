@@ -111,7 +111,11 @@ class PushOperationsQueue extends AsyncNotifier<List<PushOperation>> {
   }
 
   /// Triggered when the database updates.
-  void _onDatabaseUpdate(List<PushOperation> operations) => state = AsyncData(operations);
+  void _onDatabaseUpdate(List<PushOperation> operations) {
+    if (ref.mounted) {
+      state = AsyncData(operations);
+    }
+  }
 }
 
 /// The synchronization controller provider.
@@ -200,6 +204,9 @@ class SynchronizationController extends Notifier<SynchronizationStatus> {
 
   /// Runs the synchronization.
   Future<void> _run({bool checkSettings = true}) async {
+    if (!ref.mounted) {
+      return;
+    }
     bool hasError = false;
     try {
       if (state.phase is SynchronizationPhaseSyncing) {
@@ -210,16 +217,22 @@ class SynchronizationController extends Notifier<SynchronizationStatus> {
         phase: const SynchronizationPhaseSyncing(),
       );
       await state.waitBeforeNextOperation();
-      state = state.update(
-        retryAttempt: state.retryAttempt + 1,
-      );
+      if (ref.mounted) {
+        state = state.update(
+          retryAttempt: state.retryAttempt + 1,
+        );
+      }
 
       bool canReachBackend = await ref.read(connectivityStateProvider.future);
       if (canReachBackend) {
-        void onFinish({bool errorOccurred = false}) => state = state.update(
-          phase: const SynchronizationPhaseUpToDate(),
-          retryAttempt: errorOccurred ? state.retryAttempt : 0,
-        );
+        void onFinish({bool errorOccurred = false}) {
+          if (ref.mounted) {
+            state = state.update(
+              phase: const SynchronizationPhaseUpToDate(),
+              retryAttempt: errorOccurred ? state.retryAttempt : 0,
+            );
+          }
+        }
 
         Result pushResult = await ref.read(pushOperationsQueueProvider.notifier)._push(checkSettings: checkSettings);
         if (pushResult is! ResultSuccess) {
@@ -245,16 +258,20 @@ class SynchronizationController extends Notifier<SynchronizationStatus> {
           onFinish(errorOccurred: false);
         }
       } else {
-        state = state.update(phase: const SynchronizationPhaseOffline());
+        if (ref.mounted) {
+          state = state.update(phase: const SynchronizationPhaseOffline());
+        }
       }
     } catch (ex, stackTrace) {
       hasError = true;
-      state = state.update(
-        phase: SynchronizationPhaseError(
-          exception: ex,
-          stackTrace: stackTrace,
-        ),
-      );
+      if (ref.mounted) {
+        state = state.update(
+          phase: SynchronizationPhaseError(
+            exception: ex,
+            stackTrace: stackTrace,
+          ),
+        );
+      }
     }
 
     if (hasError) {

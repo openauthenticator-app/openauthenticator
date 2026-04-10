@@ -18,7 +18,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:webcrypto/webcrypto.dart';
 
 /// The backup store provider.
-final backupStoreProvider = AsyncNotifierProvider<BackupStore, List<Backup>>(BackupStore.new);
+final backupStoreProvider = AsyncNotifierProvider.autoDispose<BackupStore, List<Backup>>(BackupStore.new);
 
 /// Contains all backups.
 class BackupStore extends AsyncNotifier<List<Backup>> {
@@ -35,7 +35,11 @@ class BackupStore extends AsyncNotifier<List<Backup>> {
     }
     DateTime? dateTime = _fromBackupFilename(backupFile);
     Backup backup = Backup._(ref: ref, dateTime: dateTime ?? DateTime.now());
-    state = AsyncData([...(await future), backup]..sort());
+    List<Backup> backups = [...(await future), backup]..sort();
+    if (!ref.mounted) {
+      return const ResultCancelled();
+    }
+    state = AsyncData(backups);
     return ResultSuccess(value: backup);
   }
 
@@ -46,7 +50,11 @@ class BackupStore extends AsyncNotifier<List<Backup>> {
     if (result is! ResultSuccess) {
       return result.to<Backup>((value) => null);
     }
-    state = AsyncData([...(await future), backup]..sort());
+    List<Backup> backups = [...(await future), backup]..sort();
+    if (!ref.mounted) {
+      return const ResultCancelled();
+    }
+    state = AsyncData(backups);
     return ResultSuccess(value: backup);
   }
 

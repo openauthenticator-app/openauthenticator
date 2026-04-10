@@ -1,10 +1,5 @@
 part of 'method.dart';
 
-/// The local authentication app unlock method provider.
-final localAuthenticationAppUnlockMethodProvider = Provider<LocalAuthenticationAppUnlockMethod>(
-  (ref) => LocalAuthenticationAppUnlockMethod._(ref: ref),
-);
-
 /// Local authentication.
 class LocalAuthenticationAppUnlockMethod extends AppUnlockMethod {
   /// The local authentication app unlock method id.

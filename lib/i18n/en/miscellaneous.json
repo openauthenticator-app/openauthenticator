@@ -1,4 +1,5 @@
 {
+  "refreshUserInfo": "Refresh user info",
   "disableTotpSync": "You must disable TOTP synchronization first.",
   "urlCopiedToClipboard": "URL copied to clipboard !",
   "waitingDialogDefaultMessage": "Please wait...",

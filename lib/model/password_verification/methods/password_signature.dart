@@ -31,14 +31,18 @@ class PasswordSignatureVerificationMethodNotifier extends AsyncNotifier<Password
     }
     String passwordSignature = await _generatePasswordSignature(password, salt);
     await SimpleSecureStorage.write(_kPasswordSignatureKey, passwordSignature);
-    state = AsyncData(PasswordSignatureVerificationMethod(passwordSignature: passwordSignature));
+    if (ref.mounted) {
+      state = AsyncData(PasswordSignatureVerificationMethod(passwordSignature: passwordSignature));
+    }
     return true;
   }
 
   /// Disables the password signature verification method.
   Future<void> disable() async {
     await SimpleSecureStorage.delete(_kPasswordSignatureKey);
-    state = const AsyncData(PasswordSignatureVerificationMethod(passwordSignature: null));
+    if (ref.mounted) {
+      state = const AsyncData(PasswordSignatureVerificationMethod(passwordSignature: null));
+    }
   }
 
   /// Generates the [password] signature with the given [salt].

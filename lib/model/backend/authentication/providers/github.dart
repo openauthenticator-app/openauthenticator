@@ -1,13 +1,6 @@
 part of 'provider.dart';
 
 /// The Github authentication provider.
-final githubAuthenticationProvider = Provider<GithubAuthenticationProvider>(
-  (ref) => GithubAuthenticationProvider._(
-    ref: ref,
-  ),
-);
-
-/// The Github authentication provider.
 class GithubAuthenticationProvider extends AuthenticationProvider with OAuthenticationProvider {
   /// The Github authentication provider id.
   static const String kProviderId = 'github';

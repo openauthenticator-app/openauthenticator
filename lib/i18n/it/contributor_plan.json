@@ -1,5 +1,8 @@
 {
-  "subscribeSuccess": "Piano Contributore sottoscritto con successo. Grazie mille!",
+  "subscribeSuccess": {
+    "immediate": "Ti sei abbonato con successo al Piano Contributore. Grazie mille !",
+    "delayed": "L'acquisto è andato a buon fine ! Potrebbe essere necessario attendere alcuni minuti o riavviare l'app."
+  },
   "fallbackPaywall": {
     "title(rich)": "Piano ${title(Contributore)}",
     "features": [

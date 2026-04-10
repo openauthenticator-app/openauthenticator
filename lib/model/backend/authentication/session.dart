@@ -69,18 +69,23 @@ class StoredSessionNotifier extends AsyncNotifier<Session?> {
   Future<void> storeAndUse(Session session) async {
     await SimpleSecureStorage.write(_kAccessToken, session.accessToken);
     await SimpleSecureStorage.write(_kRefreshToken, session.refreshToken);
-    state = AsyncData(
-      Session(
-        accessToken: session.accessToken,
-        refreshToken: session.refreshToken,
-      ),
-    );
+    if (ref.mounted) {
+      state = AsyncData(
+        Session(
+          accessToken: session.accessToken,
+          refreshToken: session.refreshToken,
+        ),
+      );
+    }
   }
 
   /// Clears the session.
   Future<Result> clear() async {
     await SimpleSecureStorage.delete(_kAccessToken);
     await SimpleSecureStorage.delete(_kRefreshToken);
+    if (!ref.mounted) {
+      return const ResultCancelled();
+    }
     state = const AsyncData(null);
     return const ResultSuccess();
   }
@@ -93,13 +98,17 @@ final sessionRefreshManagerProvider = NotifierProvider<SessionRefreshManager, Se
 class SessionRefreshManager extends Notifier<SessionRefreshState> {
   @override
   SessionRefreshState build() {
-    ref.listen(storedSessionProvider, (_, _) => state = .idle);
+    ref.listen(storedSessionProvider, (_, _) {
+      if (ref.mounted) {
+        state = .idle;
+      }
+    });
     return .idle;
   }
 
   /// Refreshes the session.
   Future<Result> refresh({Session? session}) async {
-    if (state == .inProgress || state == .invalidSession) {
+    if (!ref.mounted || state == .inProgress || state == .invalidSession) {
       return const ResultCancelled();
     }
     state = .inProgress;
@@ -113,6 +122,9 @@ class SessionRefreshManager extends Notifier<SessionRefreshState> {
         return result;
       }
       await ref.read(storedSessionProvider.notifier).storeAndUse(result.value);
+      if (!ref.mounted) {
+        return const ResultCancelled();
+      }
       state = .success;
       return const ResultSuccess();
     } catch (ex, stackTrace) {
@@ -122,7 +134,7 @@ class SessionRefreshManager extends Notifier<SessionRefreshState> {
         InvalidSessionError.kErrorCode,
         ExpiredSessionError.kErrorCode,
       ];
-      if (ex is BackendRequestError && invalidSessionCodes.contains(ex.code)) {
+      if (ex is BackendRequestError && invalidSessionCodes.contains(ex.code) && ref.mounted) {
         state = .invalidSession;
       }
       return ResultError(

@@ -1,13 +1,6 @@
 part of 'provider.dart';
 
 /// The Microsoft authentication provider.
-final microsoftAuthenticationProvider = Provider<MicrosoftAuthenticationProvider>(
-  (ref) => MicrosoftAuthenticationProvider._(
-    ref: ref,
-  ),
-);
-
-/// The Microsoft authentication provider.
 class MicrosoftAuthenticationProvider extends AuthenticationProvider with OAuthenticationProvider {
   /// The Microsoft authentication provider id.
   static const String kProviderId = 'microsoft';

@@ -48,7 +48,8 @@
     "invalidToken": "Seu token é inválido. Tente novamente para fazer login.",
     "invalidVerificationCode": "Seu código de verificação é inválido.",
     "invalidAppVersion": "Sua versão da aplicação é inválida. Atualize para a última versão.",
-    "invalidBackendUrl": "URL do servidor backend inválida."
+    "invalidBackendUrl": "URL do servidor backend inválida.",
+    "providerUserAlreadyExists": "Um usuário com o mesmo provedor já existe, portanto não é possível associá-lo ao seu conta."
   },
   "scan": {
     "noUri": "Falha ao ler este código QR. Certifique-se de que é um código QR TOTP válido.",
@@ -63,7 +64,10 @@
     "currentStoragePasswordMismatch": "Senha mestra inválida inserida.",
     "generic": "Ocorreu um erro ao migrar seus dados. Tente novamente mais tarde."
   },
-  "noRevenueCatClient": "Nenhum cliente RevenueCat disponível.",
+  "revenueCat": {
+    "noClient": "Nenhum cliente RevenueCat disponível.",
+    "cannotRestorePurchases": "Este cliente RevenueCat não pode restaurar compras."
+  },
   "totp": {
     "create": "Este TOTP não pode ser criado.",
     "decrypt": "Falha ao descriptografar este TOTP. Certifique-se de que você tenha inserido a senha correta.",

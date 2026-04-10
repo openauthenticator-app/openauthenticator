@@ -1,5 +1,8 @@
 {
-  "subscribeSuccess": "Vous avez souscrit à l'Abonnement Contributeur avec succès. Merci beaucoup !",
+  "subscribeSuccess": {
+    "immediate": "Vous vous êtes abonné avec succès à l'Abonnement Contributeur. Merci beaucoup !",
+    "delayed": "L'achat a réussi ! Vous devrez peut-être attendre quelques minutes ou redémarrer l'application."
+  },
   "fallbackPaywall": {
     "title(rich)": "Abonnement ${title(Contributeur)}",
     "features": [

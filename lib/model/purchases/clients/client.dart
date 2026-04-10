@@ -7,7 +7,6 @@ import 'package:open_authenticator/model/purchases/clients/dart.dart';
 import 'package:open_authenticator/model/purchases/clients/method_channel.dart';
 import 'package:open_authenticator/model/settings/backend_url.dart';
 import 'package:open_authenticator/utils/platform.dart';
-import 'package:open_authenticator/utils/result.dart';
 import 'package:purchases_flutter/models/purchases_configuration.dart' as rc_purchases_configuration;
 import 'package:purchases_flutter/purchases_flutter.dart';
 
@@ -97,28 +96,25 @@ abstract class RevenueCatClient {
     return offering?.availablePackages.map((package) => package.packageType).toList() ?? [];
   }
 
-  /// Returns whether the user has the given [entitlementId].
-  Future<bool> hasEntitlement(String entitlementId) async {
-    CustomerInfo? customerInfo = await getCustomerInfo();
-    return customerInfo?.entitlements.active[entitlementId]?.isActive ?? false;
-  }
-
   /// Purchases the given [purchasable].
-  Future<void> purchase(Purchasable purchasable, PackageType packageType) async {
+  /// Returns whether the user info should be refreshed.
+  Future<bool> purchase(Purchasable purchasable, PackageType packageType) async {
     Offerings? offerings = await getOfferings();
     Offering? offering = offerings?.getOffering(purchasable.offeringId);
     if (offering == null) {
-      return;
+      return false;
     }
 
     Package? package = offering.availablePackages.firstWhereOrNull((package) => package.packageType == packageType);
     if (package != null) {
-      await purchasePackage(package);
+      return await purchasePackage(package);
     }
+    return false;
   }
 
   /// Purchases the given [package].
-  Future<void> purchasePackage(Package package);
+  /// Returns whether the user info should be refreshed.
+  Future<bool> purchasePackage(Package package);
 
   /// Returns the prices of the [purchasable].
   Future<Map<PackageType, Price>> getPrices(Purchasable purchasable) async {
@@ -137,14 +133,17 @@ abstract class RevenueCatClient {
     return result;
   }
 
-  /// Restores the user purchases, if possible.
-  Future<Result> restorePurchases();
-
   /// Returns the user management URL.
   Future<String?> getManagementUrl() async {
     CustomerInfo? customerInfo = await getCustomerInfo();
     return customerInfo?.managementURL;
   }
+}
+
+/// Allows to restore the user purchases.
+mixin CanRestorePurchases on RevenueCatClient {
+  /// Restores the user purchases, if possible.
+  Future<void> restorePurchases();
 }
 
 /// Represents a price.

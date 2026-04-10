@@ -1,10 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/model/purchases/clients/client.dart';
-import 'package:open_authenticator/utils/result.dart';
 import 'package:purchases_flutter/purchases_flutter.dart' hide Price;
 
 /// Allows to communicate with RevenueCat using its SDK.
-class RevenueCatMethodChannelClient extends RevenueCatClient {
+class RevenueCatMethodChannelClient extends RevenueCatClient with CanRestorePurchases {
   /// Creates a new RevenueCat method channel client instance.
   RevenueCatMethodChannelClient({
     required super.purchasesConfiguration,
@@ -25,18 +24,16 @@ class RevenueCatMethodChannelClient extends RevenueCatClient {
   Future<Offerings?> getOfferings() => Purchases.getOfferings();
 
   @override
-  Future<void> purchasePackage(Package package) async {
+  Future<bool> purchasePackage(Package package) async {
     await Purchases.purchase(
       PurchaseParams.package(
         package,
         customerEmail: purchasesConfiguration.email,
       ),
     );
+    return true;
   }
 
   @override
-  Future<Result> restorePurchases() async {
-    await Purchases.restorePurchases();
-    return const ResultSuccess();
-  }
+  Future<void> restorePurchases() async => await Purchases.restorePurchases();
 }

@@ -1,4 +1,5 @@
 {
+  "refreshUserInfo": "Atualizar usuário",
   "disableTotpSync": "Você deve primeiro desabilitar a sincronização de TOTP.",
   "urlCopiedToClipboard": "URL copiada para a área de transferência!",
   "waitingDialogDefaultMessage": "Por favor, aguarde...",

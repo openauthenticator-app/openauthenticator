@@ -21,5 +21,9 @@ class ConnectivityStateNotifier extends AsyncNotifier<bool> {
   }
 
   /// Triggered when the connectivity state has changed.
-  void _onConnectivityChanged(List<ConnectivityResult> result) => state = AsyncData(result.firstOrNull != ConnectivityResult.none);
+  void _onConnectivityChanged(List<ConnectivityResult> result) {
+    if (ref.mounted) {
+      state = AsyncData(result.firstOrNull != ConnectivityResult.none);
+    }
+  }
 }

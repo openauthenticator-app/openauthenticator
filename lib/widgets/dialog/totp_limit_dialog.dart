@@ -5,6 +5,7 @@ import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/backend/user.dart';
 import 'package:open_authenticator/model/purchases/contributor_plan.dart';
 import 'package:open_authenticator/model/settings/storage_type.dart';
+import 'package:open_authenticator/spacing.dart';
 import 'package:open_authenticator/utils/contributor_plan.dart';
 import 'package:open_authenticator/utils/result.dart';
 import 'package:open_authenticator/utils/storage_migration.dart';
@@ -13,6 +14,7 @@ import 'package:open_authenticator/widgets/centered_circular_progress_indicator.
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
 import 'package:open_authenticator/widgets/dialog/error_dialog.dart';
+import 'package:open_authenticator/widgets/waiting_overlay.dart';
 
 /// A dialog that blocks everything until the user has either changed its storage type or subscribed to the Contributor Plan.
 class TotpLimitDialog extends ConsumerWidget {
@@ -51,7 +53,7 @@ class TotpLimitDialog extends ConsumerWidget {
       displayCloseButton: !autoDialog,
       actions: [
         ClickableButton(
-          onPress: () => _returnIfSucceeded(context, StorageMigrationUtils.changeStorageType(context, ref, StorageType.localOnly)),
+          onPress: () => _returnIfSucceeded(context, StorageMigrationUtils.changeStorageType(context, ref, StorageType.localOnly).then((result) => result is ResultSuccess)),
           child: ButtonText(translations.totpLimit.actions.stopSynchronization),
         ),
         ClickableButton(
@@ -70,14 +72,32 @@ class TotpLimitDialog extends ConsumerWidget {
           Text(autoDialog ? translations.totpLimit.message.alreadySubscribed.auto(count: user.totpsLimit) : translations.totpLimit.message.alreadySubscribed.manual(count: user.totpsLimit))
         else
           Text(autoDialog ? translations.totpLimit.message.notSubscribed.auto(count: user.totpsLimit) : translations.totpLimit.message.notSubscribed.manual(count: user.totpsLimit)),
+        Padding(
+          padding: const EdgeInsets.only(top: kSpace),
+          child: ClickableButton(
+            onPress: () async {
+              Result<User> result = await showWaitingOverlay(
+                context,
+                future: ref.read(userProvider.notifier).refreshUserInfo(),
+              );
+              if (!context.mounted) {
+                return;
+              }
+              context.handleResult(result);
+              if (result is ResultSuccess<User> && result.value.contributorPlan) {
+                Navigator.pop(context, true);
+              }
+            },
+            child: ButtonText(translations.miscellaneous.refreshUserInfo),
+          ),
+        ),
       ],
     );
   }
 
   /// Waits for the [action] result before closing the dialog in case of success.
-  Future<void> _returnIfSucceeded(BuildContext context, Future<Result> action) async {
-    Result result = await action;
-    if (context.mounted && result is ResultSuccess) {
+  Future<void> _returnIfSucceeded(BuildContext context, Future<bool> action) async {
+    if ((await action) && context.mounted) {
       Navigator.pop(context, true);
     }
   }

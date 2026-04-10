@@ -50,7 +50,11 @@ class StoredCryptoStore extends AsyncNotifier<CryptoStore?> {
   }
 
   /// Uses the [cryptoStore] as [state].
-  void use(CryptoStore cryptoStore) => state = AsyncData(cryptoStore);
+  void use(CryptoStore cryptoStore) {
+    if (ref.mounted) {
+      state = AsyncData(cryptoStore);
+    }
+  }
 
   /// Changes the current crypto store password, preserving the current salt if possible.
   Future<CryptoStore> changeCryptoStore(String newPassword, {CryptoStore? newCryptoStore, bool checkSettings = true}) async {

@@ -71,7 +71,9 @@ class TotpImageCacheManager extends AsyncNotifier<Map<String, CacheObject>> {
           url: imageUrl,
           imageType: imageType,
         );
-        state = AsyncData(cached);
+        if (ref.mounted) {
+          state = AsyncData(cached);
+        }
         imageCache.clear();
         _saveIndex(content: cached);
       }
@@ -88,7 +90,9 @@ class TotpImageCacheManager extends AsyncNotifier<Map<String, CacheObject>> {
       file.deleteIfExists();
       cached.remove(uuid);
     }
-    state = AsyncData(cached);
+    if (ref.mounted) {
+      state = AsyncData(cached);
+    }
     _saveIndex(content: cached);
   }
 
@@ -118,7 +122,9 @@ class TotpImageCacheManager extends AsyncNotifier<Map<String, CacheObject>> {
     if (directory.existsSync()) {
       directory.deleteSync(recursive: true);
     }
-    state = const AsyncData({});
+    if (ref.mounted) {
+      state = const AsyncData({});
+    }
   }
 
   /// Returns the cache index.

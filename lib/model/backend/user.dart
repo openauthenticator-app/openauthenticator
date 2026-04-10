@@ -16,6 +16,9 @@ class User {
   /// The user ID.
   final String id;
 
+  /// Whether the user has an active Contributor Plan.
+  final bool contributorPlan;
+
   /// The TOTPs limit.
   final int totpsLimit;
 
@@ -37,6 +40,7 @@ class User {
   /// Creates a new user instance.
   const User._({
     required this.id,
+    required this.contributorPlan,
     required this.totpsLimit,
     this.email,
     this.googleId,
@@ -49,6 +53,7 @@ class User {
   User.fromJson(Map<String, dynamic> json)
     : this._(
         id: json['id'],
+        contributorPlan: json['contributorPlan'] == true,
         totpsLimit: json['totpsLimit'],
         email: json['providers']?['email'],
         googleId: json['providers']?['googleId'],
@@ -96,6 +101,7 @@ class User {
   /// Updates the user email.
   User updateEmail(String? email) => User._(
     id: id,
+    contributorPlan: contributorPlan,
     totpsLimit: totpsLimit,
     email: email,
     googleId: googleId,
@@ -107,6 +113,7 @@ class User {
   /// Updates the user Google ID.
   User updateGoogleId(String? googleId) => User._(
     id: id,
+    contributorPlan: contributorPlan,
     totpsLimit: totpsLimit,
     email: email,
     googleId: googleId,
@@ -118,6 +125,7 @@ class User {
   /// Updates the user GitHub ID.
   User updateGithubId(String? githubId) => User._(
     id: id,
+    contributorPlan: contributorPlan,
     totpsLimit: totpsLimit,
     email: email,
     googleId: googleId,
@@ -129,6 +137,7 @@ class User {
   /// Updates the user Microsoft ID.
   User updateMicrosoftId(String? microsoftId) => User._(
     id: id,
+    contributorPlan: contributorPlan,
     totpsLimit: totpsLimit,
     email: email,
     googleId: googleId,
@@ -140,6 +149,7 @@ class User {
   /// Updates the user Apple ID.
   User updateAppleId(String? appleId) => User._(
     id: id,
+    contributorPlan: contributorPlan,
     totpsLimit: totpsLimit,
     email: email,
     googleId: googleId,
@@ -151,6 +161,7 @@ class User {
   /// Converts the user to a JSON map.
   Map<String, dynamic> toJson() => {
     'id': id,
+    'contributorPlan': contributorPlan,
     'totpsLimit': totpsLimit,
     'email': ?email,
     'googleId': ?googleId,

@@ -16,7 +16,7 @@ class CacheTotpPicturesSettingsEntry extends SettingsEntry<bool> {
 
   @override
   Future<void> changeValue(bool value) async {
-    if (value != state.value) {
+    if (value != state.value && ref.mounted) {
       state = const AsyncLoading();
       TotpImageCacheManager totpImageCacheManager = ref.read(totpImageCacheManagerProvider.notifier);
       if (value) {

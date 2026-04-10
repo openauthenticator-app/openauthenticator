@@ -1,13 +1,6 @@
 part of 'provider.dart';
 
 /// The Apple authentication provider.
-final appleAuthenticationProvider = Provider<AppleAuthenticationProvider>(
-  (ref) => AppleAuthenticationProvider._(
-    ref: ref,
-  ),
-);
-
-/// The Apple authentication provider.
 class AppleAuthenticationProvider extends AuthenticationProvider with OAuthenticationProvider {
   /// The Apple authentication provider id.
   static const String kProviderId = 'apple';

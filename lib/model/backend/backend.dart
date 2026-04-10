@@ -43,7 +43,9 @@ class BackendClient extends AsyncNotifier<Map<String, String>> {
       String appClientId = currentPlatform.generateAppClientId();
       headers['App-Client-Id'] = appClientId;
       await SimpleSecureStorage.write('appClientId', appClientId);
-      state = AsyncData(headers);
+      if (ref.mounted) {
+        state = AsyncData(headers);
+      }
     }
     return headers;
   }

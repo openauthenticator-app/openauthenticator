@@ -73,6 +73,7 @@ class ContributorPlanFallbackPaywall extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    RevenueCatClient? revenueCatClient = ref.watch(revenueCatClientProvider).value;
     FButtonStyleDelta bottomButtonsStyle = .delta(
       contentStyle: .delta(
         textStyle: .delta(
@@ -165,11 +166,19 @@ class ContributorPlanFallbackPaywall extends ConsumerWidget {
             ),
             ClickableButton(
               variant: .ghost,
-              onPress: () => _tryRestorePurchases(context, ref),
+              onPress: () => _tryRefreshUserInfo(context, ref),
               mainAxisSize: .min,
               style: bottomButtonsStyle,
-              child: ButtonText(translations.contributorPlan.fallbackPaywall.button.restorePurchases),
+              child: ButtonText(translations.miscellaneous.refreshUserInfo),
             ),
+            if (revenueCatClient is CanRestorePurchases)
+              ClickableButton(
+                variant: .ghost,
+                onPress: () => _tryRestorePurchases(context, ref),
+                mainAxisSize: .min,
+                style: bottomButtonsStyle,
+                child: ButtonText(translations.contributorPlan.fallbackPaywall.button.restorePurchases),
+              ),
           ],
         ),
       ],
@@ -179,18 +188,44 @@ class ContributorPlanFallbackPaywall extends ConsumerWidget {
   /// Tries to do purchase the [packageType].
   Future<void> _tryPurchase(BuildContext context, WidgetRef ref, PackageType packageType) async {
     ContributorPlan contributorPlan = ref.read(contributorPlanStateProvider.notifier);
-    Result result = await showWaitingOverlay(
+    Result<ContributorPlanState> result = await showWaitingOverlay(
       context,
       future: contributorPlan.purchase(packageType),
     );
-    if (context.mounted) {
-      context.handleResult(
-        result,
-        successMessage: translations.contributorPlan.subscribeSuccess,
-      );
-      if (result is ResultSuccess) {
-        onPurchaseCompleted();
-      }
+    if (!context.mounted) {
+      return;
+    }
+    _handleContributorPlanStateResult(context, result, delayedSuccessMessage: translations.contributorPlan.subscribeSuccess.delayed);
+  }
+
+  /// Tries to refresh the user info.
+  Future<void> _tryRefreshUserInfo(BuildContext context, WidgetRef ref) async {
+    ContributorPlan contributorPlan = ref.read(contributorPlanStateProvider.notifier);
+    if (!context.mounted) {
+      return;
+    }
+    Result<ContributorPlanState> result = await showWaitingOverlay(
+      context,
+      future: contributorPlan.refresh(),
+    );
+    if (!context.mounted) {
+      return;
+    }
+    _handleContributorPlanStateResult(context, result);
+  }
+
+  /// Handles the [result] of either the [ContributorPlan.purchase] or [ContributorPlan.refresh] method.
+  void _handleContributorPlanStateResult(BuildContext context, Result<ContributorPlanState> result, {String? delayedSuccessMessage}) {
+    if (result is! ResultSuccess<ContributorPlanState>) {
+      context.handleResult(result);
+      return;
+    }
+    context.handleResult(
+      result,
+      successMessage: result.value == .active ? translations.contributorPlan.subscribeSuccess.immediate : (delayedSuccessMessage ?? translations.error.noError),
+    );
+    if (result.value == .active) {
+      onPurchaseCompleted();
     }
   }
 

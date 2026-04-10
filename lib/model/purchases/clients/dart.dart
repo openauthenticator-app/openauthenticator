@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/model/purchases/clients/client.dart';
 import 'package:open_authenticator/model/settings/entry.dart';
-import 'package:open_authenticator/utils/result.dart';
 import 'package:open_authenticator/utils/shared_preferences_with_prefix.dart';
 import 'package:purchases_dart/purchases_dart.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
@@ -40,7 +39,7 @@ class RevenueCatDartClient extends RevenueCatClient {
   Future<Offerings?> getOfferings() => PurchasesDart.getOfferings();
 
   @override
-  Future<void> purchasePackage(Package package) async {
+  Future<bool> purchasePackage(Package package) async {
     Uri? webCheckoutUrl = await PurchasesDart.getWebCheckoutUrl(
       package,
       email: purchasesConfiguration.email,
@@ -48,12 +47,7 @@ class RevenueCatDartClient extends RevenueCatClient {
     if (webCheckoutUrl != null && (await canLaunchUrl(webCheckoutUrl))) {
       await launchUrl(webCheckoutUrl);
     }
-  }
-
-  @override
-  Future<Result> restorePurchases() async {
-    await PurchasesDart.updateAppUserId(purchasesConfiguration.appUserID!);
-    return const ResultCancelled();
+    return false;
   }
 }
 

@@ -7,7 +7,7 @@ import 'package:open_authenticator/model/password_verification/methods/password_
 import 'package:open_authenticator/utils/result.dart';
 
 /// The provider instance.
-final passwordVerificationProvider = AsyncNotifierProvider<PasswordVerification, List<PasswordVerificationMethod>>(PasswordVerification.new);
+final passwordVerificationProvider = AsyncNotifierProvider.autoDispose<PasswordVerification, List<PasswordVerificationMethod>>(PasswordVerification.new);
 
 /// Allows to check whether a given password is the user's master password.
 class PasswordVerification extends AsyncNotifier<List<PasswordVerificationMethod>> {

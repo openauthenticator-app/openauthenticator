@@ -23,7 +23,7 @@ class BackendRequestError extends LocalizableException {
     this.code,
     this.message,
   }) : super(
-         localizedErrorMessage: localizedErrorMessage ?? translations.error.appUnlock.generic,
+         localizedErrorMessage: localizedErrorMessage ?? translations.error.generic.noException,
        );
 
   /// Creates a new backend request error instance from a JSON map.
@@ -61,6 +61,12 @@ class BackendRequestError extends LocalizableException {
         );
       case InvalidVerificationCodeError.kErrorCode:
         return InvalidVerificationCodeError._(
+          route: route,
+          statusCode: statusCode,
+          message: message,
+        );
+      case _ProviderUserAlreadyExists.kErrorCode:
+        return _ProviderUserAlreadyExists._(
           route: route,
           statusCode: statusCode,
           message: message,
@@ -174,6 +180,22 @@ class InvalidAppVersionError extends BackendRequestError {
     super.message,
   }) : super._(
          localizedErrorMessage: translations.error.backend.invalidAppVersion,
+         code: kErrorCode,
+       );
+}
+
+/// Thrown when the provider user already exists.
+class _ProviderUserAlreadyExists extends BackendRequestError {
+  /// The provider user already exists error code.
+  static const String kErrorCode = 'providerUserAlreadyExists';
+
+  /// Creates a new expired session error instance.
+  _ProviderUserAlreadyExists._({
+    required super.route,
+    required super.statusCode,
+    super.message,
+  }) : super._(
+         localizedErrorMessage: translations.error.backend.providerUserAlreadyExists,
          code: kErrorCode,
        );
 }

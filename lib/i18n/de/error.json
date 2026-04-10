@@ -48,7 +48,8 @@
     "invalidToken": "Ihr Token ist ungültig. Bitte versuchen Sie sich erneut einzuloggen.",
     "invalidVerificationCode": "Ihr Bestätigungscode ist ungültig.",
     "invalidAppVersion": "Ihre App-Version ist ungültig. Bitte aktualisieren Sie auf die letzte Version.",
-    "invalidBackendUrl": "Ungültige URL für den Backend."
+    "invalidBackendUrl": "Ungültige URL für den Backend.",
+    "providerUserAlreadyExists": "Ein Benutzer mit dem gleichen Authentifizierungsanbieter existiert bereits, daher kann es nicht verknüpft werden mit Ihrem Konto."
   },
   "scan": {
     "noUri": "Dieser QR-Code konnte nicht gelesen werden. Bitte stellen Sie sicher, dass es sich um einen gültigen TOTP-QR-Code handelt.",
@@ -63,7 +64,10 @@
     "currentStoragePasswordMismatch": "Ungültiges Master-Passwort eingegeben.",
     "generic": "Beim Migrieren Ihrer Daten ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut."
   },
-  "noRevenueCatClient": "Kein RevenueCat-Client verfügbar.",
+  "revenueCat": {
+    "noClient": "Kein RevenueCat-Client verfügbar.",
+    "cannotRestorePurchases": "Dieser RevenueCat-Client kann keine Bestellungen wiederherstellen."
+  },
   "totp": {
     "create": "Dieses TOTP konnte nicht erstellt werden.",
     "decrypt": "Entschlüsselung des TOTP fehlgeschlagen. Bitte stelle sicher, dass du das richtige Passwort eingegeben hast.",

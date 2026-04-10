@@ -1,10 +1,5 @@
 part of 'method.dart';
 
-/// The master password app unlock method provider.
-final masterPasswordAppUnlockMethodProvider = Provider<MasterPasswordAppUnlockMethod>(
-  (ref) => MasterPasswordAppUnlockMethod._(ref: ref),
-);
-
 /// Enter master password.
 class MasterPasswordAppUnlockMethod extends AppUnlockMethod<String> {
   /// The master password app unlock method id.
@@ -19,7 +14,7 @@ class MasterPasswordAppUnlockMethod extends AppUnlockMethod<String> {
 
   @override
   Future<Result<String>> _tryUnlock(BuildContext context, UnlockReason reason) async {
-    if (reason != UnlockReason.openApp && reason != UnlockReason.sensibleAction) {
+    if (reason != .openApp && reason != .sensibleAction) {
       List<Totp> totps = await _ref.read(totpRepositoryProvider.future);
       if (totps.isEmpty) {
         return const ResultSuccess();
@@ -29,12 +24,12 @@ class MasterPasswordAppUnlockMethod extends AppUnlockMethod<String> {
       return const ResultCancelled();
     }
 
-    Result<String> result = await _promptMasterPasswordForUnlock(context, reason == UnlockReason.openApp ? translations.appUnlock.masterPasswordDialogMessage : null);
+    Result<String> result = await _promptMasterPasswordForUnlock(context, reason == .openApp ? translations.appUnlock.masterPasswordDialogMessage : null);
     if (result is! ResultSuccess<String>) {
       return result;
     }
 
-    if (reason == UnlockReason.openApp) {
+    if (reason == .openApp) {
       Salt? salt = await Salt.readFromLocalStorage();
       _ref.read(cryptoStoreProvider.notifier).use(await CryptoStore.fromPassword(result.value, salt!));
     }
