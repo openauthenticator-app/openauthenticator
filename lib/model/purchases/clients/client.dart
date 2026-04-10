@@ -20,21 +20,21 @@ final revenueCatClientProvider = FutureProvider((ref) async {
   if (user == null) {
     return null;
   }
-  PurchasesConfiguration? configuration = switch (currentPlatform) {
-    Platform.android => PurchasesConfiguration(apiKey: AppCredentials.revenueCatPublicKeyAndroid),
-    Platform.iOS || Platform.macOS => PurchasesConfiguration(apiKey: AppCredentials.revenueCatPublicKeyDarwin),
-    Platform.windows => PurchasesConfiguration(apiKey: AppCredentials.revenueCatPublicKeyWindows),
-    Platform.linux => PurchasesConfiguration(apiKey: AppCredentials.revenueCatPublicKeyLinux),
+  String? apiKey = switch (currentPlatform) {
+    Platform.android => AppCredentials.revenueCatPublicKeyAndroid,
+    Platform.iOS || Platform.macOS => AppCredentials.revenueCatPublicKeyDarwin,
+    Platform.windows => AppCredentials.revenueCatPublicKeyWindows,
+    Platform.linux => AppCredentials.revenueCatPublicKeyLinux,
     _ => null,
   };
-  if (configuration == null) {
+  if (apiKey == null || apiKey.isEmpty) {
     return null;
   }
-  configuration = configuration
-    ..appUserID = user.id
-    ..email = user.email;
   return RevenueCatClient.fromPlatform(
-    purchasesConfiguration: configuration,
+    purchasesConfiguration: PurchasesConfiguration(
+      apiKey: apiKey,
+      user: user,
+    ),
     backendHost: backendHost,
   );
 });
@@ -189,6 +189,9 @@ class PurchasesConfiguration extends rc_purchases_configuration.PurchasesConfigu
   /// Creates a new purchases configuration instance.
   PurchasesConfiguration({
     required String apiKey,
-    this.email,
-  }) : super(apiKey);
+    required User user,
+  }) : email = user.email,
+       super(apiKey) {
+    appUserID = user.id;
+  }
 }

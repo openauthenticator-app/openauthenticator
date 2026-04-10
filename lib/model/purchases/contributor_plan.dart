@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:open_authenticator/app.dart';
 import 'package:open_authenticator/i18n/localizable_exception.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/backend/user.dart';
@@ -16,6 +17,9 @@ final contributorPlanStateProvider = AsyncNotifierProvider<ContributorPlan, Cont
 class ContributorPlan extends AsyncNotifier<ContributorPlanState> {
   @override
   FutureOr<ContributorPlanState> build() async {
+    if (AppContributorPlan.offeringId.isEmpty) {
+      return .impossible;
+    }
     RevenueCatClient? client = await ref.watch(revenueCatClientProvider.future);
     if (client == null) {
       return .impossible;

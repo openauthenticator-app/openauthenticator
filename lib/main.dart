@@ -278,7 +278,8 @@ class _RouteWidgetState extends ConsumerState<_RouteWidget> {
           conditions: [
             SupportedPlatformsCondition(),
           ],
-        )..populateWithDefaultConditions();
+        );
+        rateMyApp.populateWithDefaultConditions();
         await rateMyApp.init();
         if (rateMyApp.shouldOpenDialog && mounted) {
           rateMyApp.showRateDialog(context);
