@@ -40,6 +40,7 @@ class ClearDataSettingsEntryWidget extends ConsumerWidget with FTileMixin {
         context,
         title: translations.settings.dangerZone.clearData.confirmationDialog.title,
         message: translations.settings.dangerZone.clearData.confirmationDialog.message,
+        okButtonVariant: .destructive,
       );
       if (!confirm || !context.mounted) {
         return;
@@ -55,6 +56,7 @@ class ClearDataSettingsEntryWidget extends ConsumerWidget with FTileMixin {
         context,
         title: translations.settings.dangerZone.clearData.backupDeleteConfirmationDialog.title,
         message: translations.settings.dangerZone.clearData.backupDeleteConfirmationDialog.message,
+        okButtonVariant: .destructive,
       );
       if (!deleteBackups || !context.mounted) {
         return;

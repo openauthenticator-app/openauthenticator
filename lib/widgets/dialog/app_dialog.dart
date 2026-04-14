@@ -58,25 +58,37 @@ class AppDialog extends StatelessWidget {
           child: this.children[i],
         ),
     ];
-    return FDialog.adaptive(
-      title: title == null
-          ? null
-          : _AppDialogTitle(
-              title: title!,
-              displayCloseButton: displayCloseButton,
-            ),
-      body: SizedBox(
-        width: MediaQuery.sizeOf(context).width,
-        child: scrollable
-            ? ListView(
-                padding: EdgeInsets.zero,
-                shrinkWrap: true,
-                children: children,
-              )
-            : Column(
-                mainAxisSize: MainAxisSize.min,
-                children: children,
+    return FDialog.raw(
+      builder: (context, style) => _AppDialogContent(
+        style: style.contentStyle.resolve({context.platformVariant}),
+        slideableActions: style.slideableActions.resolve({context.platformVariant}),
+        title: title == null
+            ? null
+            : _AppDialogTitle(
+                title: title!,
+                displayCloseButton: displayCloseButton,
               ),
+        body: SizedBox(
+          width: MediaQuery.sizeOf(context).width,
+          child: scrollable
+              ? ListView(
+                  padding: EdgeInsets.zero,
+                  shrinkWrap: true,
+                  children: children,
+                )
+              : Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: children,
+                ),
+        ),
+        actions: [
+          for (int i = 0; i < (actions?.length ?? 0); i++)
+            _AdaptiveActionPadding(
+              actionIndex: i,
+              actionsCount: actions!.length,
+              action: actions![i],
+            ),
+        ],
       ),
       style: .delta(
         contentStyle: .delta(
@@ -94,16 +106,92 @@ class AppDialog extends StatelessWidget {
         ),
       ),
       animation: animation,
-      actions: [
-        for (int i = 0; i < (actions?.length ?? 0); i++)
-          _AdaptiveActionPadding(
-            actionIndex: i,
-            actionsCount: actions!.length,
-            action: actions![i],
-          ),
-      ],
     );
   }
+}
+
+/// Mimics ForUI's dialog content, but allows the text to be aligned at the start by default.
+class _AppDialogContent extends StatelessWidget {
+  /// The dialog content's style.
+  final FDialogContentStyle style;
+
+  /// Whether the dialog's actions support pressing an action and sliding to another.
+  final bool slideableActions;
+
+  /// The alignment of the content.
+  final CrossAxisAlignment alignment;
+
+  /// The dialog title.
+  final Widget? title;
+
+  /// The alignment of the title.
+  final TextAlign titleTextAlign;
+
+  /// The dialog body.
+  final Widget? body;
+
+  /// The alignment of the body.
+  final TextAlign bodyTextAlign;
+
+  /// The dialog actions.
+  final List<Widget> actions;
+
+  /// Creates a new app dialog content instance.
+  const _AppDialogContent({
+    required this.style,
+    required this.slideableActions,
+    this.alignment = .start,
+    required this.title,
+    this.titleTextAlign = .start,
+    required this.body,
+    this.bodyTextAlign = .start,
+    required this.actions,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: style.padding,
+    child: Column(
+      mainAxisSize: .min,
+      crossAxisAlignment: alignment,
+      children: [
+        if (title case final title?)
+          Padding(
+            padding: .only(bottom: style.titleSpacing),
+            child: Semantics(
+              container: true,
+              child: DefaultTextStyle.merge(textAlign: titleTextAlign, style: style.titleTextStyle, child: title),
+            ),
+          ),
+        if (body case final body?)
+          Flexible(
+            child: Padding(
+              padding: .only(bottom: style.bodySpacing),
+              child: Semantics(
+                container: true,
+                child: DefaultTextStyle.merge(textAlign: bodyTextAlign, style: style.bodyTextStyle, child: body),
+              ),
+            ),
+          ),
+        if (title != null && body != null) SizedBox(height: style.contentSpacing),
+        if (slideableActions) FTappableGroup(child: _createActions(context, style)) else _createActions(context, style),
+      ],
+    ),
+  );
+
+  /// Creates the dialog actions.
+  Widget _createActions(BuildContext context, FDialogContentStyle style) => MediaQuery.sizeOf(context).width < context.theme.breakpoints.sm
+      ? Column(
+          spacing: style.actionSpacing,
+          mainAxisSize: .min,
+          children: actions,
+        )
+      : Row(
+          spacing: style.actionSpacing,
+          mainAxisAlignment: .end,
+          children: actions.reversed.toList(),
+        );
 }
 
 /// An adaptive action padding widget.

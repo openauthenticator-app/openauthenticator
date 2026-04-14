@@ -262,6 +262,7 @@ class _RestoreBackupDialogState extends ConsumerState<_RestoreBackupDialog> {
       context,
       title: translations.settings.backups.manageBackups.deleteBackupConfirmationDialog.title,
       message: translations.settings.backups.manageBackups.deleteBackupConfirmationDialog.message,
+      okButtonVariant: .destructive,
     );
     if (!result) {
       return;

@@ -127,7 +127,7 @@ class _SyncHeaderAction extends ConsumerWidget {
         return ClickableHeaderAction(
           onPress: () async {
             if (exception is InvalidSessionException || exception is NoSessionException) {
-              InvalidSessionDialog.openDialog(context, handleResult: true);
+              InvalidSessionDialog.openDialog(context, ref, handleResult: true);
             } else {
               ErrorDialogResult? result = await ErrorDialog.openDialog(
                 context,

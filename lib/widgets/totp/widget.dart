@@ -238,6 +238,7 @@ class _MobileActionsDialog extends StatelessWidget {
         ),
       ClickableTile(
         prefix: const Icon(FIcons.trash),
+        variant: .destructive,
         onPress: deleteButtonEnabled ? (() => Navigator.pop(context, _MobileActionsDialogResult.delete)) : null,
         title: Text(translations.totp.actions.mobileDialog.delete),
       ),

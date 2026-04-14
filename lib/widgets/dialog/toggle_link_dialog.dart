@@ -12,10 +12,13 @@ import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
 import 'package:open_authenticator/widgets/dialog/text_input_dialog.dart';
 import 'package:open_authenticator/widgets/invert_colors.dart';
 
+/// Represents a toggle link dialog action.
+typedef ToggleLinkDialogResult = ({Future<Result> Function() action, bool link});
+
 /// Allows to pick an authentication provider.
-class AuthenticationProviderPickerDialog extends ConsumerWidget {
+class ToggleLinkDialog extends ConsumerWidget {
   /// Creates a new authentication picker dialog instance.
-  const AuthenticationProviderPickerDialog({
+  const ToggleLinkDialog({
     super.key,
   });
 
@@ -31,10 +34,9 @@ class AuthenticationProviderPickerDialog extends ConsumerWidget {
         trailingIcon: unlink ? FIcons.unlink : null,
         onTap: () => Navigator.pop(
           context,
-          AuthenticationProviderToggleLinkResult(
-            link: !unlink,
+          (
             action: unlink
-                ? (() => provider.unlink())
+                ? provider.unlink
                 : (() async {
                     switch (provider) {
                       case EmailAuthenticationProvider():
@@ -53,6 +55,7 @@ class AuthenticationProviderPickerDialog extends ConsumerWidget {
                         return provider.requestLinking();
                     }
                   }),
+            link: !unlink,
           ),
         ),
       );
@@ -76,25 +79,10 @@ class AuthenticationProviderPickerDialog extends ConsumerWidget {
   }
 
   /// Opens the dialog.
-  static Future<AuthenticationProviderToggleLinkResult?> openDialog(BuildContext context) => showFDialog<AuthenticationProviderToggleLinkResult>(
+  static Future<ToggleLinkDialogResult?> openDialog(BuildContext context) => showFDialog<ToggleLinkDialogResult>(
     context: context,
-    builder: (context, style, animation) => const AuthenticationProviderPickerDialog(),
+    builder: (context, style, animation) => const ToggleLinkDialog(),
   );
-}
-
-/// Returned when the user wants to toggle link to the picked provider.
-class AuthenticationProviderToggleLinkResult {
-  /// Whether to link or unlink.
-  final bool link;
-
-  /// The action to execute.
-  final Future<Result> Function() action;
-
-  /// Creates a new authentication provider picker dialog toggle link (link) result instance.
-  const AuthenticationProviderToggleLinkResult({
-    this.link = true,
-    required this.action,
-  });
 }
 
 /// An [AuthenticationProvider] tile.

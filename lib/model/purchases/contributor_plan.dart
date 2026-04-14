@@ -7,6 +7,7 @@ import 'package:open_authenticator/i18n/localizable_exception.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/backend/user.dart';
 import 'package:open_authenticator/model/purchases/clients/client.dart';
+import 'package:open_authenticator/model/settings/backend_url.dart';
 import 'package:open_authenticator/utils/result.dart';
 import 'package:purchases_flutter/purchases_flutter.dart' hide Price;
 
@@ -18,6 +19,10 @@ class ContributorPlan extends AsyncNotifier<ContributorPlanState> {
   @override
   FutureOr<ContributorPlanState> build() async {
     if (AppContributorPlan.offeringId.isEmpty) {
+      return .impossible;
+    }
+    bool hasBackendUrlChanged = ref.watch(backendUrlSettingsEntryProvider).value?.hasBackendUrlChanged ?? false;
+    if (hasBackendUrlChanged && !kDebugMode) {
       return .impossible;
     }
     RevenueCatClient? client = await ref.watch(revenueCatClientProvider.future);

@@ -34,10 +34,7 @@ class SynchronizeSettingsEntryWidget extends CheckboxSettingsEntryWidget<Storage
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     User? user = ref.watch(userProvider).value;
-    if (user == null) {
-      return const SizedBox.shrink();
-    }
-    return super.build(context, ref);
+    return user == null ? const SizedBox.shrink() : super.build(context, ref);
   }
 
   @override
@@ -50,50 +47,36 @@ class SynchronizeSettingsEntryWidget extends CheckboxSettingsEntryWidget<Storage
       );
     }
     AsyncValue<ContributorPlanState> state = ref.watch(contributorPlanStateProvider);
-    switch (state) {
-      case AsyncData():
-        switch (state.value) {
-          case ContributorPlanState.inactive:
-            return FutureBuilder(
-              future: ref.watch(totpLimitProvider.future),
-              builder: (context, snapshot) => super.createTile(
+    return switch (state) {
+      AsyncData() =>
+        state.value == .inactive
+            ? FutureBuilder(
+                future: ref.watch(totpLimitProvider.future),
+                builder: (context, snapshot) => super.createTile(
+                  context,
+                  ref,
+                  value: value,
+                  enabled: snapshot.data?.isExceeded != true,
+                ),
+              )
+            : super.createTile(
                 context,
                 ref,
                 value: value,
-                enabled: snapshot.data?.isExceeded != true,
+                enabled: enabled,
               ),
-            );
-          case ContributorPlanState.active:
-            return super.createTile(
-              context,
-              ref,
-              value: value,
-              enabled: enabled,
-            );
-          default:
-            return const SizedBox.shrink();
-        }
-      case AsyncLoading():
-      default:
-        return super.createTile(
-          context,
-          ref,
-          value: value,
-          enabled: value == .shared,
-        );
-    }
+      _ => super.createTile(
+        context,
+        ref,
+        value: value,
+        enabled: value == .shared,
+      ),
+    };
   }
 
   @override
   Widget? buildSubtitle(BuildContext context, WidgetRef ref, StorageType? storageType) {
-    AsyncValue<ContributorPlanState> state = ref.watch(contributorPlanStateProvider);
-    if (state is! AsyncData || state.value == ContributorPlanState.active || state.value == ContributorPlanState.impossible) {
-      return super.buildSubtitle(
-        context,
-        ref,
-        storageType,
-      );
-    }
+    ContributorPlanState? contributorPlanState = ref.watch(contributorPlanStateProvider).value;
     User user = ref.watch(userProvider).value!;
     AsyncValue<List<Totp>> totps = ref.watch(totpRepositoryProvider);
     if (totps is! AsyncData<List<Totp>>) {
@@ -114,11 +97,11 @@ class SynchronizeSettingsEntryWidget extends CheckboxSettingsEntryWidget<Storage
               style: const TextStyle(fontStyle: FontStyle.italic),
             ),
           ),
-          if (storageType == StorageType.localOnly && totps.value.length > user.totpsLimit)
+          if (storageType == .localOnly && totps.value.length > user.totpsLimit)
             TextSpan(
               text: '\n${translations.settings.synchronization.synchronizeTotps.subtitle.totpLimit.notEnabled}',
             ),
-          if (storageType == StorageType.shared)
+          if (storageType == .shared && contributorPlanState != .impossible)
             TextSpan(
               text: '\n${translations.settings.synchronization.synchronizeTotps.subtitle.totpLimit.enabled}',
             ),
@@ -131,5 +114,5 @@ class SynchronizeSettingsEntryWidget extends CheckboxSettingsEntryWidget<Storage
   void changeValue(BuildContext context, WidgetRef ref, bool newValue) => StorageMigrationUtils.changeStorageType(context, ref, newValue ? StorageType.shared : StorageType.localOnly);
 
   @override
-  bool isEnabled(StorageType? storageType) => storageType == StorageType.shared;
+  bool isEnabled(StorageType? storageType) => storageType == .shared;
 }

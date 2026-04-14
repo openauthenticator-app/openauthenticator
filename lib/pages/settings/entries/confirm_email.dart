@@ -4,7 +4,6 @@ import 'package:forui/forui.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/backend/authentication/providers/provider.dart';
 import 'package:open_authenticator/pages/settings/entries/widgets.dart';
-import 'package:open_authenticator/utils/account.dart';
 import 'package:open_authenticator/utils/result.dart';
 import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
@@ -61,6 +60,7 @@ class ConfirmEmailSettingsEntryWidget extends ConsumerWidget with FTileMixin {
       context,
       title: translations.settings.synchronization.confirmEmail.confirmActionPickerDialog.cancelConfirmation.validationDialog.title,
       message: translations.settings.synchronization.confirmEmail.confirmActionPickerDialog.cancelConfirmation.validationDialog.message,
+      okButtonVariant: .destructive,
     );
     if (!confirmation || !context.mounted) {
       return;
@@ -80,14 +80,18 @@ class ConfirmEmailSettingsEntryWidget extends ConsumerWidget with FTileMixin {
       context,
       title: translations.settings.synchronization.confirmEmail.codeDialog.title,
       message: translations.settings.synchronization.confirmEmail.codeDialog.message,
-      keyboardType: TextInputType.url,
+      keyboardType: .visiblePassword,
+      textCapitalization: .characters,
     );
     if (code == null || !context.mounted) {
       return;
     }
-    Result result = await ref.read(authenticationProviders).email.confirm(code);
+    Result<RedirectResult> result = await ref.read(authenticationProviders).email.confirm(code);
     if (context.mounted) {
-      AccountUtils.handleAuthenticationResult(context, result);
+      context.handleResult(
+        result,
+        successMessage: result.valueOrNull?.localizedMessage,
+      );
     }
   }
 }

@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:drift/drift.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/model/backend/request/response.dart';
 import 'package:open_authenticator/model/backend/synchronization/push/operation.dart';
@@ -14,6 +16,7 @@ import 'package:open_authenticator/model/totp/totp.dart';
 import 'package:open_authenticator/utils/drift.dart';
 import 'package:open_authenticator/utils/riverpod.dart';
 import 'package:open_authenticator/utils/sqlite.dart';
+import 'package:path_provider/path_provider.dart';
 
 part 'database.g.dart';
 part 'extensions.dart';
@@ -33,8 +36,11 @@ class AppDatabase extends _$AppDatabase {
   /// The database file name.
   static const _kDbFileName = 'app';
 
+  /// The legacy database file name.
+  static const _kLegacyDbFileName = 'totps';
+
   /// Creates a new Drift storage instance.
-  AppDatabase() : super(SqliteUtils.openConnection(_kDbFileName));
+  AppDatabase() : super(_openConnection());
 
   @override
   int get schemaVersion => 2;
@@ -277,6 +283,94 @@ class AppDatabase extends _$AppDatabase {
     batch.deleteAll(pendingBackendPushOperations);
     batch.deleteAll(backendPushOperationErrors);
   });
+
+  /// Opens the connection to the [_kDbFileName] and imports the legacy database if needed.
+  static QueryExecutor _openConnection() {
+    return LazyDatabase(() async {
+      await _importLegacyDatabaseIfNeeded();
+      return SqliteUtils.openConnection(_kDbFileName);
+    });
+  }
+
+  /// Imports the legacy database if needed.
+  static Future<void> _importLegacyDatabaseIfNeeded() async {
+    File oldDatabase = await _getDatabaseFile(_kLegacyDbFileName, addDebugModeSuffix: false);
+    if (!await oldDatabase.exists()) {
+      return;
+    }
+
+    File newDatabase = await _getDatabaseFile(_kDbFileName);
+
+    await _replaceDatabaseFiles(
+      sourceMainFile: oldDatabase,
+      targetMainFile: newDatabase,
+    );
+
+    await _renameLegacyDatabaseFiles(oldDatabase);
+  }
+
+  /// Gets the path to the database file.
+  static Future<File> _getDatabaseFile(String dbFileName, {bool addDebugModeSuffix = true}) async {
+    if (addDebugModeSuffix && kDebugMode) {
+      dbFileName += '_debug';
+    }
+    Directory directory = await getApplicationSupportDirectory();
+    return File('${directory.path}/$dbFileName.sqlite');
+  }
+
+  /// Replaces the database files.
+  static Future<void> _replaceDatabaseFiles({
+    required File sourceMainFile,
+    required File targetMainFile,
+  }) async {
+    File sourceWal = File('${sourceMainFile.path}-wal');
+    File sourceShm = File('${sourceMainFile.path}-shm');
+    File sourceJournal = File('${sourceMainFile.path}-journal');
+
+    File targetWal = File('${targetMainFile.path}-wal');
+    File targetShm = File('${targetMainFile.path}-shm');
+    File targetJournal = File('${targetMainFile.path}-journal');
+
+    await targetMainFile.parent.create(recursive: true);
+
+    Future<void> deleteIfExists(File file) async {
+      if (await file.exists()) {
+        await file.delete();
+      }
+    }
+
+    await deleteIfExists(targetWal);
+    await deleteIfExists(targetShm);
+    await deleteIfExists(targetJournal);
+    await deleteIfExists(targetMainFile);
+
+    await sourceMainFile.copy(targetMainFile.path);
+    await _copyIfExists(sourceWal, targetWal);
+    await _copyIfExists(sourceShm, targetShm);
+    await _copyIfExists(sourceJournal, targetJournal);
+  }
+
+  /// Deletes the legacy database files.
+  static Future<void> _renameLegacyDatabaseFiles(File legacyMainFile) async {
+    Future<void> renameIfExists(File file, {String suffix = '-migrated'}) async {
+      if (await file.exists()) {
+        await file.rename('${file.path}-$suffix');
+      }
+    }
+
+    await renameIfExists(legacyMainFile);
+    await renameIfExists(File('${legacyMainFile.path}-wal'));
+    await renameIfExists(File('${legacyMainFile.path}-shm'));
+    await renameIfExists(File('${legacyMainFile.path}-journal'));
+  }
+
+  /// Copies the [source] file to the [target] file if it exists.
+  static Future<void> _copyIfExists(File source, File target) async {
+    if (await source.exists()) {
+      await target.parent.create(recursive: true);
+      await source.copy(target.path);
+    }
+  }
 }
 
 /// Allows to migrate the database scheme to the latest version.

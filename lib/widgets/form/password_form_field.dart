@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:forui/forui.dart';
 
 /// A form field for entering passwords.
@@ -36,6 +37,12 @@ class PasswordFormField extends StatefulWidget {
   /// The auto validate mode.
   final AutovalidateMode autovalidateMode;
 
+  /// The input formatters.
+  final List<TextInputFormatter>? inputFormatters;
+
+  /// The text capitalization.
+  final TextCapitalization? textCapitalization;
+
   /// Creates a new password form field instance.
   const PasswordFormField({
     super.key,
@@ -50,6 +57,8 @@ class PasswordFormField extends StatefulWidget {
     this.validator,
     this.keyboardType,
     this.autovalidateMode = .disabled,
+    this.inputFormatters,
+    this.textCapitalization,
   });
 
   @override
@@ -83,6 +92,8 @@ class _PasswordFormFieldState extends State<PasswordFormField> {
     validator: widget.validator,
     keyboardType: widget.keyboardType,
     autovalidateMode: widget.autovalidateMode,
+    inputFormatters: widget.inputFormatters,
+    textCapitalization: widget.textCapitalization ?? .none,
   );
 
   /// Toggles the obscuration state.

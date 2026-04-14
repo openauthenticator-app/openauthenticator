@@ -91,7 +91,7 @@ sealed class AuthenticationProvider {
   }
 
   /// Triggered when the redirect is received.
-  Future<Result> onRedirectReceived(Uri uri) async {
+  Future<Result<RedirectResult>> onRedirectReceived(Uri uri) async {
     try {
       List<String> path = uri.pathSegments;
       if (path.lastOrNull != 'finish') {
@@ -114,9 +114,12 @@ sealed class AuthenticationProvider {
               ),
             );
         if (response is! ResultSuccess<ProviderLoginResponse>) {
-          return response;
+          return response.to((_) => null);
         }
         await _ref.read(storedSessionProvider.notifier).storeAndUse(response.value.session);
+        return ResultSuccess(
+          value: LogInSuccess(providerId: id),
+        );
       } else {
         Result<ProviderLinkResponse> response = await _ref
             .read(backendClientProvider.notifier)
@@ -128,11 +131,15 @@ sealed class AuthenticationProvider {
               ),
             );
         if (response is! ResultSuccess<ProviderLinkResponse>) {
-          return response;
+          return response.to((_) => null);
         }
         await _ref.read(userProvider.notifier).changeUser(_changeId(user, response.value.providerUserId));
+        return ResultSuccess(
+          value: LinkSuccess(
+            providerId: id,
+          ),
+        );
       }
-      return const ResultSuccess();
     } catch (ex, stackTrace) {
       return ResultError(
         exception: ex,
@@ -140,6 +147,42 @@ sealed class AuthenticationProvider {
       );
     }
   }
+}
+
+/// Represents a possible result of [AuthenticationProvider.onRedirectReceived].
+sealed class RedirectResult {
+  /// The provider id.
+  final String providerId;
+
+  /// Creates a new redirect result instance.
+  const RedirectResult({
+    required this.providerId,
+  });
+
+  /// The localized message to display.
+  String get localizedMessage;
+}
+
+/// Triggered when a user has successfully logged in.
+class LogInSuccess extends RedirectResult {
+  /// Creates a new log in success instance.
+  const LogInSuccess({
+    required super.providerId,
+  });
+
+  @override
+  String get localizedMessage => translations.authentication.logIn.success;
+}
+
+/// Triggered when a user has successfully linked its account to the provider.
+class LinkSuccess extends RedirectResult {
+  /// Creates a new link success instance.
+  const LinkSuccess({
+    required super.providerId,
+  });
+
+  @override
+  String get localizedMessage => translations.authentication.link.linkSuccess;
 }
 
 /// An OAuthentication provider.

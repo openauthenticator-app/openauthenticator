@@ -61,5 +61,13 @@
     },
     "separator": "Ou :"
   },
+  "invalidSessionDialog": {
+    "title": "Session invalide",
+    "message": "Votre session a expiré ou est invalide. Veuillez vous reconnecter pour synchroniser vos TOTP.",
+    "button": {
+      "logIn": "Connexion",
+      "logOut": "Déconnexion"
+    }
+  },
   "providerPickerDialogTitle": "Choisissez une méthode de connexion"
 }

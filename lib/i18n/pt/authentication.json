@@ -61,5 +61,13 @@
     },
     "separator": "Ou:"
   },
+  "invalidSessionDialog": {
+    "title": "Sessão inválida",
+    "message": "A sua sessão expirou ou é inválida. Por favor, inicie sessão novamente para sincronizar os seus TOTPs.",
+    "button": {
+      "logIn": "Entrar",
+      "logOut": "Sair"
+    }
+  },
   "providerPickerDialogTitle": "Escolha um método de login"
 }

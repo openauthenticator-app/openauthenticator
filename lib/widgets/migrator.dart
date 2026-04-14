@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/migrator/migrator.dart';
+import 'package:open_authenticator/model/settings/storage_type.dart';
 import 'package:open_authenticator/spacing.dart';
 import 'package:open_authenticator/utils/account.dart';
 import 'package:open_authenticator/utils/result.dart';
@@ -95,7 +96,7 @@ class Migrator extends ConsumerWidget {
 
   /// Migrates the data.
   Future<void> _migrate(BuildContext context, WidgetRef ref) async {
-    Result result = await showWaitingOverlay(
+    Result<StorageType> result = await showWaitingOverlay(
       context,
       future: ref.read(migratorProvider.notifier).migrate(),
     );
@@ -103,9 +104,11 @@ class Migrator extends ConsumerWidget {
       return;
     }
     switch (result) {
-      case ResultSuccess():
+      case ResultSuccess(:final value):
         context.handleResult(result);
-        await AccountUtils.trySignIn(context);
+        if (value == .shared) {
+          await AccountUtils.tryRequestSignIn(context);
+        }
         break;
       case ResultError():
         ErrorDialogResult? errorResult = await ErrorDialog.openDialog(

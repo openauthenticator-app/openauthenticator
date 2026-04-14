@@ -61,5 +61,13 @@
     },
     "separator": "Oppure:"
   },
+  "invalidSessionDialog": {
+    "title": "Sessione non valida",
+    "message": "La tua sessione è scaduta o non è valida. Effettua nuovamente l'accesso per sincronizzare i tuoi TOTP.",
+    "button": {
+      "logIn": "Accedi",
+      "logOut": "Esci"
+    }
+  },
   "providerPickerDialogTitle": "Scegli un metodo di accesso"
 }

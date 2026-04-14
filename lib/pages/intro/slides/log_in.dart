@@ -57,7 +57,7 @@ class _LogInButton extends ConsumerWidget {
     User? user = ref.watch(userProvider).value;
     return user == null
         ? ClickableButton(
-            onPress: () => AccountUtils.trySignIn(context),
+            onPress: () => AccountUtils.tryRequestSignIn(context),
             prefix: const Icon(FIcons.logIn),
             child: ButtonText(translations.intro.logIn.button.loggedOut),
           )

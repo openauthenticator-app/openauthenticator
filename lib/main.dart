@@ -303,12 +303,15 @@ class _RouteWidgetState extends ConsumerState<_RouteWidget> {
       if (provider == null) {
         return;
       }
-      Result result = await showWaitingOverlay(
+      Result<RedirectResult> result = await showWaitingOverlay(
         context,
         future: provider.onRedirectReceived(appLink),
       );
       if (mounted) {
-        context.handleResult(result);
+        context.handleResult(
+          result,
+          successMessage: result.valueOrNull?.localizedMessage,
+        );
       }
     }
   }
@@ -333,7 +336,7 @@ class _RouteWidgetState extends ConsumerState<_RouteWidget> {
   /// Handles an invalid session.
   Future<void> handleInvalidSession() async {
     if (mounted) {
-      await InvalidSessionDialog.openDialog(context, handleResult: true);
+      await InvalidSessionDialog.openDialog(context, ref, handleResult: true);
     }
   }
 }

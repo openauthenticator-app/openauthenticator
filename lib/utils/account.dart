@@ -2,34 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/app_unlock/reason.dart';
-import 'package:open_authenticator/model/backend/request/error.dart';
 import 'package:open_authenticator/model/backend/user.dart';
 import 'package:open_authenticator/model/settings/app_unlock_method.dart';
 import 'package:open_authenticator/utils/result.dart';
-import 'package:open_authenticator/widgets/dialog/authentication_provider_picker_dialog.dart';
 import 'package:open_authenticator/widgets/dialog/confirmation_dialog.dart';
 import 'package:open_authenticator/widgets/dialog/sign_in_dialog.dart';
+import 'package:open_authenticator/widgets/dialog/toggle_link_dialog.dart';
 import 'package:open_authenticator/widgets/waiting_overlay.dart';
 
 /// Contains some useful methods for logging and linking the user's current account.
 class AccountUtils {
   /// Prompts the user to choose an authentication provider, and use it to login.
-  static Future<Result> trySignIn(BuildContext context) async {
-    SignInDialogResult? result = await SignInDialog.openDialog(context);
-    if (result == null || !context.mounted) {
+  static Future<Result> tryRequestSignIn(BuildContext context) async {
+    SignInDialogAction? action = await SignInDialog.openDialog(context);
+    if (action == null || !context.mounted) {
       return const ResultCancelled();
     }
-    return await _trySignInOrLink(
+    return await _tryTo(
       context,
-      successMessage: result.willNeedConfirmation ? translations.authentication.logIn.successNeedConfirmation : translations.authentication.logIn.success,
       waitingDialogMessage: translations.authentication.logIn.waitingLoginMessage,
-      action: result.action,
+      action: action,
     );
   }
 
   /// Prompts the user to choose an authentication provider, and use it to link or unlink its current account.
-  static Future<Result> tryToggleLink(BuildContext context) async {
-    AuthenticationProviderToggleLinkResult? result = await AuthenticationProviderPickerDialog.openDialog(context);
+  static Future<Result> tryRequestToggleLink(BuildContext context) async {
+    ToggleLinkDialogResult? result = await ToggleLinkDialog.openDialog(context);
     if (result == null || !context.mounted) {
       return const ResultCancelled();
     }
@@ -39,15 +37,15 @@ class AccountUtils {
           context,
           title: translations.authentication.link.unlinkConfirmationDialog.title,
           message: translations.authentication.link.unlinkConfirmationDialog.message,
+          okButtonVariant: .destructive,
         ))) {
       return const ResultCancelled();
     }
     if (!context.mounted) {
       return const ResultCancelled();
     }
-    return await _trySignInOrLink(
+    return await _tryTo(
       context,
-      successMessage: unlink ? translations.authentication.link.unlinkSuccess : translations.authentication.link.linkSuccess,
       waitingDialogMessage: unlink ? null : translations.authentication.logIn.waitingLoginMessage,
       action: result.action,
     );
@@ -63,6 +61,7 @@ class AccountUtils {
       context,
       title: translations.authentication.deleteConfirmationDialog.title,
       message: translations.authentication.deleteConfirmationDialog.message,
+      okButtonVariant: .destructive,
     );
     if (!confirm || !context.mounted) {
       return const ResultCancelled();
@@ -73,48 +72,29 @@ class AccountUtils {
     if (unlockResult is! ResultSuccess || !context.mounted) {
       return unlockResult;
     }
-
-    Result deleteResult = await showWaitingOverlay(
-      context,
-      future: ref.read(userProvider.notifier).deleteUser(),
-    );
-    if (handleResult && context.mounted) {
-      context.handleResult(deleteResult);
+    if (!context.mounted) {
+      return const ResultCancelled();
     }
-    return deleteResult;
+    return _tryTo(
+      context,
+      action: () => ref.read(userProvider.notifier).deleteUser(),
+    );
   }
 
   /// Tries to do the specified [action].
-  static Future<Result> _trySignInOrLink(
+  static Future<Result> _tryTo(
     BuildContext context, {
     required Future<Result> Function() action,
-    String? successMessage,
     String? waitingDialogMessage,
-    bool handleResult = true,
   }) async {
     Result result = await showWaitingOverlay(
       context,
       future: action(),
       message: waitingDialogMessage,
     );
-    if (handleResult && context.mounted) {
-      handleAuthenticationResult(
-        context,
-        result,
-        successMessage: successMessage,
-      );
+    if (context.mounted && result is! ResultSuccess) {
+      context.handleResult(result);
     }
     return result;
   }
-
-  /// Visually handles the [result].
-  static void handleAuthenticationResult(
-    BuildContext context,
-    Result result, {
-    String? successMessage,
-  }) => context.handleResult(
-    result,
-    successMessage: successMessage ?? translations.authentication.logIn.success,
-    showDialogIfError: (exception) => exception is InvalidVerificationCodeError,
-  );
 }

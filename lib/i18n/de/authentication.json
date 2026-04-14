@@ -61,5 +61,13 @@
     },
     "separator": "Oder:"
   },
+  "invalidSessionDialog": {
+    "title": "Ungültige Sitzung",
+    "message": "Ihre Sitzung ist entweder abgelaufen oder ungültig. Bitte melden Sie sich erneut an, um Ihre TOTPs zu synchronisieren.",
+    "button": {
+      "logIn": "Anmeldung",
+      "logOut": "Abmelden"
+    }
+  },
   "providerPickerDialogTitle": "Wählen Sie eine Anmeldemethode"
 }

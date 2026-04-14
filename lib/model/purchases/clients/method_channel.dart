@@ -14,7 +14,9 @@ class RevenueCatMethodChannelClient extends RevenueCatClient with CanRestorePurc
   Future<void> initialize(Ref ref) async {
     await Purchases.configure(purchasesConfiguration);
     await Purchases.setAttributes(attributes);
-    await Purchases.setEmail(purchasesConfiguration.email!);
+    if (purchasesConfiguration.email != null) {
+      await Purchases.setEmail(purchasesConfiguration.email!);
+    }
   }
 
   @override

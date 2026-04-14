@@ -35,7 +35,7 @@ class _LogInTile extends ConsumerWidget {
             prefix: const Icon(FIcons.logIn),
             title: Text(translations.settings.synchronization.accountLogin.logIn.title),
             subtitle: Text(translations.settings.synchronization.accountLogin.logIn.subtitle),
-            onPress: () => AccountUtils.trySignIn(context),
+            onPress: () => AccountUtils.tryRequestSignIn(context),
           )
         : const SizedBox.shrink();
   }

@@ -16,7 +16,7 @@ class ContributorPlanPaywallPage extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => AppScaffold.scrollable(
+  Widget build(BuildContext context, WidgetRef ref) => (shouldFallback ? AppScaffold.scrollable : AppScaffold.new)(
     header: shouldFallback
         ? ContributorPlanFallbackPaywallHeader(
             onDismiss: () => Navigator.pop(context, false),

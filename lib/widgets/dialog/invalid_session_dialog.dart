@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/utils/account.dart';
+import 'package:open_authenticator/utils/storage_migration.dart';
 import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
@@ -18,31 +20,41 @@ class InvalidSessionDialog extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => AppDialog(
-    title: const Text('Invalid session'),
+    title: Text(translations.authentication.invalidSessionDialog.title),
     actions: [
       ClickableButton(
         onPress: () => Navigator.pop(context, InvalidSessionDialogChoice.logIn),
-        child: const ButtonText('Log-in'),
+        child: ButtonText(translations.authentication.invalidSessionDialog.button.logIn),
       ),
       ClickableButton(
-        variant: .secondary,
+        variant: .destructive,
         onPress: () => Navigator.pop(context),
-        child: ButtonText(MaterialLocalizations.of(context).cancelButtonLabel),
+        child: ButtonText(translations.authentication.invalidSessionDialog.button.logOut),
       ),
     ],
     children: [
-      const Text('Your session has either expired or is invalid. Please log-in again to synchronize your TOTPs.'),
+      Text(translations.authentication.invalidSessionDialog.message),
     ],
   );
 
   /// Opens the invalid session dialog.
-  static Future<InvalidSessionDialogChoice?> openDialog(BuildContext context, {bool handleResult = false}) async {
+  static Future<InvalidSessionDialogChoice?> openDialog(BuildContext context, WidgetRef ref, {bool handleResult = false}) async {
     InvalidSessionDialogChoice? result = await showFDialog<InvalidSessionDialogChoice>(
       context: context,
       builder: (context, style, animation) => const InvalidSessionDialog._(),
     );
-    if (handleResult && result == .logIn && context.mounted) {
-      await AccountUtils.trySignIn(context);
+    if (!handleResult || !context.mounted) {
+      return result;
+    }
+    switch (result) {
+      case .logIn:
+        await AccountUtils.tryRequestSignIn(context);
+        break;
+      case .logOut:
+        await StorageMigrationUtils.changeStorageType(context, ref, .localOnly, logout: true);
+        break;
+      default:
+        break;
     }
     return result;
   }
@@ -52,4 +64,7 @@ class InvalidSessionDialog extends ConsumerWidget {
 enum InvalidSessionDialogChoice {
   /// The user wants to log-in.
   logIn,
+
+  /// The user wants to log-out.
+  logOut,
 }

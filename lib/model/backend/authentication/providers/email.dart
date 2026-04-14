@@ -13,7 +13,7 @@ class EmailAuthenticationProvider extends AuthenticationProvider {
        );
 
   @override
-  Future<Result> onRedirectReceived(Uri uri) async {
+  Future<Result<RedirectResult>> onRedirectReceived(Uri uri) async {
     if (uri.host == 'auth' && uri.path == '/provider/email/sent') {
       String? cancelCode = uri.queryParameters['cancelCode'];
       if (cancelCode == null) {
@@ -22,9 +22,9 @@ class EmailAuthenticationProvider extends AuthenticationProvider {
         );
       }
       _ref.read(emailConfirmationStateProvider.notifier)._markNeedsConfirmation(uri.queryParameters['email']!, uri.queryParameters['cancelCode']!);
-      return const ResultSuccess();
+      return ResultSuccess(value: ConfirmationEmailSent(providerId: id));
     }
-    Result result = await super.onRedirectReceived(uri);
+    Result<RedirectResult> result = await super.onRedirectReceived(uri);
     if (result is ResultSuccess) {
       await _ref.read(emailConfirmationStateProvider.notifier)._cancelConfirmation();
     }
@@ -45,6 +45,7 @@ class EmailAuthenticationProvider extends AuthenticationProvider {
       path: '/auth/provider/$id/redirect',
       queryParameters: {
         'email': email,
+        'locale': LocaleSettings.currentLocale.languageCode,
       },
     );
     if (link) {
@@ -60,7 +61,7 @@ class EmailAuthenticationProvider extends AuthenticationProvider {
   }
 
   /// Confirms the email.
-  Future<Result> confirm(String verificationCode) async {
+  Future<Result<RedirectResult>> confirm(String verificationCode) async {
     try {
       EmailConfirmationData? data = await _ref.read(emailConfirmationStateProvider.future);
       if (data == null) {
@@ -75,7 +76,7 @@ class EmailAuthenticationProvider extends AuthenticationProvider {
             ),
           );
       if (response is! ResultSuccess<EmailConfirmResponse>) {
-        return response;
+        return response.to((_) => null);
       }
       Uri uri = response.value.url;
       return await onRedirectReceived(uri);
@@ -117,6 +118,17 @@ class EmailAuthenticationProvider extends AuthenticationProvider {
 
   @override
   User _changeId(User user, String? providerUserId) => user.updateEmail(providerUserId);
+}
+
+/// Triggered when the email has been sent.
+class ConfirmationEmailSent extends RedirectResult {
+  /// Creates a new confirmation email sent instance.
+  const ConfirmationEmailSent({
+    required super.providerId,
+  });
+
+  @override
+  String get localizedMessage => translations.authentication.logIn.successNeedConfirmation;
 }
 
 /// The email confirmation state provider.

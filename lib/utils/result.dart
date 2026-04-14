@@ -10,6 +10,9 @@ sealed class Result<T> {
   /// Creates a new result instance.
   const Result();
 
+  /// Returns `null`, by default.
+  T? get valueOrNull => null;
+
   /// Converts this result to another.
   Result<U> to<U>(U? Function(T?) convert);
 }
@@ -24,11 +27,11 @@ class ResultSuccess<T> extends Result<T> {
     T? value,
   }) : _value = value;
 
-  /// Returns the raw [_value].
-  T? get valueOrNull => _value;
-
   /// Returns the [_value], ensuring it's not null.
   T get value => _value!;
+
+  @override
+  T? get valueOrNull => value;
 
   @override
   ResultSuccess<U> to<U>(U? Function(T?) convert) => ResultSuccess(value: convert(valueOrNull));

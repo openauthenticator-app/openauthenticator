@@ -37,7 +37,7 @@ class StorageTypeSettingsEntry extends EnumSettingsEntry<StorageType> {
     StorageType value, {
     String? masterPassword,
     String? backupPassword,
-    StorageMigrationDeletedTotpPolicy storageMigrationDeletedTotpPolicy = StorageMigrationDeletedTotpPolicy.ask,
+    StorageMigrationDeletedTotpPolicy storageMigrationDeletedTotpPolicy = .ask,
   }) async {
     try {
       if (masterPassword != null) {
@@ -77,13 +77,13 @@ class StorageTypeSettingsEntry extends EnumSettingsEntry<StorageType> {
       for (Totp totp in response.totps) {
         if (await database.isMarkedAsDeleted(totp.uuid)) {
           switch (storageMigrationDeletedTotpPolicy) {
-            case StorageMigrationDeletedTotpPolicy.keep:
+            case .keep:
               database.removeDeletionMark(totp.uuid);
               break;
-            case StorageMigrationDeletedTotpPolicy.delete:
+            case .delete:
               toDelete.add(totp.uuid);
               break;
-            case StorageMigrationDeletedTotpPolicy.ask:
+            case .ask:
               throw ShouldAskForDifferentDeletedTotpPolicyException();
           }
         }

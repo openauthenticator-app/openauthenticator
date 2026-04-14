@@ -32,6 +32,7 @@ class _TotpsListWidget extends ConsumerWidget {
         ? Center(
             child: SingleChildScrollView(
               padding: context.theme.scaffoldStyle.childPadding,
+              physics: const AlwaysScrollableScrollPhysics(),
               child: ImageTextActions.asset(
                 asset: 'assets/images/home.si',
                 text: translations.home.empty,
@@ -108,6 +109,7 @@ class _TotpsListWidget extends ConsumerWidget {
       context,
       title: translations.totp.actions.deleteConfirmationDialog.title,
       message: translations.totp.actions.deleteConfirmationDialog.message,
+      okButtonVariant: .destructive,
     );
     if (!confirmation || !context.mounted) {
       return;

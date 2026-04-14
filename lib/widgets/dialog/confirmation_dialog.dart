@@ -12,11 +12,15 @@ class ConfirmationDialog extends StatelessWidget {
   /// The dialog message.
   final String message;
 
+  /// The variant of the OK button.
+  final FButtonVariant? okButtonVariant;
+
   /// Creates a confirmation dialog instance.
   const ConfirmationDialog({
     super.key,
     required this.title,
     required this.message,
+    this.okButtonVariant,
   });
 
   @override
@@ -24,6 +28,7 @@ class ConfirmationDialog extends StatelessWidget {
     title: Text(title),
     actions: [
       ClickableButton(
+        variant: okButtonVariant ?? .primary,
         onPress: () => Navigator.pop(context, true),
         child: ButtonText(MaterialLocalizations.of(context).okButtonLabel),
       ),
@@ -43,12 +48,14 @@ class ConfirmationDialog extends StatelessWidget {
     BuildContext context, {
     required String title,
     required String message,
+    FButtonVariant? okButtonVariant,
   }) async =>
       (await showFDialog<bool>(
         context: context,
         builder: (context, style, animation) => ConfirmationDialog(
           title: title,
           message: message,
+          okButtonVariant: okButtonVariant,
         ),
       )) ==
       true;

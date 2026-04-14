@@ -61,5 +61,13 @@
     },
     "separator": "Or :"
   },
+  "invalidSessionDialog": {
+    "title": "Invalid session",
+    "message": "Your session has either expired or is invalid. Please log in again to synchronize your TOTPs.",
+    "button": {
+      "logIn": "Log in",
+      "logOut": "Log out"
+    }
+  },
   "providerPickerDialogTitle": "Pick a login method"
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
@@ -29,6 +30,12 @@ class TextInputDialog extends StatefulWidget {
   /// The initial value.
   final String initialValue;
 
+  /// The input formatters.
+  final List<TextInputFormatter>? inputFormatters;
+
+  /// The text capitalization.
+  final TextCapitalization? textCapitalization;
+
   /// Additional children to display.
   final List<Widget>? children;
 
@@ -41,6 +48,8 @@ class TextInputDialog extends StatefulWidget {
     this.validator,
     this.keyboardType,
     String? initialValue,
+    this.inputFormatters,
+    this.textCapitalization,
     this.children,
   }) : initialValue = initialValue ?? '';
 
@@ -56,6 +65,8 @@ class TextInputDialog extends StatefulWidget {
     FormFieldValidator<String>? validator,
     TextInputType? keyboardType,
     String? initialValue,
+    List<TextInputFormatter>? inputFormatters,
+        TextCapitalization? textCapitalization,
     List<Widget>? children,
   }) => showFDialog<String>(
     context: context,
@@ -66,6 +77,8 @@ class TextInputDialog extends StatefulWidget {
       validator: validator,
       keyboardType: keyboardType,
       initialValue: initialValue,
+      inputFormatters: inputFormatters,
+      textCapitalization: textCapitalization,
       children: children,
     ),
   );
@@ -127,6 +140,8 @@ class _TextInputDialogState extends State<TextInputDialog> {
           validator: widget.validator,
           keyboardType: widget.keyboardType,
           autovalidateMode: AutovalidateMode.always,
+          inputFormatters: widget.inputFormatters,
+          textCapitalization: widget.textCapitalization ?? .none,
         )
       else
         FTextFormField(
@@ -137,6 +152,8 @@ class _TextInputDialogState extends State<TextInputDialog> {
           validator: widget.validator,
           keyboardType: widget.keyboardType,
           autovalidateMode: AutovalidateMode.always,
+          inputFormatters: widget.inputFormatters,
+          textCapitalization: widget.textCapitalization ?? .none,
         ),
     ],
   );

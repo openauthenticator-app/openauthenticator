@@ -190,6 +190,7 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
                   context,
                   title: translations.totp.actions.deleteConfirmationDialog.title,
                   message: translations.totp.actions.deleteConfirmationDialog.message,
+                  okButtonVariant: .destructive,
                 );
                 if (!confirmation || !context.mounted) {
                   return;
@@ -212,8 +213,15 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
       ),
       footer: ClickableButton(
         style: .delta(
-          contentStyle: const .delta(
-            padding: .value(EdgeInsets.all(kBigSpace)),
+          contentStyle: .delta(
+            padding: .value(
+              EdgeInsets.only(
+                top: kBigSpace,
+                right: kBigSpace,
+                bottom: kBigSpace + MediaQuery.paddingOf(context).bottom,
+                left: kBigSpace,
+              ),
+            ),
           ),
           decoration: .delta(
             [

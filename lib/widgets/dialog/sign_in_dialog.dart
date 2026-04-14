@@ -15,6 +15,9 @@ import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
 import 'package:open_authenticator/widgets/dialog/text_input_dialog.dart';
 import 'package:open_authenticator/widgets/divider_text.dart';
 
+/// Represents a sign-in dialog action.
+typedef SignInDialogAction = Future<Result> Function();
+
 /// Allows to sign in in the user.
 class SignInDialog extends ConsumerStatefulWidget {
   /// Creates a new sign-in dialog instance.
@@ -26,7 +29,7 @@ class SignInDialog extends ConsumerStatefulWidget {
   ConsumerState<ConsumerStatefulWidget> createState() => _SignInDialogState();
 
   /// Opens the dialog.
-  static Future<SignInDialogResult?> openDialog(BuildContext context) => showFDialog<SignInDialogResult>(
+  static Future<SignInDialogAction?> openDialog(BuildContext context) => showFDialog<SignInDialogAction>(
     context: context,
     builder: (context, style, animation) => const SignInDialog(),
   );
@@ -49,13 +52,7 @@ class _SignInDialogState extends ConsumerState<SignInDialog> {
         padding: const EdgeInsets.only(bottom: kSpace),
         child: _EmailForm(
           onEmailValidated: (provider, email) {
-            Navigator.pop(
-              context,
-              SignInDialogResult(
-                action: () => ref.read(authenticationProviders).email.requestSignIn(email),
-                willNeedConfirmation: true,
-              ),
-            );
+            Navigator.pop(context, () => ref.read(authenticationProviders).email.requestSignIn(email));
           },
         ),
       ),
@@ -67,31 +64,11 @@ class _SignInDialogState extends ConsumerState<SignInDialog> {
       ),
       _OAuthenticationProvidersWrap(
         onProviderSelected: (provider) {
-          Navigator.pop(
-            context,
-            SignInDialogResult(
-              action: provider.requestSignIn,
-            ),
-          );
+          Navigator.pop(context, provider.requestSignIn);
         },
       ),
     ],
   );
-}
-
-/// Represents a sign-in dialog action.
-class SignInDialogResult {
-  /// The action.
-  final Future<Result> Function() action;
-
-  /// Whether the sign-in will need confirmation.
-  final bool willNeedConfirmation;
-
-  /// Creates a new sign-in dialog result instance.
-  const SignInDialogResult({
-    required this.action,
-    this.willNeedConfirmation = false,
-  });
 }
 
 /// Displays the email form.
