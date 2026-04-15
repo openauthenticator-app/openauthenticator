@@ -31,7 +31,7 @@ class Totps extends Table {
   TextColumn get encryptionSalt => text().map(const Uint8ListConverter())();
 
   /// Maps to [Totp.updatedAt].
-  IntColumn get updatedAt => integer()();
+  DateTimeColumn get updatedAt => dateTime().withDefault(Constant(DateTime.fromMillisecondsSinceEpoch(0)))();
 
   @override
   Set<Column> get primaryKey => {uuid};
@@ -82,7 +82,7 @@ class BackendPushOperationErrors extends Table {
   TextColumn get errorDetails => text().nullable()();
 
   /// Maps to [PushOperationResult.createdAt].
-  IntColumn get createdAt => integer()();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 }
 
 /// Represents a push operation kind.

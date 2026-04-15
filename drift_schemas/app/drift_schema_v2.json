@@ -136,10 +136,10 @@
           {
             "name": "updated_at",
             "getter_name": "updatedAt",
-            "moor_type": "int",
+            "moor_type": "dateTime",
             "nullable": false,
             "customConstraints": null,
-            "default_dart": null,
+            "default_dart": "const CustomExpression('0')",
             "default_client_dart": null,
             "dsl_features": []
           }
@@ -208,7 +208,7 @@
             "dsl_features": [],
             "type_converter": {
               "dart_expr": "const EnumNameConverter<PushOperationKind>(PushOperationKind.values)",
-              "dart_type_name": "PushOperationKind<dynamic>"
+              "dart_type_name": "PushOperationKind"
             }
           },
           {
@@ -295,10 +295,10 @@
           {
             "name": "created_at",
             "getter_name": "createdAt",
-            "moor_type": "int",
+            "moor_type": "dateTime",
             "nullable": false,
             "customConstraints": null,
-            "default_dart": null,
+            "default_dart": "const CustomExpression('CAST(strftime(\\'%s\\', CURRENT_TIMESTAMP) AS INTEGER)')",
             "default_client_dart": null,
             "dsl_features": []
           }
@@ -315,7 +315,7 @@
       "sql": [
         {
           "dialect": "sqlite",
-          "sql": "CREATE TABLE IF NOT EXISTS \"totps\" (\"uuid\" TEXT NOT NULL, \"secret\" TEXT NOT NULL, \"label\" TEXT NULL, \"issuer\" TEXT NULL, \"algorithm\" TEXT NULL, \"digits\" INTEGER NULL, \"validity\" INTEGER NULL, \"image_url\" TEXT NULL, \"encryption_salt\" TEXT NOT NULL, \"updated_at\" INTEGER NOT NULL, PRIMARY KEY (\"uuid\"));"
+          "sql": "CREATE TABLE IF NOT EXISTS \"totps\" (\"uuid\" TEXT NOT NULL, \"secret\" TEXT NOT NULL, \"label\" TEXT NULL, \"issuer\" TEXT NULL, \"algorithm\" TEXT NULL, \"digits\" INTEGER NULL, \"validity\" INTEGER NULL, \"image_url\" TEXT NULL, \"encryption_salt\" TEXT NOT NULL, \"updated_at\" INTEGER NOT NULL DEFAULT 0, PRIMARY KEY (\"uuid\"));"
         }
       ]
     },
@@ -342,7 +342,7 @@
       "sql": [
         {
           "dialect": "sqlite",
-          "sql": "CREATE TABLE IF NOT EXISTS \"backend_push_operation_errors\" (\"operation_uuid\" TEXT NOT NULL, \"totp_uuid\" TEXT NOT NULL, \"error_kind\" TEXT NOT NULL, \"error_details\" TEXT NULL, \"created_at\" INTEGER NOT NULL);"
+          "sql": "CREATE TABLE IF NOT EXISTS \"backend_push_operation_errors\" (\"operation_uuid\" TEXT NOT NULL, \"totp_uuid\" TEXT NOT NULL, \"error_kind\" TEXT NOT NULL, \"error_details\" TEXT NULL, \"created_at\" INTEGER NOT NULL DEFAULT (CAST(strftime('%s', CURRENT_TIMESTAMP) AS INTEGER)));"
         }
       ]
     }

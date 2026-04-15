@@ -103,7 +103,7 @@ class _SyncHeaderAction extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     StorageType? storageType = ref.watch(storageTypeSettingsEntryProvider).value;
-    if (storageType != StorageType.shared) {
+    if (storageType != .shared) {
       return const SizedBox.shrink();
     }
     SynchronizationPhase phase = ref.watch(synchronizationControllerProvider.select((status) => status.phase));
@@ -117,12 +117,14 @@ class _SyncHeaderAction extends ConsumerWidget {
           ),
         );
       case SynchronizationPhaseSyncing():
-        return const ClickableHeaderAction(
-          onPress: null,
-          icon: RotationAnimation(
-            child: Icon(FIcons.refreshCcw),
-          ),
-        );
+        return currentPlatform.isDesktop
+            ? const ClickableHeaderAction(
+                onPress: null,
+                icon: RotationAnimation(
+                  child: Icon(FIcons.refreshCcw),
+                ),
+              )
+            : const SizedBox.shrink();
       case SynchronizationPhaseError(:final exception, :final stackTrace):
         return ClickableHeaderAction(
           onPress: () async {

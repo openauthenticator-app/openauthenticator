@@ -72,12 +72,12 @@ class AppDialog extends StatelessWidget {
           width: MediaQuery.sizeOf(context).width,
           child: scrollable
               ? ListView(
-                  padding: EdgeInsets.zero,
+                  padding: .zero,
                   shrinkWrap: true,
                   children: children,
                 )
               : Column(
-                  mainAxisSize: MainAxisSize.min,
+                  mainAxisSize: .min,
                   children: children,
                 ),
         ),
@@ -96,8 +96,9 @@ class AppDialog extends StatelessWidget {
             .all(
               const .delta(
                 padding: .value(EdgeInsets.zero),
+                titlePadding: .value(EdgeInsets.zero),
+                bodyPadding: .value(EdgeInsets.zero),
                 titleSpacing: 0,
-                bodySpacing: 0,
                 contentSpacing: 0,
                 actionSpacing: 0,
               ),
@@ -158,16 +159,17 @@ class _AppDialogContent extends StatelessWidget {
       children: [
         if (title case final title?)
           Padding(
-            padding: .only(bottom: style.titleSpacing),
+            padding: style.titlePadding,
             child: Semantics(
               container: true,
               child: DefaultTextStyle.merge(textAlign: titleTextAlign, style: style.titleTextStyle, child: title),
             ),
           ),
+        if (title != null && body != null) SizedBox(height: style.titleSpacing),
         if (body case final body?)
           Flexible(
             child: Padding(
-              padding: .only(bottom: style.bodySpacing),
+              padding: style.bodyPadding,
               child: Semantics(
                 container: true,
                 child: DefaultTextStyle.merge(textAlign: bodyTextAlign, style: style.bodyTextStyle, child: body),
@@ -224,7 +226,7 @@ class _AdaptiveActionPadding extends StatelessWidget {
   @override
   Widget build(BuildContext context) => MediaQuery.sizeOf(context).width < context.theme.breakpoints.sm
       ? Padding(
-          padding: EdgeInsets.only(
+          padding: .only(
             top: actionIndex == 0 ? bigGap : gap,
             right: bigGap,
             bottom: actionIndex == actionsCount - 1 ? bigGap : gap,
@@ -233,7 +235,7 @@ class _AdaptiveActionPadding extends StatelessWidget {
           child: action,
         )
       : Padding(
-          padding: EdgeInsets.only(
+          padding: .only(
             top: bigGap,
             right: actionIndex == 0 ? bigGap : gap,
             bottom: bigGap,

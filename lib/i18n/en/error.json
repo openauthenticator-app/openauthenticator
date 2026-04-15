@@ -78,9 +78,16 @@
   },
   "passwordMismatch": "The new crypto store password is incorrect.",
   "migrator": {
+    "message": "An error occurred while migrating your data. Please try again.",
     "idToken": "Could not get ID token. Please try again later.",
     "httpError": "Migration failed. HTTP Error $statusCode : $body.",
-    "authProviderNotFound": "Could not find authentication provider $providerId.",
-    "migrationCancelled": "Migration cancelled."
+    "migrationCancelled": "Migration cancelled.",
+    "firebaseUserNotFound": "Firebase user cannot be found. Please contact us.",
+    "invalidIdToken": "Invalid ID token. Please contact us.",
+    "invalidUserId": "Invalid user ID. Please contact us.",
+    "userAlreadyMigrated": "Your account has been successfully migrated previously. Please log in with your credentials.",
+    "noSupportedAuthenticationProvider": "We cannot find any supported authentication provider. Please contact us.",
+    "userWithProviderIdAlreadyExists": "An user with the same provider ID already exists, so it's not possible to migrate your account with your current credentials. Please contact us.",
+    "userCreationFailed": "An error occurred while creating your account. Please contact us."
   }
 }

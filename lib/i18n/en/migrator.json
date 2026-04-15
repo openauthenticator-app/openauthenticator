@@ -4,6 +4,5 @@
   "button": {
     "migrate": "Migrate",
     "dontMigrate": "Don't migrate"
-  },
-  "error": "An error occurred while migrating your data. Please try again."
+  }
 }

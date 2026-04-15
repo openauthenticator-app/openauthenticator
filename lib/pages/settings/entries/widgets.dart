@@ -140,7 +140,7 @@ class RightChevronSuffix extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const Padding(
-    padding: EdgeInsets.symmetric(horizontal: 8),
+    padding: .symmetric(horizontal: 8),
     child: Icon(FIcons.chevronRight),
   );
 }

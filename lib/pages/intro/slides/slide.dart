@@ -209,7 +209,7 @@ class IntroPageSlideWidgetState extends State<IntroPageSlideWidget> with TickerP
   Widget build(BuildContext context) => Column(
     children: [
       Padding(
-        padding: EdgeInsets.only(
+        padding: .only(
           top: MediaQuery.paddingOf(context).top,
           bottom: kBigSpace * 2,
         ),
@@ -302,7 +302,7 @@ class IntroPageSlideParagraphWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: EdgeInsets.only(bottom: padding),
+    padding: .only(bottom: padding),
     child: Text.rich(
       textSpan,
       textAlign: textAlign,

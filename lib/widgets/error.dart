@@ -45,7 +45,7 @@ class ErrorAlert extends StatelessWidget {
         ),
       ),
       Padding(
-        padding: EdgeInsets.only(bottom: onRetryPressed == null ? 0 : kSpace),
+        padding: .only(bottom: onRetryPressed == null ? 0 : kSpace),
         child: FutureBuilder(
           future: canLaunchUrl(reportIssueUrl),
           builder: (context, asyncSnapshot) => ClickableButton(
@@ -147,7 +147,6 @@ class _ErrorWithStackTraceState extends State<ErrorWithStackTrace> with SingleTi
               value: expanded,
               onChange: toggleStackTrace,
               style: .delta(
-                childPadding: .value(EdgeInsets.only(right: context.theme.switchStyle.childPadding.horizontal / 2)),
                 trackColor: .delta(
                   [
                     .match({.selected}, context.theme.colors.error),
@@ -160,6 +159,7 @@ class _ErrorWithStackTraceState extends State<ErrorWithStackTrace> with SingleTi
             ClickableButton.icon(
               onPress: () async {
                 try {
+                  HapticFeedback.mediumImpact();
                   await Clipboard.setData(
                     ClipboardData(
                       text: details,

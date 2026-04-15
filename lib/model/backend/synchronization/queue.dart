@@ -48,7 +48,7 @@ class PushOperationsQueue extends AsyncNotifier<List<PushOperation>> {
   Future<Result> _push({bool checkSettings = true}) async {
     if (checkSettings) {
       StorageType storageType = await ref.read(storageTypeSettingsEntryProvider.future);
-      if (storageType == StorageType.localOnly) {
+      if (storageType == .localOnly) {
         return const ResultCancelled();
       }
     }

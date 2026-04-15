@@ -72,12 +72,16 @@ class AboutAppDialog extends StatelessWidget {
                 ),
             ],
           ),
+          textAlign: .center,
           style: context.theme.typography.lg,
         ),
       ),
       if (applicationLegalese != null)
         Center(
-          child: Text(applicationLegalese!),
+          child: Text(
+            applicationLegalese!,
+            textAlign: .center,
+          ),
         ),
     ],
   );
@@ -154,7 +158,7 @@ class _LicensesDialogState extends State<_LicensesDialog> {
         if (snapshot.hasError) ErrorWithStackTrace(error: snapshot.error),
         if (snapshot.data == null)
           const Padding(
-            padding: EdgeInsets.all(kBigSpace),
+            padding: .all(kBigSpace),
             child: CenteredCircularProgressIndicator(),
           )
         else
@@ -208,7 +212,7 @@ class _LicensesDialogState extends State<_LicensesDialog> {
       children: [
         for (LicenseParagraph paragraph in package.paragraphs)
           Padding(
-            padding: EdgeInsets.only(
+            padding: .only(
               left: math.max(0, paragraph.indent) * 12,
               bottom: kSpace,
             ),

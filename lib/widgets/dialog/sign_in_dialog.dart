@@ -202,7 +202,7 @@ class _OAuthenticationProvidersWrap extends ConsumerWidget {
                     onTapIfLoggedOut: () => onProviderSelected(provider),
                     providerId: provider.id,
                     size: circleButtonSize,
-                    padding: EdgeInsets.all(circleButtonPadding),
+                    padding: .all(circleButtonPadding),
                   ),
               ],
             )
@@ -211,7 +211,7 @@ class _OAuthenticationProvidersWrap extends ConsumerWidget {
               children: [
                 for (int i = 0; i < providers.length; i++)
                   Padding(
-                    padding: EdgeInsets.only(bottom: i < providers.length - 1 ? 10 : 0),
+                    padding: .only(bottom: i < providers.length - 1 ? 10 : 0),
                     child: _ProviderButton(
                       onPressIfLoggedOut: () => onProviderSelected(providers.elementAt(i)),
                       providerId: providers.elementAt(i).id,

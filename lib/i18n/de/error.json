@@ -78,9 +78,16 @@
   },
   "passwordMismatch": "Das neue Passwort für den Krypto-Speicher ist nicht korrekt.",
   "migrator": {
+    "message": "Beim Migrieren Ihrer Daten ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
     "idToken": "ID-Token konnte nicht abgerufen werden. Bitte versuche es später erneut.",
     "httpError": "Migration fehlgeschlagen. HTTP-Fehler $statusCode: $body.",
-    "authProviderNotFound": "Authentifizierungsanbieter $providerId konnte nicht gefunden werden.",
-    "migrationCancelled": "Migration abgebrochen."
+    "migrationCancelled": "Migration abgebrochen.",
+    "firebaseUserNotFound": "Firebase-Benutzer konnte nicht gefunden werden. Bitte kontaktieren Sie uns.",
+    "invalidIdToken": "Ungültiges ID-Token. Bitte kontaktieren Sie uns.",
+    "invalidUserId": "Ungültige Benutzer-ID. Bitte kontaktieren Sie uns.",
+    "userAlreadyMigrated": "Ihr Konto wurde bereits erfolgreich migriert. Bitte melden Sie sich mit Ihren Zugangsdaten an.",
+    "noSupportedAuthenticationProvider": "Wir konnten keinen unterstützten Authentifizierungsanbieter finden. Bitte kontaktieren Sie uns.",
+    "userWithProviderIdAlreadyExists": "Ein Benutzer mit derselben Provider-ID existiert bereits, daher ist eine Migration Ihres Kontos mit Ihren aktuellen Zugangsdaten nicht möglich. Bitte kontaktieren Sie uns.",
+    "userCreationFailed": "Beim Erstellen Ihres Kontos ist ein Fehler aufgetreten. Bitte kontaktieren Sie uns."
   }
 }

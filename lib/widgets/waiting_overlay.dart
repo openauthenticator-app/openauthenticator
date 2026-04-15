@@ -88,7 +88,7 @@ class _WaitingDialog extends StatelessWidget {
         Row(
           children: [
             const Padding(
-              padding: EdgeInsets.only(
+              padding: .only(
                 top: kSpace,
                 right: kBigSpace,
                 bottom: kSpace,

@@ -17,11 +17,14 @@ class AppScaffold extends StatelessWidget {
   /// Whether to center the list.
   final bool center;
 
+  /// The padding of the scaffold.
+  final EdgeInsets? padding;
+
   /// The scaffold style.
   final FScaffoldStyleDelta scaffoldStyle;
 
   /// Builds a list of widgets.
-  final Widget Function(List<Widget> children) _widgetBuilder;
+  final Widget Function(List<Widget> children, EdgeInsets padding) _widgetBuilder;
 
   /// Creates a new app scaffold instance.
   const AppScaffold({
@@ -30,6 +33,7 @@ class AppScaffold extends StatelessWidget {
     required this.children,
     this.footer,
     this.center = false,
+    this.padding,
     this.scaffoldStyle = const .context(),
   }) : _widgetBuilder = _defaultWidgetBuilder;
 
@@ -40,16 +44,19 @@ class AppScaffold extends StatelessWidget {
     required this.children,
     this.footer,
     this.center = false,
+    this.padding,
     this.scaffoldStyle = const .context(),
   }) : _widgetBuilder = _defaultScrollableWidgetBuilder;
 
   /// Creates a new app scaffold instance from an [asyncValue].
   static AppScaffold asyncValue<T>({
+    bool scrollable = true,
     Widget? header,
     Widget Function(T value)? headerBuilder,
     Widget? footer,
     Widget Function(T value)? footerBuilder,
-    bool scrollable = true,
+    EdgeInsets? padding,
+    EdgeInsets Function(T value)? paddingBuilder,
     bool? center,
     FScaffoldStyleDelta scaffoldStyle = const .context(),
     required AsyncValue<T> asyncValue,
@@ -67,7 +74,26 @@ class AppScaffold extends StatelessWidget {
       _ => footer,
     },
     scaffoldStyle: scaffoldStyle,
-    center: center ?? (!asyncValue.hasValue || (asyncValue is Iterable ? (asyncValue.value as Iterable).isEmpty : asyncValue.value == null)),
+    padding: switch (asyncValue) {
+      AsyncValue(:final value, hasValue: true) => paddingBuilder?.call(value!) ?? padding,
+      AsyncError() => padding,
+      _ => padding,
+    },
+    center: (() {
+      if (asyncValue.hasError) {
+        return false;
+      }
+      if (asyncValue.isLoading || !asyncValue.hasValue) {
+        return true;
+      }
+      if (center != null) {
+        return center;
+      }
+      if (asyncValue is Iterable) {
+        return (asyncValue.value as Iterable).isEmpty;
+      }
+      return false;
+    })(),
     children: switch (asyncValue) {
       AsyncValue(:final value, hasValue: true) => builder(value!),
       AsyncError(:final error, :final stackTrace) => [
@@ -85,7 +111,7 @@ class AppScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget child = _widgetBuilder.call(children);
+    Widget child = _widgetBuilder.call(children, padding ?? context.theme.style.pagePadding);
     return FScaffold(
       scaffoldStyle: scaffoldStyle,
       childPad: false,
@@ -96,30 +122,25 @@ class AppScaffold extends StatelessWidget {
   }
 
   /// Builds the non-scrollable widget.
-  static Widget _defaultWidgetBuilder(List<Widget> children) => children.length == 1
-      ? children.first
-      : Column(
-          mainAxisSize: .min,
-          children: children,
-        );
+  static Widget _defaultWidgetBuilder(List<Widget> children, EdgeInsets padding) => Padding(
+    padding: padding,
+    child: children.length == 1
+        ? children.first
+        : Column(
+            mainAxisSize: .min,
+            children: children,
+          ),
+  );
 
   /// Builds the scrollable widget.
-  static Widget _defaultScrollableWidgetBuilder(List<Widget> children) => children.length == 1
-      ? Builder(
-          builder: (context) {
-            return SingleChildScrollView(
-              padding: context.theme.style.pagePadding,
-              child: children.first,
-            );
-          },
+  static Widget _defaultScrollableWidgetBuilder(List<Widget> children, EdgeInsets padding) => children.length == 1
+      ? SingleChildScrollView(
+          padding: padding,
+          child: children.first,
         )
-      : Builder(
-          builder: (context) {
-            return ListView(
-              shrinkWrap: true,
-              padding: context.theme.style.pagePadding,
-              children: children,
-            );
-          },
+      : ListView(
+          shrinkWrap: true,
+          padding: padding,
+          children: children,
         );
 }

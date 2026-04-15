@@ -50,7 +50,10 @@ class AppDatabase extends _$AppDatabase {
 
   /// Stores the given [totp].
   Future<void> addTotp(Totp totp) async {
-    await into(totps).insert(totp.asDriftTotp);
+    await into(totps).insert(
+      totp.asDriftTotp,
+      mode: .insertOrReplace,
+    );
   }
 
   /// Stores the given [totps].
@@ -59,7 +62,7 @@ class AppDatabase extends _$AppDatabase {
       batch.insertAll(
         this.totps,
         totps.map((totp) => totp.asDriftTotp),
-        mode: InsertMode.insertOrReplace,
+        mode: .insertOrReplace,
       );
     });
   }
@@ -266,7 +269,7 @@ class AppDatabase extends _$AppDatabase {
               operation.operationUuid.isValue(error.operationUuid) &
               operation.errorKind.isValue(error.errorCode) &
               operation.errorDetails.isValue(error.errorDetails!) &
-              operation.createdAt.isValue(error.createdAt.millisecondsSinceEpoch),
+              operation.createdAt.isValue(error.createdAt),
         ))
         .go();
   }
@@ -294,7 +297,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// Imports the legacy database if needed.
   static Future<void> _importLegacyDatabaseIfNeeded() async {
-    File oldDatabase = await _getDatabaseFile(_kLegacyDbFileName, addDebugModeSuffix: false);
+    File oldDatabase = await _getDatabaseFile(_kLegacyDbFileName);
     if (!await oldDatabase.exists()) {
       return;
     }
@@ -378,6 +381,7 @@ extension _Migrations on GeneratedDatabase {
   /// Returns the migration strategy.
   OnUpgrade get schemaUpgrade => stepByStep(
     from1To2: (migrator, schema) async {
+      await migrator.addColumn(schema.totps, schema.totps.updatedAt);
       await migrator.createTable(schema.deletedTotps);
       await migrator.createTable(schema.pendingBackendPushOperations);
       await migrator.createTable(schema.backendPushOperationErrors);

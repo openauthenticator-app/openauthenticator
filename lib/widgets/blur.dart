@@ -11,9 +11,6 @@ class Blur extends StatelessWidget {
   /// A widget to display above the blur effect.
   final Widget? above;
 
-  /// Value of blur effect, higher the blur more the blur effect.
-  final double blur;
-
   /// Radius of the child to be blurred.
   final BorderRadius? borderRadius;
 
@@ -31,7 +28,6 @@ class Blur extends StatelessWidget {
     super.key,
     this.below,
     this.above,
-    this.blur = 5,
     this.borderRadius,
     this.colorOpacity = 0.5,
     this.overlay,
@@ -46,7 +42,7 @@ class Blur extends StatelessWidget {
         ?below,
         Positioned.fill(
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
+            filter: context.theme.dialogRouteStyle.barrierFilter?.call(1) ?? ImageFilter.blur(sigmaX: 5, sigmaY: 5),
             child: Container(
               decoration: BoxDecoration(
                 color: context.theme.colors.background.withValues(alpha: colorOpacity),

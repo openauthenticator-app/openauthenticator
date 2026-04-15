@@ -68,7 +68,7 @@ class ImageTextActions extends StatelessWidget {
         child: image,
       ),
       Padding(
-        padding: EdgeInsets.only(bottom: actions.isEmpty ? 0 : kBigSpace),
+        padding: .only(bottom: actions.isEmpty ? 0 : kBigSpace),
         child: Text(
           text,
           textAlign: TextAlign.center,
@@ -77,7 +77,7 @@ class ImageTextActions extends StatelessWidget {
       for (int i = 0; i < actions.length; i++)
         Center(
           child: Padding(
-            padding: EdgeInsets.only(bottom: i == actions.length - 1 ? 0 : kSpace),
+            padding: .only(bottom: i == actions.length - 1 ? 0 : kSpace),
             child: actions[i],
           ),
         ),

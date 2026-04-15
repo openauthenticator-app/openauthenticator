@@ -22,7 +22,8 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
   FutureOr<List<Totp>> build() async {
     AppDatabase database = ref.watch(appDatabaseProvider);
     CryptoStore? cryptoStore = await ref.watch(cryptoStoreProvider.future);
-    return await (await database.listTotps()).decrypt(cryptoStore);
+    List<Totp> decrypted = await (await database.listTotps()).decrypt(cryptoStore);
+    return decrypted.sortCanonically();
   }
 
   /// Tries to decrypt all TOTPs with the given [cryptoStore].
@@ -38,7 +39,7 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
     if (!ref.mounted) {
       return {};
     }
-    state = AsyncData(newTotpsList);
+    state = AsyncData(newTotpsList.sortCanonically());
     return difference;
   }
 
@@ -78,7 +79,7 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
         await database.addTotps(totps);
       }
       StorageType storageType = await ref.read(storageTypeSettingsEntryProvider.future);
-      if (storageType == StorageType.shared && !fromNetwork) {
+      if (storageType == .shared && !fromNetwork) {
         _enqueue(
           SetTotpsPushOperation(
             totps: totps,
@@ -107,7 +108,7 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
       AppDatabase database = ref.read(appDatabaseProvider);
       await database.replaceTotps(totps);
       StorageType storageType = await ref.read(storageTypeSettingsEntryProvider.future);
-      if (storageType == StorageType.shared && !fromNetwork) {
+      if (storageType == .shared && !fromNetwork) {
         _enqueue(
           DeleteTotpsPushOperation(
             uuids: [
@@ -174,18 +175,20 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
         await database.updateTotp(totps.first);
       }
       StorageType storageType = await ref.read(storageTypeSettingsEntryProvider.future);
-      if (storageType == StorageType.shared && !fromNetwork) {
+      if (storageType == .shared && !fromNetwork) {
         _enqueue(
           SetTotpsPushOperation(
             totps: totps,
           ),
         );
       }
-      await ref.read(totpImageCacheManagerProvider.notifier).fillCache(totps: totps);
+      CryptoStore? cryptoStore = await ref.read(cryptoStoreProvider.future);
+      List<Totp> decrypted = await totps.decrypt(cryptoStore);
+      await ref.read(totpImageCacheManagerProvider.notifier).fillCache(totps: decrypted);
       if (!ref.mounted) {
         return const ResultCancelled();
       }
-      state = AsyncData(totpsList.createMergedList(totps: totps));
+      state = AsyncData(totpsList.createMergedList(totps: decrypted));
       return const ResultSuccess();
     } catch (ex, stackTrace) {
       return ResultError(
@@ -215,7 +218,7 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
       await database.deleteTotps(uuids);
       await database.markAsDeleted(uuids);
       StorageType storageType = await ref.read(storageTypeSettingsEntryProvider.future);
-      if (storageType == StorageType.shared && !fromNetwork) {
+      if (storageType == .shared && !fromNetwork) {
         _enqueue(
           DeleteTotpsPushOperation(
             uuids: uuids,
@@ -269,7 +272,7 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
         AppDatabase database = ref.read(appDatabaseProvider);
         await database.replaceTotps(newTotps);
         StorageType storageType = await ref.read(storageTypeSettingsEntryProvider.future);
-        if (storageType == StorageType.shared) {
+        if (storageType == .shared) {
           _enqueue(
             SetTotpsPushOperation(
               totps: newTotps,
@@ -300,8 +303,35 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
 
 /// Allows to easily decrypt a TOTP list.
 extension _DecryptList on List<Totp> {
+  /// Sorts the TOTP list.
+  List<Totp> sortCanonically() => List.of(this)
+    ..sort((a, b) {
+      if (a.isDecrypted) {
+        if (b.isDecrypted) {
+          int issuersComparison = ((a as DecryptedTotp).issuer ?? '').compareTo((b as DecryptedTotp).issuer ?? '');
+          if (issuersComparison != 0) {
+            return issuersComparison;
+          }
+          int labelsComparison = (a.label ?? '').compareTo(b.label ?? '');
+          if (labelsComparison != 0) {
+            return labelsComparison;
+          }
+          return a.uuid.compareTo(b.uuid);
+        }
+        return -1;
+      }
+      if (b.isDecrypted) {
+        return 1;
+      }
+      return a.uuid.compareTo(b.uuid);
+    });
+
   /// Merges the [totp] to the current TOTP list.
-  List<Totp> createMergedList({Totp? totp, List<Totp>? totps}) {
+  List<Totp> createMergedList({
+    Totp? totp,
+    List<Totp>? totps,
+    bool sort = true,
+  }) {
     List<Totp> from = [
       ?totp,
       if (totps != null)
@@ -310,11 +340,12 @@ extension _DecryptList on List<Totp> {
     Set<String> uuids = {
       for (Totp totp in from) totp.uuid,
     };
-    return [
+    List<Totp> result = [
       ...from,
       for (Totp totp in this)
         if (!uuids.contains(totp.uuid)) totp,
     ];
+    return sort ? result.sortCanonically() : result;
   }
 
   /// Decrypts the current list.

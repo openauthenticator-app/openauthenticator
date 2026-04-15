@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:forui/forui.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/totp/decrypted.dart';
@@ -176,6 +177,7 @@ class TotpTile extends StatelessWidget {
     VoidCallback? onEditPress,
     VoidCallback? onDeletePress,
   }) async {
+    HapticFeedback.heavyImpact();
     _MobileActionsDialogResult? choice = await showFDialog<_MobileActionsDialogResult>(
       context: context,
       builder: (context, style, animation) => _MobileActionsDialog(
@@ -188,10 +190,10 @@ class TotpTile extends StatelessWidget {
       return;
     }
     switch (choice) {
-      case _MobileActionsDialogResult.edit:
+      case .edit:
         onEditPress?.call();
         break;
-      case _MobileActionsDialogResult.delete:
+      case .delete:
         onDeletePress?.call();
         break;
     }

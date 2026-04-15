@@ -15,7 +15,7 @@ extension _ToOpenAuthenticatorTotp on _DriftTotp {
     algorithm: algorithm,
     digits: digits,
     validity: validity,
-    updatedAt: DateTime.fromMillisecondsSinceEpoch(updatedAt),
+    updatedAt: updatedAt,
   );
 }
 
@@ -44,7 +44,7 @@ extension _ToOpenAuthenticatorBackendPushOperationError on _DriftBackendPushOper
     totpUuid: totpUuid,
     errorCode: errorKind.name,
     errorDetails: errorDetails,
-    createdAt: DateTime.fromMillisecondsSinceEpoch(createdAt),
+    createdAt: createdAt,
   );
 }
 
@@ -61,7 +61,7 @@ extension _ToDriftTotp on Totp {
     issuer: encryptedData.encryptedIssuer,
     imageUrl: encryptedData.encryptedImageUrl,
     encryptionSalt: encryptedData.encryptionSalt.value,
-    updatedAt: updatedAt.millisecondsSinceEpoch,
+    updatedAt: updatedAt,
   );
 }
 
@@ -89,7 +89,7 @@ extension _ToDriftBackendPushOperationError on PushOperationResult {
       totpUuid: totpUuid,
       errorKind: errorKind!,
       errorDetails: errorDetails,
-      createdAt: createdAt.millisecondsSinceEpoch,
+      createdAt: createdAt,
     );
   }
 }

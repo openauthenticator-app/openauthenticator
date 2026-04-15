@@ -3,9 +3,11 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:open_authenticator/i18n/localizable_exception.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/migrator/migrator.dart';
 import 'package:open_authenticator/model/settings/storage_type.dart';
+import 'package:open_authenticator/pages/settings/page.dart';
 import 'package:open_authenticator/spacing.dart';
 import 'package:open_authenticator/utils/account.dart';
 import 'package:open_authenticator/utils/result.dart';
@@ -32,63 +34,67 @@ class Migrator extends ConsumerWidget {
     AsyncValue<MigrationState> migrationState = ref.watch(migratorProvider);
     return switch (migrationState) {
       AsyncData(:final value) => switch (value) {
-        MigrationState.needed => AppScaffold(
+        .needed => AppScaffold(
           center: true,
+          padding: .zero,
           children: [
             Blur(
-              above: Center(
-                child: ListView(
-                  shrinkWrap: true,
-                  padding: context.theme.style.pagePadding,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: kBigSpace),
-                      child: Text(
-                        translations.migrator.title,
-                        textAlign: TextAlign.center,
-                        style: context.theme.typography.xl2,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: kBigSpace),
-                      child: Text(
-                        translations.migrator.message,
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: kSpace),
-                      child: SizedBox(
-                        width: math.min(MediaQuery.sizeOf(context).width - kBigSpace, 300),
-                        child: ClickableButton(
-                          onPress: () => _migrate(context, ref),
-                          prefix: const Icon(FIcons.cloudSync),
-                          child: ButtonText(translations.migrator.button.migrate),
+              above: Padding(
+                padding: context.theme.style.pagePadding,
+                child: Center(
+                  child: ListView(
+                    shrinkWrap: true,
+                    padding: context.theme.style.pagePadding,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: kBigSpace),
+                        child: Text(
+                          translations.migrator.title,
+                          textAlign: TextAlign.center,
+                          style: context.theme.typography.xl2,
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      width: math.min(MediaQuery.sizeOf(context).width - kBigSpace, 300),
-                      child: ClickableButton(
-                        variant: .destructive,
-                        onPress: () async {
-                          await showWaitingOverlay(
-                            context,
-                            future: ref.read(migratorProvider.notifier).markMigrated(),
-                          );
-                        },
-                        prefix: const Icon(FIcons.cloudAlert),
-                        child: ButtonText(translations.migrator.button.dontMigrate),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: kBigSpace),
+                        child: Text(
+                          translations.migrator.message,
+                          textAlign: TextAlign.center,
+                        ),
                       ),
-                    ),
-                  ],
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: kSpace),
+                        child: SizedBox(
+                          width: math.min(MediaQuery.sizeOf(context).width - kBigSpace, 300),
+                          child: ClickableButton(
+                            onPress: () => _migrate(context, ref),
+                            prefix: const Icon(FIcons.cloudSync),
+                            child: ButtonText(translations.migrator.button.migrate),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: math.min(MediaQuery.sizeOf(context).width - kBigSpace, 300),
+                        child: ClickableButton(
+                          variant: .destructive,
+                          onPress: () async {
+                            await showWaitingOverlay(
+                              context,
+                              future: ref.read(migratorProvider.notifier).markMigrated(),
+                            );
+                          },
+                          prefix: const Icon(FIcons.cloudAlert),
+                          child: ButtonText(translations.migrator.button.dontMigrate),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               below: child,
             ),
           ],
         ),
-        MigrationState.notNeeded || MigrationState.done => child,
+        .notNeeded || .done => child,
       },
       _ => child,
     };
@@ -107,15 +113,16 @@ class Migrator extends ConsumerWidget {
       case ResultSuccess(:final value):
         context.handleResult(result);
         if (value == .shared) {
+          Navigator.pushNamed(context, SettingsPage.name);
           await AccountUtils.tryRequestSignIn(context);
         }
         break;
-      case ResultError():
+      case ResultError(:final exception, :final stackTrace):
         ErrorDialogResult? errorResult = await ErrorDialog.openDialog(
           context,
-          message: translations.migrator.error,
-          error: result.exception,
-          stackTrace: result.stackTrace,
+          message: exception is LocalizableException ? exception.localizedErrorMessage : translations.error.migrator.message,
+          error: exception,
+          stackTrace: stackTrace,
         );
         if (errorResult == .retry && context.mounted) {
           await _migrate(context, ref);

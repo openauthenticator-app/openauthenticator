@@ -125,6 +125,7 @@ class _TotpsListWidget extends ConsumerWidget {
 
   /// Allows to copy the code to the clipboard.
   static Future<void> copyCode(BuildContext context, DecryptedTotp totp) async {
+    HapticFeedback.mediumImpact();
     await Clipboard.setData(ClipboardData(text: totp.generateCode()));
     if (context.mounted) {
       showSuccessToast(context, text: translations.totp.actions.copyConfirmation);
@@ -207,7 +208,7 @@ class _TotpsListWidget extends ConsumerWidget {
     }
 
     switch (choice) {
-      case TotpDecryptDialogResult.changeTotpKey:
+      case .changeTotpKey:
         Result result = await showWaitingOverlay(
           context,
           future: changeTotpsKey(decryptedTotps.$1, [decryptedTotps.$2.first]),
@@ -216,7 +217,7 @@ class _TotpsListWidget extends ConsumerWidget {
           context.handleResult(result);
         }
         break;
-      case TotpDecryptDialogResult.changeAllTotpsKey:
+      case .changeAllTotpsKey:
         Result result = await showWaitingOverlay(
           context,
           future: changeTotpsKey(decryptedTotps.$1, decryptedTotps.$2),
@@ -225,7 +226,7 @@ class _TotpsListWidget extends ConsumerWidget {
           context.handleResult(result);
         }
         break;
-      case TotpDecryptDialogResult.changeMasterPassword:
+      case .changeMasterPassword:
         await MasterPasswordUtils.changeMasterPassword(context, ref, password: password);
         break;
       default:

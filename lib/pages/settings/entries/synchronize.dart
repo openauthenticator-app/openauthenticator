@@ -101,7 +101,7 @@ class SynchronizeSettingsEntryWidget extends CheckboxSettingsEntryWidget<Storage
             TextSpan(
               text: '\n${translations.settings.synchronization.synchronizeTotps.subtitle.totpLimit.notEnabled}',
             ),
-          if (storageType == .shared && contributorPlanState != .impossible)
+          if (storageType == .shared && contributorPlanState == .inactive)
             TextSpan(
               text: '\n${translations.settings.synchronization.synchronizeTotps.subtitle.totpLimit.enabled}',
             ),

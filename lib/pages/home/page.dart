@@ -108,7 +108,8 @@ class _HomePageState extends ConsumerState<HomePage> {
     bool displaySearchButton = ref.read(displaySearchButtonSettingsEntryProvider).value ?? true;
     return AppScaffold.asyncValue(
       asyncValue: totps,
-      scrollable: false,
+      scrollable: !totps.hasValue,
+      paddingBuilder: (_) => EdgeInsets.zero,
       header: _HomePageHeader(
         showAddButton: !_RevealFloatingActionButtonWidget.hasFloatingActionButton,
         onAddButtonPress: () => onAddButtonPress(context),

@@ -78,9 +78,16 @@
   },
   "passwordMismatch": "Le mot de passe du magasin de chiffrement est incorrect.",
   "migrator": {
+    "message": "Une erreur est survenue lors de la migration de vos données. Veuillez réessayer.",
     "idToken": "Impossible de récupérer le jeton d'identification. Veuillez réessayer plus tard.",
     "httpError": "Migration échouée. Erreur HTTP $statusCode : $body.",
-    "authProviderNotFound": "Impossible de trouver le fournisseur d'authentification $providerId.",
-    "migrationCancelled": "Migration annulée."
+    "migrationCancelled": "Migration annulée.",
+    "firebaseUserNotFound": "Utilisateur Firebase introuvable. Veuillez nous contacter.",
+    "invalidIdToken": "Jeton ID invalide. Veuillez nous contacter.",
+    "invalidUserId": "ID utilisateur invalide. Veuillez nous contacter.",
+    "userAlreadyMigrated": "Votre compte a déjà été migré avec succès. Veuillez vous connecter avec vos identifiants.",
+    "noSupportedAuthenticationProvider": "Aucun fournisseur d'authentification pris en charge n'a été trouvé. Veuillez nous contacter.",
+    "userWithProviderIdAlreadyExists": "Un utilisateur avec le même identifiant de fournisseur existe déjà, il n'est donc pas possible de migrer votre compte avec vos identifiants actuels. Veuillez nous contacter.",
+    "userCreationFailed": "Une erreur est survenue lors de la création de votre compte. Veuillez nous contacter."
   }
 }

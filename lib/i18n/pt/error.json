@@ -78,9 +78,16 @@
   },
   "passwordMismatch": "A senha do armazenamento de criptografia está incorreta.",
   "migrator": {
+    "message": "Ocorreu um erro ao migrar os seus dados. Por favor, tente novamente.",
     "idToken": "Não foi possível obter o token de identificação. Tente novamente mais tarde.",
     "httpError": "Migração falhou. Erro HTTP $statusCode : $body.",
-    "authProviderNotFound": "Não foi possível encontrar o provedor de autenticação $providerId.",
-    "migrationCancelled": "Migração cancelada."
+    "migrationCancelled": "Migração cancelada.",
+    "firebaseUserNotFound": "Utilizador Firebase não encontrado. Por favor, contacte-nos.",
+    "invalidIdToken": "Token de ID inválido. Por favor, contacte-nos.",
+    "invalidUserId": "ID de utilizador inválido. Por favor, contacte-nos.",
+    "userAlreadyMigrated": "A sua conta foi migrada com sucesso anteriormente. Por favor, inicie sessão com as suas credenciais.",
+    "noSupportedAuthenticationProvider": "Não conseguimos encontrar nenhum fornecedor de autenticação suportado. Por favor, contacte-nos.",
+    "userWithProviderIdAlreadyExists": "Já existe um utilizador com o mesmo ID de fornecedor, pelo que não é possível migrar a sua conta com as suas credenciais atuais. Por favor, contacte-nos.",
+    "userCreationFailed": "Ocorreu un erro ao criar a sua conta. Por favor, contacte-nos."
   }
 }

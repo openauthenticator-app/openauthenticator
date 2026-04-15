@@ -22,6 +22,7 @@ class ContributorPlanPaywallPage extends ConsumerWidget {
             onDismiss: () => Navigator.pop(context, false),
           )
         : null,
+    padding: shouldFallback ? null : .zero,
     children: [
       if (shouldFallback)
         ContributorPlanFallbackPaywall(

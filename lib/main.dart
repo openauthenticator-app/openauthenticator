@@ -27,6 +27,7 @@ import 'package:open_authenticator/utils/rate_my_app.dart';
 import 'package:open_authenticator/utils/result.dart';
 import 'package:open_authenticator/utils/utils.dart';
 import 'package:open_authenticator/widgets/animated_theme.dart';
+import 'package:open_authenticator/widgets/app_scaffold.dart';
 import 'package:open_authenticator/widgets/centered_circular_progress_indicator.dart';
 import 'package:open_authenticator/widgets/dialog/invalid_session_dialog.dart';
 import 'package:open_authenticator/widgets/dialog/totp_limit_dialog.dart';
@@ -115,9 +116,15 @@ class OpenAuthenticatorApp extends ConsumerWidget {
         showIntroState: 'error',
         theme: theme,
         locale: locale,
-        home: ErrorAlert(
-          error: error,
-          stackTrace: stackTrace,
+        home: Builder(
+          builder: (context) => AppScaffold.scrollable(
+            children: [
+              ErrorAlert(
+                error: error,
+                stackTrace: stackTrace,
+              ),
+            ],
+          ),
         ),
       ),
       _ => _createMaterialApp(

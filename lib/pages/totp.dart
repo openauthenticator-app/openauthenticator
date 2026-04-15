@@ -207,7 +207,10 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
                   Navigator.pop(context);
                 }
               },
-              icon: const Icon(FIcons.trash),
+              icon: Icon(
+                FIcons.trash,
+                color: context.theme.colors.destructive,
+              ),
             ),
         ],
       ),

@@ -22,7 +22,7 @@ class ScannerErrorWidget extends StatelessWidget {
       padding: const EdgeInsets.all(kBigSpace),
       children: [
         const Padding(
-          padding: EdgeInsets.only(bottom: kBigSpace),
+          padding: .only(bottom: kBigSpace),
           child: Icon(FIcons.circleAlert),
         ),
         Text(

@@ -86,7 +86,10 @@ class ConfirmEmailSettingsEntryWidget extends ConsumerWidget with FTileMixin {
     if (code == null || !context.mounted) {
       return;
     }
-    Result<RedirectResult> result = await ref.read(authenticationProviders).email.confirm(code);
+    Result<RedirectResult> result = await showWaitingOverlay(
+      context,
+      future: ref.read(authenticationProviders).email.confirm(code),
+    );
     if (context.mounted) {
       context.handleResult(
         result,

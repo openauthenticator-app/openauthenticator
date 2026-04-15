@@ -66,7 +66,7 @@ class _IntroPageState extends ConsumerState<IntroPage> with BrightnessListener {
       footerBuilder: (slideState) {
         bool hasFinished = slideState.slideIndex == slideState.slideCount - 1;
         return Padding(
-          padding: EdgeInsets.only(
+          padding: .only(
             top: kSpace,
             right: kBigSpace,
             bottom: kSpace + MediaQuery.paddingOf(context).bottom,

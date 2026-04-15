@@ -56,7 +56,7 @@ class _UnlockChallengeState extends ConsumerState<UnlockChallenge> {
         value == .unlocked
             ? widget.child
             : AppScaffold(
-                center: true,
+                padding: .zero,
                 children: [
                   Blur(
                     above: switch (cannotUnlockException) {
@@ -146,6 +146,7 @@ class _UnlockChallengeContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Center(
     child: ListView(
+      padding: context.theme.style.pagePadding,
       shrinkWrap: true,
       children: [
         Padding(

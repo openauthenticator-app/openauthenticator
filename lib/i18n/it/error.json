@@ -78,9 +78,16 @@
   },
   "passwordMismatch": "La password del store di crittografia è errata",
   "migrator": {
+    "message": "Si è verificato un errore durante la migrazione dei tuoi dati. Per favore, riprova.",
     "idToken": "Impossibile ottenere il token di identificazione. Riprova più tardi.",
     "httpError": "Migrazione fallita. Errore HTTP $statusCode: $body.",
-    "authProviderNotFound": "Impossibile trovare il fornitore di autenticazione $providerId.",
-    "migrationCancelled": "Migrazione annullata."
+    "migrationCancelled": "Migrazione annullata.",
+    "firebaseUserNotFound": "Utente Firebase non trovato. Contattaci.",
+    "invalidIdToken": "Token ID non valido. Contattaci.",
+    "invalidUserId": "ID utente non valido. Contattaci.",
+    "userAlreadyMigrated": "Il tuo account è già stato migrato correttamente. Accedi con le tue credenziali.",
+    "noSupportedAuthenticationProvider": "Non è stato trovato alcun fornitore di autenticazione supportato. Contattaci.",
+    "userWithProviderIdAlreadyExists": "Esiste già un utente con lo stesso ID fornitore, quindi non è possibile migrare il tuo account con le tue credenziali attuali. Contattaci.",
+    "userCreationFailed": "Si è verificato un errore durante la creazione del tuo account. Contattaci."
   }
 }

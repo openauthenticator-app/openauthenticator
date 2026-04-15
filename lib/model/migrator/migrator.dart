@@ -69,16 +69,26 @@ class Migrator extends AsyncNotifier<MigrationState> {
             'debug': kDebugMode,
           }),
         );
-        if (response.statusCode != 200) {
-          if (response.statusCode == 400 && response.body.contains('User already migrated')) {
+        Map<String, dynamic> json = {'success': false};
+        try {
+          json = jsonDecode(response.body);
+        } on FormatException catch (_) {
+          throw _HttpErrorException(response: response);
+        }
+        if (!json['success']) {
+          String errorCode = json['data']?['errorCode'] ?? 'migration';
+          if (errorCode == 'userAlreadyExists') {
             await markMigrated();
             return const ResultSuccess(value: .shared);
           }
-          throw _HttpErrorException(response: response);
+          throw _MigrationRequestException(
+            errorCode: errorCode,
+            message: json['data']?['message'],
+          );
         }
       }
       await markMigrated();
-      return const ResultSuccess(value: .localOnly);
+      return ResultSuccess(value: newStorageType);
     } catch (ex, stackTrace) {
       if (ref.mounted) {
         state = AsyncError(ex, stackTrace);
@@ -132,4 +142,33 @@ class _HttpErrorException extends LocalizableException {
            body: response.body,
          ),
        );
+}
+
+/// Thrown when the migration request failed.
+class _MigrationRequestException extends LocalizableException {
+  /// The message.
+  final String? message;
+
+  /// Creates a new migration request exception instance.
+  _MigrationRequestException({
+    String errorCode = 'migration',
+    this.message,
+  }) : super(
+         localizedErrorMessage: switch (errorCode) {
+           'firebaseUserNotFound' => translations.error.migrator.firebaseUserNotFound,
+           'invalidIdToken' => translations.error.migrator.invalidIdToken,
+           'invalidUserId' => translations.error.migrator.invalidUserId,
+           'userAlreadyMigrated' || 'userAlreadyExists' => translations.error.migrator.userAlreadyMigrated,
+           'noSupportedAuthenticationProvider' => translations.error.migrator.noSupportedAuthenticationProvider,
+           'userWithProviderIdAlreadyExists' => translations.error.migrator.userWithProviderIdAlreadyExists,
+           'userCreationFailed' => translations.error.migrator.userCreationFailed,
+           _ => translations.error.generic.withException(exception: errorCode),
+         },
+       );
+
+  @override
+  String toString() => [
+    super.toString(),
+    if (message != null && message!.isNotEmpty) message,
+  ].join('\n');
 }

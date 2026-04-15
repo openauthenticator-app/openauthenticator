@@ -57,7 +57,7 @@ class SyncIssuesPage extends ConsumerWidget {
         else
           for (int i = 0; i < value.length; i++)
             Padding(
-              padding: EdgeInsets.only(bottom: i < value.length - 1 ? kBigSpace : 0),
+              padding: .only(bottom: i < value.length - 1 ? kBigSpace : 0),
               child: _PushOperationErrorWidget(
                 error: value[i],
                 onDeletePress: () async {
