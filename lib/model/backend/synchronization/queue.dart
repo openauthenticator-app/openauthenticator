@@ -213,8 +213,8 @@ class SynchronizationController extends Notifier<SynchronizationStatus> {
         );
       }
 
-      bool canReachBackend = await ref.read(connectivityStateProvider.future);
-      if (canReachBackend) {
+      bool isNotOffline = await ref.read(connectivityStateProvider.future);
+      if (isNotOffline) {
         void onFinish({bool errorOccurred = false}) {
           if (ref.mounted) {
             state = state.update(

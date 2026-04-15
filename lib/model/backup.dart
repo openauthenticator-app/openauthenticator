@@ -36,6 +36,8 @@ class BackupStore extends AsyncNotifier<List<Backup>> {
     DateTime? dateTime = _fromBackupFilename(backupFile);
     Backup backup = Backup._(ref: ref, dateTime: dateTime ?? DateTime.now());
     List<Backup> backups = [...(await future), backup]..sort();
+    Directory directory = await getBackupsDirectory();
+    backupFile.copySync(join(directory.path, backup.filename));
     if (!ref.mounted) {
       return const ResultCancelled();
     }
@@ -124,8 +126,12 @@ class Backup implements Comparable<Backup> {
     if (!file.existsSync()) {
       return false;
     }
-    Map<String, dynamic> jsonData = jsonDecode(file.readAsStringSync());
-    return jsonData[kTotpsKey] is List && jsonData[kSaltKey] is String && jsonData[kPasswordSignatureKey] is String;
+    try {
+      Map<String, dynamic> jsonData = jsonDecode(file.readAsStringSync());
+      return jsonData[kTotpsKey] is List && jsonData[kSaltKey] is String && jsonData[kPasswordSignatureKey] is String;
+    } on FormatException {
+      return false;
+    }
   }
 
   /// Restore this backup.
@@ -189,7 +195,7 @@ class Backup implements Comparable<Backup> {
       }
       HmacSecretKey hmacSecretKey = await HmacSecretKey.importRawKey(await newStore.key.exportRawKey(), Hash.sha256);
       File file = await getBackupPath(createDirectory: true);
-      file.writeAsString(
+      await file.writeAsString(
         jsonEncode({
           kPasswordSignatureKey: base64.encode(await hmacSecretKey.signBytes(utf8.encode(password))),
           kSaltKey: base64.encode(newStore.salt.value),
