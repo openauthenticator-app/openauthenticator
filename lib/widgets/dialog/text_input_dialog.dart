@@ -66,7 +66,7 @@ class TextInputDialog extends StatefulWidget {
     TextInputType? keyboardType,
     String? initialValue,
     List<TextInputFormatter>? inputFormatters,
-        TextCapitalization? textCapitalization,
+    TextCapitalization? textCapitalization,
     List<Widget>? children,
   }) => showFDialog<String>(
     context: context,

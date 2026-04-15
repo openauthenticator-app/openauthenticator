@@ -202,10 +202,10 @@ class AppDatabase extends _$AppDatabase {
 
   /// Applies the given push response.
   Future<void> applyPushResponse(SynchronizationPushResponse value) async {
-    Set<String> toDelete = {};
+    Set<String> operationUuidsToDelete = {};
     Map<String, List<PushOperationResult>> resultsWithErrors = {};
     for (PushOperationResult result in value.result) {
-      toDelete.add(result.totpUuid);
+      operationUuidsToDelete.add(result.operationUuid);
       if (!result.success) {
         resultsWithErrors.putIfAbsent(result.totpUuid, () => []).add(result);
       }
@@ -242,7 +242,7 @@ class AppDatabase extends _$AppDatabase {
       }
     }
     await batch((batch) {
-      batch.deleteWhere(pendingBackendPushOperations, (operation) => operation.uuid.isIn(toDelete));
+      batch.deleteWhere(pendingBackendPushOperations, (operation) => operation.uuid.isIn(operationUuidsToDelete));
       batch.insertAll(pendingBackendPushOperations, toRetry);
       batch.insertAll(backendPushOperationErrors, errors);
     });
@@ -263,15 +263,15 @@ class AppDatabase extends _$AppDatabase {
   /// Adds a new backend push operation error.
   Future<void> deleteBackendPushOperationError(PushOperationError error) async {
     assert(!error.success, 'Cannot delete a successful operation.');
-    await (delete(backendPushOperationErrors)..where(
-          (operation) =>
-              operation.totpUuid.isValue(error.totpUuid) &
-              operation.operationUuid.isValue(error.operationUuid) &
-              operation.errorKind.isValue(error.errorCode) &
-              operation.errorDetails.isValue(error.errorDetails!) &
-              operation.createdAt.isValue(error.createdAt),
-        ))
-        .go();
+    Expression<bool> predicate(BackendPushOperationErrors operation) {
+      Expression<bool> errorDetailsPredicate = error.errorDetails == null ? operation.errorDetails.isNull() : operation.errorDetails.isValue(error.errorDetails!);
+      return operation.totpUuid.isValue(error.totpUuid) &
+          operation.operationUuid.isValue(error.operationUuid) &
+          operation.errorKind.isValue(error.errorCode) &
+          errorDetailsPredicate &
+          operation.createdAt.isValue(error.createdAt);
+    }
+    await (delete(backendPushOperationErrors)..where(predicate)).go();
   }
 
   /// Deletes all backend push operation errors.

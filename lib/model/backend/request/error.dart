@@ -65,6 +65,12 @@ class BackendRequestError extends LocalizableException {
           statusCode: statusCode,
           message: message,
         );
+      case InvalidAppVersionError.kErrorCode:
+        return InvalidAppVersionError._(
+          route: route,
+          statusCode: statusCode,
+          message: message,
+        );
       case _ProviderUserAlreadyExists.kErrorCode:
         return _ProviderUserAlreadyExists._(
           route: route,

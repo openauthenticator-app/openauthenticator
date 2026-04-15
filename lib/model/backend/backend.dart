@@ -22,6 +22,9 @@ final backendClientProvider = AsyncNotifierProvider<BackendClient, Map<String, S
 
 /// Allows to communicate with the backend.
 class BackendClient extends AsyncNotifier<Map<String, String>> {
+  /// The default timeout in seconds.
+  static const int _kDefaultTimeout = 10;
+
   /// The HTTP client instance.
   final http.Client _client = http.Client();
 
@@ -33,6 +36,7 @@ class BackendClient extends AsyncNotifier<Map<String, String>> {
     return {
       'App-Version': packageInfo.version,
       'App-Client-Id': ?appClientId,
+      HttpHeaders.userAgentHeader: 'OpenAuthenticator/${packageInfo.version}/${currentPlatform.name}',
     };
   }
 
@@ -76,14 +80,16 @@ class BackendClient extends AsyncNotifier<Map<String, String>> {
       }
 
       backendUrl ??= (await ref.read(backendUrlSettingsEntryProvider.future)).backendUrl;
-      http.Response response = await request.execute(
-        _client,
-        UriBuilder.prefix(
-          prefix: backendUrl,
-          path: request.route,
-        ).build(),
-        headers: headers,
-      );
+      http.Response response = await request
+          .execute(
+            _client,
+            UriBuilder.prefix(
+              prefix: backendUrl,
+              path: request.route,
+            ).build(),
+            headers: headers,
+          )
+          .timeout(const Duration(seconds: _kDefaultTimeout));
       return ResultSuccess(
         value: request.toResponse(response),
       );

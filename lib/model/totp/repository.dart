@@ -129,7 +129,7 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
       if (!ref.mounted) {
         return const ResultCancelled();
       }
-      state = AsyncData(totpsList.createMergedList(totps: decrypted));
+      state = AsyncData(decrypted.sortCanonically());
       return const ResultSuccess();
     } catch (ex, stackTrace) {
       return ResultError(

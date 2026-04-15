@@ -78,7 +78,7 @@ class StorageTypeSettingsEntry extends EnumSettingsEntry<StorageType> {
         if (await database.isMarkedAsDeleted(totp.uuid)) {
           switch (storageMigrationDeletedTotpPolicy) {
             case .keep:
-              database.removeDeletionMark(totp.uuid);
+              await database.removeDeletionMark(totp.uuid);
               break;
             case .delete:
               toDelete.add(totp.uuid);

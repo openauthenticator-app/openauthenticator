@@ -59,6 +59,7 @@ class User {
         googleId: json['providers']?['googleId'],
         githubId: json['providers']?['githubId'],
         microsoftId: json['providers']?['microsoftId'],
+        appleId: json['providers']?['appleId'],
       );
 
   /// Whether the user has an authentication provider.
@@ -96,6 +97,14 @@ class User {
   Future<void> _saveToCache() async {
     File file = await _getFile(create: true);
     await file.writeAsString(jsonEncode(toJson()));
+  }
+
+  /// Clears the user cache.
+  static Future<void> _clearCache() async {
+    File file = await _getFile();
+    if (file.existsSync()) {
+      await file.delete();
+    }
   }
 
   /// Updates the user email.
@@ -163,11 +172,13 @@ class User {
     'id': id,
     'contributorPlan': contributorPlan,
     'totpsLimit': totpsLimit,
-    'email': ?email,
-    'googleId': ?googleId,
-    'githubId': ?githubId,
-    'microsoftId': ?microsoftId,
-    'appleId': ?appleId,
+    'providers': {
+      'email': ?email,
+      'googleId': ?googleId,
+      'githubId': ?githubId,
+      'microsoftId': ?microsoftId,
+      'appleId': ?appleId,
+    },
   };
 }
 
@@ -231,7 +242,11 @@ class UserNotifier extends AsyncNotifier<User?> {
       );
     } finally {
       if (forceClearLocally) {
+        await User._clearCache();
         await ref.read(storedSessionProvider.notifier).clear();
+        // if (ref.mounted) {
+        //   state = const AsyncData(null);
+        // }
       }
     }
   }
@@ -244,7 +259,11 @@ class UserNotifier extends AsyncNotifier<User?> {
           .sendHttpRequest(
             const DeleteUserRequest(),
           );
+      await User._clearCache();
       await ref.read(storedSessionProvider.notifier).clear();
+      // if (ref.mounted) {
+      //   state = const AsyncData(null);
+      // }
       return result;
     } catch (ex, stackTrace) {
       return ResultError<DeleteUserResponse>(

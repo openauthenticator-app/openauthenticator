@@ -145,7 +145,6 @@ class SynchronizationController extends Notifier<SynchronizationStatus> {
       return SynchronizationStatus();
     }
 
-    // WidgetsBinding.instance.addObserver(this);
     ref.onDispose(_dispose);
 
     Timer periodicTimer = Timer.periodic(_kPeriodicInterval, (_) => notifyLocalChange());
@@ -159,17 +158,8 @@ class SynchronizationController extends Notifier<SynchronizationStatus> {
     );
   }
 
-  // @override
-  // void didChangeAppLifecycleState(AppLifecycleState state) {
-  //   if (state == AppLifecycleState.resumed) {
-  //     notifyLocalChange();
-  //   }
-  // }
-
   /// Disposes the controller.
   void _dispose() {
-    // WidgetsBinding.instance.removeObserver(this);
-
     _coalesceTimer?.cancel();
     _retryTimer?.cancel();
 
