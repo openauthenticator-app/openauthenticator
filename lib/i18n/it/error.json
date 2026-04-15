@@ -38,6 +38,7 @@
     "noPasswordVerificationMethodAvailable": "Impossibile sbloccare l'applicazione con la tua password perché le informazioni sull'applicazione sono state alterate. Cambia la tua password principale per continuare.\nNota che i tuoi TOTPs dovranno essere decifrati manualmente."
   },
   "backend": {
+    "invalidJsonResponse": "Risposta non valida dal $route (HTTP $statusCode) : $body.",
     "noEmailToConfirm": "Nessun email da confermare.",
     "invalidSession": "La tua sessione non è valida. Riprova a effettuare il login.",
     "noSession": "Devi effettuare il login per continuare.",

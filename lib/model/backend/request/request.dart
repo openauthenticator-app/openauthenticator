@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:open_authenticator/i18n/localizable_exception.dart';
+import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/backend/authentication/providers/provider.dart';
 import 'package:open_authenticator/model/backend/request/error.dart';
 import 'package:open_authenticator/model/backend/request/response.dart';
@@ -25,19 +27,50 @@ sealed class BackendRequest<T extends BackendResponse> {
 
   /// Converts the response to a backend response.
   T toResponse(http.Response response) {
-    Map<String, dynamic> json = jsonDecode(response.body);
-    if (!json['success']) {
-      throw BackendRequestError.fromJson(
+    try {
+      Map<String, dynamic> json = jsonDecode(response.body);
+      if (!json.containsKey('success') || !json.containsKey('data')) {
+        throw InvalidJsonResponse(
+          route: route,
+          statusCode: response.statusCode,
+          body: response.body,
+        );
+      }
+      if (json['success'] != true) {
+        throw BackendRequestError.fromJson(
+          route: route,
+          statusCode: response.statusCode,
+          json: json,
+        );
+      }
+      return _toResponseIfNoError(json['data']);
+    } on FormatException {
+      throw InvalidJsonResponse(
         route: route,
         statusCode: response.statusCode,
-        json: json,
+        body: response.body,
       );
     }
-    return _toResponseIfNoError(json['data']);
   }
 
   /// Converts the response to a backend response.
   T _toResponseIfNoError(dynamic data);
+}
+
+/// Thrown when the response is invalid.
+class InvalidJsonResponse extends LocalizableException {
+  /// Creates a new invalid JSON response exception instance.
+  InvalidJsonResponse({
+    required String route,
+    required int statusCode,
+    required String body,
+  }) : super(
+         localizedErrorMessage: translations.error.backend.invalidJsonResponse(
+           route: route,
+           statusCode: statusCode,
+           body: body,
+         ),
+       );
 }
 
 /// Represents a backend request with a body.

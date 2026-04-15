@@ -23,7 +23,7 @@ final backupStoreProvider = AsyncNotifierProvider.autoDispose<BackupStore, List<
 /// Contains all backups.
 class BackupStore extends AsyncNotifier<List<Backup>> {
   /// The backup filename regex.
-  static const String _kBackupFilenameRegex = r'\d{10}\.bak';
+  static const String _kBackupFilenameRegex = r'\d{13}\.bak';
 
   @override
   FutureOr<List<Backup>> build() => _listBackups();
@@ -36,7 +36,7 @@ class BackupStore extends AsyncNotifier<List<Backup>> {
     DateTime? dateTime = _fromBackupFilename(backupFile);
     Backup backup = Backup._(ref: ref, dateTime: dateTime ?? DateTime.now());
     List<Backup> backups = [...(await future), backup]..sort();
-    Directory directory = await getBackupsDirectory();
+    Directory directory = await getBackupsDirectory(create: true);
     backupFile.copySync(join(directory.path, backup.filename));
     if (!ref.mounted) {
       return const ResultCancelled();
@@ -167,7 +167,7 @@ class Backup implements Comparable<Backup> {
           totps.add(decryptedTotp ?? totp);
         }
       }
-      if (totps.isEmpty) {
+      if (totps.isEmpty && jsonTotps.isNotEmpty) {
         throw InvalidPasswordException();
       }
       return await _ref.read(totpRepositoryProvider.notifier).replaceBy(totps);

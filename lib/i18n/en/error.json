@@ -38,6 +38,7 @@
     "noPasswordVerificationMethodAvailable": "Cannot unlock the app with your password because the app data integrity has been altered. Please change your master password to continue.\nNote that your TOTPs will still need to be decrypted manually."
   },
   "backend": {
+    "invalidJsonResponse": "Invalid response from $route (HTTP $statusCode) : $body.",
     "noEmailToConfirm": "No email to confirm.",
     "invalidSession": "Your session is invalid. Please try to log-in again.",
     "noSession": "You must be logged-in to proceed.",

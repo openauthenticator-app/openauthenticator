@@ -109,62 +109,73 @@ class _TextInputDialogState extends State<TextInputDialog> {
     });
 
   /// Whether the input is valid.
-  late bool valid = widget.validator == null ? true : (widget.validator!.call(value) != null);
+  late bool valid = widget.validator == null ? true : (widget.validator!(value) == null);
 
   @override
-  Widget build(BuildContext context) => AppDialog(
-    title: Text(widget.title),
-    actions: [
-      ClickableButton(
-        onPress: valid ? (() => Navigator.pop(context, value)) : null,
-        child: ButtonText(MaterialLocalizations.of(context).okButtonLabel),
-      ),
-      ClickableButton(
-        variant: .secondary,
-        onPress: () => Navigator.pop(context),
-        child: ButtonText(MaterialLocalizations.of(context).cancelButtonLabel),
-      ),
-    ],
-    children: [
-      Text(
-        widget.message,
-        textAlign: TextAlign.left,
-      ),
-      if (widget.children != null) ...widget.children!,
-      if (widget.password)
-        PasswordFormField(
-          control: .managed(controller: valueController),
-          autofocus: true,
-          onSubmit: (value) => Navigator.pop(context, value),
-          textInputAction: TextInputAction.go,
-          validator: widget.validator,
-          keyboardType: widget.keyboardType,
-          autovalidateMode: AutovalidateMode.always,
-          inputFormatters: widget.inputFormatters,
-          textCapitalization: widget.textCapitalization ?? .none,
-        )
-      else
-        FTextFormField(
-          control: .managed(controller: valueController),
-          autofocus: true,
-          onSubmit: (value) => Navigator.pop(context, value),
-          textInputAction: TextInputAction.go,
-          validator: widget.validator,
-          keyboardType: widget.keyboardType,
-          autovalidateMode: AutovalidateMode.always,
-          inputFormatters: widget.inputFormatters,
-          textCapitalization: widget.textCapitalization ?? .none,
+  Widget build(BuildContext context) {
+    void onSubmit(String value) {
+      bool valid = onChanged(value);
+      if (valid) {
+        Navigator.pop(context, value);
+      }
+    }
+
+    return AppDialog(
+      title: Text(widget.title),
+      actions: [
+        ClickableButton(
+          onPress: valid ? (() => Navigator.pop(context, value)) : null,
+          child: ButtonText(MaterialLocalizations.of(context).okButtonLabel),
         ),
-    ],
-  );
+        ClickableButton(
+          variant: .secondary,
+          onPress: () => Navigator.pop(context),
+          child: ButtonText(MaterialLocalizations.of(context).cancelButtonLabel),
+        ),
+      ],
+      children: [
+        Text(
+          widget.message,
+          textAlign: TextAlign.left,
+        ),
+        if (widget.children != null) ...widget.children!,
+        if (widget.password)
+          PasswordFormField(
+            control: .managed(controller: valueController),
+            autofocus: true,
+            onSubmit: onSubmit,
+            textInputAction: TextInputAction.go,
+            validator: widget.validator,
+            keyboardType: widget.keyboardType,
+            autovalidateMode: AutovalidateMode.always,
+            inputFormatters: widget.inputFormatters,
+            textCapitalization: widget.textCapitalization ?? .none,
+          )
+        else
+          FTextFormField(
+            control: .managed(controller: valueController),
+            autofocus: true,
+            onSubmit: onSubmit,
+            textInputAction: TextInputAction.go,
+            validator: widget.validator,
+            keyboardType: widget.keyboardType,
+            autovalidateMode: AutovalidateMode.always,
+            inputFormatters: widget.inputFormatters,
+            textCapitalization: widget.textCapitalization ?? .none,
+          ),
+      ],
+    );
+  }
 
   /// Triggered when changed.
-  void onChanged(String newValue) {
+  bool onChanged(String newValue) {
     value = newValue;
     if (widget.validator != null) {
       bool result = widget.validator!(newValue) == null;
       setState(() => valid = result);
+      return result;
     }
+    return true;
   }
 }
 

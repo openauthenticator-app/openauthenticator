@@ -38,6 +38,7 @@
     "noPasswordVerificationMethodAvailable": "Impossible de déverrouiller l'application avec votre mot de passe car les données de l'application ont été altérées. Veuillez changer votre mot de passe maître pour continuer.\nVeuillez noter que vos TOTPs devront être déchiffrés manuellement."
   },
   "backend": {
+    "invalidJsonResponse": "Réponse invalide du $route (HTTP $statusCode) : $body.",
     "noEmailToConfirm": "Aucun email à confirmer.",
     "invalidSession": "Votre session est invalide. Veuillez réessayer de vous connecter.",
     "noSession": "Vous devez être connecté pour continuer.",

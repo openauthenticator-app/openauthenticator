@@ -38,6 +38,7 @@
     "noPasswordVerificationMethodAvailable": "Falha ao desbloquear a aplicação com sua senha porque as informações da aplicação foram alteradas. Altere sua senha mestra para continuar.\nNota que seus TOTPs serão descriptografados manualmente."
   },
   "backend": {
+    "invalidJsonResponse": "Resposta inválida do $route (HTTP $statusCode) : $body.",
     "noEmailToConfirm": "Nenhum e-mail para confirmar.",
     "invalidSession": "Sua sessão é inválida. Tente novamente para fazer login.",
     "noSession": "Você deve estar logado para prosseguir.",

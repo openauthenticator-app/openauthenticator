@@ -35,25 +35,28 @@ class Blur extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) => ClipRRect(
-    borderRadius: borderRadius ?? BorderRadius.zero,
-    child: Stack(
-      children: [
-        ?below,
-        Positioned.fill(
-          child: BackdropFilter(
-            filter: context.theme.dialogRouteStyle.barrierFilter?.call(1) ?? ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-            child: Container(
-              decoration: BoxDecoration(
-                color: context.theme.colors.background.withValues(alpha: colorOpacity),
+  Widget build(BuildContext context) => PopScope(
+    canPop: above == null || below == null,
+    child: ClipRRect(
+      borderRadius: borderRadius ?? BorderRadius.zero,
+      child: Stack(
+        children: [
+          ?below,
+          Positioned.fill(
+            child: BackdropFilter(
+              filter: context.theme.dialogRouteStyle.barrierFilter?.call(1) ?? ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: context.theme.colors.background.withValues(alpha: colorOpacity),
+                ),
+                alignment: alignment,
+                child: overlay,
               ),
-              alignment: alignment,
-              child: overlay,
             ),
           ),
-        ),
-        ?above,
-      ],
+          ?above,
+        ],
+      ),
     ),
   );
 }

@@ -38,6 +38,7 @@
     "noPasswordVerificationMethodAvailable": "Die App kann nicht mit Ihrem Passwort entsperrt werden, da die Integrität der App-Daten verändert wurde. Bitte ändern Sie Ihr Master-Passwort, um fortzufahren.\nBeachten Sie, dass Ihre TOTP-Codes weiterhin manuell entschlüsselt werden müssen."
   },
   "backend": {
+    "invalidJsonResponse": "Ungültige Antwort vom $route (HTTP $statusCode) : $body.",
     "noEmailToConfirm": "Keine E-Mail zum Bestätigen.",
     "invalidSession": "Ihre Sitzung ist ungültig. Bitte versuchen Sie sich erneut einzuloggen.",
     "noSession": "Sie müssen sich einloggen, um fortzufahren.",
