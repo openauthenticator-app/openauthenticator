@@ -22,6 +22,9 @@ part 'database.g.dart';
 part 'extensions.dart';
 part 'tables.dart';
 
+/// A map of deleted TOTPs.
+typedef DeletedTotpMap = Map<String, DateTime>;
+
 /// The app database provider.
 final appDatabaseProvider = Provider.autoDispose<AppDatabase>((ref) {
   AppDatabase storage = AppDatabase();
@@ -73,7 +76,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   /// Deletes the TOTP associated to the given [uuids].
-  Future<void> deleteTotps(List<String> uuids) async {
+  Future<void> deleteTotps(Iterable<String> uuids) async {
     await (delete(totps)..where((totp) => totp.uuid.isIn(uuids))).go();
   }
 
@@ -119,40 +122,48 @@ class AppDatabase extends _$AppDatabase {
   SimpleSelectStatement<$TotpsTable, _DriftTotp> _selectAllTotps() => select(totps)..orderBy([(table) => OrderingTerm(expression: table.issuer)]);
 
   /// Replace all current TOTPs by [newTotps].
-  Future<void> replaceTotps(List<Totp> newTotps) => batch((batch) {
-    batch.deleteAll(totps);
-    batch.insertAll(totps, newTotps.map((totp) => totp.asDriftTotp));
-  });
-
-  /// Returns all deleted TOTPs.
-  Future<List<String>> getDeletedUuids() async {
-    return await (select(deletedTotps)).map((deletedTotp) => deletedTotp.uuid).get();
+  Future<void> replaceTotps(List<Totp> totpsToInsert, DeletedTotpMap tombstonesToInsert) async {
+    await totps.deleteAll();
+    await removeDeletionMarks([
+      for (Totp totp in totpsToInsert) totp.uuid,
+    ]);
+    await markAsDeleted(tombstonesToInsert);
+    await addTotps(totpsToInsert);
   }
 
-  /// Marks the given [uuids] as deleted.
-  Future<void> markAsDeleted(List<String> uuids) async {
+  /// Returns all deleted TOTPs.
+  Future<DeletedTotpMap> getDeletedTotps() async {
+    List<MapEntry<String, DateTime>> tombstones = await (select(deletedTotps)).map((deletedTotp) => MapEntry(deletedTotp.uuid, deletedTotp.deletedAt)).get();
+    return Map.fromEntries(tombstones);
+  }
+
+  /// Adds the given [tombstones] to the deleted TOTPs table.
+  Future<void> markAsDeleted(DeletedTotpMap tombstones) async {
+    DeletedTotpMap merged = await getDeletedTotps();
+
+    for (MapEntry<String, DateTime> entry in tombstones.entries) {
+      DateTime? current = merged[entry.key];
+      if (current == null || current.isBefore(entry.value)) {
+        merged[entry.key] = entry.value;
+      }
+    }
+
     await batch((batch) {
+      batch.deleteAll(deletedTotps);
       batch.insertAll(
         deletedTotps,
-        uuids.map((uuid) => _DriftDeletedTotp(uuid: uuid)),
-        mode: InsertMode.insertOrIgnore,
+        [
+          for (MapEntry<String, DateTime> entry in merged.entries)
+            _DriftDeletedTotp(uuid: entry.key, deletedAt: entry.value),
+        ],
       );
     });
+
   }
 
   /// Marks the given [totp] as not deleted.
-  Future<void> removeDeletionMark(String uuid) async {
-    await (delete(deletedTotps)..where((deletedTotp) => deletedTotp.uuid.isValue(uuid))).go();
-  }
-
-  /// Returns whether the given [uuid] is deleted.
-  Future<bool> isMarkedAsDeleted(String uuid) async {
-    _DriftDeletedTotp? deletedTotp =
-        await (select(deletedTotps)
-              ..where((deletedTotp) => deletedTotp.uuid.isValue(uuid))
-              ..limit(1))
-            .getSingleOrNull();
-    return deletedTotp != null;
+  Future<void> removeDeletionMarks(List<String> uuids) async {
+    await (delete(deletedTotps)..where((deletedTotp) => deletedTotp.uuid.isIn(uuids))).go();
   }
 
   /// Returns the push operation associated to the given [uuid].
@@ -210,40 +221,53 @@ class AppDatabase extends _$AppDatabase {
         resultsWithErrors.putIfAbsent(result.totpUuid, () => []).add(result);
       }
     }
-    List<_DriftBackendPushOperation> toRetry = [];
+
+    Map<String, PushOperation> pendingOperationsByUuid = {
+      for (PushOperation operation in await listPendingBackendPushOperations())
+        if (operationUuidsToDelete.contains(operation.uuid)) operation.uuid: operation,
+    };
+
+    Map<String, Totp> retrySets = {};
+    DeletedTotpMap retryDeletes = {};
     List<_DriftBackendPushOperationError> errors = [];
     for (MapEntry<String, List<PushOperationResult>> entry in resultsWithErrors.entries) {
-      List<Totp> toSet = [];
-      List<String> toDelete = [];
       for (PushOperationResult result in entry.value) {
         if (!result.errorKind!.isPermanent) {
-          PushOperation? operation = await getPendingBackendPushOperation(result.operationUuid);
+          PushOperation? operation = pendingOperationsByUuid[result.operationUuid];
           if (operation != null) {
             switch (operation) {
               case SetTotpsPushOperation(:final payload):
                 Map<String, dynamic>? totpData = payload[result.totpUuid];
                 if (totpData != null) {
-                  toSet.add(JsonTotp.fromJson(totpData, uuid: result.totpUuid));
+                  retrySets[result.totpUuid] = JsonTotp.fromJson(totpData, uuid: result.totpUuid);
                 }
                 break;
-              case DeleteTotpsPushOperation():
-                toDelete.add(result.totpUuid);
+              case DeleteTotpsPushOperation(:final payload):
+                int? deletedAt = payload[result.totpUuid];
+                if (deletedAt != null) {
+                  retryDeletes[result.totpUuid] = DateTime.fromMillisecondsSinceEpoch(deletedAt);
+                }
                 break;
             }
           }
         }
         errors.add(result.asDriftBackendPushOperationError);
       }
-      if (toSet.isNotEmpty) {
-        toRetry.add(SetTotpsPushOperation(totps: toSet).asDriftBackendPushOperation);
-      }
-      if (toDelete.isNotEmpty) {
-        toRetry.add(DeleteTotpsPushOperation(uuids: toDelete).asDriftBackendPushOperation);
-      }
     }
+
+    List<PushOperation> retries = <PushOperation>[
+      if (retrySets.isNotEmpty) SetTotpsPushOperation(totps: retrySets.values.toList()),
+      if (retryDeletes.isNotEmpty) DeleteTotpsPushOperation(tombstones: retryDeletes),
+    ].compacted;
+
     await batch((batch) {
       batch.deleteWhere(pendingBackendPushOperations, (operation) => operation.uuid.isIn(operationUuidsToDelete));
-      batch.insertAll(pendingBackendPushOperations, toRetry);
+      batch.insertAll(
+        pendingBackendPushOperations,
+        [
+          for (PushOperation operation in retries) operation.asDriftBackendPushOperation,
+        ],
+      );
       batch.insertAll(backendPushOperationErrors, errors);
     });
   }
@@ -271,6 +295,7 @@ class AppDatabase extends _$AppDatabase {
           errorDetailsPredicate &
           operation.createdAt.isValue(error.createdAt);
     }
+
     await (delete(backendPushOperationErrors)..where(predicate)).go();
   }
 

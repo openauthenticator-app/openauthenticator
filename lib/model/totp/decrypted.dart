@@ -72,6 +72,30 @@ class DecryptedTotp extends Totp {
   @override
   Future<Totp> decrypt(CryptoStore? cryptoStore) => Future.value(this);
 
+  @override
+  Totp copyWith({
+    EncryptedData? encryptedData,
+    Algorithm? algorithm,
+    int? digits,
+    Duration? validity,
+    DateTime? updatedAt,
+  }) => encryptedData is DecryptedData
+      ? DecryptedTotp(
+          uuid: uuid,
+          decryptedData: encryptedData,
+          algorithm: algorithm ?? this.algorithm,
+          digits: digits ?? this.digits,
+          validity: validity ?? this.validity,
+          updatedAt: updatedAt ?? this.updatedAt,
+        )
+      : super.copyWith(
+          encryptedData: encryptedData,
+          algorithm: algorithm,
+          digits: digits,
+          validity: validity,
+          updatedAt: updatedAt,
+        );
+
   /// Manually creates a [DecryptedTotp].
   static Future<DecryptedTotp?> create({
     required CryptoStore? cryptoStore,

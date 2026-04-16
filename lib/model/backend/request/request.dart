@@ -76,7 +76,7 @@ class InvalidJsonResponse extends LocalizableException {
 /// Represents a backend request with a body.
 mixin BackendWithBodyRequest<T extends BackendResponse> on BackendRequest<T> {
   /// The body.
-  Object? get body => null;
+  Object? get jsonBody => null;
 
   /// The encoding.
   Encoding? get encoding => null;
@@ -112,7 +112,7 @@ abstract class BackendPostRequest<T extends BackendResponse> extends BackendRequ
       if (headers != null) ...headers,
       'Content-Type': 'application/json',
     },
-    body: jsonEncode(body),
+    body: jsonEncode(jsonBody),
     encoding: encoding,
   );
 }
@@ -132,7 +132,7 @@ abstract class BackendDeleteRequest<T extends BackendResponse> extends BackendRe
       if (headers != null) ...headers,
       'Content-Type': 'application/json',
     },
-    body: jsonEncode(body),
+    body: jsonEncode(jsonBody),
     encoding: encoding,
   );
 }
@@ -190,7 +190,7 @@ class RefreshSessionRequest extends BackendPostRequest<RefreshSessionResponse> {
        );
 
   @override
-  Object? get body => {'refreshToken': refreshToken};
+  Object? get jsonBody => {'refreshToken': refreshToken};
 
   @override
   RefreshSessionResponse _toResponseIfNoError(dynamic data) => RefreshSessionResponse.fromJson(data);
@@ -210,7 +210,7 @@ class UserLogoutRequest extends BackendPostRequest<UserLogoutResponse> {
        );
 
   @override
-  Object? get body => {'refreshToken': refreshToken};
+  Object? get jsonBody => {'refreshToken': refreshToken};
 
   @override
   UserLogoutResponse _toResponseIfNoError(dynamic data) => UserLogoutResponse.fromJson(data);
@@ -234,7 +234,7 @@ class EmailConfirmRequest extends BackendPostRequest<EmailConfirmResponse> {
        );
 
   @override
-  Object? get body => {
+  Object? get jsonBody => {
     'email': email,
     'verificationCode': verificationCode,
   };
@@ -261,7 +261,7 @@ class EmailConfirmationCancelRequest extends BackendPostRequest<EmailConfirmatio
        );
 
   @override
-  Object? get body => {
+  Object? get jsonBody => {
     'email': email,
     'cancelCode': cancelCode,
   };
@@ -288,7 +288,7 @@ class ProviderLoginRequest extends BackendPostRequest<ProviderLoginResponse> {
        );
 
   @override
-  Object? get body => {
+  Object? get jsonBody => {
     'authorizationCode': authorizationCode,
     if (codeVerifier != null) 'codeVerifier': codeVerifier,
   };
@@ -316,7 +316,7 @@ class ProviderLinkRequest extends BackendPostRequest<ProviderLinkResponse> {
        );
 
   @override
-  Object? get body => {
+  Object? get jsonBody => {
     'authorizationCode': authorizationCode,
     if (codeVerifier != null) 'codeVerifier': codeVerifier,
   };
@@ -353,7 +353,7 @@ class SynchronizationPushRequest extends BackendPostRequest<SynchronizationPushR
        );
 
   @override
-  Object? get body => [
+  Object? get jsonBody => [
     for (PushOperation operation in operations) operation.toJson(httpRequest: true),
   ];
 
@@ -363,21 +363,29 @@ class SynchronizationPushRequest extends BackendPostRequest<SynchronizationPushR
 
 /// A request that allows to pull TOTPs.
 class SynchronizationPullRequest extends BackendPostRequest<SynchronizationPullResponse> {
-  /// The timestamps.
-  final Map<String, DateTime> timestamps;
+  /// The TOTPs that are still active.
+  final Map<String, DateTime> active;
+
+  /// The TOTPs that are still deleted.
+  final Map<String, DateTime> deleted;
 
   /// Creates a new synchronization pull request instance.
   const SynchronizationPullRequest({
-    this.timestamps = const {},
+    this.active = const {},
+    this.deleted = const {},
   }) : super(
          route: '/totps/sync/pull',
          needsAuthorization: true,
        );
 
   @override
-  Object? get body => {
-    for (String uuid in timestamps.keys) uuid: timestamps[uuid]!.millisecondsSinceEpoch,
-  };
+  Object? get jsonBody {
+    MapEntry<String, dynamic> convert(String key, DateTime value) => MapEntry(key, value.millisecondsSinceEpoch);
+    return {
+      'active': active.map(convert),
+      'deleted': deleted.map(convert),
+    };
+  }
 
   @override
   SynchronizationPullResponse _toResponseIfNoError(dynamic data) => SynchronizationPullResponse.fromJson(data);

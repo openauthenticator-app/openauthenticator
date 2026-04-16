@@ -126,6 +126,22 @@ class Totp extends Equatable implements Comparable<Totp> {
           )
         : null;
   }
+
+  /// Returns a copy of the current TOTP instance.
+  Totp copyWith({
+    EncryptedData? encryptedData,
+    Algorithm? algorithm,
+    int? digits,
+    Duration? validity,
+    DateTime? updatedAt,
+  }) => Totp(
+    uuid: uuid,
+    encryptedData: encryptedData ?? this.encryptedData,
+    algorithm: algorithm ?? this.algorithm,
+    digits: digits ?? this.digits,
+    validity: validity ?? this.validity,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
 }
 
 /// Everything that should be encrypted goes here.

@@ -63,7 +63,6 @@ class StorageTypeSettingsEntry extends EnumSettingsEntry<StorageType> {
       }
 
       AppDatabase database = ref.read(appDatabaseProvider);
-      List<String> toDelete = [];
       Result<GetUserTotpsResponse> result = await ref
           .read(backendClientProvider.notifier)
           .sendHttpRequest(
@@ -74,19 +73,27 @@ class StorageTypeSettingsEntry extends EnumSettingsEntry<StorageType> {
       }
 
       GetUserTotpsResponse response = result.value;
+      DeletedTotpMap locallyDeletedTotps = await database.getDeletedTotps();
+      List<String> tombstonesToRemove = [];
+      DeletedTotpMap toDelete = {};
       for (Totp totp in response.totps) {
-        if (await database.isMarkedAsDeleted(totp.uuid)) {
+        DateTime? deletedAt = locallyDeletedTotps[totp.uuid];
+        if (deletedAt != null) {
           switch (storageMigrationDeletedTotpPolicy) {
             case .keep:
-              await database.removeDeletionMark(totp.uuid);
+              tombstonesToRemove.add(totp.uuid);
               break;
             case .delete:
-              toDelete.add(totp.uuid);
+              toDelete[totp.uuid] = deletedAt;
               break;
             case .ask:
               throw ShouldAskForDifferentDeletedTotpPolicyException();
           }
         }
+      }
+
+      if (tombstonesToRemove.isNotEmpty) {
+        await database.removeDeletionMarks(tombstonesToRemove);
       }
 
       List<Totp> currentStorageTotps = await database.listTotps();
@@ -132,7 +139,7 @@ class StorageTypeSettingsEntry extends EnumSettingsEntry<StorageType> {
         )
         ..enqueue(
           DeleteTotpsPushOperation(
-            uuids: toDelete,
+            tombstones: toDelete,
           ),
         );
 

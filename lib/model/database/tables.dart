@@ -40,8 +40,11 @@ class Totps extends Table {
 /// Represents a deleted [Totp].
 @DataClassName('_DriftDeletedTotp')
 class DeletedTotps extends Table {
-  /// Maps to [Totp.uuid].
+  /// The UUID of the deleted TOTP.
   TextColumn get uuid => text()();
+
+  /// The date and time when the TOTP was deleted.
+  DateTimeColumn get deletedAt => dateTime().withDefault(currentDateAndTime)();
 
   @override
   Set<Column> get primaryKey => {uuid};

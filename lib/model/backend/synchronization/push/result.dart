@@ -105,6 +105,12 @@ enum PushOperationErrorKind {
   /// The update timestamp is invalid.
   invalidUpdateTimestamp(isPermanent: true),
 
+  /// The TOTP has been deleted more recently.
+  deletedTotp(isPermanent: true),
+
+  /// The delete timestamp is invalid.
+  invalidDeleteTimestamp(isPermanent: true),
+
   /// The max TOTPs count has been exceeded.
   maxCountExceeded,
 

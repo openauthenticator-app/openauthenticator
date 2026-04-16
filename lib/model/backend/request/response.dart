@@ -189,13 +189,13 @@ class SynchronizationPullResponse extends BackendResponse {
   final List<Totp> updates;
 
   /// The TOTPs to delete.
-  final List<String> deletes;
+  final Map<String, DateTime> deletes;
 
   /// Creates a new synchronization pull response instance.
   const SynchronizationPullResponse({
     this.inserts = const [],
     this.updates = const [],
-    this.deletes = const [],
+    this.deletes = const {},
   });
 
   /// Creates a new synchronization pull response instance from a JSON map.
@@ -203,7 +203,7 @@ class SynchronizationPullResponse extends BackendResponse {
     : this(
         inserts: _totpListFromJson(json['inserts']),
         updates: _totpListFromJson(json['updates']),
-        deletes: (json['deletes'] as List).cast<String>(),
+        deletes: (json['deletes'] as Map).map((key, value) => MapEntry(key, DateTime.fromMillisecondsSinceEpoch(value))),
       );
 
   /// Creates a new synchronization pull response instance from a JSON map.

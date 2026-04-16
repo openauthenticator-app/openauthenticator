@@ -83,7 +83,7 @@ class TotpImageCacheManager extends AsyncNotifier<Map<String, CacheObject>> {
   }
 
   /// Deletes the cached images, if possible.
-  Future<void> deleteCachedImages(List<String> uuids) async {
+  Future<void> deleteCachedImages(Iterable<String> uuids) async {
     Map<String, CacheObject> cached = Map.from(await future);
     for (String uuid in uuids) {
       File file = await _getTotpCachedImageFile(uuid);

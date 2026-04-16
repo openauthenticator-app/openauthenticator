@@ -53,7 +53,7 @@ class PushOperationsQueue extends AsyncNotifier<List<PushOperation>> {
       }
     }
     List<PushOperation> operations = await future;
-    List<PushOperation> compactedOperations = _compact(operations);
+    List<PushOperation> compactedOperations = operations.compacted;
     AppDatabase database = ref.read(appDatabaseProvider);
     if (compactedOperations.length != operations.length) {
       await database.replacePendingBackendPushOperations(compactedOperations);
@@ -76,38 +76,6 @@ class PushOperationsQueue extends AsyncNotifier<List<PushOperation>> {
 
     await database.applyPushResponse(result.value);
     return const ResultSuccess();
-  }
-
-  /// Compacts the push operations list.
-  List<PushOperation> _compact(List<PushOperation> operations) {
-    if (operations.isEmpty) {
-      return [];
-    }
-
-    Set<String> processedTotpUuids = {};
-    List<PushOperation> result = [];
-
-    for (PushOperation operation in operations.reversed) {
-      switch (operation) {
-        case SetTotpsPushOperation(:final payload):
-          Map<String, dynamic> newPayload = {
-            for (MapEntry<String, dynamic> entry in payload.entries)
-              if (processedTotpUuids.add(entry.key)) entry.key: entry.value,
-          };
-          if (newPayload.isNotEmpty) {
-            result.add(operation.copyWith(payload: newPayload));
-          }
-          break;
-        case DeleteTotpsPushOperation(:final payload):
-          List<String> newPayload = payload.where((uuid) => processedTotpUuids.add(uuid)).toList();
-          if (newPayload.isNotEmpty) {
-            result.add(operation.copyWith(payload: newPayload));
-          }
-          break;
-      }
-    }
-
-    return result.reversed.toList();
   }
 
   /// Triggered when the database updates.
@@ -297,33 +265,46 @@ class SynchronizationController extends Notifier<SynchronizationStatus> {
         return const ResultCancelled();
       }
     }
+
     List<Totp> totps = await ref.read(totpRepositoryProvider.future);
+    DeletedTotpMap deletedTotps = await ref.read(appDatabaseProvider).getDeletedTotps();
     Result<SynchronizationPullResponse> result = await ref
         .read(backendClientProvider.notifier)
         .sendHttpRequest(
           SynchronizationPullRequest(
-            timestamps: {
+            active: {
               for (Totp totp in totps) totp.uuid: totp.updatedAt,
             },
+            deleted: deletedTotps,
           ),
         );
+
     if (result is! ResultSuccess<SynchronizationPullResponse>) {
       return result;
     }
 
     TotpRepository repository = ref.read(totpRepositoryProvider.notifier);
-    await repository.addTotps(
+    Result addResult = await repository.addTotps(
       result.value.inserts,
       fromNetwork: true,
     );
-    await repository.updateTotps(
+    if (addResult is! ResultSuccess) {
+      return addResult;
+    }
+    Result updateResult = await repository.updateTotps(
       result.value.updates,
       fromNetwork: true,
     );
-    await repository.deleteTotps(
+    if (updateResult is! ResultSuccess) {
+      return updateResult;
+    }
+    Result deleteResult = await repository.deleteTotps(
       result.value.deletes,
       fromNetwork: true,
     );
+    if (deleteResult is! ResultSuccess) {
+      return deleteResult;
+    }
     return const ResultSuccess();
   }
 }

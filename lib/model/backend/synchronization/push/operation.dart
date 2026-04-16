@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:open_authenticator/model/database/database.dart';
 import 'package:open_authenticator/model/totp/json.dart';
 import 'package:open_authenticator/model/totp/totp.dart';
 import 'package:uuid/uuid.dart';
@@ -89,7 +90,7 @@ class SetTotpsPushOperation extends PushOperation<Map<String, dynamic>> {
 }
 
 /// Represents a `delete` push operation.
-class DeleteTotpsPushOperation extends PushOperation<List<String>> {
+class DeleteTotpsPushOperation extends PushOperation<Map<String, int>> {
   /// Creates a new `delete` push operation instance from a raw payload.
   DeleteTotpsPushOperation.raw({
     super.uuid,
@@ -100,11 +101,13 @@ class DeleteTotpsPushOperation extends PushOperation<List<String>> {
   /// Creates a new `delete` push operation instance from a UUIDs list.
   DeleteTotpsPushOperation({
     String? uuid,
-    required List<String> uuids,
+    required DeletedTotpMap tombstones,
     DateTime? createdAt,
   }) : this.raw(
          uuid: uuid,
-         payload: uuids,
+         payload: {
+           for (MapEntry<String, DateTime> entry in tombstones.entries) entry.key: entry.value.millisecondsSinceEpoch,
+         },
          createdAt: createdAt,
        );
 
@@ -113,11 +116,50 @@ class DeleteTotpsPushOperation extends PushOperation<List<String>> {
 
   @override
   DeleteTotpsPushOperation copyWith({
-    List<String>? payload,
+    Map<String, int>? payload,
     DateTime? createdAt,
   }) => DeleteTotpsPushOperation.raw(
     uuid: uuid,
     payload: payload ?? this.payload,
     createdAt: createdAt ?? this.createdAt,
   );
+}
+
+/// Allows to compact a list of push operations.
+extension Compact on List<PushOperation> {
+  /// Compacts the current push operations while preserving their relative order.
+  /// Only the latest operation for each TOTP UUID is kept.
+  List<PushOperation> get compacted {
+    if (isEmpty) {
+      return [];
+    }
+
+    Set<String> processedTotpUuids = {};
+    List<PushOperation> result = [];
+
+    for (PushOperation operation in reversed) {
+      switch (operation) {
+        case SetTotpsPushOperation(:final payload):
+          Map<String, dynamic> newPayload = {
+            for (MapEntry<String, dynamic> entry in payload.entries)
+              if (processedTotpUuids.add(entry.key)) entry.key: entry.value,
+          };
+          if (newPayload.isNotEmpty) {
+            result.add(operation.copyWith(payload: newPayload));
+          }
+          break;
+        case DeleteTotpsPushOperation(:final payload):
+          Map<String, int> newPayload = {
+            for (MapEntry<String, int> entry in payload.entries)
+              if (processedTotpUuids.add(entry.key)) entry.key: entry.value,
+          };
+          if (newPayload.isNotEmpty) {
+            result.add(operation.copyWith(payload: newPayload));
+          }
+          break;
+      }
+    }
+
+    return result.reversed.toList();
+  }
 }
