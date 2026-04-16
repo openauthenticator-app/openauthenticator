@@ -69,7 +69,7 @@ class BackendClient extends AsyncNotifier<Map<String, String>> {
 
       Map<String, String> headers = await _writeAppClientIdIfNeeded();
       if (request.needsAuthorization) {
-        if (ref.read(sessionRefreshManagerProvider) == .invalidSession) {
+        if (ref.read(sessionRefreshManagerProvider) is SessionRefreshStateInvalidSession) {
           throw InvalidSessionException();
         }
         session ??= await ref.read(storedSessionProvider.future);

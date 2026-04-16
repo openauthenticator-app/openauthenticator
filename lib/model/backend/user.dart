@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/model/backend/authentication/providers/provider.dart';
 import 'package:open_authenticator/model/backend/authentication/session.dart';
@@ -73,9 +74,12 @@ class User {
   };
 
   /// Gets the user authentication provider ID.
-  static Future<File> _getFile({bool create = false}) async {
+  static Future<File> _getFile({
+    bool create = false,
+    bool addDebugModeSuffix = true,
+  }) async {
     Directory directory = await getApplicationSupportDirectory();
-    File file = File('${directory.path}/user.json');
+    File file = File('${directory.path}/user${addDebugModeSuffix && kDebugMode ? '_debug' : ''}.json');
     if (create && !file.existsSync()) {
       file.createSync();
     }

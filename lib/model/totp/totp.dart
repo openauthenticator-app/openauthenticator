@@ -122,7 +122,7 @@ class Totp extends Equatable implements Comparable<Totp> {
             algorithm: result.algorithm,
             digits: result.digits,
             validity: result.validity,
-            updatedAt: result.updatedAt,
+            updatedAt: DateTime.now(),
           )
         : null;
   }

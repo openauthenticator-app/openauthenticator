@@ -90,11 +90,11 @@ class SynchronizeSettingsEntryWidget extends CheckboxSettingsEntryWidget<Storage
           translations.settings.synchronization.synchronizeTotps.subtitle.totpLimit.limit(
             limit: TextSpan(
               text: user.totpsLimit.toString(),
-              style: const TextStyle(fontStyle: FontStyle.italic),
+              style: const TextStyle(fontStyle: .italic),
             ),
             count: TextSpan(
               text: totps.value.length.toString(),
-              style: const TextStyle(fontStyle: FontStyle.italic),
+              style: const TextStyle(fontStyle: .italic),
             ),
           ),
           if (storageType == .localOnly && totps.value.length > user.totpsLimit)

@@ -24,10 +24,10 @@ class ChangeMasterPasswordSettingsEntryWidget extends ConsumerWidget with FTileM
         TextSpan(
           text: translations.settings.security.changeMasterPassword.subtitle.text,
           children: [
-            if (storageType.value == StorageType.shared)
+            if (storageType.value == .shared)
               TextSpan(
                 text: translations.settings.security.changeMasterPassword.subtitle.sync,
-                style: const TextStyle(fontStyle: FontStyle.italic),
+                style: const TextStyle(fontStyle: .italic),
               ),
           ],
         ),

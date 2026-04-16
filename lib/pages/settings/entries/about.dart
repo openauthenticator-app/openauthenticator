@@ -25,15 +25,15 @@ class AboutSettingsEntryWidget extends StatelessWidget with FTileMixin {
         translations.settings.about.aboutApp.subtitle(
           appName: const TextSpan(
             text: App.appName,
-            style: TextStyle(fontStyle: FontStyle.italic),
+            style: TextStyle(fontStyle: .italic),
           ),
           appVersion: TextSpan(
             text: snapshot.data ?? '1.0.0',
-            style: const TextStyle(fontStyle: FontStyle.italic),
+            style: const TextStyle(fontStyle: .italic),
           ),
           appAuthor: const TextSpan(
             text: App.appAuthor,
-            style: TextStyle(fontStyle: FontStyle.italic),
+            style: TextStyle(fontStyle: .italic),
           ),
         ),
       ),

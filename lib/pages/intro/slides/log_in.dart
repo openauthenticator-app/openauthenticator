@@ -29,7 +29,7 @@ class LogInIntroPageSlide extends StatelessWidget {
       ),
       IntroPageSlideParagraphWidget(
         text: translations.intro.logIn.secondParagraph,
-        textStyle: const TextStyle(fontStyle: FontStyle.italic),
+        textStyle: const TextStyle(fontStyle: .italic),
       ),
       Padding(
         padding: const EdgeInsets.only(bottom: kBigSpace),

@@ -137,8 +137,8 @@
       "title": "Gestion des sauvegardes",
       "subtitle": {
         "zero": "Vous n'avez aucune sauvegarde.",
-        "one": "Vous avez actuellement $n sauvegarde.",
-        "other": "Vous avez actuellement $n sauvegardes."
+        "one(rich)": "Vous avez actuellement $backups sauvegarde.",
+        "more(rich)": "Vous avez actuellement $backups sauvegardes."
       },
       "backupsDialogTitle": "Gestion des sauvegardes",
       "restoreBackupPasswordDialog": {

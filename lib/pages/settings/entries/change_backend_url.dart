@@ -8,13 +8,10 @@ import 'package:open_authenticator/model/backend/backend.dart';
 import 'package:open_authenticator/model/backend/request/request.dart';
 import 'package:open_authenticator/model/backend/request/response.dart';
 import 'package:open_authenticator/model/settings/backend_url.dart';
-import 'package:open_authenticator/model/settings/storage_type.dart';
 import 'package:open_authenticator/pages/settings/entries/widgets.dart';
 import 'package:open_authenticator/utils/result.dart';
 import 'package:open_authenticator/utils/storage_migration.dart';
-import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
-import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
 import 'package:open_authenticator/widgets/dialog/text_input_dialog.dart';
 import 'package:open_authenticator/widgets/waiting_overlay.dart';
 
@@ -32,30 +29,8 @@ class ChangeBackendUrlSettingsEntryWidget extends ConsumerWidget with FTileMixin
     title: Text(translations.settings.dangerZone.changeBackendUrl.title),
     subtitle: Text(translations.settings.dangerZone.changeBackendUrl.subtitle),
     onPress: () async {
-      StorageType storageType = await showWaitingOverlay(
-        context,
-        future: ref.read(storageTypeSettingsEntryProvider.future),
-      );
+      await StorageMigrationUtils.changeStorageType(context, ref, .localOnly, logout: true);
       if (!context.mounted) {
-        return;
-      }
-      if (storageType == .shared) {
-        await showFDialog(
-          context: context,
-          builder: (context, style, animation) => AppDialog(
-            title: Text(translations.error.widget.title),
-            actions: [
-              ClickableButton(
-                variant: .secondary,
-                onPress: () => Navigator.pop(context),
-                child: ButtonText(MaterialLocalizations.of(context).okButtonLabel),
-              ),
-            ],
-            children: [
-              Text(translations.miscellaneous.disableTotpSync),
-            ],
-          ),
-        );
         return;
       }
       String currentUrl = await showWaitingOverlay(
@@ -69,7 +44,7 @@ class ChangeBackendUrlSettingsEntryWidget extends ConsumerWidget with FTileMixin
         context,
         title: translations.settings.dangerZone.changeBackendUrl.inputDialog.title,
         message: translations.settings.dangerZone.changeBackendUrl.inputDialog.message(defaultBackendUrl: App.defaultBackendUrl),
-        keyboardType: TextInputType.url,
+        keyboardType: .url,
         initialValue: currentUrl,
         validator: (string) => Uri.tryParse(string ?? '') == null ? translations.error.validation.url : null,
       );
@@ -92,13 +67,6 @@ class ChangeBackendUrlSettingsEntryWidget extends ConsumerWidget with FTileMixin
           showDialogIfError: (_) => false,
         );
         return;
-      }
-      StorageType currentStorage = await ref.read(storageTypeSettingsEntryProvider.future);
-      if (!context.mounted) {
-        return;
-      }
-      if (currentStorage == .shared) {
-        await StorageMigrationUtils.changeStorageType(context, ref, .localOnly, logout: true);
       }
       if (!context.mounted) {
         return;

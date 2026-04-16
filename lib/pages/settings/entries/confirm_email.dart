@@ -33,7 +33,7 @@ class ConfirmEmailSettingsEntryWidget extends ConsumerWidget with FTileMixin {
         translations.settings.synchronization.confirmEmail.subtitle(
           email: TextSpan(
             text: emailToConfirm.value!.email,
-            style: const TextStyle(fontStyle: FontStyle.italic),
+            style: const TextStyle(fontStyle: .italic),
           ),
         ),
       ),

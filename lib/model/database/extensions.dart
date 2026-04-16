@@ -23,14 +23,14 @@ extension _ToOpenAuthenticatorTotp on _DriftTotp {
 extension _ToOpenAuthenticatorBackendPushOperation on _DriftBackendPushOperation {
   /// Converts this instance to a [PushOperation].
   PushOperation get asBackendPushOperation => switch (kind) {
-    PushOperationKind.set => SetTotpsPushOperation.raw(
+    .set => SetTotpsPushOperation.raw(
       uuid: uuid,
-      payload: jsonDecode(jsonPayload),
+      payload: jsonDecode(jsonPayload).cast<String, dynamic>(),
       createdAt: createdAt,
     ),
-    PushOperationKind.delete => DeleteTotpsPushOperation.raw(
+    .delete => DeleteTotpsPushOperation.raw(
       uuid: uuid,
-      payload: jsonDecode(jsonPayload).cast<String>(),
+      payload: jsonDecode(jsonPayload).cast<String, int>(),
       createdAt: createdAt,
     ),
   };

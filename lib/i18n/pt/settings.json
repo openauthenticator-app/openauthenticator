@@ -137,8 +137,8 @@
       "title": "Gerenciar backups",
       "subtitle": {
         "zero": "Você não possui nenhum backup armazenado.",
-        "one": "Atualmente, você possui $n backup armazenado.",
-        "other": "Atualmente, você possui $n backups armazenados."
+        "one(rich)": "Atualmente, você possui $backups backup armazenado.",
+        "more(rich)": "Atualmente, você possui $backups backups armazenados."
       },
       "backupsDialogTitle": "Gerenciar backups",
       "restoreBackupPasswordDialog": {

@@ -137,8 +137,8 @@
       "title": "Gestisci backup",
       "subtitle": {
         "zero": "Non hai backup memorizzati.",
-        "one": "Attualmente hai $n backup memorizzato.",
-        "other": "Attualmente hai $n backup memorizzati."
+        "one(rich)": "Attualmente hai $backups backup memorizzato.",
+        "more(rich)": "Attualmente hai $backups backup memorizzati."
       },
       "backupsDialogTitle": "Gestisci backup",
       "restoreBackupPasswordDialog": {

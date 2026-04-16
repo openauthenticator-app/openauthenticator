@@ -37,7 +37,18 @@ class ManageBackupSettingsEntryWidget extends ConsumerWidget with FTileMixin {
       suffix: const RightChevronSuffix(),
       prefix: const Icon(FIcons.clock),
       title: Text(translations.settings.backups.manageBackups.title),
-      subtitle: Text(translations.settings.backups.manageBackups.subtitle(n: backupCount)),
+      subtitle: Text.rich(
+        backupCount == 0
+            ? TextSpan(
+                text: translations.settings.backups.manageBackups.subtitle.zero,
+              )
+            : (backupCount == 1 ? translations.settings.backups.manageBackups.subtitle.one : translations.settings.backups.manageBackups.subtitle.more)(
+                backups: TextSpan(
+                  text: backupCount.toString(),
+                  style: const TextStyle(fontStyle: .italic),
+                ),
+              ),
+      ),
       enabled: backups.hasValue,
       onPress: () {
         showFDialog(
@@ -70,9 +81,9 @@ class _RestoreBackupDialogState extends ConsumerState<_RestoreBackupDialog> {
           if (value.isEmpty)
             Text(
               key: shareActionKey,
-              translations.settings.backups.manageBackups.subtitle(n: 0),
+              translations.settings.backups.manageBackups.subtitle.zero,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontStyle: FontStyle.italic),
+              style: const TextStyle(fontStyle: .italic),
             ),
           for (Backup backup in value)
             ExpandableTile(

@@ -50,7 +50,7 @@ class StorageTypeSettingsEntry extends EnumSettingsEntry<StorageType> {
         }
       }
 
-      if (value == StorageType.localOnly) {
+      if (value == .localOnly) {
         super.changeValue(value);
         return const ResultSuccess();
       }
@@ -119,10 +119,7 @@ class StorageTypeSettingsEntry extends EnumSettingsEntry<StorageType> {
           } else if (await totp.encryptedData.canDecryptData(newCryptoStore)) {
             oldCryptoStore = newCryptoStore;
           } else {
-            oldCryptoStore = await CryptoStore.fromPassword(
-              masterPassword,
-              totp.encryptedData.encryptionSalt,
-            );
+            oldCryptoStore = await CryptoStore.fromPassword(masterPassword, totp.encryptedData.encryptionSalt);
           }
           DecryptedTotp? decryptedTotp = await totp.changeEncryptionKey(oldCryptoStore, newCryptoStore);
           toAdd.add(decryptedTotp ?? totp);

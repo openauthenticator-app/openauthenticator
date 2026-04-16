@@ -100,18 +100,24 @@ class SessionRefreshManager extends Notifier<SessionRefreshState> {
   SessionRefreshState build() {
     ref.listen(storedSessionProvider, (_, _) {
       if (ref.mounted) {
-        state = .idle;
+        state = const SessionRefreshStateIdle();
       }
     });
-    return .idle;
+    return const SessionRefreshStateIdle();
   }
 
   /// Refreshes the session.
   Future<Result> refresh({Session? session}) async {
-    if (!ref.mounted || state == .inProgress || state == .invalidSession) {
-      return const ResultCancelled();
+    Result result = const ResultCancelled();
+    if (!ref.mounted || state is SessionRefreshStateInvalidSession) {
+      return result;
     }
-    state = .inProgress;
+    if (state is SessionRefreshStateInProgress) {
+      return await (state as SessionRefreshStateInProgress)._pendingRefresh.future;
+    }
+
+    Completer<Result>? pendingRefresh = Completer();
+    state = SessionRefreshStateInProgress(pendingRefresh: pendingRefresh);
     try {
       BackendClient backend = await ref.read(backendClientProvider.notifier);
       Result<Session> result = await _sendRefreshRequest(backend, session: session);
@@ -122,11 +128,10 @@ class SessionRefreshManager extends Notifier<SessionRefreshState> {
         return result;
       }
       await ref.read(storedSessionProvider.notifier).storeAndUse(result.value);
-      if (!ref.mounted) {
-        return const ResultCancelled();
+      if (ref.mounted) {
+        state = const SessionRefreshStateSuccess();
+        result = const ResultSuccess();
       }
-      state = .success;
-      return const ResultSuccess();
     } catch (ex, stackTrace) {
       List<String> invalidSessionCodes = [
         InvalidPayloadError.kErrorCode,
@@ -135,13 +140,15 @@ class SessionRefreshManager extends Notifier<SessionRefreshState> {
         ExpiredSessionError.kErrorCode,
       ];
       if (ex is BackendRequestError && invalidSessionCodes.contains(ex.code) && ref.mounted) {
-        state = .invalidSession;
+        state = const SessionRefreshStateInvalidSession();
       }
-      return ResultError(
+      result = ResultError(
         exception: ex,
         stackTrace: stackTrace,
       );
     }
+    pendingRefresh.complete(result);
+    return result;
   }
 
   /// Sends a refresh request.
@@ -177,16 +184,36 @@ class NoSessionException extends LocalizableException {
 }
 
 /// The session refresh state.
-enum SessionRefreshState {
-  /// The session refresh state is idle.
-  idle,
+sealed class SessionRefreshState {
+  /// Creates a new session refresh state instance.
+  const SessionRefreshState();
+}
 
-  /// The session refresh state is in progress.
-  inProgress,
+/// The session refresh state is idle.
+class SessionRefreshStateIdle extends SessionRefreshState {
+  /// Creates a new idle session refresh state instance.
+  const SessionRefreshStateIdle();
+}
 
-  /// The session refresh state is success.
-  success,
+/// The session refresh state is in progress.
+class SessionRefreshStateInProgress extends SessionRefreshState {
+  /// The pending refresh completer.
+  final Completer<Result> _pendingRefresh;
 
-  /// The session refresh state is invalid.
-  invalidSession,
+  /// Creates a new in progress session refresh state instance.
+  SessionRefreshStateInProgress({
+    required Completer<Result> pendingRefresh,
+  }) : _pendingRefresh = pendingRefresh;
+}
+
+/// The session refresh state is success.
+class SessionRefreshStateSuccess extends SessionRefreshState {
+  /// Creates a new success session refresh state instance.
+  const SessionRefreshStateSuccess();
+}
+
+/// The session refresh state is invalid.
+class SessionRefreshStateInvalidSession extends SessionRefreshState {
+  /// Creates a new invalid session refresh state instance.
+  const SessionRefreshStateInvalidSession();
 }

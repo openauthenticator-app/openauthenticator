@@ -103,7 +103,7 @@ sealed class AuthenticationProvider {
       }
       User? user = await _ref.read(userProvider.future);
       SessionRefreshState sessionRefreshState = _ref.read(sessionRefreshManagerProvider);
-      if (user == null || sessionRefreshState == .invalidSession) {
+      if (user == null || sessionRefreshState is SessionRefreshStateInvalidSession) {
         Result<ProviderLoginResponse> response = await _ref
             .read(backendClientProvider.notifier)
             .sendHttpRequest(

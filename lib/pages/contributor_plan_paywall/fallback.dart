@@ -393,11 +393,11 @@ class _ContributorPlanBillingPlanPickerState extends ConsumerState<_ContributorP
               translations.contributorPlan.fallbackPaywall.packageType.price(
                 price: TextSpan(
                   text: NumberFormat.simpleCurrency(locale: translations.$meta.locale.underscoreTag, name: price.currencyCode).format(price.amount),
-                  style: const TextStyle(fontStyle: FontStyle.italic),
+                  style: const TextStyle(fontStyle: .italic),
                 ),
                 interval: TextSpan(
                   text: interval.toLowerCase(),
-                  style: const TextStyle(fontStyle: FontStyle.italic),
+                  style: const TextStyle(fontStyle: .italic),
                 ),
               ),
             ),

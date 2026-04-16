@@ -137,8 +137,8 @@
       "title": "Manage backups",
       "subtitle": {
         "zero": "You do not have any backup stored.",
-        "one": "You currently have $n backup stored.",
-        "other": "You currently have $n backups stored."
+        "one(rich)": "You currently have $backups backup stored.",
+        "more(rich)": "You currently have $backups backups stored."
       },
       "backupsDialogTitle": "Manage backups",
       "restoreBackupPasswordDialog": {

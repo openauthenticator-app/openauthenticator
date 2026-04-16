@@ -269,7 +269,7 @@ class _RouteWidgetState extends ConsumerState<_RouteWidget> {
           if (previous == next) {
             return;
           }
-          if (next == .invalidSession) {
+          if (next is SessionRefreshStateInvalidSession) {
             WidgetsBinding.instance.addPostFrameCallback((_) => handleInvalidSession());
           }
         },

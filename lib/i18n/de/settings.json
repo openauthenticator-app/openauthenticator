@@ -137,8 +137,8 @@
       "title": "Sicherungen verwalten",
       "subtitle": {
         "zero": "Sie haben keine Sicherung gespeichert.",
-        "one": "Sie haben derzeit $n Sicherung gespeichert.",
-        "other": "Sie haben derzeit $n Sicherungen gespeichert."
+        "one(rich)": "Sie haben derzeit $backups Sicherung gespeichert.",
+        "more(rich)": "Sie haben derzeit $backups Sicherungen gespeichert."
       },
       "backupsDialogTitle": "Sicherungen verwalten",
       "restoreBackupPasswordDialog": {

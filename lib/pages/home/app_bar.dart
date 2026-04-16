@@ -109,11 +109,10 @@ class _SyncHeaderAction extends ConsumerWidget {
     SynchronizationPhase phase = ref.watch(synchronizationControllerProvider.select((status) => status.phase));
     switch (phase) {
       case SynchronizationPhaseOffline():
-        return ClickableHeaderAction(
+        return const ClickableHeaderAction(
           onPress: null,
           icon: Icon(
             FIcons.refreshCcwDot,
-            color: context.theme.colors.muted,
           ),
         );
       case SynchronizationPhaseSyncing():

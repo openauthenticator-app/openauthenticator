@@ -108,8 +108,8 @@ class SynchronizationController extends Notifier<SynchronizationStatus> {
 
   @override
   SynchronizationStatus build() {
-    StorageType? storageType = ref.read(storageTypeSettingsEntryProvider).value;
-    if (storageType == StorageType.localOnly) {
+    StorageType? storageType = ref.watch(storageTypeSettingsEntryProvider).value;
+    if (storageType == .localOnly) {
       return SynchronizationStatus();
     }
 
@@ -120,10 +120,19 @@ class SynchronizationController extends Notifier<SynchronizationStatus> {
 
     notifyLocalChange();
 
-    AsyncValue<bool> connectivityState = ref.watch(connectivityStateProvider);
+    ref.listen(connectivityStateProvider, _onConnectivityChanged);
     return SynchronizationStatus(
-      phase: connectivityState.value == true ? const SynchronizationPhaseIdle() : const SynchronizationPhaseOffline(),
+      phase: const SynchronizationPhaseIdle(),
     );
+  }
+
+  /// Triggered when the connectivity state has changed.
+  void _onConnectivityChanged(AsyncValue<bool>? previous, AsyncValue<bool> next) {
+    if (ref.mounted) {
+      state = state.update(
+        phase: next.value == true ? const SynchronizationPhaseIdle() : const SynchronizationPhaseOffline(),
+      );
+    }
   }
 
   /// Disposes the controller.

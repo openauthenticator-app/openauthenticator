@@ -19,7 +19,7 @@ part 'master_password.dart';
 part 'none.dart';
 
 /// The app unlock method provider.
-final appUnlockMethodProvider = Provider.autoDispose.family<AppUnlockMethod?, String>(
+final appUnlockMethodProvider = Provider.family<AppUnlockMethod?, String>(
   (ref, id) => switch (id) {
     LocalAuthenticationAppUnlockMethod.kMethodId => LocalAuthenticationAppUnlockMethod._(ref: ref),
     MasterPasswordAppUnlockMethod.kMethodId => MasterPasswordAppUnlockMethod._(ref: ref),

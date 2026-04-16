@@ -18,7 +18,7 @@ class AccountLinkSettingsEntryWidget extends ConsumerWidget with FTileMixin {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     SessionRefreshState sessionRefreshState = ref.watch(sessionRefreshManagerProvider);
-    if (sessionRefreshState == .invalidSession) {
+    if (sessionRefreshState is SessionRefreshStateInvalidSession) {
       return const SizedBox.shrink();
     }
     User? user = ref.watch(userProvider).value;
@@ -53,10 +53,10 @@ class AccountLinkSettingsEntryWidget extends ConsumerWidget with FTileMixin {
                           if (i < providers.length - 1)
                             const TextSpan(
                               text: ', ',
-                              style: TextStyle(fontStyle: FontStyle.normal),
+                              style: TextStyle(fontStyle: .normal),
                             ),
                         ],
-                        style: const TextStyle(fontStyle: FontStyle.italic),
+                        style: const TextStyle(fontStyle: .italic),
                       ),
                   ],
                 ),
@@ -65,7 +65,7 @@ class AccountLinkSettingsEntryWidget extends ConsumerWidget with FTileMixin {
         ),
       ),
       onPress: () => AccountUtils.tryRequestToggleLink(context),
-      enabled: sessionRefreshState != .inProgress,
+      enabled: sessionRefreshState is! SessionRefreshStateInProgress,
     );
   }
 }

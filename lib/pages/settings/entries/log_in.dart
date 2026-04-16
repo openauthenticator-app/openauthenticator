@@ -59,7 +59,7 @@ class _LogOutTile extends ConsumerWidget {
       translations.settings.synchronization.accountLogin.logOut.subtitle(
         user: TextSpan(
           text: user,
-          style: const TextStyle(fontStyle: FontStyle.italic),
+          style: const TextStyle(fontStyle: .italic),
         ),
       ),
     ),
