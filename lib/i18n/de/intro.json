@@ -12,7 +12,8 @@
     "fourthParagraph": "Dieses Limit kann jederzeit aufgehoben werden, indem Sie in den $app-Einstellungen den Mitwirkender-Plan abonnieren.",
     "button": {
       "loggedOut": "Einloggen",
-      "loggedIn": "Erfolgreich eingeloggt"
+      "loggedIn": "Erfolgreich eingeloggt",
+      "confirmEmail": "E-Mail bestätigen"
     }
   },
   "password": {

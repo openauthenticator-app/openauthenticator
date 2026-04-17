@@ -100,7 +100,7 @@ class ContributorPlanFallbackPaywall extends ConsumerWidget {
             ),
           ),
         ),
-        FTile.raw(
+        ClickableTile.raw(
           child: Column(
             spacing: kSpace / 2,
             children: [

@@ -1,0 +1,22 @@
+{
+  "confirmActionPickerDialog": {
+    "title": "Que voulez-vous faire ?",
+    "confirm": {
+      "title": "Valider votre compte",
+      "subtitle": "Collez le code que vous avez reçu par e-mail pour confirmer votre compte."
+    },
+    "cancelConfirmation": {
+      "title": "Annuler la confirmation du compte",
+      "subtitle": "Annuler la confirmation du compte.",
+      "validationDialog": {
+        "title": "Confirmation",
+        "message": "Êtes-vous sûr ?"
+      }
+    }
+  },
+  "success": "Adresse mail confirmée avec succès.",
+  "codeDialog": {
+    "title": "Code de confirmation",
+    "message": "Soit visitez le lien avec cet appareil, soit collez le code ci-dessous pour confirmer votre adresse e-mail."
+  }
+}

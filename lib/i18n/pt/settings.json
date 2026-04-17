@@ -89,27 +89,7 @@
     },
     "confirmEmail": {
       "title": "Confirme seu e-mail",
-      "subtitle(rich)": "Um e-mail de confirmação foi enviado para o endereço: $email.\nClique no link para concluir o login. Você também pode tocar nesta opção para digitá-lo manualmente.",
-      "success": "E-mail confirmado com sucesso.",
-      "confirmActionPickerDialog": {
-        "title": "O que você deseja fazer?",
-        "confirm": {
-          "title": "Confirmar sua conta",
-          "subtitle": "Cole o código que você recebeu por e-mail para confirmar sua conta."
-        },
-        "cancelConfirmation": {
-          "title": "Cancelar confirmação da conta",
-          "subtitle": "Cancelar a confirmação da sua conta.",
-          "validationDialog": {
-            "title": "Confirmação",
-            "message": "Tem certeza?"
-          }
-        }
-      },
-      "codeDialog": {
-        "title": "Código de confirmação",
-        "message": "Visite o link com este dispositivo ou cole o código abaixo para confirmar seu endereço de e-mail."
-      }
+      "subtitle(rich)": "Um e-mail de confirmação foi enviado para o endereço: $email.\nClique no link para concluir o login. Você também pode tocar nesta opção para digitá-lo manualmente."
     },
     "synchronizeTotps": {
       "title": "Sincronizar TOTPs",

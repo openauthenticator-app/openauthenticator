@@ -85,8 +85,8 @@ class Totp extends Equatable implements Comparable<Totp> {
 
   /// Tries to decrypt the current TOTP [secret].
   /// Returns the current instance if failed.
-  Future<Totp> decrypt(CryptoStore? cryptoStore) async {
-    DecryptedData? decryptedData = await DecryptedData.decrypt(
+  Totp decrypt(CryptoStore? cryptoStore) {
+    DecryptedData? decryptedData = DecryptedData.decrypt(
       cryptoStore: cryptoStore,
       encryptedData: encryptedData,
     );
@@ -103,15 +103,15 @@ class Totp extends Equatable implements Comparable<Totp> {
   int compareTo(Totp other) => uuid.compareTo(other.uuid);
 
   /// Changes the encryption key of the current TOTP.
-  Future<DecryptedTotp?> changeEncryptionKey(CryptoStore previousCryptoStore, CryptoStore newCryptoStore) async {
-    Totp result = await decrypt(previousCryptoStore);
+  DecryptedTotp? changeEncryptionKey(CryptoStore previousCryptoStore, CryptoStore newCryptoStore) {
+    Totp result = decrypt(previousCryptoStore);
     if (!result.isDecrypted) {
-      result = await decrypt(newCryptoStore);
+      result = decrypt(newCryptoStore);
       if (!result.isDecrypted) {
         return null;
       }
     }
-    DecryptedData? decryptedData = await (result as DecryptedTotp).decryptedData.changeEncryptionKey(newCryptoStore);
+    DecryptedData? decryptedData = (result as DecryptedTotp).decryptedData.changeEncryptionKey(newCryptoStore);
     if (decryptedData == null) {
       return null;
     }
@@ -172,34 +172,34 @@ class EncryptedData extends Equatable {
   });
 
   /// Encrypts the passed data.
-  static Future<EncryptedData?> encrypt({
+  static EncryptedData? encrypt({
     CryptoStore? cryptoStore,
     required String secret,
     String? label,
     String? issuer,
     String? imageUrl,
-  }) async {
-    Uint8List? encryptedSecret = await cryptoStore?.encrypt(secret);
+  }) {
+    Uint8List? encryptedSecret = cryptoStore?.encrypt(secret);
     if (encryptedSecret == null) {
       return null;
     }
     Uint8List? encryptedLabel;
     if (label != null) {
-      encryptedLabel = await cryptoStore?.encrypt(label);
+      encryptedLabel = cryptoStore?.encrypt(label);
       if (encryptedLabel == null) {
         return null;
       }
     }
     Uint8List? encryptedIssuer;
     if (issuer != null) {
-      encryptedIssuer = await cryptoStore?.encrypt(issuer);
+      encryptedIssuer = cryptoStore?.encrypt(issuer);
       if (encryptedIssuer == null) {
         return null;
       }
     }
     Uint8List? encryptedImageUrl;
     if (imageUrl != null) {
-      encryptedImageUrl = await cryptoStore?.encrypt(imageUrl);
+      encryptedImageUrl = cryptoStore?.encrypt(imageUrl);
       if (encryptedImageUrl == null) {
         return null;
       }
@@ -214,7 +214,7 @@ class EncryptedData extends Equatable {
   }
 
   /// Returns whether the given [cryptoStore] can decrypt this instance.
-  Future<bool> canDecryptData(CryptoStore cryptoStore) => cryptoStore.canDecrypt(encryptedSecret);
+  bool canDecryptData(CryptoStore cryptoStore) => cryptoStore.canDecrypt(encryptedSecret);
 
   @override
   List<Object?> get props => [

@@ -129,6 +129,9 @@ FThemeData _adaptLightTheme(FThemeData light, {required bool touch}) {
     toasterStyle: _adaptToasterStyle(
       boxShadow: [tileShadow],
     ),
+    alertStyles: _adaptAlertStyles(
+      boxShadow: [tileShadow],
+    ),
     style: _adaptGeneralStyle(
       shadow: [tileShadow],
     ),
@@ -378,6 +381,21 @@ FToasterStyleDelta _adaptToasterStyle({
       ),
     ],
   ),
+);
+
+/// Adapts the alert styles.
+FVariantsDelta<FAlertVariantConstraint, FAlertVariant, FAlertStyle, FAlertStyleDelta> _adaptAlertStyles({
+  List<BoxShadow>? boxShadow,
+}) => .delta(
+  [
+    .all(
+      .delta(
+        decoration: .boxDelta(
+          boxShadow: boxShadow,
+        ),
+      ),
+    ),
+  ],
 );
 
 /// Adapts the general styles.

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:cipherlib/hashlib.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/app.dart';
@@ -15,7 +16,6 @@ import 'package:open_authenticator/model/totp/totp.dart';
 import 'package:open_authenticator/utils/result.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:webcrypto/webcrypto.dart';
 
 /// The backup store provider.
 final backupStoreProvider = AsyncNotifierProvider.autoDispose<BackupStore, List<Backup>>(BackupStore.new);
@@ -147,9 +147,9 @@ class Backup implements Comparable<Backup> {
       }
 
       Map<String, dynamic> jsonData = jsonDecode(file.readAsStringSync());
-      CryptoStore cryptoStore = await CryptoStore.fromPassword(password, Salt.fromRawValue(value: base64.decode(jsonData[kSaltKey])));
-      HmacSecretKey hmacSecretKey = await HmacSecretKey.importRawKey(await cryptoStore.key.exportRawKey(), Hash.sha256);
-      if (!(await hmacSecretKey.verifyBytes(base64.decode(jsonData[kPasswordSignatureKey]), utf8.encode(password)))) {
+      CryptoStore cryptoStore = CryptoStore.fromPassword(password, Salt.fromRawValue(value: base64.decode(jsonData[kSaltKey])));
+      MACHashBase hmacSecretKey = cryptoStore.createHmacKey();
+      if (!(hmacSecretKey.verify(base64.decode(jsonData[kPasswordSignatureKey]), utf8.encode(password)))) {
         throw InvalidPasswordException();
       }
 
@@ -163,7 +163,7 @@ class Backup implements Comparable<Backup> {
       for (dynamic jsonTotp in jsonTotps) {
         Totp? totp = JsonTotp.tryFromJson(jsonTotp);
         if (totp != null) {
-          DecryptedTotp? decryptedTotp = await totp.changeEncryptionKey(cryptoStore, currentCryptoStore);
+          DecryptedTotp? decryptedTotp = totp.changeEncryptionKey(cryptoStore, currentCryptoStore);
           totps.add(decryptedTotp ?? totp);
         }
       }
@@ -186,18 +186,18 @@ class Backup implements Comparable<Backup> {
       if (currentCryptoStore == null) {
         throw _CryptoError();
       }
-      CryptoStore newStore = await CryptoStore.fromPassword(password, await Salt.generate());
+      CryptoStore newStore = CryptoStore.fromPassword(password, Salt.generate());
       List<Totp> totps = await _ref.read(totpRepositoryProvider.future);
       List<Totp> toBackup = [];
       for (Totp totp in totps) {
-        DecryptedTotp? decryptedTotp = await totp.changeEncryptionKey(currentCryptoStore, newStore);
+        DecryptedTotp? decryptedTotp = totp.changeEncryptionKey(currentCryptoStore, newStore);
         toBackup.add(decryptedTotp ?? totp);
       }
-      HmacSecretKey hmacSecretKey = await HmacSecretKey.importRawKey(await newStore.key.exportRawKey(), Hash.sha256);
+      MACHashBase hmacSecretKey = newStore.createHmacKey();
       File file = await getBackupPath(createDirectory: true);
       await file.writeAsString(
         jsonEncode({
-          kPasswordSignatureKey: base64.encode(await hmacSecretKey.signBytes(utf8.encode(password))),
+          kPasswordSignatureKey: hmacSecretKey.string(password, utf8).base64(),
           kSaltKey: base64.encode(newStore.salt.value),
           kTotpsKey: [
             for (Totp totp in toBackup) totp.toJson(),

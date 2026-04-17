@@ -29,8 +29,18 @@ class ChangeBackendUrlSettingsEntryWidget extends ConsumerWidget with FTileMixin
     title: Text(translations.settings.dangerZone.changeBackendUrl.title),
     subtitle: Text(translations.settings.dangerZone.changeBackendUrl.subtitle),
     onPress: () async {
-      await StorageMigrationUtils.changeStorageType(context, ref, .localOnly, logout: true);
+      Result result = await StorageMigrationUtils.changeStorageType(
+        context,
+        ref,
+        .localOnly,
+        logout: true,
+        handleResult: false,
+      );
       if (!context.mounted) {
+        return;
+      }
+      if (result is! ResultSuccess) {
+        context.handleResult(result);
         return;
       }
       String currentUrl = await showWaitingOverlay(

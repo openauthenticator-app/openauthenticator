@@ -19,13 +19,12 @@ dependencies:
     sdk: flutter
   animations: ^2.1.2
   flutter_riverpod: ^3.3.1
-  simple_secure_storage: ^0.3.7
+  simple_secure_storage: ^0.4.1
   jovial_svg: ^1.1.29
   mobile_scanner: ^7.2.0
   path_provider: ^2.1.5
   shared_preferences: ^2.5.5
   uuid: ^4.5.3
-  webcrypto: ^0.6.0
   equatable: ^2.0.8
   drift: ^2.31.0
   drift_flutter: ^0.2.8
@@ -46,18 +45,19 @@ dependencies:
   slang_flutter: ^4.14.0
   rate_my_app: ^2.3.2
   app_links: ^7.0.0
-  hashlib: ^2.3.0
+  hashlib: ^2.3.1
   hashlib_codecs: ^3.0.1
   scrollable_positioned_list: ^0.3.8
   share_plus: ^12.0.2
   wakelock_plus: ^1.5.1
   file_picker: ^11.0.2
   connectivity_plus: ^7.1.1
-  sentry_flutter: ^9.17.0
+  sentry_flutter: ^9.18.0
   forui: ^0.21.1
   forui_assets: ^0.21.0
   custom_refresh_indicator: ^4.0.1
-  # TODO: Remove these dependencies once migration is finished.
+  cipherlib: ^0.1.0
+  # TODO: Remove Firebase dependencies once migration is finished.
   firebase_core: ^4.7.0
   firebase_auth: ^6.4.0
   cloud_firestore: ^6.3.0

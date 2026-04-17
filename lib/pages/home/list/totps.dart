@@ -80,7 +80,7 @@ class _TotpsListWidget extends ConsumerWidget {
       }
       return;
     }
-    if (!(await totp.encryptedData.canDecryptData(currentCryptoStore))) {
+    if (!(totp.encryptedData.canDecryptData(currentCryptoStore))) {
       if (context.mounted) {
         bool shouldContinue = await ConfirmationDialog.ask(
           context,
@@ -148,8 +148,8 @@ class _TotpsListWidget extends ConsumerWidget {
     (CryptoStore, List<DecryptedTotp>) decryptedTotps = await showWaitingOverlay(
       context,
       future: () async {
-        CryptoStore previousCryptoStore = await CryptoStore.fromPassword(password, totp.encryptedData.encryptionSalt);
-        Totp targetTotp = await totp.decrypt(previousCryptoStore);
+        CryptoStore previousCryptoStore = CryptoStore.fromPassword(password, totp.encryptedData.encryptionSalt);
+        Totp targetTotp = totp.decrypt(previousCryptoStore);
         if (!targetTotp.isDecrypted) {
           return (previousCryptoStore, <DecryptedTotp>[]);
         }
@@ -192,7 +192,7 @@ class _TotpsListWidget extends ConsumerWidget {
         }
         List<DecryptedTotp> toUpdate = [];
         for (DecryptedTotp totp in totps) {
-          DecryptedTotp? decryptedTotpWithNewKey = await totp.changeEncryptionKey(oldCryptoStore, currentCryptoStore);
+          DecryptedTotp? decryptedTotpWithNewKey = totp.changeEncryptionKey(oldCryptoStore, currentCryptoStore);
           if (decryptedTotpWithNewKey == null || !decryptedTotpWithNewKey.isDecrypted) {
             throw _CryptoStoreChangeException();
           }

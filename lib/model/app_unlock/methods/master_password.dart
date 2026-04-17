@@ -31,7 +31,7 @@ class MasterPasswordAppUnlockMethod extends AppUnlockMethod<String> {
 
     if (reason == .openApp) {
       Salt? salt = await Salt.readFromLocalStorage();
-      _ref.read(cryptoStoreProvider.notifier).use(await CryptoStore.fromPassword(result.value, salt!));
+      _ref.read(cryptoStoreProvider.notifier).use(CryptoStore.fromPassword(result.value, salt!));
     }
 
     return ResultSuccess(value: result.value);

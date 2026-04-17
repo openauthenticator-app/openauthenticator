@@ -3,11 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:open_authenticator/app.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
+import 'package:open_authenticator/model/backend/authentication/providers/provider.dart';
 import 'package:open_authenticator/model/backend/user.dart';
 import 'package:open_authenticator/pages/intro/slides/slide.dart';
 import 'package:open_authenticator/pages/settings/entries/synchronize.dart';
 import 'package:open_authenticator/spacing.dart';
 import 'package:open_authenticator/utils/account.dart';
+import 'package:open_authenticator/utils/email_confirmation.dart';
 import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 
@@ -32,8 +34,18 @@ class LogInIntroPageSlide extends StatelessWidget {
         textStyle: const TextStyle(fontStyle: .italic),
       ),
       Padding(
-        padding: const EdgeInsets.only(bottom: kBigSpace),
+        padding: const EdgeInsets.only(bottom: kSpace),
         child: _LogInButton(),
+      ),
+      Consumer(
+        builder: (context, ref, child) {
+          EmailConfirmationData? emailToConfirm = ref.watch(emailConfirmationStateProvider).value;
+          return Padding(
+            padding: EdgeInsets.only(bottom: emailToConfirm == null ? kSpace : kBigSpace),
+            child: child,
+          );
+        },
+        child: _ConfirmEmailButton(),
       ),
       SynchronizeSettingsEntryWidget.intro(),
       IntroPageSlideParagraphWidget(
@@ -65,6 +77,22 @@ class _LogInButton extends ConsumerWidget {
             onPress: null,
             prefix: const Icon(FIcons.check),
             child: ButtonText(translations.intro.logIn.button.loggedIn),
+          );
+  }
+}
+
+/// The confirm email button.
+class _ConfirmEmailButton extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    AsyncValue<EmailConfirmationData?> emailToConfirm = ref.watch(emailConfirmationStateProvider);
+    return emailToConfirm.value == null
+        ? const SizedBox.shrink()
+        : ClickableButton(
+            onPress: () => EmailConfirmationUtils.askForConfirmation(context, ref),
+            variant: .ghost,
+            prefix: const Icon(FIcons.mail),
+            child: ButtonText(translations.intro.logIn.button.confirmEmail),
           );
   }
 }

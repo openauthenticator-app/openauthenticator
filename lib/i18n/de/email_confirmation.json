@@ -1,0 +1,22 @@
+{
+  "confirmActionPickerDialog": {
+    "title": "Was möchten Sie tun?",
+    "confirm": {
+      "title": "Bestätigen Sie Ihr Konto",
+      "subtitle": "Fügen Sie den Code ein, den Sie per E-Mail erhalten haben, um Ihr Konto zu bestätigen."
+    },
+    "cancelConfirmation": {
+      "title": "Kontobestätigung aufheben",
+      "subtitle": "Heben Sie Ihre Kontobestätigung auf.",
+      "validationDialog": {
+        "title": "Bestätigung",
+        "message": "Sind Sie sicher?"
+      }
+    }
+  },
+  "success": "E-Mail erfolgreich bestätigt.",
+  "codeDialog": {
+    "title": "Bestätigungscode",
+    "message": "Besuchen Sie entweder den Link mit diesem Gerät oder fügen Sie den Code unten ein, um Ihre E-Mail-Adresse zu bestätigen."
+  }
+}

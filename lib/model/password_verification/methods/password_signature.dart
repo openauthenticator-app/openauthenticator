@@ -2,11 +2,11 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:cipherlib/hashlib.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/model/crypto.dart';
 import 'package:open_authenticator/model/password_verification/methods/method.dart';
 import 'package:simple_secure_storage/simple_secure_storage.dart';
-import 'package:webcrypto/webcrypto.dart';
 
 /// The provider instance.
 final passwordSignatureVerificationMethodProvider = AsyncNotifierProvider<PasswordSignatureVerificationMethodNotifier, PasswordSignatureVerificationMethod>(
@@ -47,9 +47,9 @@ class PasswordSignatureVerificationMethodNotifier extends AsyncNotifier<Password
 
   /// Generates the [password] signature with the given [salt].
   Future<String> _generatePasswordSignature(String password, Salt salt) async {
-    CryptoStore cryptoStore = await CryptoStore.fromPassword(password, salt);
-    HmacSecretKey hmacSecretKey = await cryptoStore.createHmacKey();
-    String passwordSignature = base64.encode(await hmacSecretKey.signBytes(utf8.encode(password)));
+    CryptoStore cryptoStore = CryptoStore.fromPassword(password, salt);
+    MACHashBase hmacSecretKey = cryptoStore.createHmacKey();
+    String passwordSignature = hmacSecretKey.string(password, utf8).base64();
     return passwordSignature;
   }
 }
@@ -76,18 +76,9 @@ class PasswordSignatureVerificationMethod with PasswordVerificationMethod {
     if (salt == null) {
       return false;
     }
-    CryptoStore cryptoStore = await CryptoStore.fromPassword(password, salt);
-    HmacSecretKey hmacSecretKey = await cryptoStore.createHmacKey();
+    CryptoStore cryptoStore = CryptoStore.fromPassword(password, salt);
+    MACHashBase hmacSecretKey = cryptoStore.createHmacKey();
     Uint8List decodedSignature = base64.decode(passwordSignature!);
-    return await hmacSecretKey.verifyBytes(decodedSignature, utf8.encode(password));
-  }
-}
-
-/// Allows to create HMAC keys from the current crypto store.
-extension _HmacKey on CryptoStore {
-  /// Returns the HMAC secret key corresponding to the [key] with the [salt].
-  Future<HmacSecretKey> createHmacKey() async {
-    HmacSecretKey hmacSecretKey = await HmacSecretKey.importRawKey(await key.exportRawKey(), Hash.sha256);
-    return hmacSecretKey;
+    return hmacSecretKey.verify(decodedSignature, utf8.encode(password));
   }
 }

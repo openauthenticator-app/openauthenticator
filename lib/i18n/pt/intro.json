@@ -12,7 +12,8 @@
     "fourthParagraph": "Esse limite pode ser removido a qualquer momento assinando o Plano de Contribuidor nas configurações do $app.",
     "button": {
       "loggedOut": "Entrar",
-      "loggedIn": "Login realizado com sucesso"
+      "loggedIn": "Login realizado com sucesso",
+      "confirmEmail": "Confirmar email"
     }
   },
   "password": {

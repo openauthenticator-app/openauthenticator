@@ -12,7 +12,8 @@
     "fourthParagraph": "Questo limite può essere rimosso in qualsiasi momento sottoscrivendo il Piano Contributore nelle impostazioni di $app.",
     "button": {
       "loggedOut": "Accedi",
-      "loggedIn": "Accesso effettuato con successo"
+      "loggedIn": "Accesso effettuato con successo",
+      "confirmEmail": "Conferma email"
     }
   },
   "password": {

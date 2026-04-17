@@ -23,7 +23,7 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
   FutureOr<List<Totp>> build() async {
     AppDatabase database = ref.watch(appDatabaseProvider);
     CryptoStore? cryptoStore = await ref.watch(cryptoStoreProvider.future);
-    List<Totp> decrypted = await (await database.listTotps()).decrypt(cryptoStore);
+    List<Totp> decrypted = (await database.listTotps()).decrypt(cryptoStore);
     return decrypted.sortCanonically();
   }
 
@@ -35,7 +35,7 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
       return {};
     }
     state = const AsyncLoading();
-    List<Totp> newTotpsList = await totpsList.decrypt(cryptoStore);
+    List<Totp> newTotpsList = totpsList.decrypt(cryptoStore);
     Set<DecryptedTotp> difference = newTotpsList.decryptedTotps.toSet().difference(totpsList.decryptedTotps.toSet());
     if (!ref.mounted) {
       return {};
@@ -108,7 +108,7 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
       if (!ref.mounted) {
         return const ResultCancelled();
       }
-      state = AsyncData(totpsList.createMergedList(totps: await inserts.decrypt(cryptoStore)));
+      state = AsyncData(totpsList.createMergedList(totps: inserts.decrypt(cryptoStore)));
       return ResultSuccess(value: inserts);
     } catch (ex, stackTrace) {
       return ResultError(
@@ -148,7 +148,7 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
         );
       }
       CryptoStore? cryptoStore = await ref.read(cryptoStoreProvider.future);
-      List<Totp> decrypted = await inserts.decrypt(cryptoStore);
+      List<Totp> decrypted = inserts.decrypt(cryptoStore);
       await ref.read(totpImageCacheManagerProvider.notifier).fillCache(totps: decrypted);
       if (!ref.mounted) {
         return const ResultCancelled();
@@ -228,7 +228,7 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
         );
       }
       CryptoStore? cryptoStore = await ref.read(cryptoStoreProvider.future);
-      List<Totp> decrypted = await updates.decrypt(cryptoStore);
+      List<Totp> decrypted = updates.decrypt(cryptoStore);
       await ref.read(totpImageCacheManagerProvider.notifier).fillCache(totps: decrypted);
       if (!ref.mounted) {
         return const ResultCancelled();
@@ -324,10 +324,10 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
       List<Totp> totpsList = await future;
       CryptoStore? currentCryptoStore = await storedCryptoStore.future;
       if (updateTotps && currentCryptoStore != null) {
-        CryptoStore newCryptoStore = await CryptoStore.fromPassword(password, currentCryptoStore.salt);
+        CryptoStore newCryptoStore = CryptoStore.fromPassword(password, currentCryptoStore.salt);
         List<Totp> newTotps = [];
         for (Totp totp in totpsList) {
-          DecryptedTotp? decryptedTotp = await totp.changeEncryptionKey(currentCryptoStore, newCryptoStore);
+          DecryptedTotp? decryptedTotp = totp.changeEncryptionKey(currentCryptoStore, newCryptoStore);
           newTotps.add(decryptedTotp ?? totp);
         }
         AppDatabase database = ref.read(appDatabaseProvider);
@@ -410,9 +410,9 @@ extension _DecryptList on List<Totp> {
   }
 
   /// Decrypts the current list.
-  Future<List<Totp>> decrypt(CryptoStore? cryptoStore) async => [
+  List<Totp> decrypt(CryptoStore? cryptoStore) => [
     for (Totp totp in this) //
-      await totp.decrypt(cryptoStore),
+      totp.decrypt(cryptoStore),
   ];
 
   /// Returns the decrypted TOTPs list.

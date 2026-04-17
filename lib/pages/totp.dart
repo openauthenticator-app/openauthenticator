@@ -519,7 +519,7 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
   }
 
   /// Creates a [DecryptedTotp] corresponding to the current fields.
-  Future<DecryptedTotp?> _createTotp() async => await DecryptedTotp.create(
+  Future<DecryptedTotp?> _createTotp() async => DecryptedTotp.create(
     cryptoStore: await ref.read(cryptoStoreProvider.future),
     uuid: widget.totp?.uuid,
     secret: secret.toUpperCase(),

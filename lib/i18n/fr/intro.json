@@ -12,7 +12,8 @@
     "fourthParagraph": "Cette limite peut être supprimée à tout moment en souscrivant à l'Abonnement Contributeur dans les paramètres d'$app.",
     "button": {
       "loggedOut": "Connexion",
-      "loggedIn": "Connecté avec succès"
+      "loggedIn": "Connecté avec succès",
+      "confirmEmail": "Confirmer l'adresse e-mail"
     }
   },
   "password": {

@@ -155,6 +155,7 @@ class OpenAuthenticatorApp extends ConsumerWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
+      debugShowCheckedModeBanner: false,
       supportedLocales: AppLocaleUtils.supportedLocales,
       themeMode: theme.value,
       darkTheme: dark.toApproximateMaterialTheme(),

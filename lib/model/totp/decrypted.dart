@@ -70,7 +70,7 @@ class DecryptedTotp extends Totp {
   }
 
   @override
-  Future<Totp> decrypt(CryptoStore? cryptoStore) => Future.value(this);
+  Totp decrypt(CryptoStore? cryptoStore) => this;
 
   @override
   Totp copyWith({
@@ -97,7 +97,7 @@ class DecryptedTotp extends Totp {
         );
 
   /// Manually creates a [DecryptedTotp].
-  static Future<DecryptedTotp?> create({
+  static DecryptedTotp? create({
     required CryptoStore? cryptoStore,
     String? uuid,
     required String secret,
@@ -108,8 +108,8 @@ class DecryptedTotp extends Totp {
     Duration? validity,
     String? imageUrl,
     DateTime? updatedAt,
-  }) async {
-    EncryptedData? encryptedData = await EncryptedData.encrypt(
+  }) {
+    EncryptedData? encryptedData = EncryptedData.encrypt(
       cryptoStore: cryptoStore,
       secret: secret,
       label: label,
@@ -251,34 +251,34 @@ class DecryptedData extends EncryptedData {
        );
 
   /// Decrypts the passed [encryptedData].
-  static Future<DecryptedData?> decrypt({
+  static DecryptedData? decrypt({
     CryptoStore? cryptoStore,
     required EncryptedData encryptedData,
-  }) async {
+  }) {
     if (encryptedData is DecryptedData) {
       return encryptedData;
     }
-    String? decryptedSecret = await cryptoStore?.decrypt(encryptedData.encryptedSecret);
+    String? decryptedSecret = cryptoStore?.decrypt(encryptedData.encryptedSecret);
     if (decryptedSecret == null) {
       return null;
     }
     String? decryptedLabel;
     if (encryptedData.encryptedLabel != null) {
-      decryptedLabel = await cryptoStore?.decrypt(encryptedData.encryptedLabel!);
+      decryptedLabel = cryptoStore?.decrypt(encryptedData.encryptedLabel!);
       if (decryptedLabel == null) {
         return null;
       }
     }
     String? decryptedIssuer;
     if (encryptedData.encryptedIssuer != null) {
-      decryptedIssuer = await cryptoStore?.decrypt(encryptedData.encryptedIssuer!);
+      decryptedIssuer = cryptoStore?.decrypt(encryptedData.encryptedIssuer!);
       if (decryptedIssuer == null) {
         return null;
       }
     }
     String? decryptedImageUrl;
     if (encryptedData.encryptedImageUrl != null) {
-      decryptedImageUrl = await cryptoStore?.decrypt(encryptedData.encryptedImageUrl!);
+      decryptedImageUrl = cryptoStore?.decrypt(encryptedData.encryptedImageUrl!);
       if (decryptedImageUrl == null) {
         return null;
       }
@@ -293,11 +293,11 @@ class DecryptedData extends EncryptedData {
   }
 
   /// Changes the encryption key of the current TOTP.
-  Future<DecryptedData?> changeEncryptionKey(CryptoStore newCryptoStore) async {
-    if (await canDecryptData(newCryptoStore)) {
+  DecryptedData? changeEncryptionKey(CryptoStore newCryptoStore) {
+    if (canDecryptData(newCryptoStore)) {
       return this;
     }
-    EncryptedData? encryptedData = await EncryptedData.encrypt(
+    EncryptedData? encryptedData = EncryptedData.encrypt(
       cryptoStore: newCryptoStore,
       secret: decryptedSecret,
       issuer: decryptedIssuer,

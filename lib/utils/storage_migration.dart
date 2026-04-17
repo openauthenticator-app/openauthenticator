@@ -26,27 +26,33 @@ class StorageMigrationUtils {
     bool showConfirmation = true,
     String? backupPassword,
     bool logout = false,
-    String currentStorageMasterPassword = '',
+    String? currentStorageMasterPassword,
     StorageMigrationDeletedTotpPolicy storageMigrationDeletedTotpPolicy = .ask,
     bool handleResult = true,
   }) async {
-    if (showConfirmation) {
-      _ConfirmationResult? result = await _ConfirmationDialog.ask(context, newType == .shared);
-      if (result == null || !result.confirm || !context.mounted) {
-        return const ResultCancelled();
-      }
-      backupPassword ??= result.backupPassword;
+    StorageType currentType = await ref.read(storageTypeSettingsEntryProvider.future);
+    if (!context.mounted) {
+      return const ResultCancelled();
     }
-    Result<bool> passwordCheckResult = await (await ref.read(passwordVerificationProvider.future)).isPasswordValid(currentStorageMasterPassword);
-    if (passwordCheckResult is! ResultSuccess<bool> || !passwordCheckResult.value) {
-      if (!context.mounted) {
-        return const ResultCancelled();
+    if (newType != currentType) {
+      if (showConfirmation) {
+        _ConfirmationResult? result = await _ConfirmationDialog.ask(context, newType == .shared);
+        if (result == null || !result.confirm || !context.mounted) {
+          return const ResultCancelled();
+        }
+        backupPassword ??= result.backupPassword;
       }
-      String? enteredCurrentStorageMasterPassword = await MasterPasswordInputDialog.prompt(context);
-      if (enteredCurrentStorageMasterPassword == null || !context.mounted) {
-        return const ResultCancelled();
+      Result<bool> passwordCheckResult = await (await ref.read(passwordVerificationProvider.future)).isPasswordValid(currentStorageMasterPassword ?? '');
+      if (passwordCheckResult is! ResultSuccess<bool> || !passwordCheckResult.value) {
+        if (!context.mounted) {
+          return const ResultCancelled();
+        }
+        String? enteredCurrentStorageMasterPassword = await MasterPasswordInputDialog.prompt(context);
+        if (enteredCurrentStorageMasterPassword == null || !context.mounted) {
+          return const ResultCancelled();
+        }
+        currentStorageMasterPassword = enteredCurrentStorageMasterPassword;
       }
-      currentStorageMasterPassword = enteredCurrentStorageMasterPassword;
     }
     if (!context.mounted) {
       return const ResultCancelled();

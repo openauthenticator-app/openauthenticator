@@ -104,24 +104,24 @@ class StorageTypeSettingsEntry extends EnumSettingsEntry<StorageType> {
         CryptoStore? currentCryptoStore = ref.read(cryptoStoreProvider).value;
         CryptoStore? newCryptoStore;
         for (Totp totp in response.totps) {
-          CryptoStore cryptoStore = await CryptoStore.fromPassword(masterPassword, totp.encryptedData.encryptionSalt);
-          if (await totp.encryptedData.canDecryptData(cryptoStore)) {
+          CryptoStore cryptoStore = CryptoStore.fromPassword(masterPassword, totp.encryptedData.encryptionSalt);
+          if (totp.encryptedData.canDecryptData(cryptoStore)) {
             newCryptoStore = cryptoStore;
             break;
           }
         }
-        newCryptoStore ??= await CryptoStore.fromPassword(masterPassword, response.totps.first.encryptedData.encryptionSalt);
+        newCryptoStore ??= CryptoStore.fromPassword(masterPassword, response.totps.first.encryptedData.encryptionSalt);
 
         for (Totp totp in currentStorageTotps) {
           CryptoStore oldCryptoStore;
-          if (currentCryptoStore != null && await totp.encryptedData.canDecryptData(currentCryptoStore)) {
+          if (currentCryptoStore != null && totp.encryptedData.canDecryptData(currentCryptoStore)) {
             oldCryptoStore = currentCryptoStore;
-          } else if (await totp.encryptedData.canDecryptData(newCryptoStore)) {
+          } else if (totp.encryptedData.canDecryptData(newCryptoStore)) {
             oldCryptoStore = newCryptoStore;
           } else {
-            oldCryptoStore = await CryptoStore.fromPassword(masterPassword, totp.encryptedData.encryptionSalt);
+            oldCryptoStore = CryptoStore.fromPassword(masterPassword, totp.encryptedData.encryptionSalt);
           }
-          DecryptedTotp? decryptedTotp = await totp.changeEncryptionKey(oldCryptoStore, newCryptoStore);
+          DecryptedTotp? decryptedTotp = totp.changeEncryptionKey(oldCryptoStore, newCryptoStore);
           toAdd.add(decryptedTotp ?? totp);
         }
         await ref.read(cryptoStoreProvider.notifier).changeCryptoStore(masterPassword, newCryptoStore: newCryptoStore);

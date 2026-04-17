@@ -89,27 +89,7 @@
     },
     "confirmEmail": {
       "title": "Confirm your email",
-      "subtitle(rich)": "A confirmation email has been sent to your email address : $email.\nPlease click on the link to finish your login. You can also tap on this tile to enter it manually.",
-      "success": "Email confirmed with success.",
-      "confirmActionPickerDialog": {
-        "title": "What do you want to do ?",
-        "confirm": {
-          "title": "Confirm your account",
-          "subtitle": "Paste the code you received by email to confirm your account."
-        },
-        "cancelConfirmation": {
-          "title": "Cancel account confirmation",
-          "subtitle": "Cancel your account confirmation.",
-          "validationDialog": {
-            "title": "Confirmation",
-            "message": "Are you sure ?"
-          }
-        }
-      },
-      "codeDialog": {
-        "title": "Confirmation code",
-        "message": "Either visit the link with this device or paste the code below to confirm your email address."
-      }
+      "subtitle(rich)": "A confirmation email has been sent to your email address : $email.\nPlease click on the link to finish your login. You can also tap on this tile to enter it manually."
     },
     "synchronizeTotps": {
       "title": "Synchronize TOTPs",

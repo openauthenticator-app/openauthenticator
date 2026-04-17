@@ -89,27 +89,7 @@
     },
     "confirmEmail": {
       "title": "E-Mail bestätigt.",
-      "subtitle(rich)": "Eine Bestätigungs-E-Mail wurde an $email gesendet. Klicken Sie auf den Link, um die Anmeldung abzuschließen, oder tippen Sie hier, um den Code manuell einzugeben.",
-      "success": "E-Mail erfolgreich bestätigt.",
-      "confirmActionPickerDialog": {
-        "title": "Was möchten Sie tun?",
-        "confirm": {
-          "title": "Bestätigen Sie Ihr Konto",
-          "subtitle": "Fügen Sie den Code ein, den Sie per E-Mail erhalten haben, um Ihr Konto zu bestätigen."
-        },
-        "cancelConfirmation": {
-          "title": "Kontobestätigung aufheben",
-          "subtitle": "Heben Sie Ihre Kontobestätigung auf.",
-          "validationDialog": {
-            "title": "Bestätigung",
-            "message": "Sind Sie sicher?"
-          }
-        }
-      },
-      "codeDialog": {
-        "title": "Bestätigungscode",
-        "message": "Besuchen Sie entweder den Link mit diesem Gerät oder fügen Sie den Code unten ein, um Ihre E-Mail-Adresse zu bestätigen."
-      }
+      "subtitle(rich)": "Eine Bestätigungs-E-Mail wurde an $email gesendet. Klicken Sie auf den Link, um die Anmeldung abzuschließen, oder tippen Sie hier, um den Code manuell einzugeben."
     },
     "synchronizeTotps": {
       "title": "TOTPs synchronisieren",
