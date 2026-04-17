@@ -1,20 +1,29 @@
 ---
 name: Feature request
 about: Suggest an idea for this project
-title: ''
-labels: enhancement
+title: "feat: "
+labels: ["enhancement"]
 assignees: Skyost
 
 ---
 
-**Is your feature request related to a problem ? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+## Need
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+Describe the problem or user need.
 
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
+## Proposed solution
 
-**Additional context**
-Add any other context or screenshots about the feature request here.
+Describe the change you would like to see.
+
+## Alternatives considered
+
+List any alternatives or approaches already considered.
+
+## Expected impact
+
+Explain the value for other users, contributors, or maintainers.
+Also explain the impact on the backend.
+
+## Additional context
+
+Links, mockups, screenshots, references, etc.

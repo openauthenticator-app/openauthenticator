@@ -1,6 +1,6 @@
 <div align="center">
   <a href="https://openauthenticator.app">
-    <img src="https://github.com/Skyost/OpenAuthenticator/raw/main/docs/public/images/logo.svg" alt="Logo" width="120" height="120">
+    <img src="https://github.com/openauthenticator-app/openauthenticator/raw/main/docs/public/images/logo.svg" alt="Logo" width="120" height="120">
   </a>
 
   <h3>Open Authenticator</h3>
@@ -21,9 +21,9 @@
   </p>
 
   <p>
-    <img src="https://img.shields.io/github/license/openauthenticator-app/backend" alt="License">
-    <img src="https://img.shields.io/github/languages/top/openauthenticator-app/backend" alt="Top language">
-    <img src="https://img.shields.io/github/stars/openauthenticator-app/backend" alt="GitHub stars">
+    <img src="https://img.shields.io/github/license/openauthenticator-app/openauthenticator" alt="License">
+    <img src="https://img.shields.io/github/languages/top/openauthenticator-app/openauthenticator" alt="Top language">
+    <img src="https://img.shields.io/github/stars/openauthenticator-app/openauthenticator" alt="GitHub stars">
   </p>
 </div>
 
@@ -40,10 +40,13 @@ The project focuses on three core ideas :
 
 Open Authenticator currently targets Android, iOS, Windows, macOS and Linux.
 
+> [!TIP]
+> If you like this project, consider starring it on GitHub !
+
 ## Features
 
 - Cross-platform Flutter application for mobile and desktop.
-- Free and open-source software under the [GPL v3.0 license](https://github.com/Skyost/OpenAuthenticator/blob/main/LICENSE).
+- Free and open-source software under the [GPL v3.0 license](https://github.com/openauthenticator-app/openauthenticator/blob/main/LICENSE).
 - Secure local storage for your OTP data.
 - QR code scanning and `otpauth://` link handling.
 - Optional synchronization across devices with self-hostable backend support.
@@ -63,8 +66,8 @@ Prebuilt packages and store links are available on the [official website](https:
 
 ### Prerequisites
 
-- A recent stable version of Flutter.
-- Dart SDK `>=3.10.0 <4.0.0`.
+- A recent stable version of **Flutter**.
+- **Dart** SDK `>=3.10.0 <4.0.0`.
 - Platform toolchains for the targets you want to run.
 
 It is recommended to stay on Flutter stable :
@@ -88,20 +91,20 @@ flutter pub get
 
 Some files used by the app are generated or refreshed during setup.
 
-1. Compile SVG assets to `.si`:
+First, compile SVG assets to `.si` :
 
 ```sh
 dart run open_authenticator:compile_svg
 ```
 
-2. Generate source files used by code generation:
+Then, generate source files used by code generation :
 
 ```sh
 dart run build_runner build --delete-conflicting-outputs
 dart run slang
 ```
 
-3. Generate `lib/app.dart` for your local build:
+Last but not least, generate `lib/app.dart` for your local build :
 
 ```sh
 dart run open_authenticator:generate
@@ -127,6 +130,8 @@ you want to run against.
 
 ### Run the app
 
+To run the app :
+
 ```sh
 flutter run
 ```
@@ -134,17 +139,17 @@ flutter run
 ## Contributing
 
 Contributions are more than welcome. For setup details, contribution rules and PR expectations, read
-[CONTRIBUTING.md](https://github.com/Skyost/OpenAuthenticator/blob/main/CONTRIBUTING.md).
+[CONTRIBUTING.md](https://github.com/openauthenticator-app/openauthenticator/blob/main/CONTRIBUTING.md).
 
 You can also help by :
 
 - reporting bugs or suggesting features in the
-  [issue tracker](https://github.com/Skyost/OpenAuthenticator/issues) ;
+  [issue tracker](https://github.com/openauthenticator-app/openauthenticator/issues) ;
 - improving translations through the
   [translation page](https://openauthenticator.app/translate/) ;
 - submitting fixes for documentation, UI text or code.
 
-## Support The Project
+## Support the project
 
 If you want to support Open Authenticator financially, you can use :
 
@@ -154,4 +159,5 @@ If you want to support Open Authenticator financially, you can use :
 
 ## License
 
-Open Authenticator is licensed under the [GNU General Public License v3.0](LICENSE).
+Open Authenticator is licensed under the
+[GNU General Public License v3.0](https://github.com/openauthenticator-app/openauthenticator/blob/main/LICENSE).

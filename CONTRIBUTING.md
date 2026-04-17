@@ -1,6 +1,6 @@
 # Contribution Guidelines
 
-**Note:** If these contribution guidelines are not followed your issue or PR might be closed, so
+**Note :** If these contribution guidelines are not followed your issue or PR might be closed, so
 please read these instructions carefully.
 
 ## Contribution types
@@ -62,13 +62,6 @@ Then, to download required dependencies, run the following command in the app di
 
 ```shell
 flutter pub get
-```
-
-You will then need to configure your Firebase environment :
-
-```shell
-dart pub global activate flutterfire_cli
-flutterfire configure
 ```
 
 Now, generate the remaining files required by Open Authenticator :
@@ -161,8 +154,8 @@ dart run open_authenticator:version
 Note that you need a Github PAT that has write access to the current repository. It should be put
 in a `.env` file under the key `GITHUB_PAT`.
 
-[GitHub issue]: https://github.com/Skyost/OpenAuthenticator/issues
-[GitHub issues]: https://github.com/Skyost/OpenAuthenticator/issues
-[PRs]: https://github.com/Skyost/OpenAuthenticator/pulls
+[GitHub issue]: https://github.com/openauthenticator-app/openauthenticator/issues
+[GitHub issues]: https://github.com/openauthenticator-app/openauthenticator/issues
+[PRs]: https://github.com/openauthenticator-app/openauthenticator/pulls
 [pubspec doc]: https://dart.dev/tools/pub/pubspec
 [conventional commit]: https://www.conventionalcommits.org
