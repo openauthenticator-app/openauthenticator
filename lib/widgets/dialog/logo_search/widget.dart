@@ -101,6 +101,7 @@ class _LogoSearchState extends State<LogoSearch> {
         Wrap(
           alignment: WrapAlignment.center,
           spacing: widget.imageWidth / 10,
+          runSpacing: widget.imageWidth / 10,
           children: [
             for (String logo in searches[filteredSearchKeywords]!) //
               buildImageWidget(logo),

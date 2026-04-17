@@ -56,7 +56,9 @@ Open Authenticator currently targets Android, iOS, Windows, macOS and Linux.
 
 ## Screenshots
 
-<img src="https://openauthenticator.app/images/screenshots/home.png" alt="Open Authenticator screenshot" height="400">
+<img src="https://openauthenticator.app/images/screenshots/readme/home.png" alt="Main page" height="400">
+<img src="https://openauthenticator.app/images/screenshots/readme/edit.png" alt="Edit TOTP page" height="400">
+<img src="https://openauthenticator.app/images/screenshots/readme/settings.png" alt="Settings page" height="400">
 
 ## Download
 
