@@ -5,29 +5,101 @@ import 'package:args/args.dart';
 /// Generates "lib/app.dart".
 void main(List<String> arguments) {
   ArgParser parser = ArgParser()
-    ..addOption('app-name', defaultsTo: 'Open Authenticator')
-    ..addOption('app-author', defaultsTo: 'Skyost')
-    ..addOption('app-package-name', defaultsTo: 'app.openauthenticator')
-    ..addOption('default-backend-url', defaultsTo: 'https://backend.openauthenticator.app')
-    ..addOption('github-repository-url', defaultsTo: 'https://github.com/openauthenticator-app/openauthenticator')
-    ..addOption('app-translation-url', defaultsTo: 'https://openauthenticator.app/translate/')
-    ..addOption('sentry-dsn', defaultsTo: '')
-    ..addOption('revenue-cat-public-key-android', defaultsTo: '')
-    ..addOption('revenue-cat-public-key-darwin', defaultsTo: '')
-    ..addOption('revenue-cat-public-key-windows', defaultsTo: '')
-    ..addOption('revenue-cat-offering-id', defaultsTo: '')
-    ..addOption('logo-dev-api-key', defaultsTo: '')
-    ..addOption('google-play-identifier', defaultsTo: '')
-    ..addOption('app-store-identifier', defaultsTo: '')
-    ..addOption('privacy-policy-link', defaultsTo: 'https://openauthenticator.app/privacy-policy')
-    ..addOption('terms-of-service-link', defaultsTo: 'https://openauthenticator.app/terms-of-service')
-    ..addOption('restore-purchases-link', defaultsTo: 'https://openauthenticator.app/contact');
+    ..addOption(
+      'app-name',
+      defaultsTo: 'Open Authenticator',
+      help: 'The app name.',
+    )
+    ..addOption(
+      'app-author',
+      defaultsTo: 'Skyost',
+      help: 'The app author.',
+    )
+    ..addOption(
+      'app-package-name',
+      defaultsTo: 'app.openauthenticator',
+      help: 'The app package name.',
+    )
+    ..addOption(
+      'default-backend-url',
+      defaultsTo: 'https://backend.openauthenticator.app',
+      help: 'The app backend URL.',
+    )
+    ..addOption(
+      'github-repository-url',
+      defaultsTo: 'https://github.com/openauthenticator-app/openauthenticator',
+      help: 'The Github repository URL.',
+    )
+    ..addOption(
+      'app-translation-url',
+      defaultsTo: 'https://openauthenticator.app/translate/',
+      help: 'The app translation URL.',
+    )
+    ..addOption(
+      'sentry-dsn',
+      defaultsTo: '',
+      help: 'The Sentry DSN.',
+    )
+    ..addOption(
+      'revenue-cat-public-key-android',
+      defaultsTo: '',
+      help: 'The RevenueCat Android public key.',
+    )
+    ..addOption(
+      'revenue-cat-public-key-darwin',
+      defaultsTo: '',
+      help: 'The RevenueCat iOS / macOS public key.',
+    )
+    ..addOption(
+      'revenue-cat-public-key-windows-linux',
+      defaultsTo: '',
+      help: 'The RevenueCat Windows / Linux public key.',
+    )
+    ..addOption(
+      'revenue-cat-offering-id',
+      defaultsTo: '',
+      help: 'The Contributor Plan offering id.',
+    )
+    ..addOption(
+      'logo-dev-api-key',
+      defaultsTo: '',
+      help: 'The `logo.dev` API key.',
+    )
+    ..addOption(
+      'google-play-identifier',
+      defaultsTo: '',
+      help: 'The Google Play app identifier.',
+    )
+    ..addOption(
+      'app-store-identifier',
+      defaultsTo: '',
+      help: 'The Apple App Store app identifier.',
+    )
+    ..addOption(
+      'privacy-policy-link',
+      defaultsTo: 'https://openauthenticator.app/privacy-policy',
+      help: 'The link to the privacy policy.',
+    )
+    ..addOption(
+      'terms-of-service-link',
+      defaultsTo: 'https://openauthenticator.app/terms-of-service',
+      help: 'The link to the terms of service.',
+    )
+    ..addFlag(
+      'help',
+      abbr: 'h',
+      negatable: false,
+      help: 'Show this help message.',
+    );
 
-  final results = parser.parse(arguments);
+  ArgResults results = parser.parse(arguments);
+  if (results['help']) {
+    stdout.writeln(parser.usage);
+    return;
+  }
 
-  final content = '''
-import 'package:flutter/foundation.dart';
-
+  String content =
+      '''
 /// Contains some app constants.
 class App {
   /// The app name.
