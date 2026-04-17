@@ -67,7 +67,7 @@ class PushOperationsQueue extends AsyncNotifier<List<PushOperation>> {
         .read(backendClientProvider.notifier)
         .sendHttpRequest(
           SynchronizationPushRequest(
-            operations: compactedOperations,
+            operations: compactedOperations.reversed.toList(),
           ),
         );
     if (result is! ResultSuccess<SynchronizationPushResponse>) {

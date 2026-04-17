@@ -30,7 +30,7 @@ sealed class PushOperation<T> with EquatableMixin {
   });
 
   /// The operation kind.
-  String get _kind;
+  PushOperationKind get _kind;
 
   @override
   List<Object?> get props => [
@@ -46,7 +46,7 @@ sealed class PushOperation<T> with EquatableMixin {
   }) => {
     'uuid': uuid,
     'payload': payload,
-    'kind': _kind,
+    'kind': _kind.name,
     if (!httpRequest) ...{
       'createdAt': createdAt.millisecondsSinceEpoch,
     },
@@ -76,7 +76,7 @@ class SetTotpsPushOperation extends PushOperation<Map<String, dynamic>> {
        );
 
   @override
-  String get _kind => 'set';
+  PushOperationKind get _kind => PushOperationKind.set;
 
   @override
   SetTotpsPushOperation copyWith({
@@ -112,7 +112,7 @@ class DeleteTotpsPushOperation extends PushOperation<Map<String, int>> {
        );
 
   @override
-  String get _kind => 'delete';
+  PushOperationKind get _kind => PushOperationKind.delete;
 
   @override
   DeleteTotpsPushOperation copyWith({
@@ -125,19 +125,40 @@ class DeleteTotpsPushOperation extends PushOperation<Map<String, int>> {
   );
 }
 
+/// Represents a push operation kind.
+enum PushOperationKind {
+  /// Represents a delete operation.
+  delete,
+
+  /// Represents a set operation.
+  set,
+}
+
 /// Allows to compact a list of push operations.
 extension Compact on List<PushOperation> {
-  /// Compacts the current push operations while preserving their relative order.
-  /// Only the latest operation for each TOTP UUID is kept.
+  /// Compacts the current push operations. Only the latest operation for each TOTP UUID is kept.
   List<PushOperation> get compacted {
     if (isEmpty) {
       return [];
     }
 
+    List<PushOperation> sorted = List.of(this)
+      ..sort((a, b) {
+        int createdAtComparison = b.createdAt.compareTo(a.createdAt);
+        if (createdAtComparison != 0) {
+          return createdAtComparison;
+        }
+        int kindComparison = a._kind.index.compareTo(b._kind.index);
+        if (kindComparison != 0) {
+          return kindComparison;
+        }
+        return a.uuid.compareTo(b.uuid);
+      });
+
     Set<String> processedTotpUuids = {};
     List<PushOperation> result = [];
 
-    for (PushOperation operation in reversed) {
+    for (PushOperation operation in sorted) {
       switch (operation) {
         case SetTotpsPushOperation(:final payload):
           Map<String, dynamic> newPayload = {
@@ -160,6 +181,6 @@ extension Compact on List<PushOperation> {
       }
     }
 
-    return result.reversed.toList();
+    return result;
   }
 }

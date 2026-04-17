@@ -87,12 +87,3 @@ class BackendPushOperationErrors extends Table {
   /// Maps to [PushOperationResult.createdAt].
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 }
-
-/// Represents a push operation kind.
-enum PushOperationKind {
-  /// Represents a set operation.
-  set,
-
-  /// Represents a delete operation.
-  delete,
-}

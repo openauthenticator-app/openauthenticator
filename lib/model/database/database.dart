@@ -154,11 +154,13 @@ class AppDatabase extends _$AppDatabase {
         deletedTotps,
         [
           for (MapEntry<String, DateTime> entry in merged.entries)
-            _DriftDeletedTotp(uuid: entry.key, deletedAt: entry.value),
+            _DriftDeletedTotp(
+              uuid: entry.key,
+              deletedAt: entry.value,
+            ),
         ],
       );
     });
-
   }
 
   /// Marks the given [totp] as not deleted.
@@ -178,7 +180,12 @@ class AppDatabase extends _$AppDatabase {
 
   /// Selects the pending backend push operations.
   Selectable<PushOperation> _selectPendingBackendPushOperations() {
-    SimpleSelectStatement<$PendingBackendPushOperationsTable, _DriftBackendPushOperation> operations = select(pendingBackendPushOperations)..orderBy([(table) => OrderingTerm.asc(table.createdAt)]);
+    SimpleSelectStatement<$PendingBackendPushOperationsTable, _DriftBackendPushOperation> operations = select(pendingBackendPushOperations)
+      ..orderBy([
+        (table) => OrderingTerm.desc(table.createdAt),
+        (table) => OrderingTerm.asc(table.kind),
+        (table) => OrderingTerm.asc(table.uuid),
+      ]);
     return operations.map((operation) => operation.asBackendPushOperation);
   }
 
