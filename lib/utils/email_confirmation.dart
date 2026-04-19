@@ -14,7 +14,11 @@ import 'package:open_authenticator/widgets/waiting_overlay.dart';
 /// Allows to handle email confirmation.
 class EmailConfirmationUtils {
   /// Asks for email confirmation.
-  static Future<Result> askForConfirmation(BuildContext context, WidgetRef ref, {bool handleResult = true}) async {
+  static Future<Result> askForConfirmation(
+    BuildContext context,
+    WidgetRef ref, {
+    bool handleResult = true,
+  }) async {
     _ConfirmAction? confirmAction = await _ConfirmActionPickerDialog.openDialog(context);
     if (confirmAction == null || !context.mounted) {
       return const ResultCancelled();
@@ -57,14 +61,14 @@ class EmailConfirmationUtils {
 
   /// Tries to confirm the user. He has to enter the code manually.
   static Future<Result<RedirectResult>> _tryConfirm(BuildContext context, WidgetRef ref) async {
-    String? code = await TextInputDialog.prompt(
+    String? code = (await TextInputDialog.prompt(
       context,
       title: translations.emailConfirmation.codeDialog.title,
       message: translations.emailConfirmation.codeDialog.message,
       keyboardType: .visiblePassword,
       textCapitalization: .characters,
-    );
-    if (code == null || !context.mounted) {
+    ))?.trim();
+    if (code == null || code.isEmpty || !context.mounted) {
       return const ResultCancelled();
     }
     return await showWaitingOverlay(

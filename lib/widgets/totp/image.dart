@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -66,32 +65,25 @@ class TotpImage extends ConsumerWidget {
       return _makeCircle(_createDefaultImage());
     }
 
-    AsyncValue<Map<String, CacheObject>> cached = ref.watch(totpImageCacheManagerProvider);
-    if (cached is! AsyncData<Map<String, CacheObject>>) {
-      return _makeCircle(_createDefaultImage());
-    }
+    AsyncValue<ResolvedTotpImage?> resolved = ref.watch(
+      totpResolvedImageProvider((
+        uuid: uuid!,
+        imageUrl: imageUrl,
+      )),
+    );
 
-    return FutureBuilder(
-      future: cached.value.getCachedImage(uuid!, imageUrl),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return _makeCircle(_createDefaultImage());
-        }
-        File file = snapshot.data!.$1;
-        String? source = file.existsSync() ? file.path : imageUrl;
-        if (source == null) {
-          return _makeCircle(_createDefaultImage());
-        }
-        return _makeCircle(
-          SmartImage(
+    return _makeCircle(
+      switch (resolved) {
+        AsyncData(:final value) when value != null => SmartImage(
             imageKey: ValueKey('$uuid/$imageUrl'),
-            source: source,
+            source: value.source,
             height: size,
             width: size,
             fit: BoxFit.contain,
-            imageType: snapshot.data!.$2,
+            imageType: value.imageType,
+            errorBuilder: (_) => _createPlaceholderImage(),
           ),
-        );
+        _ => _createDefaultImage(),
       },
     );
   }
@@ -105,25 +97,29 @@ class TotpImage extends ConsumerWidget {
     ),
   );
 
-  /// Creates a default image, with the app logo inside.
+  /// Creates the default image.
   Widget _createDefaultImage() => imageUrl == null
-      ? ColorFiltered(
-          colorFilter: ColorFilter.mode(
-            _filterColor,
-            BlendMode.color,
-          ),
-          child: SizedScalableImage(
-            height: size,
-            width: size,
-            asset: 'assets/images/logo.si',
-          ),
-        )
-      : SmartImage(
+      ? _createPlaceholderImage()
+      : ResolvedSmartImage(
           source: imageUrl!,
           height: size,
           width: size,
           fit: BoxFit.contain,
+          errorBuilder: (_) => _createPlaceholderImage(),
         );
+
+  /// Creates the local placeholder image, with the app logo inside.
+  Widget _createPlaceholderImage() => ColorFiltered(
+      colorFilter: ColorFilter.mode(
+        _filterColor,
+        BlendMode.color,
+      ),
+      child: SizedScalableImage(
+        height: size,
+        width: size,
+        asset: 'assets/images/logo.si',
+      ),
+    );
 }
 
 /// Displays the TOTP image with a countdown.

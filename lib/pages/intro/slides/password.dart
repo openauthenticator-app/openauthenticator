@@ -29,7 +29,9 @@ class PasswordIntroPageSlide extends StatelessWidget {
       ),
       Padding(
         padding: const EdgeInsets.only(bottom: kSpace),
-        child: MasterPasswordForm(onChanged: onPasswordChanged),
+        child: FTile.raw(
+          child: MasterPasswordForm(onChanged: onPasswordChanged),
+        ),
       ),
       Padding(
         padding: const EdgeInsets.only(bottom: kBigSpace),

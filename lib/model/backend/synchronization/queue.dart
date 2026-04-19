@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/model/backend/backend.dart';
 import 'package:open_authenticator/model/backend/connectivity.dart';
@@ -13,6 +14,7 @@ import 'package:open_authenticator/model/database/database.dart';
 import 'package:open_authenticator/model/settings/storage_type.dart';
 import 'package:open_authenticator/model/totp/repository.dart';
 import 'package:open_authenticator/model/totp/totp.dart';
+import 'package:open_authenticator/utils/platform.dart';
 import 'package:open_authenticator/utils/result.dart';
 
 /// The push operations errors provider.
@@ -90,7 +92,7 @@ class PushOperationsQueue extends AsyncNotifier<List<PushOperation>> {
 final synchronizationControllerProvider = NotifierProvider<SynchronizationController, SynchronizationStatus>(SynchronizationController.new);
 
 /// Allows to control the synchronization process.
-class SynchronizationController extends Notifier<SynchronizationStatus> {
+class SynchronizationController extends Notifier<SynchronizationStatus> with WidgetsBindingObserver {
   /// The synchronization periodic interval.
   static const Duration _kPeriodicInterval = Duration(minutes: 10);
 
@@ -113,17 +115,28 @@ class SynchronizationController extends Notifier<SynchronizationStatus> {
       return SynchronizationStatus();
     }
 
-    ref.onDispose(_dispose);
-
     Timer periodicTimer = Timer.periodic(_kPeriodicInterval, (_) => notifyLocalChange());
     ref.onDispose(periodicTimer.cancel);
 
+    if (currentPlatform.isMobile) {
+      WidgetsBinding.instance.addObserver(this);
+    }
+
     notifyLocalChange();
+    ref.onDispose(_dispose);
 
     ref.listen(connectivityStateProvider, _onConnectivityChanged);
     return SynchronizationStatus(
       phase: const SynchronizationPhaseIdle(),
     );
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == .resumed) {
+      forceSync();
+    }
   }
 
   /// Triggered when the connectivity state has changed.
@@ -139,6 +152,8 @@ class SynchronizationController extends Notifier<SynchronizationStatus> {
   void _dispose() {
     _coalesceTimer?.cancel();
     _retryTimer?.cancel();
+
+    WidgetsBinding.instance.removeObserver(this);
 
     _coalesceTimer = null;
     _retryTimer = null;

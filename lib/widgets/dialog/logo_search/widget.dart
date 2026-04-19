@@ -148,7 +148,7 @@ class _LogoSearchState extends State<LogoSearch> {
     Widget image = UnconstrainedBox(
       child: SizedBox(
         width: widget.imageWidth,
-        child: SmartImage(
+        child: ResolvedSmartImage(
           source: imageUrl,
           height: widget.imageWidth,
           width: widget.imageWidth,
