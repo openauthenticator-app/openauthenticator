@@ -103,12 +103,13 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
           ),
         );
       }
-      ref.read(totpImageCacheManagerProvider.notifier).fillCache(totps: inserts);
       CryptoStore? cryptoStore = await ref.read(cryptoStoreProvider.future);
+      List<Totp> decrypted = inserts.decrypt(cryptoStore);
+      await ref.read(totpImageCacheManagerProvider.notifier).fillCache(totps: decrypted);
       if (!ref.mounted) {
         return const ResultCancelled();
       }
-      state = AsyncData(totpsList.createMergedList(totps: inserts.decrypt(cryptoStore)));
+      state = AsyncData(totpsList.createMergedList(totps: decrypted));
       return ResultSuccess(value: inserts);
     } catch (ex, stackTrace) {
       return ResultError(
@@ -149,6 +150,7 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
       }
       CryptoStore? cryptoStore = await ref.read(cryptoStoreProvider.future);
       List<Totp> decrypted = inserts.decrypt(cryptoStore);
+      await ref.read(totpImageCacheManagerProvider.notifier).deleteCachedImages(tombstonesToInsert.keys);
       await ref.read(totpImageCacheManagerProvider.notifier).fillCache(totps: decrypted);
       if (!ref.mounted) {
         return const ResultCancelled();
@@ -286,7 +288,7 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
           ),
         );
       }
-      ref.read(totpImageCacheManagerProvider.notifier).deleteCachedImages(deletes.keys);
+      await ref.read(totpImageCacheManagerProvider.notifier).deleteCachedImages(deletes.keys);
       if (!ref.mounted) {
         return const ResultCancelled();
       }
