@@ -34,13 +34,9 @@ class ChangeBackendUrlSettingsEntryWidget extends ConsumerWidget with FTileMixin
         ref,
         .localOnly,
         logout: true,
-        handleResult: false,
+        handleResult: (result) => result is! ResultSuccess,
       );
-      if (!context.mounted) {
-        return;
-      }
-      if (result is! ResultSuccess) {
-        context.handleResult(result);
+      if (!context.mounted || result is! ResultSuccess) {
         return;
       }
       String currentUrl = await showWaitingOverlay(

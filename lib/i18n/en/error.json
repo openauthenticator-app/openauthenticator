@@ -80,6 +80,7 @@
   "passwordMismatch": "The new crypto store password is incorrect.",
   "migrator": {
     "message": "An error occurred while migrating your data. Please try again.",
+    "noFirebaseUser": "No Firebase user available. Please try again later or contact us.",
     "idToken": "Could not get ID token. Please try again later.",
     "httpError": "Migration failed. HTTP Error $statusCode : $body.",
     "migrationCancelled": "Migration cancelled.",

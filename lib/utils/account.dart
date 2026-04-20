@@ -22,6 +22,7 @@ class AccountUtils {
       context,
       waitingDialogMessage: translations.authentication.logIn.waitingLoginMessage,
       action: action,
+      handleResult: (result) => result is! ResultSuccess,
     );
   }
 
@@ -48,15 +49,15 @@ class AccountUtils {
       context,
       waitingDialogMessage: unlink ? null : translations.authentication.logIn.waitingLoginMessage,
       action: result.action,
+      handleResult: (result) => result is! ResultSuccess,
     );
   }
 
   /// Prompts the user to choose an authentication provider, use it to re-authenticate and delete its account.
   static Future<Result> tryDeleteAccount(
     BuildContext context,
-    WidgetRef ref, {
-    bool handleResult = true,
-  }) async {
+    WidgetRef ref,
+  ) async {
     bool confirm = await ConfirmationDialog.ask(
       context,
       title: translations.authentication.deleteConfirmationDialog.title,
@@ -78,6 +79,7 @@ class AccountUtils {
     return _tryTo(
       context,
       action: () => ref.read(userProvider.notifier).deleteUser(),
+      handleResult: (_) => true,
     );
   }
 
@@ -86,13 +88,14 @@ class AccountUtils {
     BuildContext context, {
     required Future<Result> Function() action,
     String? waitingDialogMessage,
+    bool Function(Result result)? handleResult,
   }) async {
     Result result = await showWaitingOverlay(
       context,
       future: action(),
       message: waitingDialogMessage,
     );
-    if (context.mounted && result is! ResultSuccess) {
+    if ((handleResult?.call(result) ?? true) && context.mounted) {
       context.handleResult(result);
     }
     return result;

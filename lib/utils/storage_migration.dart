@@ -28,80 +28,83 @@ class StorageMigrationUtils {
     bool logout = false,
     String? currentStorageMasterPassword,
     StorageMigrationDeletedTotpPolicy storageMigrationDeletedTotpPolicy = .ask,
-    bool handleResult = true,
+    bool Function(Result result)? handleResult,
   }) async {
-    StorageType currentType = await ref.read(storageTypeSettingsEntryProvider.future);
-    if (!context.mounted) {
-      return const ResultCancelled();
-    }
-    if (newType != currentType) {
-      if (showConfirmation) {
-        _ConfirmationResult? result = await _ConfirmationDialog.ask(context, newType == .shared);
-        if (result == null || !result.confirm || !context.mounted) {
-          return const ResultCancelled();
-        }
-        backupPassword ??= result.backupPassword;
+    Result result = await (() async {
+      StorageType currentType = await ref.read(storageTypeSettingsEntryProvider.future);
+      if (!context.mounted) {
+        return const ResultCancelled();
       }
-      Result<bool> passwordCheckResult = await (await ref.read(passwordVerificationProvider.future)).isPasswordValid(currentStorageMasterPassword ?? '');
-      if (passwordCheckResult is! ResultSuccess<bool> || !passwordCheckResult.value) {
-        if (!context.mounted) {
-          return const ResultCancelled();
-        }
-        String? enteredCurrentStorageMasterPassword = await MasterPasswordInputDialog.prompt(context);
-        if (enteredCurrentStorageMasterPassword == null || !context.mounted) {
-          return const ResultCancelled();
-        }
-        currentStorageMasterPassword = enteredCurrentStorageMasterPassword;
-      }
-    }
-    if (!context.mounted) {
-      return const ResultCancelled();
-    }
-    Result result = await showWaitingOverlay(
-      context,
-      future: ref
-          .read(storageTypeSettingsEntryProvider.notifier)
-          .changeValue(
-            newType,
-            masterPassword: currentStorageMasterPassword,
-            backupPassword: backupPassword,
-            storageMigrationDeletedTotpPolicy: storageMigrationDeletedTotpPolicy,
-          ),
-    );
-    if (!context.mounted) {
-      return const ResultCancelled();
-    }
-    switch (result) {
-      case ResultSuccess():
-        if (logout) {
-          Result logoutResult = await showWaitingOverlay(
-            context,
-            future: ref.read(userProvider.notifier).logoutUser(),
-          );
-          result = logoutResult;
-        }
-        break;
-      case ResultError(:final exception):
-        if (exception is ShouldAskForDifferentDeletedTotpPolicyException) {
-          StorageMigrationDeletedTotpPolicy? enteredStorageMigrationDeletedTotpPolicy = await _StorageMigrationDeletedTotpPolicyPickerDialog.openDialog(context);
-          if (enteredStorageMigrationDeletedTotpPolicy == null || !context.mounted) {
-            return result;
+      if (newType != currentType) {
+        if (showConfirmation) {
+          _ConfirmationResult? result = await _ConfirmationDialog.ask(context, newType == .shared);
+          if (result == null || !result.confirm || !context.mounted) {
+            return const ResultCancelled();
           }
-          return await changeStorageType(
-            context,
-            ref,
-            newType,
-            showConfirmation: false,
-            logout: logout,
-            backupPassword: backupPassword,
-            currentStorageMasterPassword: currentStorageMasterPassword,
-            storageMigrationDeletedTotpPolicy: enteredStorageMigrationDeletedTotpPolicy,
-          );
+          backupPassword ??= result.backupPassword;
         }
-      default:
-        break;
-    }
-    if (handleResult && context.mounted) {
+        Result<bool> passwordCheckResult = await(await ref.read(passwordVerificationProvider.future)).isPasswordValid(currentStorageMasterPassword ?? '');
+        if (passwordCheckResult is! ResultSuccess<bool> || !passwordCheckResult.value) {
+          if (!context.mounted) {
+            return const ResultCancelled();
+          }
+          String? enteredCurrentStorageMasterPassword = await MasterPasswordInputDialog.prompt(context);
+          if (enteredCurrentStorageMasterPassword == null || !context.mounted) {
+            return const ResultCancelled();
+          }
+          currentStorageMasterPassword = enteredCurrentStorageMasterPassword;
+        }
+      }
+      if (!context.mounted) {
+        return const ResultCancelled();
+      }
+      Result result = await showWaitingOverlay(
+        context,
+        future: ref
+            .read(storageTypeSettingsEntryProvider.notifier)
+            .changeValue(
+              newType,
+              masterPassword: currentStorageMasterPassword,
+              backupPassword: backupPassword,
+              storageMigrationDeletedTotpPolicy: storageMigrationDeletedTotpPolicy,
+            ),
+      );
+      if (!context.mounted) {
+        return const ResultCancelled();
+      }
+      switch (result) {
+        case ResultSuccess():
+          if (logout) {
+            Result logoutResult = await showWaitingOverlay(
+              context,
+              future: ref.read(userProvider.notifier).logoutUser(),
+            );
+            result = logoutResult;
+          }
+          break;
+        case ResultError(:final exception):
+          if (exception is ShouldAskForDifferentDeletedTotpPolicyException) {
+            StorageMigrationDeletedTotpPolicy? enteredStorageMigrationDeletedTotpPolicy = await _StorageMigrationDeletedTotpPolicyPickerDialog.openDialog(context);
+            if (enteredStorageMigrationDeletedTotpPolicy == null || !context.mounted) {
+              return result;
+            }
+            return await changeStorageType(
+              context,
+              ref,
+              newType,
+              showConfirmation: false,
+              logout: logout,
+              backupPassword: backupPassword,
+              currentStorageMasterPassword: currentStorageMasterPassword,
+              storageMigrationDeletedTotpPolicy: enteredStorageMigrationDeletedTotpPolicy,
+            );
+          }
+        default:
+          break;
+      }
+      return result;
+    })();
+    if ((handleResult?.call(result) ?? true) && context.mounted) {
       context.handleResult(result);
     }
     return result;

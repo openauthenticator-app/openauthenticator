@@ -80,6 +80,7 @@
   "passwordMismatch": "A senha do armazenamento de criptografia está incorreta.",
   "migrator": {
     "message": "Ocorreu um erro ao migrar os seus dados. Por favor, tente novamente.",
+    "noFirebaseUser": "Nenhum utilizador Firebase disponível. Por favor, tente novamente mais tarde ou contacte-nos.",
     "idToken": "Não foi possível obter o token de identificação. Tente novamente mais tarde.",
     "httpError": "Migração falhou. Erro HTTP $statusCode : $body.",
     "migrationCancelled": "Migração cancelada.",

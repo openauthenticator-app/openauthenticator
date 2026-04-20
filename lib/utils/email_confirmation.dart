@@ -17,29 +17,25 @@ class EmailConfirmationUtils {
   static Future<Result> askForConfirmation(
     BuildContext context,
     WidgetRef ref, {
-    bool handleResult = true,
+    bool Function(Result result)? handleResult,
   }) async {
+    Result result;
     _ConfirmAction? confirmAction = await _ConfirmActionPickerDialog.openDialog(context);
     if (confirmAction == null || !context.mounted) {
-      return const ResultCancelled();
+      result = const ResultCancelled();
+    } else {
+      result = await switch (confirmAction) {
+        .tryConfirm => _tryConfirm(context, ref),
+        .cancelConfirmation => _tryCancelConfirmation(context, ref),
+      };
     }
-    switch (confirmAction) {
-      case _ConfirmAction.tryConfirm:
-        Result result = await _tryConfirm(context, ref);
-        if (handleResult && context.mounted) {
-          context.handleResult(
-            result,
-            successMessage: result.valueOrNull?.localizedMessage,
-          );
-        }
-        return result;
-      case _ConfirmAction.cancelConfirmation:
-        Result result = await _tryCancelConfirmation(context, ref);
-        if (handleResult && context.mounted) {
-          context.handleResult(result);
-        }
-        return result;
+    if ((handleResult?.call(result) ?? true) && context.mounted) {
+      context.handleResult(
+        result,
+        successMessage: confirmAction == .tryConfirm ? (result as ResultSuccess<RedirectResult>).valueOrNull?.localizedMessage : null,
+      );
     }
+    return result;
   }
 
   /// Tries to cancel the confirmation.

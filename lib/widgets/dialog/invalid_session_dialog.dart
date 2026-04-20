@@ -10,12 +10,9 @@ import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
 
 /// A dialog that asks the user to log-in because of an invalid session.
 class InvalidSessionDialog extends ConsumerWidget {
-  /// Whether to automatically handle the result.
-  final bool handleResult;
-
+  /// Creates a new invalid session dialog instance.
   const InvalidSessionDialog._({
     super.key,
-    this.handleResult = false,
   });
 
   @override

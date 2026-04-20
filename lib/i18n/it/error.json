@@ -80,6 +80,7 @@
   "passwordMismatch": "La password del store di crittografia è errata",
   "migrator": {
     "message": "Si è verificato un errore durante la migrazione dei tuoi dati. Per favore, riprova.",
+    "noFirebaseUser": "Nessun utente Firebase disponibile. Riprova più tardi o contattaci.",
     "idToken": "Impossibile ottenere il token di identificazione. Riprova più tardi.",
     "httpError": "Migrazione fallita. Errore HTTP $statusCode: $body.",
     "migrationCancelled": "Migrazione annullata.",

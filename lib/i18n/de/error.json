@@ -80,6 +80,7 @@
   "passwordMismatch": "Das neue Passwort für den Krypto-Speicher ist nicht korrekt.",
   "migrator": {
     "message": "Beim Migrieren Ihrer Daten ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+    "noFirebaseUser": "Kein Firebase-Benutzer verfügbar. Bitte versuchen Sie es später erneut oder kontaktieren Sie uns.",
     "idToken": "ID-Token konnte nicht abgerufen werden. Bitte versuche es später erneut.",
     "httpError": "Migration fehlgeschlagen. HTTP-Fehler $statusCode: $body.",
     "migrationCancelled": "Migration abgebrochen.",

@@ -39,7 +39,7 @@ class FirebaseAuthRest extends FirebaseAuth {
 
   @override
   Future<void> initialize() async {
-    super.initialize();
+    await super.initialize();
     _methodChannel.setMethodCallHandler(_handlePlatformCall);
     String? userData = await SimpleSecureStorage.read(_kUserData);
     if (userData == null) {
