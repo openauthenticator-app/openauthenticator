@@ -9,6 +9,7 @@ import 'package:open_authenticator/spacing.dart';
 import 'package:open_authenticator/utils/debounce.dart';
 import 'package:open_authenticator/utils/form_label.dart';
 import 'package:open_authenticator/widgets/centered_circular_progress_indicator.dart';
+import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/logo_search/sources.dart';
 import 'package:open_authenticator/widgets/smart_image.dart';
 
@@ -117,6 +118,14 @@ class _LogoSearchState extends State<LogoSearch> {
     ],
   );
 
+  @override
+  void dispose() {
+    debounce.clear(search);
+    client.close();
+    searchKeywordsController.dispose();
+    super.dispose();
+  }
+
   /// Returns the search keywords, non null and lowercased.
   String get filteredSearchKeywords => searchKeywordsController.text.trim().isEmpty ? kDefaultSearch : searchKeywordsController.text.trim().toLowerCase();
 
@@ -185,6 +194,6 @@ class _LogoSearchState extends State<LogoSearch> {
             ),
             child: image,
             onPress: () => widget.onLogoClicked!.call(imageUrl),
-          );
+          ).clickable();
   }
 }

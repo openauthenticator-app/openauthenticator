@@ -236,13 +236,15 @@ class _MobileActionsDialog extends StatelessWidget {
         ClickableTile(
           prefix: const Icon(FIcons.pencil),
           onPress: editButtonEnabled ? (() => Navigator.pop(context, _MobileActionsDialogResult.edit)) : null,
-          title: Text(translations.totp.actions.mobileDialog.edit),
+          title: Text(translations.totp.actions.mobileDialog.edit.title),
+          subtitle: Text(translations.totp.actions.mobileDialog.edit.subtitle),
         ),
       ClickableTile(
         prefix: const Icon(FIcons.trash),
         variant: .destructive,
         onPress: deleteButtonEnabled ? (() => Navigator.pop(context, _MobileActionsDialogResult.delete)) : null,
-        title: Text(translations.totp.actions.mobileDialog.delete),
+        title: Text(translations.totp.actions.mobileDialog.delete.title),
+        subtitle: Text(translations.totp.actions.mobileDialog.delete.subtitle),
       ),
     ],
   );

@@ -20,9 +20,9 @@ class CacheTotpPicturesSettingsEntry extends SettingsEntry<bool> {
       state = const AsyncLoading();
       TotpImageCacheManager totpImageCacheManager = ref.read(totpImageCacheManagerProvider.notifier);
       if (value) {
-        totpImageCacheManager.fillCache();
+        await totpImageCacheManager.fillCache(checkSettings: false);
       } else {
-        totpImageCacheManager.clearCache();
+        await totpImageCacheManager.clearCache();
       }
     }
     await super.changeValue(value);

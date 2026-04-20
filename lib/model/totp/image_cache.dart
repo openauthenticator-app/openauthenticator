@@ -12,7 +12,6 @@ import 'package:open_authenticator/utils/image_type.dart';
 import 'package:open_authenticator/utils/jovial_svg.dart';
 import 'package:open_authenticator/utils/utils.dart';
 import 'package:path/path.dart';
-
 import 'package:path_provider/path_provider.dart';
 
 /// The TOTP image cache manager provider.
@@ -21,10 +20,12 @@ final totpImageCacheManagerProvider = AsyncNotifierProvider<TotpImageCacheManage
 /// Resolves the best image source for a TOTP.
 final totpResolvedImageProvider = FutureProvider.family.autoDispose<ResolvedTotpImage?, ({String uuid, String? imageUrl})>((ref, args) async {
   ref.watch(totpImageCacheManagerProvider);
-  return ref.read(totpImageCacheManagerProvider.notifier).resolveImage(
-    args.uuid,
-    args.imageUrl,
-  );
+  return ref
+      .read(totpImageCacheManagerProvider.notifier)
+      .resolveImage(
+        args.uuid,
+        args.imageUrl,
+      );
 });
 
 /// A resolved TOTP image source.
@@ -174,7 +175,10 @@ class TotpImageCacheManager extends AsyncNotifier<Map<String, CacheObject>> {
   }
 
   /// Fills the cache with all TOTPs that can be read from the TOTP repository.
-  Future<void> fillCache({Iterable<Totp>? totps, bool checkSettings = true}) async {
+  Future<void> fillCache({
+    Iterable<Totp>? totps,
+    bool checkSettings = true,
+  }) async {
     if (checkSettings) {
       bool cacheEnabled = await ref.read(cacheTotpPicturesSettingsEntryProvider.future);
       if (!cacheEnabled) {
@@ -242,13 +246,7 @@ class TotpImageCacheManager extends AsyncNotifier<Map<String, CacheObject>> {
         if (totp.isDecrypted && (totp as DecryptedTotp).imageUrl != null) totp.uuid: totp.imageUrl!,
     };
     Directory directory = await _getTotpImagesDirectory();
-    Set<String> fileNames = await directory.exists()
-        ? (await directory.list().toList())
-            .whereType<File>()
-            .map((file) => basename(file.path))
-            .where((name) => name != 'index.json')
-            .toSet()
-        : {};
+    Set<String> fileNames = await directory.exists() ? (await directory.list().toList()).whereType<File>().map((file) => basename(file.path)).where((name) => name != 'index.json').toSet() : {};
 
     bool changed = false;
     Map<String, CacheObject> repaired = {};

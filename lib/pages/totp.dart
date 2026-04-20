@@ -62,7 +62,11 @@ class TotpPage extends ConsumerStatefulWidget {
       return;
     }
     if (totp == null) {
-      showErrorToast(context, text: translations.totp.page.uriError);
+      showErrorToast(
+        context,
+        text: cryptoStore == null ? translations.error.generic.noException : translations.totp.page.uriError,
+      );
+      return;
     }
     Navigator.pushNamedAndRemoveUntil(
       context,
@@ -280,7 +284,7 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
                       setState(() => this.imageUrl = imageUrl);
                     }
                   },
-                )
+                ).clickable()
               else
                 createImageWidget(),
               FTextFormField(

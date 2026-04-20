@@ -3,8 +3,14 @@
     "decrypt": "Decrypt",
     "mobileDialog": {
       "title": "TOTP actions",
-      "edit": "Edit TOTP",
-      "delete": "Delete TOTP"
+      "edit": {
+        "title": "Edit TOTP",
+        "subtitle": "Edit the TOTP parameters or display the QR code."
+      },
+      "delete": {
+        "title": "Delete TOTP",
+        "subtitle": "Delete this TOTP from your device."
+      }
     },
     "desktopButtons": {
       "edit": "Edit",

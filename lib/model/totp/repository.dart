@@ -105,7 +105,11 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
       }
       CryptoStore? cryptoStore = await ref.read(cryptoStoreProvider.future);
       List<Totp> decrypted = inserts.decrypt(cryptoStore);
-      await ref.read(totpImageCacheManagerProvider.notifier).fillCache(totps: decrypted);
+      ref
+          .read(totpImageCacheManagerProvider.notifier)
+          .fillCache(
+            totps: decrypted,
+          );
       if (!ref.mounted) {
         return const ResultCancelled();
       }
@@ -150,8 +154,9 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
       }
       CryptoStore? cryptoStore = await ref.read(cryptoStoreProvider.future);
       List<Totp> decrypted = inserts.decrypt(cryptoStore);
-      await ref.read(totpImageCacheManagerProvider.notifier).deleteCachedImages(tombstonesToInsert.keys);
-      await ref.read(totpImageCacheManagerProvider.notifier).fillCache(totps: decrypted);
+      TotpImageCacheManager totpImageCacheManager = ref.read(totpImageCacheManagerProvider.notifier);
+      totpImageCacheManager.deleteCachedImages(tombstonesToInsert.keys);
+      totpImageCacheManager.fillCache(totps: decrypted);
       if (!ref.mounted) {
         return const ResultCancelled();
       }
@@ -231,7 +236,11 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
       }
       CryptoStore? cryptoStore = await ref.read(cryptoStoreProvider.future);
       List<Totp> decrypted = updates.decrypt(cryptoStore);
-      await ref.read(totpImageCacheManagerProvider.notifier).fillCache(totps: decrypted);
+      ref
+          .read(totpImageCacheManagerProvider.notifier)
+          .fillCache(
+            totps: decrypted,
+          );
       if (!ref.mounted) {
         return const ResultCancelled();
       }
@@ -288,7 +297,11 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
           ),
         );
       }
-      await ref.read(totpImageCacheManagerProvider.notifier).deleteCachedImages(deletes.keys);
+      ref
+          .read(totpImageCacheManagerProvider.notifier)
+          .deleteCachedImages(
+            deletes.keys,
+          );
       if (!ref.mounted) {
         return const ResultCancelled();
       }
