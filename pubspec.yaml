@@ -35,8 +35,8 @@ dependencies:
   qr_flutter: ^4.1.0
   intl: any
   url_launcher: ^6.3.2
-  purchases_flutter: ^10.0.0
-  purchases_ui_flutter: ^10.0.0
+  purchases_flutter: ^10.0.1
+  purchases_ui_flutter: ^10.0.1
   purchases_dart:
     git:
       url: https://github.com/openauthenticator-app/purchases-dart.git
@@ -45,8 +45,8 @@ dependencies:
   slang_flutter: ^4.14.0
   rate_my_app: ^2.3.2
   app_links: ^7.0.0
-  hashlib: ^2.3.1
-  hashlib_codecs: ^3.0.1
+  hashlib: ^2.3.4
+  hashlib_codecs: ^3.1.2
   scrollable_positioned_list: ^0.3.8
   share_plus: ^12.0.2
   wakelock_plus: ^1.5.1

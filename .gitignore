@@ -51,7 +51,6 @@ app.*.map.json
 # Generated files
 lib/app.dart
 **/*.g.dart
-**/*.steps.dart
 /assets/images/*.si
 /assets/images/**/*.si
 

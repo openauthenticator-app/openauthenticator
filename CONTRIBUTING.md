@@ -67,7 +67,7 @@ flutter pub get
 Now, generate the remaining files required by Open Authenticator :
 
 ```shell
-dart run build_runner build
+dart run build_runner build --delete-conflicting-outputs
 dart run slang
 dart run open_authenticator:generate
 ```
