@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:open_authenticator/i18n/translations.g.dart';
 
 /// Represents a push operation result.
 class PushOperationResult with EquatableMixin {
@@ -81,9 +82,6 @@ class PushOperationResult with EquatableMixin {
 
 /// Represents a push operation error.
 class PushOperationError extends PushOperationResult {
-  @override
-  String get errorCode => super.errorCode!;
-
   /// Creates a new push operation error instance.
   PushOperationError._({
     required super.operationUuid,
@@ -92,6 +90,12 @@ class PushOperationError extends PushOperationResult {
     required super.errorDetails,
     super.createdAt,
   }) : super._();
+
+  @override
+  String get errorCode => super.errorCode!;
+
+  @override
+  PushOperationErrorKind get errorKind => super.errorKind!;
 }
 
 /// Represents a push operation error kind.
@@ -111,8 +115,11 @@ enum PushOperationErrorKind {
   /// The delete timestamp is invalid.
   invalidDeleteTimestamp(isPermanent: true),
 
+  /// The maximum operations count has been exceeded.
+  maxOperationsCountExceeded,
+
   /// The max TOTPs count has been exceeded.
-  maxCountExceeded,
+  tooManyTotps,
 
   /// Any other error occurred.
   genericError
@@ -125,4 +132,16 @@ enum PushOperationErrorKind {
   const PushOperationErrorKind({
     this.isPermanent = false,
   });
+
+  /// Returns the localized message.
+  String get localizedMessage => switch (this) {
+    invalidUuid => translations.error.pushOperationErrorKind.invalidUuid,
+    invalidTotp => translations.error.pushOperationErrorKind.invalidTotp,
+    invalidUpdateTimestamp => translations.error.pushOperationErrorKind.invalidUpdateTimestamp,
+    deletedTotp => translations.error.pushOperationErrorKind.deletedTotp,
+    invalidDeleteTimestamp => translations.error.pushOperationErrorKind.invalidDeleteTimestamp,
+    maxOperationsCountExceeded => translations.error.pushOperationErrorKind.maxOperationsCountExceeded,
+    tooManyTotps => translations.error.pushOperationErrorKind.tooManyTotps,
+    genericError => translations.error.pushOperationErrorKind.genericError,
+  };
 }

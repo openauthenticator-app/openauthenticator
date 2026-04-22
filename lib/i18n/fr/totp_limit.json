@@ -3,8 +3,8 @@
   "message": {
     "error": "Vous avez atteint le nombre maximum de TOTPs synchronisables, mais nous ne parvenons pas à vous montrer les options disponibles pour étendre cette limite. Veuillez réessayer plus tard ou nous contacter si vous avez besoin d'aide.",
     "notSubscribed": {
-      "auto": "Vous synchronisez actuellement vos TOTPs et avez dépassé la limite de $count TOTPs avant de devoir souscrire au plan Contributor. Vous devez donc soit les stocker localement (ce qui signifie plus de synchronisation), soit souscrire au plan Contributor.",
-      "manual": "Vous synchronisez actuellement vos TOTPs et avez une limite de $count TOTPs avant de devoir souscrire au plan Contributor. Vous devez donc soit les stocker localement (ce qui signifie plus de synchronisation), soit souscrire au plan Contributor pour ajouter un autre TOTP."
+      "auto": "Vous synchronisez actuellement vos TOTPs et avez dépassé la limite de $count TOTPs avant de devoir souscrire à l'Abonnement Contributeur. Vous devez donc soit les stocker localement (ce qui signifie plus de synchronisation), soit souscrire au plan Contributor.",
+      "manual": "Vous synchronisez actuellement vos TOTPs et avez une limite de $count TOTPs avant de devoir souscrire au l'Abonnement Contributeur. Vous devez donc soit les stocker localement (ce qui signifie plus de synchronisation), soit souscrire au plan Contributor pour ajouter un autre TOTP."
     },
     "alreadySubscribed": {
       "auto": "Vous synchronisez actuellement vos TOTPs et avez dépassé la limite de $count TOTPs. Vous devez donc les stocker localement (ce qui signifie plus de synchronisation). Pour contourner cette limite, vous pouvez auto-héberger le serveur backend.",

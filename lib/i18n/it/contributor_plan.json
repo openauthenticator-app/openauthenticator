@@ -28,6 +28,7 @@
       }
     },
     "button": {
+      "subscribed": "Abbonamento effettuato!",
       "privacyPolicy": "Privacy policy",
       "termsOfService": "Termini del servizio",
       "restorePurchases": "Ripristina acquisti"

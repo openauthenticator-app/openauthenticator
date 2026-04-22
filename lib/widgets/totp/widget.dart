@@ -15,7 +15,7 @@ import 'package:open_authenticator/widgets/totp/image.dart';
 /// Allows to display TOTPs in a [ListView].
 class TotpTile extends StatelessWidget {
   /// The default image size.
-  static const double _kDefaultImageSize = 70;
+  static const double kDefaultImageSize = 70;
 
   /// The TOTP instance.
   final Totp totp;
@@ -39,7 +39,7 @@ class TotpTile extends StatelessWidget {
   TotpTile.adaptive({
     Key? key,
     required Totp totp,
-    double imageSize = _kDefaultImageSize,
+    double imageSize = kDefaultImageSize,
     bool displayCode = true,
     Function(BuildContext context)? onTap,
     VoidCallback? onDecryptPress,
@@ -70,7 +70,7 @@ class TotpTile extends StatelessWidget {
   const TotpTile({
     super.key,
     required this.totp,
-    this.imageSize = _kDefaultImageSize,
+    this.imageSize = kDefaultImageSize,
     this.displayCode = true,
     this.onTap,
     this.onLongPress,

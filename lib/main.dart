@@ -239,7 +239,7 @@ class _RouteWidgetState extends ConsumerState<_RouteWidget> {
       ref.listenManual(
         appLinksListenerProvider,
         (previous, next) async {
-          if (previous == next || next is! AsyncData<Uri?> || next.value == null) {
+          if (previous?.value == next.value || next is! AsyncData<Uri?> || next.value == null) {
             return;
           }
           Uri uri = next.value!;
@@ -257,7 +257,7 @@ class _RouteWidgetState extends ConsumerState<_RouteWidget> {
       ref.listenManual(
         totpLimitProvider,
         (previous, next) async {
-          if (previous == next || next is! AsyncData<TotpLimit> || !next.value.isExceeded) {
+          if (previous?.value == next.value || next is! AsyncData<TotpLimit> || !next.value.isExceeded) {
             return;
           }
           WidgetsBinding.instance.addPostFrameCallback((_) => handleTotpLimitExceeded());

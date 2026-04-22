@@ -11,6 +11,9 @@ import 'package:open_authenticator/widgets/totp/time_based.dart';
 
 /// Displays a TOTP image.
 class TotpImage extends ConsumerWidget {
+  /// The default size.
+  static const double kDefaultSize = 100;
+
   /// The TOTP UUID.
   final String? uuid;
 
@@ -33,14 +36,14 @@ class TotpImage extends ConsumerWidget {
     this.imageUrl,
     required this.label,
     this.issuer,
-    this.size = 100,
+    this.size = kDefaultSize,
   });
 
   /// Creates a new TOTP image widget instance from a TOTP instance.
   TotpImage.fromTotp({
     Key? key,
     required Totp totp,
-    double size = 100,
+    double size = kDefaultSize,
   }) : this(
          key: key,
          uuid: totp.uuid,
@@ -75,14 +78,14 @@ class TotpImage extends ConsumerWidget {
     return _makeCircle(
       switch (resolved) {
         AsyncData(:final value) when value != null => SmartImage(
-            imageKey: ValueKey('$uuid/$imageUrl'),
-            source: value.source,
-            height: size,
-            width: size,
-            fit: BoxFit.contain,
-            imageType: value.imageType,
-            errorBuilder: (_) => _createPlaceholderImage(),
-          ),
+          imageKey: ValueKey('$uuid/$imageUrl'),
+          source: value.source,
+          height: size,
+          width: size,
+          fit: BoxFit.contain,
+          imageType: value.imageType,
+          errorBuilder: (_) => _createPlaceholderImage(),
+        ),
         _ => _createDefaultImage(),
       },
     );
@@ -110,16 +113,16 @@ class TotpImage extends ConsumerWidget {
 
   /// Creates the local placeholder image, with the app logo inside.
   Widget _createPlaceholderImage() => ColorFiltered(
-      colorFilter: ColorFilter.mode(
-        _filterColor,
-        BlendMode.color,
-      ),
-      child: SizedScalableImage(
-        height: size,
-        width: size,
-        asset: 'assets/images/logo.si',
-      ),
-    );
+    colorFilter: ColorFilter.mode(
+      _filterColor,
+      BlendMode.color,
+    ),
+    child: SizedScalableImage(
+      height: size,
+      width: size,
+      asset: 'assets/images/logo.si',
+    ),
+  );
 }
 
 /// Displays the TOTP image with a countdown.
@@ -213,15 +216,16 @@ class _TotpCountdownImageCircularProgressState extends TimeBasedTotpWidgetState<
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    if (state == AppLifecycleState.resumed) {
+    if (state == .resumed) {
       updateState(changeColors: false);
     }
   }
 
   @override
-  void didUpdateWidget(covariant _TotpCountdownImageCircularProgress oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.totp.validity != widget.totp.validity) {
+  void onTotpChanged(covariant _TotpCountdownImageCircularProgress oldWidget) {
+    if (oldWidget.totp.validity == widget.totp.validity) {
+      updateState(changeColors: false);
+    } else {
       cancelAnimation();
       scheduleAnimation();
     }

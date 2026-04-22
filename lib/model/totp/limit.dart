@@ -1,3 +1,4 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/model/backend/user.dart';
 import 'package:open_authenticator/model/settings/storage_type.dart';
@@ -17,7 +18,7 @@ final totpLimitProvider = FutureProvider<TotpLimit>((ref) async {
 });
 
 /// The class that allows to check whether TOTP limit has been reached.
-class TotpLimit {
+class TotpLimit with EquatableMixin {
   /// The user TOTPs limit.
   final int? userTotpsLimit;
 
@@ -59,4 +60,11 @@ class TotpLimit {
 
   /// Returns whether the TOTP limit is exceeded.
   bool get isExceeded => willExceedIfAddMore(count: 0);
+
+  @override
+  List<Object?> get props => [
+    userTotpsLimit,
+    storageType,
+    currentTotpCount,
+  ];
 }

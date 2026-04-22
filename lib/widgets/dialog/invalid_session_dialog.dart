@@ -25,7 +25,7 @@ class InvalidSessionDialog extends ConsumerWidget {
       ),
       ClickableButton(
         variant: .destructive,
-        onPress: () => Navigator.pop(context),
+        onPress: () => Navigator.pop(context, InvalidSessionDialogChoice.logOut),
         child: ButtonText(translations.authentication.invalidSessionDialog.button.logOut),
       ),
     ],

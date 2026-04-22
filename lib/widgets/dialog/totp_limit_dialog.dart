@@ -53,6 +53,7 @@ class TotpLimitDialog extends ConsumerWidget {
       displayCloseButton: !autoDialog,
       actions: [
         ClickableButton(
+          variant: .destructive,
           onPress: () => _returnIfSucceeded(context, StorageMigrationUtils.changeStorageType(context, ref, StorageType.localOnly).then((result) => result is ResultSuccess)),
           child: ButtonText(translations.totpLimit.actions.stopSynchronization),
         ),
@@ -75,6 +76,7 @@ class TotpLimitDialog extends ConsumerWidget {
         Padding(
           padding: const EdgeInsets.only(top: kSpace),
           child: ClickableButton(
+            variant: .secondary,
             onPress: () async {
               Result<User> result = await showWaitingOverlay(
                 context,

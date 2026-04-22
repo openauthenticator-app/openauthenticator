@@ -5,7 +5,8 @@
     "title": "Erreur $errorCode",
     "expandable": {
       "permanent": "Cette erreur est permanente et l'opération ne sera pas retentée.",
-      "date": "Date : $date",
+      "date": "Date :",
+      "code": "Code :",
       "details": "Détails :",
       "deleteButton": "Supprimer"
     }

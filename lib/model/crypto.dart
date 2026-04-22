@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:cipherlib/cipherlib.dart';
 import 'package:cipherlib/random.dart';
@@ -97,6 +96,7 @@ class CryptoStore {
   static const int _initializationVectorLength = 96 ~/ 8;
 
   /// The key instance.
+  @visibleForTesting
   final Uint8List key;
 
   /// The salt.

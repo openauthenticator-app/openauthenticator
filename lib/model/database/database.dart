@@ -281,7 +281,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// Selects the backend push operation errors.
   Selectable<PushOperationError> _selectBackendPushOperationErrors() {
-    SimpleSelectStatement<$BackendPushOperationErrorsTable, _DriftBackendPushOperationError> operations = select(backendPushOperationErrors)..orderBy([(table) => OrderingTerm.asc(table.createdAt)]);
+    SimpleSelectStatement<$BackendPushOperationErrorsTable, _DriftBackendPushOperationError> operations = select(backendPushOperationErrors)..orderBy([(table) => OrderingTerm.desc(table.createdAt)]);
     return operations.map((operation) => operation.asBackendPushOperationResult as PushOperationError);
   }
 

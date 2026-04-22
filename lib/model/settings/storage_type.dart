@@ -51,7 +51,7 @@ class StorageTypeSettingsEntry extends EnumSettingsEntry<StorageType> {
       }
 
       if (value == .localOnly) {
-        super.changeValue(value);
+        await super.changeValue(value);
         return const ResultSuccess();
       }
 
@@ -92,17 +92,13 @@ class StorageTypeSettingsEntry extends EnumSettingsEntry<StorageType> {
         }
       }
 
-      if (tombstonesToRemove.isNotEmpty) {
-        await database.removeDeletionMarks(tombstonesToRemove);
-      }
-
       List<Totp> currentStorageTotps = await database.listTotps();
       List<Totp> toAdd = [];
+      CryptoStore? newCryptoStore;
       if (masterPassword == null || response.totps.isEmpty) {
         toAdd.addAll(currentStorageTotps);
       } else {
         CryptoStore? currentCryptoStore = ref.read(cryptoStoreProvider).value;
-        CryptoStore? newCryptoStore;
         for (Totp totp in response.totps) {
           CryptoStore cryptoStore = CryptoStore.fromPassword(masterPassword, totp.encryptedData.encryptionSalt);
           if (totp.encryptedData.canDecryptData(cryptoStore)) {
@@ -124,21 +120,33 @@ class StorageTypeSettingsEntry extends EnumSettingsEntry<StorageType> {
           DecryptedTotp? decryptedTotp = totp.changeEncryptionKey(oldCryptoStore, newCryptoStore);
           toAdd.add(decryptedTotp ?? totp);
         }
-        await ref.read(cryptoStoreProvider.notifier).changeCryptoStore(masterPassword, newCryptoStore: newCryptoStore);
       }
 
-      ref.read(pushOperationsQueueProvider.notifier)
-        ..enqueue(
+      await database.addTotps(toAdd);
+      if (tombstonesToRemove.isNotEmpty) {
+        await database.removeDeletionMarks(tombstonesToRemove);
+      }
+      if (newCryptoStore != null) {
+        await ref.read(cryptoStoreProvider.notifier).changeCryptoStore(masterPassword!, newCryptoStore: newCryptoStore);
+      }
+
+      PushOperationsQueue pushOperationsQueue = ref.read(pushOperationsQueueProvider.notifier);
+      if (toAdd.isNotEmpty) {
+        await pushOperationsQueue.enqueue(
           SetTotpsPushOperation(
             totps: toAdd,
           ),
           andRun: false,
-        )
-        ..enqueue(
+        );
+      }
+      if (toDelete.isNotEmpty) {
+        await pushOperationsQueue.enqueue(
           DeleteTotpsPushOperation(
             tombstones: toDelete,
           ),
+          andRun: false,
         );
+      }
 
       await super.changeValue(value);
 

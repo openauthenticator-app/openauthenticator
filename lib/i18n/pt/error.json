@@ -77,6 +77,16 @@
       "generic": "Falha ao criptografar este TOTP com o armazenamento de criptografia atual."
     }
   },
+  "pushOperationErrorKind": {
+    "invalidUuid": "ID da operação inválido.",
+    "invalidTotp": "Dados TOTP inválidos.",
+    "invalidUpdateTimestamp": "Data de atualização inválida.",
+    "deletedTotp": "Este TOTP já foi excluído.",
+    "invalidDeleteTimestamp": "Data de exclusão inválida.",
+    "maxOperationsCountExceeded": "Muitas alterações pendentes.",
+    "tooManyTotps": "Limite de TOTP atingido.",
+    "genericError": "Sincronização falhou."
+  },
   "passwordMismatch": "A senha do armazenamento de criptografia está incorreta.",
   "migrator": {
     "message": "Ocorreu um erro ao migrar os seus dados. Por favor, tente novamente.",

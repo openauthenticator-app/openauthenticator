@@ -4,6 +4,7 @@ import 'package:forui/forui.dart';
 import 'package:intl/intl.dart';
 import 'package:open_authenticator/app.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
+import 'package:open_authenticator/model/backend/user.dart';
 import 'package:open_authenticator/model/purchases/clients/client.dart';
 import 'package:open_authenticator/model/purchases/contributor_plan.dart';
 import 'package:open_authenticator/spacing.dart';
@@ -61,7 +62,7 @@ class ContributorPlanFallbackPaywallHeader extends StatelessWidget {
 
 /// Allows to pick for a billing plan (annual / monthly).
 /// Displayed only if `purchases_ui_flutter` is unavailable on the current OS.
-class ContributorPlanFallbackPaywall extends ConsumerWidget {
+class ContributorPlanFallbackPaywall extends ConsumerStatefulWidget {
   /// Triggered when the purchase has completed.
   final VoidCallback onPurchaseCompleted;
 
@@ -72,7 +73,14 @@ class ContributorPlanFallbackPaywall extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConsumerStatefulWidget> createState() => _ContributorPlanFallbackPaywallState();
+}
+
+class _ContributorPlanFallbackPaywallState extends ConsumerState<ContributorPlanFallbackPaywall> {
+  bool hasPressedPurchaseButton = false;
+
+  @override
+  Widget build(BuildContext context) {
     RevenueCatClient? revenueCatClient = ref.watch(revenueCatClientProvider).value;
     FButtonStyleDelta bottomButtonsStyle = .delta(
       contentStyle: .delta(
@@ -106,7 +114,7 @@ class ContributorPlanFallbackPaywall extends ConsumerWidget {
             children: [
               for (String feature in translations.contributorPlan.fallbackPaywall.features)
                 Row(
-                  mainAxisSize: MainAxisSize.min,
+                  mainAxisSize: .min,
                   children: [
                     Padding(
                       padding: const EdgeInsets.only(right: kSpace / 2),
@@ -136,7 +144,7 @@ class ContributorPlanFallbackPaywall extends ConsumerWidget {
         Padding(
           padding: const EdgeInsets.only(bottom: kSpace),
           child: _ContributorPlanBillingPlanPicker(
-            onContinuePress: (packageType) => _tryPurchase(context, ref, packageType),
+            onContinuePress: _tryPurchase,
           ),
         ),
         Wrap(
@@ -165,8 +173,8 @@ class ContributorPlanFallbackPaywall extends ConsumerWidget {
               child: ButtonText(translations.contributorPlan.fallbackPaywall.button.termsOfService),
             ),
             ClickableButton(
-              variant: .ghost,
-              onPress: () => _tryRefreshUserInfo(context, ref),
+              variant: hasPressedPurchaseButton ? .outline : .ghost,
+              onPress: _tryRefreshUserInfo,
               mainAxisSize: .min,
               style: bottomButtonsStyle,
               child: ButtonText(translations.miscellaneous.refreshUserInfo),
@@ -174,7 +182,7 @@ class ContributorPlanFallbackPaywall extends ConsumerWidget {
             if (revenueCatClient is CanRestorePurchases)
               ClickableButton(
                 variant: .ghost,
-                onPress: () => _tryRestorePurchases(context, ref),
+                onPress: _tryRestorePurchases,
                 mainAxisSize: .min,
                 style: bottomButtonsStyle,
                 child: ButtonText(translations.contributorPlan.fallbackPaywall.button.restorePurchases),
@@ -186,64 +194,55 @@ class ContributorPlanFallbackPaywall extends ConsumerWidget {
   }
 
   /// Tries to do purchase the [packageType].
-  Future<void> _tryPurchase(BuildContext context, WidgetRef ref, PackageType packageType) async {
+  Future<void> _tryPurchase(PackageType packageType) async {
     ContributorPlan contributorPlan = ref.read(contributorPlanStateProvider.notifier);
     Result<ContributorPlanState> result = await showWaitingOverlay(
       context,
       future: contributorPlan.purchase(packageType),
     );
-    if (!context.mounted) {
-      return;
+    _handleContributorPlanStateResult(
+      result,
+      successMessage: (state) => state == .active ? translations.contributorPlan.subscribeSuccess.immediate : translations.contributorPlan.subscribeSuccess.delayed,
+    );
+    if (result is ResultSuccess<ContributorPlanState> && result.value != .active && mounted) {
+      setState(() => hasPressedPurchaseButton = true);
     }
-    _handleContributorPlanStateResult(context, result, delayedSuccessMessage: translations.contributorPlan.subscribeSuccess.delayed);
   }
 
   /// Tries to refresh the user info.
-  Future<void> _tryRefreshUserInfo(BuildContext context, WidgetRef ref) async {
+  Future<void> _tryRefreshUserInfo() async {
     ContributorPlan contributorPlan = ref.read(contributorPlanStateProvider.notifier);
-    if (!context.mounted) {
-      return;
-    }
     Result<ContributorPlanState> result = await showWaitingOverlay(
       context,
       future: contributorPlan.refresh(),
     );
-    if (!context.mounted) {
-      return;
-    }
-    _handleContributorPlanStateResult(context, result);
+    _handleContributorPlanStateResult(result);
+  }
+
+  /// Tries to restore the purchases.
+  Future<void> _tryRestorePurchases() async {
+    ContributorPlan contributorPlan = ref.read(contributorPlanStateProvider.notifier);
+    Result<ContributorPlanState> result = await showWaitingOverlay(
+      context,
+      future: contributorPlan.restore(),
+    );
+    _handleContributorPlanStateResult(
+      result,
+      successMessage: (_) => translations.contributorPlan.fallbackPaywall.restorePurchasesSuccess,
+    );
   }
 
   /// Handles the [result] of either the [ContributorPlan.purchase] or [ContributorPlan.refresh] method.
-  void _handleContributorPlanStateResult(BuildContext context, Result<ContributorPlanState> result, {String? delayedSuccessMessage}) {
-    if (result is! ResultSuccess<ContributorPlanState>) {
-      context.handleResult(result);
+  void _handleContributorPlanStateResult(Result<ContributorPlanState> result, {String? Function(ContributorPlanState?)? successMessage}) {
+    if (!mounted) {
       return;
     }
     context.handleResult(
       result,
-      successMessage: result.value == .active ? translations.contributorPlan.subscribeSuccess.immediate : (delayedSuccessMessage ?? translations.error.noError),
+      successMessage: successMessage?.call(result.valueOrNull),
     );
-    if (result.value == .active) {
-      onPurchaseCompleted();
-    }
-  }
-
-  /// Tries to restore the purchases.
-  Future<void> _tryRestorePurchases(BuildContext context, WidgetRef ref) async {
-    ContributorPlan contributorPlan = ref.read(contributorPlanStateProvider.notifier);
-    if (!context.mounted) {
-      return;
-    }
-    Result result = await showWaitingOverlay(context, future: contributorPlan.restore());
-    if (context.mounted) {
-      context.handleResult(
-        result,
-        successMessage: translations.contributorPlan.fallbackPaywall.restorePurchasesSuccess,
-      );
-      if (result is ResultSuccess) {
-        onPurchaseCompleted();
-      }
+    if (result.valueOrNull == .active) {
+      widget.onPurchaseCompleted();
     }
   }
 }
@@ -268,69 +267,72 @@ class _ContributorPlanBillingPlanPickerState extends ConsumerState<_ContributorP
   PackageType? packageType;
 
   @override
-  Widget build(BuildContext context) => Column(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      Padding(
-        padding: const EdgeInsets.only(bottom: kBigSpace),
-        child: FutureBuilder(
-          future: ref.read(contributorPlanStateProvider.notifier).getPrices(),
-          builder: (context, snapshot) {
-            if (snapshot.hasError || snapshot.data is ResultError) {
-              Object? error;
-              if (snapshot.hasError) {
-                error = snapshot.error!;
-              } else if (snapshot.data is ResultError) {
-                error = snapshot.error;
-              }
-              return Text(
-                error == null ? translations.error.generic.tryAgain : translations.error.generic.withException(exception: error),
-                textAlign: TextAlign.center,
-              );
-            }
-            if (snapshot.hasData) {
-              Result<Prices> result = snapshot.requireData;
-              if (result is! ResultSuccess) {
-                Object? exception = result is! ResultError ? null : (result as ResultError).exception;
+  Widget build(BuildContext context) {
+    AsyncValue<User?> user = ref.watch(userProvider);
+    return Column(
+      mainAxisSize: .min,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: kBigSpace),
+          child: FutureBuilder(
+            future: ref.read(contributorPlanStateProvider.notifier).getPrices(),
+            builder: (context, snapshot) {
+              if (snapshot.hasError || snapshot.data is ResultError) {
+                Object? error;
+                if (snapshot.hasError) {
+                  error = snapshot.error!;
+                } else if (snapshot.data is ResultError) {
+                  error = snapshot.error;
+                }
                 return Text(
-                  exception == null ? translations.error.generic.tryAgain : translations.error.generic.withException(exception: exception),
+                  error == null ? translations.error.generic.tryAgain : translations.error.generic.withException(exception: error),
                   textAlign: TextAlign.center,
                 );
               }
-              Prices prices = (result as ResultSuccess).value;
-              if (prices.packagesPrice.isEmpty) {
-                return Text(
-                  translations.contributorPlan.fallbackPaywall.packageType.empty,
-                  textAlign: TextAlign.center,
-                );
-              }
-              return Row(
-                mainAxisAlignment: .spaceEvenly,
-                mainAxisSize: .max,
-                spacing: kBigSpace,
-                children: [
-                  for (MapEntry<PackageType, Price> entry in prices.packagesPrice.entries)
-                    Expanded(
-                      child: _createTile(
-                        context,
-                        packageType: entry.key,
-                        price: entry.value,
-                        off: prices.promotions[entry.key],
+              if (snapshot.hasData) {
+                Result<Prices> result = snapshot.requireData;
+                if (result is! ResultSuccess) {
+                  Object? exception = result is! ResultError ? null : (result as ResultError).exception;
+                  return Text(
+                    exception == null ? translations.error.generic.tryAgain : translations.error.generic.withException(exception: exception),
+                    textAlign: TextAlign.center,
+                  );
+                }
+                Prices prices = (result as ResultSuccess).value;
+                if (prices.packagesPrice.isEmpty) {
+                  return Text(
+                    translations.contributorPlan.fallbackPaywall.packageType.empty,
+                    textAlign: TextAlign.center,
+                  );
+                }
+                return Row(
+                  mainAxisAlignment: .spaceEvenly,
+                  mainAxisSize: .max,
+                  spacing: kBigSpace,
+                  children: [
+                    for (MapEntry<PackageType, Price> entry in prices.packagesPrice.entries)
+                      Expanded(
+                        child: _createTile(
+                          context,
+                          packageType: entry.key,
+                          price: entry.value,
+                          off: prices.promotions[entry.key],
+                        ),
                       ),
-                    ),
-                ],
-              );
-            }
-            return const CenteredCircularProgressIndicator();
-          },
+                  ],
+                );
+              }
+              return const CenteredCircularProgressIndicator();
+            },
+          ),
         ),
-      ),
-      ClickableButton(
-        onPress: packageType == null ? null : (() => widget.onContinuePress(packageType!)),
-        child: ButtonText(MaterialLocalizations.of(context).continueButtonLabel),
-      ),
-    ],
-  );
+        ClickableButton(
+          onPress: !user.hasValue || user.value!.contributorPlan || packageType == null ? null : (() => widget.onContinuePress(packageType!)),
+          child: ButtonText(user.value?.contributorPlan == true ? translations.contributorPlan.fallbackPaywall.button.subscribed : MaterialLocalizations.of(context).continueButtonLabel),
+        ),
+      ],
+    );
+  }
 
   /// Creates the list tile for the given [packageType].
   Widget _createTile(

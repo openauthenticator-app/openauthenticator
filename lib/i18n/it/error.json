@@ -77,6 +77,16 @@
       "generic": "Impossibile crittografare il TOTP con lo store di crittografia corrente."
     }
   },
+  "pushOperationErrorKind": {
+    "invalidUuid": "ID operazione non valido.",
+    "invalidTotp": "Dati TOTP non validi.",
+    "invalidUpdateTimestamp": "Data di aggiornamento non valida.",
+    "deletedTotp": "Questo TOTP è già stato eliminato.",
+    "invalidDeleteTimestamp": "Data di eliminazione non valida.",
+    "maxOperationsCountExceeded": "Troppe modifiche in sospeso.",
+    "tooManyTotps": "Limite TOTP raggiunto.",
+    "genericError": "Sincronizzazione non riuscita."
+  },
   "passwordMismatch": "La password del store di crittografia è errata",
   "migrator": {
     "message": "Si è verificato un errore durante la migrazione dei tuoi dati. Per favore, riprova.",

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/model/backend/authentication/providers/provider.dart';
@@ -13,7 +14,7 @@ import 'package:open_authenticator/utils/result.dart';
 import 'package:path_provider/path_provider.dart';
 
 /// Represents a user, got from the backend.
-class User {
+class User with EquatableMixin {
   /// The user ID.
   final String id;
 
@@ -170,6 +171,18 @@ class User {
     microsoftId: microsoftId,
     appleId: appleId,
   );
+
+  @override
+  List<Object?> get props => [
+    id,
+    contributorPlan,
+    totpsLimit,
+    email,
+    googleId,
+    githubId,
+    microsoftId,
+    appleId,
+  ];
 
   /// Converts the user to a JSON map.
   Map<String, dynamic> toJson() => {

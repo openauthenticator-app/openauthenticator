@@ -28,6 +28,7 @@
       }
     },
     "button": {
+      "subscribed": "Subscribed !",
       "privacyPolicy": "Privacy policy",
       "termsOfService": "Terms of service",
       "restorePurchases": "Restore purchases"

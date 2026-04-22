@@ -77,6 +77,16 @@
       "generic": "Verschlüsselung des TOTP mit dem aktuellen Krypto-Speicher fehlgeschlagen."
     }
   },
+  "pushOperationErrorKind": {
+    "invalidUuid": "Ungültige Vorgangs-ID.",
+    "invalidTotp": "Ungültige TOTP-Daten.",
+    "invalidUpdateTimestamp": "Ungültiges Aktualisierungsdatum.",
+    "deletedTotp": "Dieses TOTP wurde bereits gelöscht.",
+    "invalidDeleteTimestamp": "Ungültiges Löschdatum.",
+    "maxOperationsCountExceeded": "Zu viele ausstehende Änderungen.",
+    "tooManyTotps": "TOTP-Limit erreicht.",
+    "genericError": "Synchronisierung fehlgeschlagen."
+  },
   "passwordMismatch": "Das neue Passwort für den Krypto-Speicher ist nicht korrekt.",
   "migrator": {
     "message": "Beim Migrieren Ihrer Daten ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",

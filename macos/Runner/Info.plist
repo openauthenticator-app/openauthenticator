@@ -59,10 +59,6 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
-	<key>FirebaseDynamicLinksCustomDomains</key>
-	<array>
-		<string>https://login.openauthenticator.app/do</string>
-	</array>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>

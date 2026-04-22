@@ -25,7 +25,7 @@ class Totp extends Equatable implements Comparable<Totp> {
   static const String kDigitsKey = 'digits';
 
   /// The validity key.
-  static const String kValidityKey = 'period';
+  static const String kValidityKey = 'validity';
 
   /// The image URL key.
   static const String kImageUrlKey = 'imageUrl';

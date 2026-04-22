@@ -94,16 +94,25 @@ class BackendClient extends AsyncNotifier<Map<String, String>> {
         value: request.toResponse(response),
       );
     } catch (ex, stackTrace) {
-      if (autoRefreshAccessToken && ex is ExpiredSessionError) {
-        Result result = await ref.read(sessionRefreshManagerProvider.notifier).refresh();
-        if (result is! ResultSuccess) {
-          return result.to((value) => null);
-        }
-        return await sendHttpRequest(
-          request,
-          backendUrl: backendUrl,
-          autoRefreshAccessToken: false,
-        );
+      switch (ex) {
+        case ExpiredSessionError():
+          if (autoRefreshAccessToken) {
+            Result result = await ref.read(sessionRefreshManagerProvider.notifier).refresh();
+            if (result is! ResultSuccess) {
+              return result.to((value) => null);
+            }
+            return await sendHttpRequest(
+              request,
+              backendUrl: backendUrl,
+              autoRefreshAccessToken: false,
+            );
+          }
+          break;
+        case InvalidPayloadError():
+        case InvalidTokenError():
+        case InvalidSessionError():
+          ref.read(sessionRefreshManagerProvider.notifier).handleBackendRequestError(ex as BackendRequestError);
+          break;
       }
       return ResultError(
         exception: ex,

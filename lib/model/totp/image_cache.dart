@@ -2,15 +2,19 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/painting.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:open_authenticator/model/settings/cache_totp_pictures.dart';
 import 'package:open_authenticator/model/totp/decrypted.dart';
 import 'package:open_authenticator/model/totp/repository.dart';
 import 'package:open_authenticator/model/totp/totp.dart';
+import 'package:open_authenticator/pages/totp.dart';
 import 'package:open_authenticator/utils/image_type.dart';
 import 'package:open_authenticator/utils/jovial_svg.dart';
 import 'package:open_authenticator/utils/utils.dart';
+import 'package:open_authenticator/widgets/totp/image.dart';
+import 'package:open_authenticator/widgets/totp/widget.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -88,14 +92,15 @@ class TotpImageCacheManager extends AsyncNotifier<Map<String, CacheObject>> {
           );
         }
         await file.writeAsBytes(response.bodyBytes);
+        await _evictCachedImageFile(file);
         ImageType imageType;
         if (imageUrl.endsWith('.svg')) {
-          imageType = ImageType.svg;
+          imageType = .svg;
           if (await JovialSvgUtils.svgToSi(response.body, file)) {
-            imageType = ImageType.si;
+            imageType = .si;
           }
         } else {
-          imageType = ImageType.other;
+          imageType = .other;
         }
 
         await _enqueueCacheMutation(() async {
@@ -122,6 +127,7 @@ class TotpImageCacheManager extends AsyncNotifier<Map<String, CacheObject>> {
       Map<String, CacheObject> cached = await _readCachedState();
       for (String uuid in uuids) {
         File file = await _getTotpCachedImageFile(uuid);
+        await _evictCachedImageFile(file);
         await file.deleteIfExists();
         cached.remove(uuid);
       }
@@ -282,6 +288,20 @@ class TotpImageCacheManager extends AsyncNotifier<Map<String, CacheObject>> {
 
   /// Returns the TOTP cached image file.
   static Future<File> _getTotpCachedImageFile(String uuid, {bool createDirectory = false}) async => File(join((await _getTotpImagesDirectory(create: createDirectory)).path, uuid));
+
+  /// Evicts every image provider variant used by TOTP images.
+  static Future<void> _evictCachedImageFile(File file) async {
+    FileImage fileImage = FileImage(file);
+    await fileImage.evict();
+    await Future.wait([
+      for (double size in [
+        TotpTile.kDefaultImageSize,
+        TotpImage.kDefaultSize,
+        TotpPage.kDefaultTotpImageSize,
+      ])
+        ResizeImage.resizeIfNeeded(size.toInt(), size.toInt(), fileImage).evict(),
+    ]);
+  }
 
   /// Returns the totp images directory, creating it if doesn't exist yet.
   static Future<Directory> _getTotpImagesDirectory({bool create = false}) async {

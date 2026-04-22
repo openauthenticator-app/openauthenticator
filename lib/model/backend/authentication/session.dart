@@ -107,8 +107,8 @@ class SessionRefreshManager extends Notifier<SessionRefreshState> {
   }
 
   /// Refreshes the session.
-  Future<Result> refresh({Session? session}) async {
-    Result result = const ResultCancelled();
+  Future<Result<Session>> refresh({Session? session}) async {
+    Result<Session> result = const ResultCancelled();
     if (!ref.mounted || state is SessionRefreshStateInvalidSession) {
       return result;
     }
@@ -116,31 +116,26 @@ class SessionRefreshManager extends Notifier<SessionRefreshState> {
       return await (state as SessionRefreshStateInProgress)._pendingRefresh.future;
     }
 
-    Completer<Result>? pendingRefresh = Completer();
+    Completer<Result<Session>>? pendingRefresh = Completer();
     state = SessionRefreshStateInProgress(pendingRefresh: pendingRefresh);
     try {
       BackendClient backend = await ref.read(backendClientProvider.notifier);
-      Result<Session> result = await _sendRefreshRequest(backend, session: session);
-      if (result is! ResultSuccess<Session>) {
-        if (result is ResultError) {
-          Error.throwWithStackTrace((result as ResultError).exception, (result as ResultError).stackTrace);
-        }
-        return result;
-      }
-      await ref.read(storedSessionProvider.notifier).storeAndUse(result.value);
-      if (ref.mounted) {
-        state = const SessionRefreshStateSuccess();
-        result = const ResultSuccess();
+      result = await _sendRefreshRequest(backend, session: session);
+      switch (result) {
+        case ResultSuccess<Session>():
+          await ref.read(storedSessionProvider.notifier).storeAndUse(result.value);
+          if (ref.mounted) {
+            state = const SessionRefreshStateSuccess();
+          }
+          break;
+        case ResultError<Session>():
+          Error.throwWithStackTrace(result.exception, result.stackTrace);
+        default:
+          break;
       }
     } catch (ex, stackTrace) {
-      List<String> invalidSessionCodes = [
-        InvalidPayloadError.kErrorCode,
-        InvalidTokenError.kErrorCode,
-        InvalidSessionError.kErrorCode,
-        ExpiredSessionError.kErrorCode,
-      ];
-      if (ex is BackendRequestError && invalidSessionCodes.contains(ex.code) && ref.mounted) {
-        state = const SessionRefreshStateInvalidSession();
+      if (ex is BackendRequestError) {
+        handleBackendRequestError(ex);
       }
       result = ResultError(
         exception: ex,
@@ -149,6 +144,19 @@ class SessionRefreshManager extends Notifier<SessionRefreshState> {
     }
     pendingRefresh.complete(result);
     return result;
+  }
+
+  /// Handles a backend request error.
+  void handleBackendRequestError(BackendRequestError ex) {
+    List<String> invalidSessionCodes = [
+      InvalidPayloadError.kErrorCode,
+      InvalidTokenError.kErrorCode,
+      InvalidSessionError.kErrorCode,
+      ExpiredSessionError.kErrorCode,
+    ];
+    if (invalidSessionCodes.contains(ex.code) && ref.mounted) {
+      state = const SessionRefreshStateInvalidSession();
+    }
   }
 
   /// Sends a refresh request.
@@ -198,11 +206,11 @@ class SessionRefreshStateIdle extends SessionRefreshState {
 /// The session refresh state is in progress.
 class SessionRefreshStateInProgress extends SessionRefreshState {
   /// The pending refresh completer.
-  final Completer<Result> _pendingRefresh;
+  final Completer<Result<Session>> _pendingRefresh;
 
   /// Creates a new in progress session refresh state instance.
   SessionRefreshStateInProgress({
-    required Completer<Result> pendingRefresh,
+    required Completer<Result<Session>> pendingRefresh,
   }) : _pendingRefresh = pendingRefresh;
 }
 

@@ -30,7 +30,7 @@ extension JsonTotp on Totp {
   Map<String, dynamic> toJson({bool includeUuid = true}) => {
     if (includeUuid) Totp.kUuidKey: uuid,
     ...encryptedData.toJson(),
-    if (algorithm != null) Totp.kAlgorithmKey: algorithm!.name,
+    if (algorithm != null) Totp.kAlgorithmKey: algorithm!.name.toUpperCase(),
     if (digits != null) Totp.kDigitsKey: digits,
     if (validity != null) Totp.kValidityKey: validity!.inSeconds,
     Totp.kUpdatedAtKey: updatedAt.millisecondsSinceEpoch,

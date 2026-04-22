@@ -3,10 +3,15 @@ import 'package:hashlib_codecs/hashlib_codecs.dart';
 import 'package:open_authenticator/model/crypto.dart';
 import 'package:open_authenticator/model/totp/algorithm.dart';
 import 'package:open_authenticator/model/totp/totp.dart';
+import 'package:open_authenticator/utils/uri_builder.dart';
 import 'package:uuid/uuid.dart';
 
 /// Represents a TOTP, in its decrypted state.
 class DecryptedTotp extends Totp {
+  /// The period key.
+  /// Used in `otpauth` URIs.
+  static const String _kPeriodKey = 'period';
+
   /// Creates a new decrypted TOTP instance.
   const DecryptedTotp({
     required super.uuid,
@@ -144,7 +149,7 @@ class DecryptedTotp extends Totp {
     if (label.startsWith('/')) {
       label = label.substring(1);
     }
-    int? validity = uri.queryParameters.containsKey(Totp.kValidityKey) ? int.tryParse(uri.queryParameters[Totp.kValidityKey]!) : null;
+    int? validity = uri.queryParameters.containsKey(_kPeriodKey) ? int.tryParse(uri.queryParameters[_kPeriodKey]!) : null;
     return create(
       cryptoStore: cryptoStore,
       secret: uri.queryParameters[Totp.kSecretKey]!,
@@ -175,26 +180,25 @@ class DecryptedTotp extends Totp {
     int? digits,
     Duration? validity,
   }) {
-    Map<String, dynamic> queryParameters = {};
-    queryParameters[Totp.kSecretKey] = secret;
-    if (issuer != null) {
-      queryParameters[Totp.kIssuerKey] = issuer;
-    }
-    if (algorithm != null) {
-      queryParameters[Totp.kAlgorithmKey] = algorithm.name.toLowerCase();
-    }
-    if (digits != null) {
-      queryParameters[Totp.kDigitsKey] = digits.toString();
-    }
-    if (validity != null) {
-      queryParameters[Totp.kValidityKey] = validity.inSeconds.toString();
-    }
-    return Uri(
+    UriBuilder builder = UriBuilder(
       scheme: 'otpauth',
       host: 'totp',
       path: label,
-      queryParameters: queryParameters,
     );
+    builder.appendQueryParameter(Totp.kSecretKey, secret);
+    if (issuer != null) {
+      builder.appendQueryParameter(Totp.kIssuerKey, issuer);
+    }
+    if (algorithm != null) {
+      builder.appendQueryParameter(Totp.kAlgorithmKey, algorithm.name.toLowerCase());
+    }
+    if (digits != null) {
+      builder.appendQueryParameter(Totp.kDigitsKey, digits.toString());
+    }
+    if (validity != null) {
+      builder.appendQueryParameter(_kPeriodKey, validity.inSeconds.toString());
+    }
+    return builder.build();
   }
 }
 

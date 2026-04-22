@@ -20,5 +20,8 @@ enum Algorithm {
   const Algorithm(this.mapsTo);
 
   /// Tries to convert the given [string] to an [Algorithm].
-  static Algorithm? fromString(String string) => Algorithm.values.firstWhereOrNull((algorithm) => algorithm.name.toLowerCase() == string);
+  static Algorithm? fromString(String string) {
+    String normalized = string.toLowerCase();
+    return Algorithm.values.firstWhereOrNull((algorithm) => algorithm.name.toLowerCase() == normalized);
+  }
 }

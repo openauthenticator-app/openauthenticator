@@ -77,6 +77,16 @@
       "generic": "Failed to encrypt TOTP with current crypto store."
     }
   },
+  "pushOperationErrorKind": {
+    "invalidUuid": "Invalid operation ID.",
+    "invalidTotp": "Invalid TOTP data.",
+    "invalidUpdateTimestamp": "Invalid update date.",
+    "deletedTotp": "This TOTP was already deleted.",
+    "invalidDeleteTimestamp": "Invalid deletion date.",
+    "maxOperationsCountExceeded": "Too many pending changes.",
+    "tooManyTotps": "TOTP limit reached.",
+    "genericError": "Sync failed."
+  },
   "passwordMismatch": "The new crypto store password is incorrect.",
   "migrator": {
     "message": "An error occurred while migrating your data. Please try again.",

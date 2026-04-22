@@ -36,7 +36,10 @@ class SyncIssuesPage extends ConsumerWidget {
         ],
         suffixes: [
           ClickableHeaderAction(
-            icon: const Icon(FIcons.trash),
+            icon: Icon(
+              FIcons.trash,
+              color: context.theme.colors.destructive,
+            ),
             onPress: () async {
               await showWaitingOverlay(
                 context,
@@ -94,7 +97,7 @@ class _PushOperationErrorWidget extends ConsumerWidget {
       translations.syncIssues.operations.title(errorCode: error.errorCode),
     ),
     children: [
-      if (error.errorKind!.isPermanent)
+      if (error.errorKind.isPermanent)
         Text(
           translations.syncIssues.operations.expandable.permanent,
           style: TextStyle(
@@ -102,13 +105,36 @@ class _PushOperationErrorWidget extends ConsumerWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-      Text(
-        translations.syncIssues.operations.expandable.date(
-          date: '${DateFormat.yMd(translations.$meta.locale.underscoreTag).format(error.createdAt)} ${DateFormat.Hms(translations.$meta.locale.underscoreTag).format(error.createdAt)}',
+      Text.rich(
+        TextSpan(
+          children: [
+            TextSpan(
+              text: translations.syncIssues.operations.expandable.date,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            TextSpan(
+              text: ' ${DateFormat.yMd(translations.$meta.locale.underscoreTag).format(error.createdAt)} ${DateFormat.Hms(translations.$meta.locale.underscoreTag).format(error.createdAt)}',
+            ),
+          ],
+          style: context.theme.typography.xs,
         ),
-        style: TextStyle(
-          fontSize: context.theme.typography.xs.fontSize,
-          fontWeight: FontWeight.bold,
+      ),
+      Text.rich(
+        TextSpan(
+          children: [
+            TextSpan(
+              text: translations.syncIssues.operations.expandable.code,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            TextSpan(
+              text: ' ${error.errorCode}',
+            ),
+          ],
+          style: context.theme.typography.xs,
         ),
       ),
       Text(
@@ -119,7 +145,7 @@ class _PushOperationErrorWidget extends ConsumerWidget {
         ),
       ),
       Text(
-        error.errorDetails.toString(),
+        error.errorKind.localizedMessage,
         maxLines: null,
         overflow: TextOverflow.visible,
         style: TextStyle(fontSize: context.theme.typography.xs.fontSize),

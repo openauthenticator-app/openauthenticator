@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=Open Authenticator
 Comment=A cross-platform OTP app, free and open-source
-Exec=open-authenticator
+Exec=open-authenticator %u
 Icon=${SNAP}/meta/gui/icon.svg
 Terminal=false
 Type=Application

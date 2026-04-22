@@ -77,6 +77,16 @@
       "generic": "Impossible de chiffrer le TOTP avec le magasin de chiffrement actuel."
     }
   },
+  "pushOperationErrorKind": {
+    "invalidUuid": "Identifiant d'opération invalide.",
+    "invalidTotp": "Données TOTP invalides.",
+    "invalidUpdateTimestamp": "Date de mise à jour invalide.",
+    "deletedTotp": "Ce TOTP a déjà été supprimé.",
+    "invalidDeleteTimestamp": "Date de suppression invalide.",
+    "maxOperationsCountExceeded": "Trop de changements en attente.",
+    "tooManyTotps": "Limite de TOTP atteinte.",
+    "genericError": "Synchronisation échouée."
+  },
   "passwordMismatch": "Le mot de passe du magasin de chiffrement est incorrect.",
   "migrator": {
     "message": "Une erreur est survenue lors de la migration de vos données. Veuillez réessayer.",

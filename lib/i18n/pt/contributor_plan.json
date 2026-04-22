@@ -28,6 +28,7 @@
       }
     },
     "button": {
+      "subscribed": "Plano assinado!",
       "privacyPolicy": "Política de privacidade",
       "termsOfService": "Termos de serviço",
       "restorePurchases": "Restaurar compras"

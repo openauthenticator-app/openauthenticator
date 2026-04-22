@@ -89,7 +89,7 @@ class AppScaffold extends StatelessWidget {
       if (center != null) {
         return center;
       }
-      if (asyncValue is Iterable) {
+      if (asyncValue.value is Iterable) {
         return (asyncValue.value as Iterable).isEmpty;
       }
       return false;

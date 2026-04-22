@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
@@ -31,6 +32,9 @@ import 'package:qr_flutter/qr_flutter.dart';
 
 /// Allows to edit a TOTP.
 class TotpPage extends ConsumerStatefulWidget {
+  /// The default image size.
+  static const double kDefaultTotpImageSize = 150;
+
   /// The TOTP page name.
   static const String name = '/totp';
 
@@ -47,7 +51,7 @@ class TotpPage extends ConsumerStatefulWidget {
   const TotpPage({
     super.key,
     this.totp,
-    this.imageSize = 150,
+    this.imageSize = kDefaultTotpImageSize,
     bool? add,
   }) : add = add ?? totp == null;
 
@@ -378,6 +382,18 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
       validator: validateValidity,
       enabled: enabled,
     ),
+    if (kDebugMode && widget.totp != null)
+      FTextFormField(
+        control: .lifted(
+          value: TextEditingValue(text: widget.totp!.uuid),
+          onChange: (_) {},
+        ),
+        label: const FormLabelWithIcon(
+          icon: FIcons.idCard,
+          text: 'UUID',
+        ),
+        enabled: false,
+      ),
   ];
 
   @override

@@ -80,7 +80,7 @@ class ContributorPlan extends AsyncNotifier<ContributorPlanState> {
   }
 
   /// Tries to restore the subscription.
-  Future<Result> restore() async {
+  Future<Result<ContributorPlanState>> restore() async {
     try {
       RevenueCatClient? revenueCatClient = await ref.read(revenueCatClientProvider.future);
       if (revenueCatClient == null) {
@@ -97,8 +97,8 @@ class ContributorPlan extends AsyncNotifier<ContributorPlanState> {
       if (!ref.mounted) {
         return const ResultCancelled();
       }
-      await ref.read(userProvider.notifier).refreshUserInfo();
-      return const ResultSuccess();
+      Result<User> result = await ref.read(userProvider.notifier).refreshUserInfo();
+      return result.to((user) => user?.contributorPlan == true ? .active : .inactive);
     } catch (ex, stackTrace) {
       return ResultError(
         exception: ex,
