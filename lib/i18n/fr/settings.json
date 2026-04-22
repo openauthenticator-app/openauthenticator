@@ -179,7 +179,7 @@
       "subtitle": "Supprime toutes les données stockées par l'application sur votre appareil.",
       "confirmationDialog": {
         "title": "Suppression des données de l'application",
-        "message": "Voulez-vous vraiment supprimer les données de l'application ? Vous ne pourrez plus les récupérer. Veuillez noter que, si vous avez synchronisé des TOTPs, cette aciton ne les supprimera pas du stockage en ligne."
+        "message": "Voulez-vous vraiment supprimer les données de l'application ? Vous ne pourrez plus les récupérer. Veuillez noter que, si vous avez synchronisé des TOTPs, cette action ne les supprimera pas du stockage en ligne."
       },
       "backupDeleteConfirmationDialog": {
         "title": "Suppression des backups",
