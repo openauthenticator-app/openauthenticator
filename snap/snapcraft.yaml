@@ -1,6 +1,6 @@
 name: open-authenticator
 title: Open Authenticator
-version: 1.4.3
+version: 2.0.0
 summary: A cross-platform OTP app, free and open-source.
 description: Secure your online accounts with a free, open-source and lovely-crafted app.
 license: GPL-3.0-only

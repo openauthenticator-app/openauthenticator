@@ -74,6 +74,43 @@
   </branding>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="2.0.0" date="2026-04-24">
+      <url type="details">https://github.com/Skyost/OpenAuthenticator/releases/tag/2.0.0</url>
+      <description type="changelog">
+        <ul>
+          <li>Fixed various bugs with backups.</li>
+          <li>Various fixes and updates.</li>
+          <li>Various fixes.</li>
+          <li>Better handling of backend changes.</li>
+          <li>Better handling of purchases.</li>
+          <li>Did a lot of various updates.</li>
+          <li>Fixed a typo.</li>
+          <li>Fixed various remaining `TODO`s.</li>
+          <li>Improved TOTPs images cache and display.</li>
+          <li>Improved how push operations sorting was handled.</li>
+          <li>Improved the TOTP edit dialog.</li>
+          <li>Improved the migrator.</li>
+          <li>More fixes and improvements.</li>
+          <li>Now using timestamped tombstones to store deleted TOTPs.</li>
+          <li>Removed various useless strings.</li>
+          <li>Set `windowButtonVisibility` to `false`.</li>
+          <li>Updated Flatpak build scripts.</li>
+          <li>Updated README and docs.</li>
+          <li>Updated README, contribution guidelines and issue templates.</li>
+          <li>Updated README.</li>
+          <li>Updated dependencies, contribution guidelines and ignored files.</li>
+          <li>Updated dependencies.</li>
+          <li>Updated iOS / macOS project.</li>
+          <li>Updated screenshots.</li>
+          <li>Updated the `lib/app.dart` generator.</li>
+          <li>Updated the app design.</li>
+          <li>Updated the app to use a custom backend.</li>
+          <li>Various fixes and improvements.</li>
+          <li>Completely removed dependency on `webcrypto`.</li>
+          <li>Moved the docs into their own repo.</li>
+        </ul>
+      </description>
+    </release>
     <release version="1.4.3" date="2025-12-23">
       <url type="details">https://github.com/Skyost/OpenAuthenticator/releases/tag/1.4.3</url>
       <description type="changelog">

@@ -1,5 +1,17 @@
 # 📰 Open Authenticator changelog
 
+## v2.0.0
+Released on April 24, 2026.
+
+**This is a big release !** Only notable change are listed below.
+
+* **FIX**: Fixed various bugs with backups. ([#047a561](https://github.com/Skyost/OpenAuthenticator/commit/047a561))
+* **CHORE**: Improved TOTPs images cache and display. ([#88b2a96](https://github.com/Skyost/OpenAuthenticator/commit/88b2a96))
+* **CHORE**: Updated the `lib/app.dart` generator. ([#b1ccd3d](https://github.com/Skyost/OpenAuthenticator/commit/b1ccd3d))
+* **CHORE**: Updated the app design. ([#db514e6](https://github.com/Skyost/OpenAuthenticator/commit/db514e6))
+* **CHORE**: Updated the app to use a custom backend. ([#94e632d](https://github.com/Skyost/OpenAuthenticator/commit/94e632d))
+* **REFACTOR**: Completely removed dependency on `webcrypto`. ([#e427d7f](https://github.com/Skyost/OpenAuthenticator/commit/e427d7f))
+
 ## v1.4.3
 Released on December 23, 2025.
 
