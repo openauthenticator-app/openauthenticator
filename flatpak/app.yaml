@@ -25,10 +25,10 @@ modules:
     only-arches:
       - x86_64
     build-commands:
-      - "./build-flatpak.sh"
+      - "./flatpak-build-subcommand.sh"
     sources:
       - type: file
-        path: ./build-flatpak.sh
+        path: ./flatpak-build-subcommand.sh
       - type: file
         path: ./OpenAuthenticator-Linux-Portable.tar.gz
       - type: file
