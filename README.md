@@ -1,6 +1,6 @@
 <div align="center">
   <a href="https://openauthenticator.app">
-    <img src="https://github.com/openauthenticator-app/openauthenticator/raw/main/docs/public/images/logo.svg" alt="Logo" width="120" height="120">
+    <img src="https://openauthenticator.app/images/logo.svg" alt="Logo" width="120" height="120">
   </a>
 
   <h3>Open Authenticator</h3>
