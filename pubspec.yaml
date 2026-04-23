@@ -3,8 +3,9 @@ description: A cross-platform OTP app, free and open-source.
 publish_to: none
 version: 2.0.0+25
 homepage: https://openauthenticator.app
-repository: https://github.com/Skyost/OpenAuthenticator
-issue_tracker: https://github.com/Skyost/OpenAuthenticator/issues
+repository: https://github.com/openauthenticator-app/openauthenticator
+license: CC-BY-SA-4.0
+issue_tracker: https://github.com/openauthenticator-app/openauthenticator/issues
 funding:
   - https://ko-fi.com/Skyost
   - https://paypal.me/Skyost
