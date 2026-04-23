@@ -1,5 +1,16 @@
 {
-  "noError": "Success !",
+  "noError": "Operation done with success.",
+  "widget": {
+    "title": "Error",
+    "stackTrace": {
+      "show": "Show stacktrace",
+      "hide": "Hide stacktrace"
+    },
+    "button": {
+      "report": "Report",
+      "retry": "Retry"
+    }
+  },
   "validation": {
     "number": "You should enter a valid number",
     "empty": "This field is required",
@@ -7,49 +18,88 @@
     "secret": "Invalid secret entered",
     "totpDigits": "This number should be super or equal than 6",
     "masterPassword": "Invalid password entered",
-    "confirmation": "Confirmation doesn't match"
+    "confirmation": "Confirmation doesn't match",
+    "url": "Invalid URL entered"
   },
-  "timeout": {
-    "generic": "Timeout occurred. Please try again later.",
-    "authentication": "Timed out while logging in using the selected provider. Please try again.",
-    "unlink": "Timed out while trying to unlink your account from this authentication provider. Please try again.",
-    "contributorPlan": "Timed out while waiting for your Contributor Plan subscription purchase. Please try again."
-  },
-  "appUnlock": "Failed to unlock the app. Please try again.",
   "generic": {
-    "noTryAgain": "Oops, something went wrong.",
-    "tryAgain": "Something went wrong. Please try again later.",
-    "withException": "An error occurred (exception : $exception). Please try again later."
+    "noException": "Oops, something went wrong.",
+    "withException": "An error occurred (exception : $exception).",
+    "tryAgain": "Please try again later."
   },
-  "authentication": {
-    "accountExistsWithDifferentCredentialsDialog": {
-      "title": "An account already exists",
-      "message": "An account with the same email address exists in our database, but the selected authentication provider has not yet been linked to it.\nPlease try to log in using an already linked authentication provider."
-    },
-    "invalidCredential": "Invalid credentials provided.",
-    "operationNotAllowed": "Operation not allowed. This should not happen, please report this error.",
-    "userDisabled": "Your account has been disabled.",
-    "firebaseException": "An error occurred while trying to authenticate your account (exception : $exception). Please try again later."
+  "backup": {
+    "fileDoesNotExist": "Backup file does not exist : $path.",
+    "invalidPassword": "Invalid password entered.",
+    "invalidContent": "Invalid backup content.",
+    "crypto": "A cryptographic error occurred."
+  },
+  "appUnlock": {
+    "generic": "Failed to unlock the app. Please try again.",
+    "localAuthenticationDeviceNotSupported": "Cannot unlock the app because your device is not supported by local authentication. Disable this locking method with the button below.",
+    "noPasswordVerificationMethodAvailable": "Cannot unlock the app with your password because the app data integrity has been altered. Please change your master password to continue.\nNote that your TOTPs will still need to be decrypted manually."
+  },
+  "backend": {
+    "invalidJsonResponse": "Invalid response from $route (HTTP $statusCode) : $body.",
+    "noEmailToConfirm": "No email to confirm.",
+    "invalidSession": "Your session is invalid. Please try to log-in again.",
+    "noSession": "You must be logged-in to proceed.",
+    "emailAlreadySent": "An email has already been sent to this address. Please check your inbox or wait a few minutes before retrying.",
+    "noCancelCode": "No cancel code has been provided by the server. This is not normal. Please try again later.",
+    "expiredSession": "Your current session has expired. Please try to log-in again.",
+    "invalidPayload": "Your payload is invalid. Please try again later.",
+    "invalidToken": "Your token is invalid. Please try to log-in again.",
+    "invalidVerificationCode": "Your verification code is invalid.",
+    "invalidAppVersion": "Your app version is invalid. Please update to the latest version.",
+    "invalidBackendUrl": "Invalid backend URL entered.",
+    "providerUserAlreadyExists": "An user with the same provider already exists, so it's not possible to link it to your account."
   },
   "scan": {
     "noUri": "Failed to read this QR code. Please ensure it is a valid TOTP QR code.",
-    "accessDeniedDialog": {
-      "title": "Access denied",
-      "message": "Failed to access your camera (access denied : $exception). Do you want to retry ?"
-    },
+    "accessDenied": "Failed to access your camera (access denied : $exception).",
     "controllerUninitialized": "Uninitialized controller (code : $exception).",
     "unsupported": "Scanning is not supported on this device (code : $exception)."
   },
-  "storageMigration(map)": {
+  "storageMigration": {
+    "getTotps": "An error occurred while getting your remote TOTPs. Please try again later.",
     "backupError": "An error occurred while doing the backup. Please try again.",
+    "anotherDeletedTotpPolicyShouldBeUsed": "Another deleted TOTP policy should be used.",
     "currentStoragePasswordMismatch": "Invalid master password entered.",
-    "encryptionKeyChangeFailed": "An error occurred while encrypting your data. Please try again later.",
-    "genericError": "An error occurred while migrating your data. Please try again later."
+    "generic": "An error occurred while migrating your data. Please try again later."
   },
-  "authenticationValidation": {
-    "incorrectPath": "Something went wrong (path is '$path'). Please report this error.",
-    "generic": "Unable to validate request (exception : $exception). Please try again later.",
-    "oauth2": "Unable to login using $name. Please try again later."
+  "revenueCat": {
+    "noClient": "No RevenueCat client available.",
+    "cannotRestorePurchases": "This RevenueCat client cannot restore purchases."
   },
-  "totpDecrypt": "Failed to decrypt this TOTP. Please ensure you have entered the correct password."
+  "totp": {
+    "create": "This TOTP could not be created.",
+    "decrypt": "Failed to decrypt this TOTP. Please ensure you have entered the correct password.",
+    "changeCryptoStore": {
+      "noCryptoStore": "Unable to get current crypto store. Please close and reopen the app.",
+      "generic": "Failed to encrypt TOTP with current crypto store."
+    }
+  },
+  "pushOperationErrorKind": {
+    "invalidUuid": "Invalid operation ID.",
+    "invalidTotp": "Invalid TOTP data.",
+    "invalidUpdateTimestamp": "Invalid update date.",
+    "deletedTotp": "This TOTP was already deleted.",
+    "invalidDeleteTimestamp": "Invalid deletion date.",
+    "maxOperationsCountExceeded": "Too many pending changes.",
+    "tooManyTotps": "TOTP limit reached.",
+    "genericError": "Sync failed."
+  },
+  "passwordMismatch": "The new crypto store password is incorrect.",
+  "migrator": {
+    "message": "An error occurred while migrating your data. Please try again.",
+    "noFirebaseUser": "No Firebase user available. Please try again later or contact us.",
+    "idToken": "Could not get ID token. Please try again later.",
+    "httpError": "Migration failed. HTTP Error $statusCode : $body.",
+    "migrationCancelled": "Migration cancelled.",
+    "firebaseUserNotFound": "Firebase user cannot be found. Please contact us.",
+    "invalidIdToken": "Invalid ID token. Please contact us.",
+    "invalidUserId": "Invalid user ID. Please contact us.",
+    "userAlreadyMigrated": "Your account has been successfully migrated previously. Please log in with your credentials.",
+    "noSupportedAuthenticationProvider": "We cannot find any supported authentication provider. Please contact us.",
+    "userWithProviderIdAlreadyExists": "An user with the same provider ID already exists, so it's not possible to migrate your account with your current credentials. Please contact us.",
+    "userCreationFailed": "An error occurred while creating your account. Please contact us."
+  }
 }

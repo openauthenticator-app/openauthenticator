@@ -1,0 +1,22 @@
+{
+  "confirmActionPickerDialog": {
+    "title": "O que você deseja fazer?",
+    "confirm": {
+      "title": "Confirmar sua conta",
+      "subtitle": "Cole o código que você recebeu por e-mail para confirmar sua conta."
+    },
+    "cancelConfirmation": {
+      "title": "Cancelar confirmação da conta",
+      "subtitle": "Cancelar a confirmação da sua conta.",
+      "validationDialog": {
+        "title": "Confirmação",
+        "message": "Tem certeza?"
+      }
+    }
+  },
+  "success": "E-mail confirmado com sucesso.",
+  "codeDialog": {
+    "title": "Código de confirmação",
+    "message": "Visite o link com este dispositivo ou cole o código abaixo para confirmar seu endereço de e-mail."
+  }
+}

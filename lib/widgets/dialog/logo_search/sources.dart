@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -18,12 +19,16 @@ mixin Source {
   String get name;
 
   /// Searches using this source.
-  Future<List<Uri>> search(http.Client client, String userKeywords);
+  FutureOr<Iterable<Uri>> _trySearch(http.Client client, String userKeywords);
 
   /// Check whether the given [imageUrl] is good to display.
   static Future<bool> check(http.Client client, Uri imageUrl) async {
-    http.Response response = await client.head(imageUrl);
-    return response.statusCode == HttpStatus.ok;
+    try {
+      http.Response response = await client.head(imageUrl);
+      return response.statusCode == HttpStatus.ok;
+    } catch (_) {
+      return false;
+    }
   }
 }
 
@@ -36,15 +41,11 @@ mixin DirectApiSource on Source {
   Map<String, dynamic>? get queryParameters => null;
 
   @override
-  Future<List<Uri>> search(http.Client client, String userKeywords) => Future.value(
-    List.of(
-      {
-        Uri.https(apiHost, userKeywords, queryParameters),
-        Uri.https(apiHost, userKeywords.replaceAll(' ', ''), queryParameters),
-        Uri.https(apiHost, '${userKeywords.replaceAll(' ', '')}.com', queryParameters),
-      },
-    ),
-  );
+  Iterable<Uri> _trySearch(http.Client client, String userKeywords) => {
+    Uri.https(apiHost, userKeywords, queryParameters),
+    Uri.https(apiHost, userKeywords.replaceAll(' ', ''), queryParameters),
+    Uri.https(apiHost, '${userKeywords.replaceAll(' ', '')}.com', queryParameters),
+  };
 }
 
 /// Search using Wikimedia.
@@ -56,24 +57,26 @@ class WikimediaSource with Source {
   String get name => 'Wikimedia';
 
   @override
-  Future<List<Uri>> search(http.Client client, String userKeywords) async {
+  Future<List<Uri>> _trySearch(http.Client client, String userKeywords) async {
     List<String> result = [];
-    http.Response response = await client.get(buildEndpointUrl(userKeywords));
-    Map<String, dynamic> json = jsonDecode(response.body);
-    dynamic query = json['query'];
-    if (query is Map<String, dynamic>) {
-      dynamic search = query['search'];
-      if (search is List) {
-        for (dynamic element in search) {
-          if (element is Map<String, dynamic>) {
-            String logo = element['title'];
-            if (logo.endsWith('.png') || logo.endsWith('.jpg') || logo.endsWith('.jpeg') || logo.endsWith('.tiff') || logo.endsWith('.webp') || logo.endsWith('.svg')) {
-              result.add(logo);
+    try {
+      http.Response response = await client.get(buildEndpointUrl(userKeywords));
+      Map<String, dynamic> json = jsonDecode(response.body);
+      dynamic query = json['query'];
+      if (query is Map<String, dynamic>) {
+        dynamic search = query['search'];
+        if (search is List) {
+          for (dynamic element in search) {
+            if (element is Map<String, dynamic>) {
+              String logo = element['title'];
+              if (logo.endsWith('.png') || logo.endsWith('.jpg') || logo.endsWith('.jpeg') || logo.endsWith('.tiff') || logo.endsWith('.webp') || logo.endsWith('.svg')) {
+                result.add(logo);
+              }
             }
           }
         }
       }
-    }
+    } catch (_) {}
     return result.map(buildImageUrl).toList();
   }
 
@@ -134,18 +137,17 @@ class BrandfetchSource with Source {
   String get name => 'Brandfetch';
 
   @override
-  Future<List<Uri>> search(http.Client client, String userKeywords) async {
+  Future<List<Uri>> _trySearch(http.Client client, String userKeywords) async {
     List<Uri> result = [];
-    http.Response response = await client.get(buildEndpointUrl(userKeywords));
-    List jsonList = jsonDecode(response.body);
-    for (dynamic jsonBrand in jsonList) {
-      if (jsonBrand['qualityScore'] >= 0.75) {
-        Uri? uri = Uri.tryParse(jsonBrand['icon']);
-        if (uri != null) {
-          result.add(uri);
+    try {
+      http.Response response = await client.get(buildEndpointUrl(userKeywords));
+      List jsonList = jsonDecode(response.body);
+      for (dynamic jsonBrand in jsonList) {
+        if (jsonBrand['qualityScore'] >= 0.75) {
+          result.add(Uri.parse(jsonBrand['icon']));
         }
       }
-    }
+    } catch (_) {}
     return result;
   }
 
@@ -158,6 +160,6 @@ extension Search on List<Source> {
   /// Searches using these sources, avoiding errors.
   Future<List<Uri>> search(http.Client client, String userKeywords) async => [
     for (Source source in this) //
-      ...await source.search(client, userKeywords),
+      ...await source._trySearch(client, userKeywords),
   ];
 }

@@ -1,15 +1,12 @@
-import 'package:flutter/material.dart';
-import 'package:open_authenticator/i18n/translations.g.dart';
-import 'package:open_authenticator/utils/platform.dart';
-import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
+part of '../page.dart';
 
 /// A dialog that allows to choose a method to add a TOTP.
-class AddTotpDialog extends StatelessWidget {
+class _AddTotpDialog extends StatelessWidget {
   /// Whether this dialog is supported on the current platform.
   static final bool isSupported = currentPlatform.isMobile;
 
   /// Creates a new add totp dialog instance.
-  const AddTotpDialog({
+  const _AddTotpDialog({
     super.key,
   });
 
@@ -17,35 +14,36 @@ class AddTotpDialog extends StatelessWidget {
   Widget build(BuildContext context) => AppDialog(
     title: Text(translations.home.addDialog.title),
     actions: [
-      TextButton(
-        onPressed: () => Navigator.pop(context),
-        child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+      ClickableButton(
+        variant: .secondary,
+        onPress: () => Navigator.pop(context),
+        child: ButtonText(MaterialLocalizations.of(context).cancelButtonLabel),
       ),
     ],
     children: [
-      ListTile(
-        leading: const Icon(Icons.qr_code),
-        onTap: () => Navigator.pop(context, AddTotpDialogResult.qrCode),
+      ClickableTile(
+        prefix: const Icon(FIcons.qrCode),
+        onPress: () => Navigator.pop(context, AddTotpDialogResult.qrCode),
         title: Text(translations.home.addDialog.qrCode.title),
         subtitle: Text(translations.home.addDialog.qrCode.subtitle),
       ),
-      ListTile(
-        leading: const Icon(Icons.short_text),
-        onTap: () => Navigator.pop(context, AddTotpDialogResult.manually),
+      ClickableTile(
+        prefix: const Icon(FIcons.textAlignStart),
+        onPress: () => Navigator.pop(context, AddTotpDialogResult.manually),
         title: Text(translations.home.addDialog.manually.title),
         subtitle: Text(translations.home.addDialog.manually.subtitle),
       ),
     ],
   );
 
-  /// Displays the [AddTotpDialog].
-  static Future<AddTotpDialogResult?> show(BuildContext context) async => await showDialog<AddTotpDialogResult>(
+  /// Displays the [_AddTotpDialog].
+  static Future<AddTotpDialogResult?> show(BuildContext context) async => await showFDialog<AddTotpDialogResult>(
     context: context,
-    builder: (context) => const AddTotpDialog(),
+    builder: (context, style, animation) => const _AddTotpDialog(),
   );
 }
 
-/// The [AddTotpDialog] result.
+/// The [_AddTotpDialog] result.
 enum AddTotpDialogResult {
   /// When the user wants to use a QR code to add a TOTP.
   qrCode,

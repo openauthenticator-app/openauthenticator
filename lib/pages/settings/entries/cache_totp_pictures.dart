@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:forui/forui.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/settings/cache_totp_pictures.dart';
 import 'package:open_authenticator/pages/settings/entries/widgets.dart';
@@ -12,6 +12,6 @@ class CacheTotpPicturesSettingsEntryWidget extends BoolSettingsEntryWidget<Cache
          provider: cacheTotpPicturesSettingsEntryProvider,
          title: translations.settings.application.cacheTotpPictures.title,
          subtitle: translations.settings.application.cacheTotpPictures.subtitle,
-         icon: Icons.storage,
+         icon: FIcons.server,
        );
 }

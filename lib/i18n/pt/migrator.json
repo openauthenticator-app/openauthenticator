@@ -1,0 +1,8 @@
+{
+  "title": "Olá, bem-vindo(a) de volta!",
+  "message": "A aplicação foi atualizada para uma nova versão. Por favor, considere migrar os seus TOTPs para continuar a usá-los. Se tinha sessão iniciada, a sua conta também será migrada durante este processo.",
+  "button": {
+    "migrate": "Migrar",
+    "dontMigrate": "Não migrar"
+  }
+}

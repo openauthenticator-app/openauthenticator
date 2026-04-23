@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:open_authenticator/app.dart';
+import 'package:forui/forui.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
-import 'package:open_authenticator/model/authentication/firebase_authentication.dart';
-import 'package:open_authenticator/model/authentication/providers/provider.dart';
-import 'package:open_authenticator/model/authentication/state.dart';
+import 'package:open_authenticator/model/backend/user.dart';
 import 'package:open_authenticator/model/purchases/contributor_plan.dart';
 import 'package:open_authenticator/model/settings/storage_type.dart';
-import 'package:open_authenticator/model/storage/type.dart';
+import 'package:open_authenticator/model/totp/limit.dart';
 import 'package:open_authenticator/model/totp/repository.dart';
-import 'package:open_authenticator/pages/intro/slides/slide.dart';
+import 'package:open_authenticator/model/totp/totp.dart';
 import 'package:open_authenticator/pages/settings/entries/widgets.dart';
 import 'package:open_authenticator/utils/storage_migration.dart';
 
@@ -18,8 +16,7 @@ class SynchronizeSettingsEntryWidget extends CheckboxSettingsEntryWidget<Storage
   /// Creates a new synchronize settings entry widget instance.
   SynchronizeSettingsEntryWidget({
     super.key,
-    super.contentPadding,
-    super.icon = Icons.sync,
+    super.icon = FIcons.refreshCcw,
   }) : super(
          provider: storageTypeSettingsEntryProvider,
          title: translations.settings.synchronization.synchronizeTotps.title,
@@ -32,81 +29,57 @@ class SynchronizeSettingsEntryWidget extends CheckboxSettingsEntryWidget<Storage
   }) : this(
          key: key,
          icon: null,
-         contentPadding: const EdgeInsets.only(
-           bottom: IntroPageSlideParagraphWidget.kDefaultPadding,
-         ),
        );
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    FirebaseAuthenticationState? state = ref.watch(firebaseAuthenticationProvider);
-    if (state is! FirebaseAuthenticationStateLoggedIn) {
-      return const SizedBox.shrink();
-    }
-    bool hasProvider = ref.watch(userAuthenticationProviders.select((providers) => providers.availableProviders.isNotEmpty));
-    if (!hasProvider) {
-      return const SizedBox.shrink();
-    }
-    return super.build(context, ref);
+    User? user = ref.watch(userProvider).value;
+    return user == null ? const SizedBox.shrink() : super.build(context, ref);
   }
 
   @override
-  Widget createListTile(BuildContext context, WidgetRef ref, {StorageType? value, bool enabled = true}) {
+  Widget createTile(BuildContext context, WidgetRef ref, {StorageType? value, bool enabled = true}) {
     if (value == null) {
-      return super.createListTile(
+      return super.createTile(
         context,
         ref,
         enabled: false,
       );
     }
     AsyncValue<ContributorPlanState> state = ref.watch(contributorPlanStateProvider);
-    StorageType storageType = value;
-    switch (state) {
-      case AsyncData(:final value):
-        switch (value) {
-          case ContributorPlanState.inactive:
-            return FutureBuilder(
-              future: ref.watch(totpLimitProvider.future),
-              builder: (context, snapshot) => super.createListTile(
+    return switch (state) {
+      AsyncData() =>
+        state.value == .inactive
+            ? FutureBuilder(
+                future: ref.watch(totpLimitProvider.future),
+                builder: (context, snapshot) => super.createTile(
+                  context,
+                  ref,
+                  value: value,
+                  enabled: snapshot.data?.isExceeded != true,
+                ),
+              )
+            : super.createTile(
                 context,
                 ref,
-                value: storageType,
-                enabled: snapshot.data?.isExceeded != true,
+                value: value,
+                enabled: enabled,
               ),
-            );
-          case ContributorPlanState.active:
-            return super.createListTile(
-              context,
-              ref,
-              value: storageType,
-              enabled: enabled,
-            );
-          default:
-            return const SizedBox.shrink();
-        }
-      case AsyncLoading():
-      default:
-        return super.createListTile(
-          context,
-          ref,
-          value: value,
-          enabled: false,
-        );
-    }
+      _ => super.createTile(
+        context,
+        ref,
+        value: value,
+        enabled: value == .shared,
+      ),
+    };
   }
 
   @override
   Widget? buildSubtitle(BuildContext context, WidgetRef ref, StorageType? storageType) {
-    AsyncValue<ContributorPlanState> state = ref.watch(contributorPlanStateProvider);
-    if (state is! AsyncData || state.value == ContributorPlanState.active || state.value == ContributorPlanState.impossible) {
-      return super.buildSubtitle(
-        context,
-        ref,
-        storageType,
-      );
-    }
-    AsyncValue<TotpList> totps = ref.watch(totpRepositoryProvider);
-    if (totps is! AsyncData<TotpList>) {
+    ContributorPlanState? contributorPlanState = ref.watch(contributorPlanStateProvider).value;
+    User user = ref.watch(userProvider).value!;
+    AsyncValue<List<Totp>> totps = ref.watch(totpRepositoryProvider);
+    if (totps is! AsyncData<List<Totp>>) {
       return Text(translations.settings.synchronization.synchronizeTotps.subtitle.description);
     }
     return Text.rich(
@@ -116,19 +89,19 @@ class SynchronizeSettingsEntryWidget extends CheckboxSettingsEntryWidget<Storage
           const TextSpan(text: '\n'),
           translations.settings.synchronization.synchronizeTotps.subtitle.totpLimit.limit(
             limit: TextSpan(
-              text: App.freeTotpsLimit.toString(),
-              style: const TextStyle(fontStyle: FontStyle.italic),
+              text: user.totpsLimit.toString(),
+              style: const TextStyle(fontStyle: .italic),
             ),
             count: TextSpan(
               text: totps.value.length.toString(),
-              style: const TextStyle(fontStyle: FontStyle.italic),
+              style: const TextStyle(fontStyle: .italic),
             ),
           ),
-          if (storageType == StorageType.local && totps.value.length > App.freeTotpsLimit)
+          if (storageType == .localOnly && totps.value.length > user.totpsLimit)
             TextSpan(
               text: '\n${translations.settings.synchronization.synchronizeTotps.subtitle.totpLimit.notEnabled}',
             ),
-          if (storageType == StorageType.online)
+          if (storageType == .shared && contributorPlanState == .inactive)
             TextSpan(
               text: '\n${translations.settings.synchronization.synchronizeTotps.subtitle.totpLimit.enabled}',
             ),
@@ -138,8 +111,8 @@ class SynchronizeSettingsEntryWidget extends CheckboxSettingsEntryWidget<Storage
   }
 
   @override
-  void changeValue(BuildContext context, WidgetRef ref, bool newValue) => StorageMigrationUtils.changeStorageType(context, ref, newValue ? StorageType.online : StorageType.local);
+  void changeValue(BuildContext context, WidgetRef ref, bool newValue) => StorageMigrationUtils.changeStorageType(context, ref, newValue ? StorageType.shared : StorageType.localOnly);
 
   @override
-  bool isEnabled(StorageType? storageType) => storageType == StorageType.online;
+  bool isEnabled(StorageType? storageType) => storageType == .shared;
 }

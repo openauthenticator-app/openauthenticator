@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:forui/forui.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
-import 'package:open_authenticator/model/app_unlock/method.dart';
+import 'package:open_authenticator/model/app_unlock/methods/method.dart';
 import 'package:open_authenticator/model/settings/app_unlock_method.dart';
-import 'package:open_authenticator/pages/intro/slides/slide.dart';
 import 'package:open_authenticator/pages/settings/entries/widgets.dart';
 import 'package:open_authenticator/utils/result.dart';
 
 /// Allows to configure [saveDerivedKeySettingsEntryProvider].
-class SaveDerivedKeySettingsEntryWidget extends CheckboxSettingsEntryWidget<AppUnlockMethodSettingsEntry, AppUnlockMethod> {
+class SaveDerivedKeySettingsEntryWidget extends CheckboxSettingsEntryWidget<AppUnlockMethodSettingsEntry, String> {
   /// Creates a new save derived key settings entry widget instance.
   SaveDerivedKeySettingsEntryWidget({
     super.key,
-    super.contentPadding,
-    super.icon = Icons.key,
+    super.icon = FIcons.keyRound,
   }) : super(
          provider: appUnlockMethodSettingsEntryProvider,
          title: translations.settings.security.saveDerivedKey.title,
@@ -26,15 +25,12 @@ class SaveDerivedKeySettingsEntryWidget extends CheckboxSettingsEntryWidget<AppU
   }) : this(
          key: key,
          icon: null,
-         contentPadding: const EdgeInsets.only(
-           bottom: IntroPageSlideParagraphWidget.kDefaultPadding,
-         ),
        );
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    AsyncValue<AppUnlockMethod> unlockMethod = ref.watch(appUnlockMethodSettingsEntryProvider);
-    if (!unlockMethod.hasValue || unlockMethod.value is LocalAuthenticationAppUnlockMethod) {
+    AsyncValue<String> unlockMethod = ref.watch(appUnlockMethodSettingsEntryProvider);
+    if (!unlockMethod.hasValue || unlockMethod.value == LocalAuthenticationAppUnlockMethod.kMethodId) {
       return const SizedBox.shrink();
     }
     return super.build(context, ref);
@@ -42,13 +38,13 @@ class SaveDerivedKeySettingsEntryWidget extends CheckboxSettingsEntryWidget<AppU
 
   @override
   Future<void> changeValue(BuildContext context, WidgetRef ref, bool newValue) async {
-    AppUnlockMethod newMethod = newValue ? NoneAppUnlockMethod() : MasterPasswordAppUnlockMethod() as AppUnlockMethod;
+    String newMethod = newValue ? NoneAppUnlockMethod.kMethodId : MasterPasswordAppUnlockMethod.kMethodId;
     Result result = await ref.read(appUnlockMethodSettingsEntryProvider.notifier).changeValueIfUnlockSucceed(newMethod, context);
     if (context.mounted && result is! ResultSuccess) {
-      context.showSnackBarForResult(result, retryIfError: true);
+      context.handleResult(result);
     }
   }
 
   @override
-  bool isEnabled(AppUnlockMethod? value) => value is! MasterPasswordAppUnlockMethod;
+  bool isEnabled(String? value) => value != MasterPasswordAppUnlockMethod.kMethodId;
 }

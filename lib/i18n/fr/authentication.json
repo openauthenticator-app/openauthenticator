@@ -5,7 +5,6 @@
   },
   "logIn": {
     "waitingLoginMessage": "Veuillez vous connecter dans la fenêtre qui vient de s'ouvrir. Ne fermez pas l'application.",
-    "waitingConfirmationMessage": "Nous vous avons envoyé un lien de confirmation par email. Veuillez cliquer dessus pour continuer. Ne fermez pas l'application.",
     "successNeedConfirmation": "Succès ! Vous recevrez un email de confirmation bientôt. Veuillez cliquer sur le lien qui se trouve à l'intérieur avec cet appareil pour poursuivre la connexion.",
     "success": "Connecté avec succès !"
   },
@@ -14,14 +13,14 @@
     "unlinkSuccess": "Fournisseur délié avec succès.",
     "unlinkConfirmationDialog": {
       "title": "Supprimer la liaison au fournisseur",
-      "message": "Voulez-vous vraiment supprimer la liaison e votre compte à ce fournisseur d'authentification ?"
+      "message": "Voulez-vous vraiment supprimer la liaison de votre compte à ce fournisseur d'authentification ?"
     }
   },
   "deleteConfirmationDialog": {
     "title": "Supprimer votre compte",
     "message": "Voulez-vous vraiment supprimer votre compte ? Veuillez noter que, parce qu'il s'agit d'une action sensible, vous devez vous réautentifier avant de continuer."
   },
-  "firebaseAuthenticationProvider": {
+  "authenticationProvider(map)": {
     "email": {
       "name": "Email",
       "description": "Utilisez votre adresse mail pour vous connecter. Pas besoin de mot de passe, nous vous enverrons un lien de confirmation."
@@ -61,6 +60,14 @@
       "button": "Envoyer un lien"
     },
     "separator": "Ou :"
+  },
+  "invalidSessionDialog": {
+    "title": "Session invalide",
+    "message": "Votre session a expiré ou est invalide. Veuillez vous reconnecter pour synchroniser vos TOTP.",
+    "button": {
+      "logIn": "Connexion",
+      "logOut": "Déconnexion"
+    }
   },
   "providerPickerDialogTitle": "Choisissez une méthode de connexion"
 }

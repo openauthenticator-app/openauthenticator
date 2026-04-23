@@ -33,15 +33,20 @@
     "theme": {
       "title": "Thème",
       "subtitle": "Changer le thème de l'application et la luminosité.",
-      "name(map)": {
-        "system": "Système",
-        "light": "Lumineux",
-        "dark": "Sombre"
-      },
-      "description(map)": {
-        "system": "Suivre le thème du système.",
-        "light": "Utiliser le thème lumineux.",
-        "dark": "Utiliser le thème sombre."
+      "themePickerDialog": {
+        "title": "Thème",
+        "theme": {
+          "name(map)": {
+            "system": "Système",
+            "light": "Lumineux",
+            "dark": "Sombre"
+          },
+          "description(map)": {
+            "system": "Suivre le thème du système.",
+            "light": "Utiliser le thème lumineux.",
+            "dark": "Utiliser le thème sombre."
+          }
+        }
       }
     }
   },
@@ -69,11 +74,7 @@
       "title": "Relier d'autres fournisseurs",
       "subtitle": {
         "text": "Relier d'autres fournisseurs d'authentification à votre compte afin que vous puissiez les utiliser pour vous connecter.",
-        "linkedProviders(rich)": "\nCompte actuellement relié à : $providers.",
-        "providers(map)": {
-          "emailLink": "Adresse mail",
-          "password": "Adresse mail"
-        }
+        "linkedProviders(rich)": "\nCompte actuellement relié à : $providers."
       }
     },
     "accountLogin": {
@@ -83,32 +84,12 @@
       },
       "logOut": {
         "title": "Déconnexion",
-        "subtitle(rich)": "Se déconnecter pour arrêter la synchronisation des TOTPs avec cet appareil.\nActuellement connecté en tant que : $email."
+        "subtitle(rich)": "Se déconnecter pour arrêter la synchronisation des TOTPs avec cet appareil.\nActuellement connecté en tant que $user."
       }
     },
     "confirmEmail": {
       "title": "Confirmer votre adresse mail",
-      "subtitle(rich)": "Un email de confirmation a été envoyé à votre adresse mail : $email.\nVeuillez cliquer sur le lien pour poursuivre la connexion. Vous pouvez également taper ici pour l'entrer manuellement.",
-      "success": "Adresse mail confirmée avec succès.",
-      "confirmActionPickerDialog": {
-        "title": "Que voulez-vous faire ?",
-        "confirm": {
-          "title": "Valider votre compte",
-          "subtitle": "Coller le lien reçu par email pour confirmer votre compte."
-        },
-        "cancelConfirmation": {
-          "title": "Annuler la confirmation du compte",
-          "subtitle": "Annuler la confirmation du compte.",
-          "validationDialog": {
-            "title": "Confirmation",
-            "message": "Êtes-vous sûr ?"
-          }
-        }
-      },
-      "linkDialog": {
-        "title": "Lien de confirmation",
-        "message": "Visitez le lien de confirmation avec cet appareil ou collez-le ci-dessous pour confirmer votre adresse mail."
-      }
+      "subtitle(rich)": "Un email de confirmation a été envoyé à votre adresse mail : $email.\nVeuillez cliquer sur le lien pour poursuivre la connexion. Vous pouvez également taper ici pour l'entrer manuellement."
     },
     "synchronizeTotps": {
       "title": "Synchroniser vos TOTPs",
@@ -136,8 +117,8 @@
       "title": "Gestion des sauvegardes",
       "subtitle": {
         "zero": "Vous n'avez aucune sauvegarde.",
-        "one": "Vous avez actuellement $n sauvegarde.",
-        "other": "Vous avez actuellement $n sauvegardes."
+        "one(rich)": "Vous avez actuellement $backups sauvegarde.",
+        "more(rich)": "Vous avez actuellement $backups sauvegardes."
       },
       "backupsDialogTitle": "Gestion des sauvegardes",
       "restoreBackupPasswordDialog": {
@@ -181,6 +162,14 @@
   },
   "dangerZone": {
     "title": "Zone dangereuse",
+    "changeBackendUrl": {
+      "title": "Changer l'URL du backend",
+      "subtitle": "Changer l'URL du serveur backend.",
+      "inputDialog": {
+        "title": "URL du serveur backend",
+        "message": "Veuillez entrer l'URL du serveur backend. Par défaut, c'est \"$defaultBackendUrl\"."
+      }
+    },
     "deleteAccount": {
       "title": "Supprimer votre compte",
       "subtitle": "Supprime votre compte ainsi que vos données synchronisées en ligne."
@@ -190,7 +179,7 @@
       "subtitle": "Supprime toutes les données stockées par l'application sur votre appareil.",
       "confirmationDialog": {
         "title": "Suppression des données de l'application",
-        "message": "Voulez-vous vraiment supprimer les données de l'application ? Vous ne pourrez plus les récupérer. Veuillez noter que, si vous avez synchronisé des TOTPs, cette aciton ne les supprimera pas du stockage en ligne."
+        "message": "Voulez-vous vraiment supprimer les données de l'application ? Vous ne pourrez plus les récupérer. Veuillez noter que, si vous avez synchronisé des TOTPs, cette action ne les supprimera pas du stockage en ligne."
       },
       "backupDeleteConfirmationDialog": {
         "title": "Suppression des backups",

@@ -33,15 +33,20 @@
     "theme": {
       "title": "Theme",
       "subtitle": "Change the application theme and brightness.",
-      "name(map)": {
-        "system": "System",
-        "light": "Light",
-        "dark": "Dark"
-      },
-      "description(map)": {
-        "system": "Follow the system theme.",
-        "light": "Use the light theme.",
-        "dark": "Use the dark theme."
+      "themePickerDialog": {
+        "title": "Theme",
+        "theme": {
+          "name(map)": {
+            "system": "System",
+            "light": "Light",
+            "dark": "Dark"
+          },
+          "description(map)": {
+            "system": "Follow the system theme.",
+            "light": "Use the light theme.",
+            "dark": "Use the dark theme."
+          }
+        }
       }
     }
   },
@@ -69,11 +74,7 @@
       "title": "Link other providers",
       "subtitle": {
         "text": "Link your account to other authentication providers so that you can use them to log in yourself.",
-        "linkedProviders(rich)": "\nAccount currently linked to : $providers.",
-        "providers(map)": {
-          "emailLink": "Email address",
-          "password": "Email address"
-        }
+        "linkedProviders(rich)": "\nAccount currently linked to : $providers."
       }
     },
     "accountLogin": {
@@ -83,32 +84,12 @@
       },
       "logOut": {
         "title": "Log out",
-        "subtitle(rich)": "Log out to stop synchronizing your TOTPs with this device.\nCurrently signed in as : $email."
+        "subtitle(rich)": "Log out to stop synchronizing your TOTPs with this device.\nCurrently signed in as $user."
       }
     },
     "confirmEmail": {
       "title": "Confirm your email",
-      "subtitle(rich)": "A confirmation email has been sent to your email address : $email.\nPlease click on the link to finish your login. You can also tap on this tile to enter it manually.",
-      "success": "Email confirmed with success.",
-      "confirmActionPickerDialog": {
-        "title": "What do you want to do ?",
-        "confirm": {
-          "title": "Confirm your account",
-          "subtitle": "Paste the link you received by email to confirm your account."
-        },
-        "cancelConfirmation": {
-          "title": "Cancel account confirmation",
-          "subtitle": "Cancel your account confirmation.",
-          "validationDialog": {
-            "title": "Confirmation",
-            "message": "Are you sure ?"
-          }
-        }
-      },
-      "linkDialog": {
-        "title": "Confirmation link",
-        "message": "Either visit the link with this device or paste it below to confirm your email address."
-      }
+      "subtitle(rich)": "A confirmation email has been sent to your email address : $email.\nPlease click on the link to finish your login. You can also tap on this tile to enter it manually."
     },
     "synchronizeTotps": {
       "title": "Synchronize TOTPs",
@@ -136,8 +117,8 @@
       "title": "Manage backups",
       "subtitle": {
         "zero": "You do not have any backup stored.",
-        "one": "You currently have $n backup stored.",
-        "other": "You currently have $n backups stored."
+        "one(rich)": "You currently have $backups backup stored.",
+        "more(rich)": "You currently have $backups backups stored."
       },
       "backupsDialogTitle": "Manage backups",
       "restoreBackupPasswordDialog": {
@@ -181,6 +162,14 @@
   },
   "dangerZone": {
     "title": "Danger zone",
+    "changeBackendUrl": {
+      "title": "Change backend URL",
+      "subtitle": "Change the URL of the backend server.",
+      "inputDialog": {
+        "title": "Backend URL",
+        "message": "Please enter the URL of the backend server. Default is \"$defaultBackendUrl\"."
+      }
+    },
     "deleteAccount": {
       "title": "Delete your account",
       "subtitle": "Delete your account and all your synchronized data."

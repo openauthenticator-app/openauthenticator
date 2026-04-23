@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:forui/forui.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/pages/totp.dart';
+import 'package:open_authenticator/widgets/app_scaffold.dart';
+import 'package:open_authenticator/widgets/clickable.dart';
+import 'package:open_authenticator/widgets/dialog/error_dialog.dart';
 import 'package:open_authenticator/widgets/scan/scanner.dart';
-import 'package:open_authenticator/widgets/snackbar_icon.dart';
+import 'package:open_authenticator/widgets/toast.dart';
 import 'package:open_authenticator/widgets/waiting_overlay.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
@@ -35,26 +39,35 @@ class _ScanPageState extends ConsumerState<ScanPage> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    body: QrCodeScanner(
-      onScan: (barcode) async {
-        Uri? uri = Uri.tryParse(barcode);
-        if (uri == null) {
-          SnackBarIcon.showErrorSnackBar(context, text: translations.error.scan.noUri);
-          return true;
-        }
-        await showWaitingOverlay(
+  Widget build(BuildContext context) => AppScaffold(
+    header: FHeader.nested(
+      prefixes: [
+        ClickableHeaderAction.back(
+          onPress: () => Navigator.pop(context),
+        ),
+      ],
+      title: Text(translations.home.addDialog.qrCode.title),
+    ),
+    children: [
+      QrCodeScanner(
+        onScan: (barcode) async {
+          Uri? uri = Uri.tryParse(barcode);
+          if (uri == null) {
+            showErrorToast(context, text: translations.error.scan.noUri);
+            return true;
+          }
+          await showWaitingOverlay(
+            context,
+            future: TotpPage.openFromUri(context, ref, uri),
+          );
+          return false;
+        },
+        onError: (error, listener) => ErrorDialog.openDialog(
           context,
-          future: TotpPage.openFromUri(context, ref, uri),
-        );
-        return false;
-      },
-      onError: (exception, listener) => SnackBarIcon.showErrorSnackBar(context, text: translations.error.generic.withException(exception: exception)),
-    ),
-    floatingActionButton: FloatingActionButton(
-      child: const Icon(Icons.close),
-      onPressed: () => Navigator.pop(context),
-    ),
+          error: error,
+        ),
+      ),
+    ],
   );
 
   @override

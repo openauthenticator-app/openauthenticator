@@ -1,7 +1,7 @@
 {
-  "subscribe": {
-    "waitingDialogMessage": "Aguardando sua compra...",
-    "success": "Você assinou com sucesso o Plano Contributor. Muito obrigado!"
+  "subscribeSuccess": {
+    "immediate": "Subscreveu com sucesso o Plano Contributor. Muito obrigado !",
+    "delayed": "A compra foi bem-sucedida ! Poderá ter de esperar alguns minutos ou reiniciar a aplicação."
   },
   "fallbackPaywall": {
     "title(rich)": "Plano ${title(Contributor)}",
@@ -21,13 +21,14 @@
         "annual": "Ano",
         "monthly": "Mês"
       },
-      "priceSubtitle(rich)": "$subtitle\n$price / $interval.",
+      "price(rich)": "$price / $interval",
       "subtitle(map)": {
         "annual": "Cobrança anual.",
         "monthly": "Cobrança mensal."
       }
     },
     "button": {
+      "subscribed": "Plano assinado!",
       "privacyPolicy": "Política de privacidade",
       "termsOfService": "Termos de serviço",
       "restorePurchases": "Restaurar compras"

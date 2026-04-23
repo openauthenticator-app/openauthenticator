@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:forui/forui.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/settings/display_search_button.dart';
 import 'package:open_authenticator/pages/settings/entries/widgets.dart';
@@ -12,6 +12,6 @@ class DisplaySearchButtonSettingsEntryWidget extends BoolSettingsEntryWidget<Dis
          provider: displaySearchButtonSettingsEntryProvider,
          title: translations.settings.application.displaySearchIconButton.title,
          subtitle: translations.settings.application.displaySearchIconButton.subtitle,
-         icon: Icons.search,
+         icon: FIcons.search,
        );
 }

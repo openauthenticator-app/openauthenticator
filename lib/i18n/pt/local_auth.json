@@ -1,14 +1,7 @@
 {
-  "common": {
-    "goToSettings": "Ir para configurações"
-  },
   "android": {
     "signInTitle": "Autenticação necessária",
     "signInHint": "Verifique sua identidade"
-  },
-  "methodChannel": {
-    "title": "Autenticação necessária",
-    "wrongPassword": "Palavra-passe errada. Tente novamente."
   },
   "fallbackMessage": "Ocorreu um erro ao verificar a autenticação local no seu dispositivo. Insira sua senha mestra abaixo para continuar e também desativar a autenticação local."
 }

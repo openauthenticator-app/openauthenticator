@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:forui/forui.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/settings/display_copy_button.dart';
 import 'package:open_authenticator/pages/settings/entries/widgets.dart';
@@ -12,6 +12,6 @@ class DisplayCopyButtonSettingsEntryWidget extends BoolSettingsEntryWidget<Displ
          provider: displayCopyButtonSettingsEntryProvider,
          title: translations.settings.application.displayCopyIconButton.title,
          subtitle: translations.settings.application.displayCopyIconButton.subtitle,
-         icon: Icons.copy,
+         icon: FIcons.copy,
        );
 }

@@ -1,0 +1,8 @@
+{
+  "title": "Content de vous revoir !",
+  "message": "L'application a été mise à jour vers une toute nouvelle version. Veuillez envisager de migrer vos TOTPs pour continuer à les utiliser. Si vous étiez connecté, votre compte sera également migré au cours de ce processus.",
+  "button": {
+    "migrate": "Migrer",
+    "dontMigrate": "Ne pas migrer"
+  }
+}

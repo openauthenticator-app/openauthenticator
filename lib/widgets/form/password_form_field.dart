@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:forui/forui.dart';
 
 /// A form field for entering passwords.
 class PasswordFormField extends StatefulWidget {
   /// The reveal button builder.
   final Widget Function(BuildContext, VoidCallback, bool) revealButtonBuilder;
+
+  /// The control.
+  final FTextFieldControl control;
 
   /// Whether this field is enabled.
   final bool enabled;
@@ -12,19 +17,16 @@ class PasswordFormField extends StatefulWidget {
   final bool autofocus;
 
   /// Triggered when the field has been submitted.
-  final ValueChanged<String>? onFieldSubmitted;
+  final ValueChanged<String>? onSubmit;
 
   /// The text input action.
   final TextInputAction? textInputAction;
 
-  /// The field decoration.
-  final InputDecoration decoration;
+  /// The label widget.
+  final Widget? label;
 
-  /// Triggered when the value has changed.
-  final ValueChanged<String>? onChanged;
-
-  /// The initial value.
-  final String? initialValue;
+  /// The hint.
+  final String? hint;
 
   /// The field validator.
   final FormFieldValidator<String>? validator;
@@ -33,22 +35,30 @@ class PasswordFormField extends StatefulWidget {
   final TextInputType? keyboardType;
 
   /// The auto validate mode.
-  final AutovalidateMode? autovalidateMode;
+  final AutovalidateMode autovalidateMode;
+
+  /// The input formatters.
+  final List<TextInputFormatter>? inputFormatters;
+
+  /// The text capitalization.
+  final TextCapitalization? textCapitalization;
 
   /// Creates a new password form field instance.
   const PasswordFormField({
     super.key,
     this.revealButtonBuilder = _defaultRevealButtonBuilder,
+    this.control = const .managed(),
     this.enabled = true,
     this.autofocus = false,
-    this.onFieldSubmitted,
+    this.onSubmit,
     this.textInputAction,
-    this.decoration = const InputDecoration(),
-    this.onChanged,
-    this.initialValue,
+    this.label,
+    this.hint,
     this.validator,
     this.keyboardType,
-    this.autovalidateMode,
+    this.autovalidateMode = .disabled,
+    this.inputFormatters,
+    this.textCapitalization,
   });
 
   @override
@@ -57,7 +67,7 @@ class PasswordFormField extends StatefulWidget {
   /// The default reveal button builder.
   static Widget _defaultRevealButtonBuilder(BuildContext context, VoidCallback reveal, bool state) => IconButton(
     onPressed: reveal,
-    icon: Icon(state ? Icons.visibility : Icons.visibility_off),
+    icon: Icon(state ? FIcons.eyeClosed : FIcons.eye),
   );
 }
 
@@ -67,24 +77,23 @@ class _PasswordFormFieldState extends State<PasswordFormField> {
   bool isRevealed = false;
 
   @override
-  Widget build(BuildContext context) => TextFormField(
+  Widget build(BuildContext context) => FTextFormField(
+    control: widget.control,
     obscureText: !isRevealed,
     enableSuggestions: false,
     autocorrect: false,
     autofocus: widget.autofocus,
-    onFieldSubmitted: widget.onFieldSubmitted,
+    onSubmit: widget.onSubmit,
     textInputAction: widget.textInputAction,
     readOnly: !widget.enabled,
-    decoration: widget.decoration.copyWith(
-      suffixIcon: widget.revealButtonBuilder(context, toggleObscuration, isRevealed),
-      enabledBorder: widget.enabled ? null : Theme.of(context).inputDecorationTheme.disabledBorder,
-      focusedBorder: widget.enabled ? null : Theme.of(context).inputDecorationTheme.disabledBorder,
-    ),
-    onChanged: widget.onChanged,
-    initialValue: widget.initialValue,
+    suffixBuilder: (context, _, _) => widget.revealButtonBuilder(context, toggleObscuration, isRevealed),
+    label: widget.label,
+    hint: widget.hint,
     validator: widget.validator,
     keyboardType: widget.keyboardType,
     autovalidateMode: widget.autovalidateMode,
+    inputFormatters: widget.inputFormatters,
+    textCapitalization: widget.textCapitalization ?? .none,
   );
 
   /// Toggles the obscuration state.

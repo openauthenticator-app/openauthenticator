@@ -1,19 +1,20 @@
 {
-  "autoDialog": {
-    "title": "Limite TOTP raggiunto",
-    "message": "Stai attualmente sincronizzando i tuoi TOTP e hai superato il limite di $count TOTP prima di dover abbonarti al Piano Contributore. Pertanto, devi memorizzarli localmente (il che significa, nessuna ulteriore sincronizzazione), oppure abbonarti al Piano Contributore.",
-    "actions": {
-      "subscribe": "Abbonati",
-      "stopSynchronization": "Interrompi sincronizzazione"
+  "title": "Limite TOTP raggiunto",
+  "message": {
+    "error": "Hai raggiunto il numero massimo di TOTP sincronizzabili, ma non siamo in grado di mostrarti le opzioni disponibili per estendere questo limite. Riprova più tardi o contattaci se hai bisogno di aiuto.",
+    "notSubscribed": {
+      "auto": "Stai attualmente sincronizzando i tuoi TOTP e hai superato il limite di $count TOTP prima di dover sottoscrivere il Piano Contributor. Quindi devi memorizzarli localmente (il che significa, nessuna ulteriore sincronizzazione), o sottoscrivere il Piano Contributor.",
+      "manual": "Stai attualmente sincronizzando i tuoi TOTP e hai un limite di $count TOTP prima di dover sottoscrivere il Piano Contributor. Quindi devi memorizzarli localmente (il che significa, nessuna ulteriore sincronizzazione), o sottoscrivere il Piano Contributor per aggiungere un altro TOTP."
+    },
+    "alreadySubscribed": {
+      "auto": "Stai attualmente sincronizzando i tuoi TOTP e hai superato il limite di $count TOTP. Quindi devi memorizzarli localmente (il che significa, nessuna ulteriore sincronizzazione). Per aggirare questo limite, puoi ospitare autonomamente il server di backend.",
+      "manual": "Stai attualmente sincronizzando i tuoi TOTP e hai un limite di $count TOTP. Quindi devi memorizzarli localmente (il che significa, nessuna ulteriore sincronizzazione) per aggiungere un altro TOTP. Per aggirare questo limite, puoi ospitare autonomamente il server di backend."
     }
   },
-  "addDialog": {
-    "title": "Limite TOTP raggiunto",
-    "message": "Stai attualmente sincronizzando i tuoi TOTP e hai un limite di $count TOTP prima di dover abbonarti al Piano Contributore. Pertanto, devi memorizzarli localmente (il che significa, nessuna ulteriore sincronizzazione), oppure abbonarti al Piano Contributore per aggiungere un altro TOTP.",
-    "actions": {
-      "subscribe": "Abbonati",
-      "stopSynchronization": "Interrompi sincronizzazione",
-      "cancel": "Annulla"
-    }
+  "actions": {
+    "subscribe": "Sottoscrivi",
+    "stopSynchronization": "Interrompi sincronizzazione",
+    "selfHost": "Auto-ospita",
+    "cancel": "Annulla"
   }
 }

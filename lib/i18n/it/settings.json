@@ -33,15 +33,20 @@
     "theme": {
       "title": "Tema",
       "subtitle": "Cambia il tema dell'applicazione e la luminosità.",
-      "name(map)": {
-        "system": "Sistema",
-        "light": "Chiaro",
-        "dark": "Scuro"
-      },
-      "description(map)": {
-        "system": "Usa il tema del sistema.",
-        "light": "Usa il tema scuro.",
-        "dark": "Usa il tema scuro."
+      "themePickerDialog": {
+        "title": "Tema",
+        "theme": {
+          "name(map)": {
+            "system": "Sistema",
+            "light": "Chiaro",
+            "dark": "Scuro"
+          },
+          "description(map)": {
+            "system": "Usa il tema del sistema.",
+            "light": "Usa il tema scuro.",
+            "dark": "Usa il tema scuro."
+          }
+        }
       }
     }
   },
@@ -69,11 +74,7 @@
       "title": "Collega altri provider",
       "subtitle": {
         "text": "Collega il tuo account ad altri provider di autenticazione in modo da poterli utilizzare per accedere.",
-        "linkedProviders(rich)": "\nAccount attualmente collegato a: $providers.",
-        "providers(map)": {
-          "emailLink": "Indirizzo email",
-          "password": "Indirizzo email"
-        }
+        "linkedProviders(rich)": "\nAccount attualmente collegato a: $providers."
       }
     },
     "accountLogin": {
@@ -83,32 +84,12 @@
       },
       "logOut": {
         "title": "Disconnetti",
-        "subtitle(rich)": "Disconnetti per interrompere la sincronizzazione dei tuoi TOTP con questo dispositivo.\nAttualmente connesso come: $email."
+        "subtitle(rich)": "Disconnetti per interrompere la sincronizzazione dei tuoi TOTP con questo dispositivo.\nAttualmente connesso come $user."
       }
     },
     "confirmEmail": {
       "title": "Conferma la tua email",
-      "subtitle(rich)": "Un'email di conferma è stata inviata al tuo indirizzo email: $email.\nClicca sul link per completare il tuo accesso. Puoi anche toccare questo riquadro per inserirlo manualmente.",
-      "success": "Email confermata con successo.",
-      "confirmActionPickerDialog": {
-        "title": "Cosa vuoi fare?",
-        "confirm": {
-          "title": "Conferma il tuo account",
-          "subtitle": "Incolla il link che hai ricevuto via email per confermare il tuo account."
-        },
-        "cancelConfirmation": {
-          "title": "Annulla la conferma dell'account",
-          "subtitle": "Annulla la conferma del tuo account.",
-          "validationDialog": {
-            "title": "Conferma",
-            "message": "Sei sicuro?"
-          }
-        }
-      },
-      "linkDialog": {
-        "title": "Link di conferma",
-        "message": "Visita il link con questo dispositivo o incollalo qui sotto per confermare il tuo indirizzo email."
-      }
+      "subtitle(rich)": "Un'email di conferma è stata inviata al tuo indirizzo email: $email.\nClicca sul link per completare il tuo accesso. Puoi anche toccare questo riquadro per inserirlo manualmente."
     },
     "synchronizeTotps": {
       "title": "Sincronizza TOTP",
@@ -136,8 +117,8 @@
       "title": "Gestisci backup",
       "subtitle": {
         "zero": "Non hai backup memorizzati.",
-        "one": "Attualmente hai $n backup memorizzato.",
-        "other": "Attualmente hai $n backup memorizzati."
+        "one(rich)": "Attualmente hai $backups backup memorizzato.",
+        "more(rich)": "Attualmente hai $backups backup memorizzati."
       },
       "backupsDialogTitle": "Gestisci backup",
       "restoreBackupPasswordDialog": {
@@ -181,6 +162,14 @@
   },
   "dangerZone": {
     "title": "Zona di pericolo",
+    "changeBackendUrl": {
+      "title": "Cambia l'URL del backend",
+      "subtitle": "Cambia l'URL del server backend.",
+      "inputDialog": {
+        "title": "URL del server backend",
+        "message": "Inserisci l'URL del server backend. Per default, è \"$defaultBackendUrl\"."
+      }
+    },
     "deleteAccount": {
       "title": "Elimina il tuo account",
       "subtitle": "Elimina il tuo account e tutti i tuoi dati sincronizzati."

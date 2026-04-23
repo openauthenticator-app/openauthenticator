@@ -11,8 +11,15 @@ class AppLinksListener extends AsyncNotifier<Uri?> {
   @override
   Future<Uri?> build() {
     AppLinks appLinks = AppLinks();
-    StreamSubscription subscription = appLinks.uriLinkStream.listen((uri) => state = AsyncData(uri));
+    StreamSubscription subscription = appLinks.uriLinkStream.listen(provideLink);
     ref.onDispose(subscription.cancel);
     return appLinks.getInitialLink();
+  }
+
+  /// Manually provides the [uri].
+  void provideLink(Uri uri) {
+    if (ref.mounted) {
+      state = AsyncData(uri);
+    }
   }
 }

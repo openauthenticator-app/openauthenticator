@@ -43,7 +43,9 @@
     			<string>app.openauthenticator</string>
     			<key>CFBundleURLSchemes</key>
     			<array>
+    				<string>openauthenticator</string>
     				<string>otpauth</string>
+    				<string>rc-653ef11675</string>
     			</array>
     		</dict>
     	</array>
@@ -57,10 +59,6 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
-	<key>FirebaseDynamicLinksCustomDomains</key>
-	<array>
-		<string>https://login.openauthenticator.app/do</string>
-	</array>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>

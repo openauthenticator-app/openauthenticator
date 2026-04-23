@@ -1,8 +1,8 @@
 {
-  "waitingDialog": {
-    "defaultMessage": "Please wait...",
-    "countdown(rich)": "Time left : $countdown."
-  },
+  "refreshUserInfo": "Refresh user info",
+  "disableTotpSync": "You must disable TOTP synchronization first.",
+  "urlCopiedToClipboard": "URL copied to clipboard !",
+  "waitingDialogDefaultMessage": "Please wait...",
   "masterPasswordDialog": {
     "title": "Master password",
     "message": "Please enter your master password to continue."
@@ -14,5 +14,8 @@
       "hint": "Enter the backup password"
     }
   },
-  "urlCopiedToClipboard": "URL copied to clipboard !"
+  "toast": {
+    "success": "Success",
+    "error": "Error"
+  }
 }

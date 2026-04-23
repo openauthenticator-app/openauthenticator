@@ -1,19 +1,20 @@
 {
-  "autoDialog": {
-    "title": "TOTP-Limit erreicht",
-    "message": "Sie haben das Limit von $count TOTPs für die Synchronisierung erreicht. Um die Synchronisierung fortzusetzen, müssen Sie den Mitwirkender-Plan abonnieren. Alternativ können Sie Ihre TOTPs lokal speichern und die Synchronisierung beenden.",
-    "actions": {
-      "subscribe": "Abonnieren",
-      "stopSynchronization": "Synchronisation beenden"
+  "title": "TOTP-Limit erreicht",
+  "message": {
+    "error": "Sie haben die maximale Anzahl synchronisierbarer TOTPs erreicht, aber wir können Ihnen die verfügbaren Optionen zur Erweiterung dieses Limits nicht anzeigen. Bitte versuchen Sie es später erneut oder kontaktieren Sie uns, wenn Sie Hilfe benötigen.",
+    "notSubscribed": {
+      "auto": "Sie synchronisieren gerade Ihre TOTPs und haben das Limit von $count TOTPs überschritten, bevor Sie den Contributor-Plan abonnieren müssen. Sie müssen sie also entweder lokal speichern (was bedeutet, keine Synchronisierung mehr) oder den Contributor-Plan abonnieren.",
+      "manual": "Sie synchronisieren gerade Ihre TOTPs und haben ein Limit von $count TOTPs, bevor Sie den Contributor-Plan abonnieren müssen. Sie müssen sie also entweder lokal speichern (was bedeutet, keine Synchronisierung mehr) oder den Contributor-Plan abonnieren, um ein weiteres TOTP hinzuzufügen."
+    },
+    "alreadySubscribed": {
+      "auto": "Sie synchronisieren gerade Ihre TOTPs und haben das Limit von $count TOTPs überschritten. Sie müssen sie also lokal speichern (was bedeutet, keine Synchronisierung mehr). Um dieses Limit zu umgehen, können Sie den Backend-Server selbst hosten.",
+      "manual": "Sie synchronisieren gerade Ihre TOTPs und haben ein Limit von $count TOTPs. Sie müssen sie also lokal speichern (was bedeutet, keine Synchronisierung mehr), um ein weiteres TOTP hinzuzufügen. Um dieses Limit zu umgehen, können Sie den Backend-Server selbst hosten."
     }
   },
-  "addDialog": {
-    "title": "TOTP-Limit erreicht",
-    "message": "Sie haben das Limit von $count TOTPs für die Synchronisierung erreicht. Um ein weiteres TOTP hinzuzufügen, müssen Sie entweder den Mitwirkender-Plan abonnieren oder die Synchronisierung beenden und die TOTPs lokal speichern.",
-    "actions": {
-      "subscribe": "Abonnieren",
-      "stopSynchronization": "Synchronisation beenden",
-      "cancel": "Abbrechen"
-    }
+  "actions": {
+    "subscribe": "Abonnieren",
+    "stopSynchronization": "Synchronisierung stoppen",
+    "selfHost": "Selbst hosten",
+    "cancel": "Abbrechen"
   }
 }

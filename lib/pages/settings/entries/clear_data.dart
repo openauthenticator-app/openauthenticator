@@ -1,45 +1,46 @@
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:forui/forui.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/app_unlock/reason.dart';
-import 'package:open_authenticator/model/authentication/firebase_authentication.dart';
+import 'package:open_authenticator/model/backend/user.dart';
 import 'package:open_authenticator/model/backup.dart';
+import 'package:open_authenticator/model/database/database.dart';
 import 'package:open_authenticator/model/settings/app_unlock_method.dart';
 import 'package:open_authenticator/model/settings/entry.dart';
-import 'package:open_authenticator/model/storage/local.dart';
 import 'package:open_authenticator/model/totp/image_cache.dart';
-import 'package:open_authenticator/pages/settings/entries/widgets.dart';
-import 'package:open_authenticator/utils/firebase.dart';
 import 'package:open_authenticator/utils/platform.dart';
 import 'package:open_authenticator/utils/result.dart';
 import 'package:open_authenticator/utils/shared_preferences_with_prefix.dart';
+import 'package:open_authenticator/widgets/button_text.dart';
+import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
 import 'package:open_authenticator/widgets/dialog/confirmation_dialog.dart';
 import 'package:open_authenticator/widgets/waiting_overlay.dart';
 import 'package:simple_secure_storage/simple_secure_storage.dart';
 
 /// Allows to clear all the app data.
-class ClearDataSettingsEntryWidget extends ConsumerWidget {
+class ClearDataSettingsEntryWidget extends ConsumerWidget with FTileMixin {
   /// Creates a new clear data settings entry widget instance.
   const ClearDataSettingsEntryWidget({
     super.key,
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => DangerZoneListTile(
-    icon: Icons.delete_forever,
-    title: translations.settings.dangerZone.clearData.title,
-    subtitle: translations.settings.dangerZone.clearData.subtitle,
-    onTap: () async {
+  Widget build(BuildContext context, WidgetRef ref) => ClickableTile(
+    prefix: const Icon(FIcons.trash),
+    title: Text(translations.settings.dangerZone.clearData.title),
+    subtitle: Text(translations.settings.dangerZone.clearData.subtitle),
+    onPress: () async {
       bool confirm = await ConfirmationDialog.ask(
         context,
         title: translations.settings.dangerZone.clearData.confirmationDialog.title,
         message: translations.settings.dangerZone.clearData.confirmationDialog.message,
+        okButtonVariant: .destructive,
       );
       if (!confirm || !context.mounted) {
         return;
@@ -55,6 +56,7 @@ class ClearDataSettingsEntryWidget extends ConsumerWidget {
         context,
         title: translations.settings.dangerZone.clearData.backupDeleteConfirmationDialog.title,
         message: translations.settings.dangerZone.clearData.backupDeleteConfirmationDialog.message,
+        okButtonVariant: .destructive,
       );
       if (!deleteBackups || !context.mounted) {
         return;
@@ -63,25 +65,21 @@ class ClearDataSettingsEntryWidget extends ConsumerWidget {
       await showWaitingOverlay(
         context,
         future: () async {
-          Result logoutResult = await ref.read(firebaseAuthenticationProvider.notifier).logout();
+          Result logoutResult = await ref.read(userProvider.notifier).logoutUser();
           if (!context.mounted) {
             return;
           }
           if (logoutResult is! ResultSuccess) {
-            context.showSnackBarForResult(logoutResult, retryIfError: true);
+            context.handleResult(logoutResult);
             return;
-          }
-          if (isFirebaseSupported) {
-            await FirebaseFirestore.instance.terminate();
-            await FirebaseFirestore.instance.clearPersistence();
           }
           await SimpleSecureStorage.clear();
           TotpImageCacheManager totpImageCacheManager = ref.read(totpImageCacheManagerProvider.notifier);
           await totpImageCacheManager.clearCache();
           SharedPreferencesWithPrefix preferences = await ref.read(sharedPreferencesProvider.future);
           await preferences.clear();
-          LocalStorage localStorage = await ref.read(localStorageProvider);
-          await localStorage.clearTotps();
+          AppDatabase database = ref.read(appDatabaseProvider);
+          await database.clear();
           if (deleteBackups) {
             List<Backup> backups = await ref.read(backupStoreProvider.future);
             for (Backup backup in backups) {
@@ -103,17 +101,18 @@ class ClearDataSettingsEntryWidget extends ConsumerWidget {
   /// Shows the dialog that indicates the user he has to restart the app.
   Future<void> _showCloseDialog(BuildContext context) async {
     bool canExitWithConfirmDialog = _canExitWithConfirmDialog;
-    await showDialog(
+    await showFDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AppDialog(
+      builder: (context, style, animation) => AppDialog(
         title: Text(translations.settings.dangerZone.clearData.doneDialog.title),
         displayCloseButton: false,
         actions: canExitWithConfirmDialog
             ? [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text(MaterialLocalizations.of(context).continueButtonLabel),
+                ClickableButton(
+                  variant: .ghost,
+                  onPress: () => Navigator.pop(context),
+                  child: ButtonText(MaterialLocalizations.of(context).continueButtonLabel),
                 ),
               ]
             : null,

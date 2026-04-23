@@ -1,120 +1,92 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:forui/forui.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
-import 'package:open_authenticator/model/authentication/firebase_authentication.dart';
+import 'package:open_authenticator/model/backend/user.dart';
 import 'package:open_authenticator/model/password_verification/password_verification.dart';
-import 'package:open_authenticator/model/storage/storage.dart';
-import 'package:open_authenticator/model/storage/type.dart';
+import 'package:open_authenticator/model/settings/storage_type.dart';
 import 'package:open_authenticator/utils/form_label.dart';
 import 'package:open_authenticator/utils/result.dart';
+import 'package:open_authenticator/widgets/button_text.dart';
+import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
 import 'package:open_authenticator/widgets/dialog/text_input_dialog.dart';
 import 'package:open_authenticator/widgets/form/password_form_field.dart';
-import 'package:open_authenticator/widgets/snackbar_icon.dart';
 import 'package:open_authenticator/widgets/waiting_overlay.dart';
 
 /// Contains some useful methods for migrating storage type.
 class StorageMigrationUtils {
   /// Changes the storage type.
   /// Gives some feedback to the user thanks to the [context].
-  static Future<bool> changeStorageType(
+  static Future<Result> changeStorageType(
     BuildContext context,
     WidgetRef ref,
     StorageType newType, {
     bool showConfirmation = true,
     String? backupPassword,
     bool logout = false,
-    String currentStorageMasterPassword = '',
-    StorageMigrationDeletedTotpPolicy storageMigrationDeletedTotpPolicy = StorageMigrationDeletedTotpPolicy.ask,
-    bool ignoreCurrentStorage = false,
+    String? currentStorageMasterPassword,
+    StorageMigrationDeletedTotpPolicy storageMigrationDeletedTotpPolicy = .ask,
+    bool Function(Result result)? handleResult,
   }) async {
-    if (showConfirmation) {
-      _ConfirmationResult? result = await _ConfirmationDialog.ask(context, newType == StorageType.online);
-      if (result == null || !result.confirm || !context.mounted) {
-        return false;
-      }
-      backupPassword ??= result.backupPassword;
-    }
-    Result<bool> passwordCheckResult = await (await ref.read(passwordVerificationProvider.future)).isPasswordValid(currentStorageMasterPassword);
-    if (passwordCheckResult is! ResultSuccess<bool> || !passwordCheckResult.value) {
+    Result result = await (() async {
+      StorageType currentType = await ref.read(storageTypeSettingsEntryProvider.future);
       if (!context.mounted) {
-        return false;
+        return const ResultCancelled();
       }
-      String? enteredCurrentStorageMasterPassword = await MasterPasswordInputDialog.prompt(context);
-      if (enteredCurrentStorageMasterPassword == null || !context.mounted) {
-        return false;
+      if (newType != currentType) {
+        if (showConfirmation) {
+          _ConfirmationResult? result = await _ConfirmationDialog.ask(context, newType == .shared);
+          if (result == null || !result.confirm || !context.mounted) {
+            return const ResultCancelled();
+          }
+          backupPassword ??= result.backupPassword;
+        }
+        Result<bool> passwordCheckResult = await(await ref.read(passwordVerificationProvider.future)).isPasswordValid(currentStorageMasterPassword ?? '');
+        if (passwordCheckResult is! ResultSuccess<bool> || !passwordCheckResult.value) {
+          if (!context.mounted) {
+            return const ResultCancelled();
+          }
+          String? enteredCurrentStorageMasterPassword = await MasterPasswordInputDialog.prompt(context);
+          if (enteredCurrentStorageMasterPassword == null || !context.mounted) {
+            return const ResultCancelled();
+          }
+          currentStorageMasterPassword = enteredCurrentStorageMasterPassword;
+        }
       }
-      currentStorageMasterPassword = enteredCurrentStorageMasterPassword;
-    }
-    if (!context.mounted) {
-      return false;
-    }
-    Result result = await showWaitingOverlay(
-      context,
-      future: ref
-          .read(storageProvider.notifier)
-          .changeStorageType(
-            currentStorageMasterPassword,
-            newType,
-            backupPassword: backupPassword,
-            storageMigrationDeletedTotpPolicy: storageMigrationDeletedTotpPolicy,
-            ignoreCurrentStorage: ignoreCurrentStorage,
-          ),
-    );
-    if (!context.mounted) {
-      return false;
-    }
-    return await _handleResult(
-      result,
-      context,
-      ref,
-      newType,
-      logout,
-      backupPassword,
-      currentStorageMasterPassword,
-      storageMigrationDeletedTotpPolicy,
-    );
-  }
-
-  /// Handles the [result] by returning a message if there is an error.
-  static Future<bool> _handleResult(
-    Result result,
-    BuildContext context,
-    WidgetRef ref,
-    StorageType newType,
-    bool logout,
-    String? backupPassword,
-    String currentStorageMasterPassword,
-    StorageMigrationDeletedTotpPolicy storageMigrationDeletedTotpPolicy,
-  ) async {
-    switch (result) {
-      case ResultSuccess():
-        if (logout) {
-          Result logoutResult = await showWaitingOverlay(
-            context,
-            future: ref.read(firebaseAuthenticationProvider.notifier).logout(),
-          );
-          if (context.mounted) {
-            context.showSnackBarForResult(logoutResult, retryIfError: true);
+      if (!context.mounted) {
+        return const ResultCancelled();
+      }
+      Result result = await showWaitingOverlay(
+        context,
+        future: ref
+            .read(storageTypeSettingsEntryProvider.notifier)
+            .changeValue(
+              newType,
+              masterPassword: currentStorageMasterPassword,
+              backupPassword: backupPassword,
+              storageMigrationDeletedTotpPolicy: storageMigrationDeletedTotpPolicy,
+            ),
+      );
+      if (!context.mounted) {
+        return const ResultCancelled();
+      }
+      switch (result) {
+        case ResultSuccess():
+          if (logout) {
+            Result logoutResult = await showWaitingOverlay(
+              context,
+              future: ref.read(userProvider.notifier).logoutUser(),
+            );
+            result = logoutResult;
           }
-          return logoutResult is ResultSuccess;
-        } else {
-          if (context.mounted) {
-            context.showSnackBarForResult(result);
-          }
-          return true;
-        }
-      case ResultError(:final exception):
-        if (exception is! StorageMigrationException) {
-          context.showSnackBarForResult(result, retryIfError: true);
-          return false;
-        }
-        switch (exception) {
-          case ShouldAskForDifferentDeletedTotpPolicyException():
+          break;
+        case ResultError(:final exception):
+          if (exception is ShouldAskForDifferentDeletedTotpPolicyException) {
             StorageMigrationDeletedTotpPolicy? enteredStorageMigrationDeletedTotpPolicy = await _StorageMigrationDeletedTotpPolicyPickerDialog.openDialog(context);
             if (enteredStorageMigrationDeletedTotpPolicy == null || !context.mounted) {
-              break;
+              return result;
             }
             return await changeStorageType(
               context,
@@ -126,17 +98,16 @@ class StorageMigrationUtils {
               currentStorageMasterPassword: currentStorageMasterPassword,
               storageMigrationDeletedTotpPolicy: enteredStorageMigrationDeletedTotpPolicy,
             );
-          case BackupException():
-          case CurrentStoragePasswordMismatchException():
-          case EncryptionKeyChangeFailedError():
-          case GenericMigrationError():
-            SnackBarIcon.showErrorSnackBar(context, text: translations.error.storageMigration[exception.code] ?? 'An error occurred.');
-            return false;
-        }
-      default:
-        break;
+          }
+        default:
+          break;
+      }
+      return result;
+    })();
+    if ((handleResult?.call(result) ?? true) && context.mounted) {
+      context.handleResult(result);
     }
-    return false;
+    return result;
   }
 }
 
@@ -154,9 +125,9 @@ class _ConfirmationDialog extends StatefulWidget {
   State<StatefulWidget> createState() => _ConfirmationDialogState();
 
   /// Asks for the confirmation.
-  static Future<_ConfirmationResult?> ask(BuildContext context, bool enable) => showDialog<_ConfirmationResult>(
+  static Future<_ConfirmationResult?> ask(BuildContext context, bool enable) => showFDialog<_ConfirmationResult>(
     context: context,
-    builder: (context) => _ConfirmationDialog(
+    builder: (context, style, animation) => _ConfirmationDialog(
       enable: enable,
     ),
   );
@@ -173,33 +144,39 @@ class _ConfirmationDialogState extends State<_ConfirmationDialog> {
   /// The backup password.
   String? backupPassword;
 
+  /// The backup password text editing controller.
+  late final TextEditingController backupPasswordController = TextEditingController(text: backupPassword);
+
   @override
   Widget build(BuildContext context) => AppDialog(
     title: Text(translations.storageMigration.confirmDialog.title),
     actions: [
-      TextButton(
-        onPressed: () {
+      ClickableButton(
+        onPress: () {
           if (createBackup && !backupPasswordFormKey.currentState!.validate()) {
             return;
           }
           Navigator.pop(context, _ConfirmationResult(confirm: true, backupPassword: createBackup ? backupPassword : null));
         },
-        child: Text(MaterialLocalizations.of(context).continueButtonLabel),
+        child: ButtonText(MaterialLocalizations.of(context).continueButtonLabel),
       ),
-      TextButton(
-        onPressed: () => Navigator.pop(context, const _ConfirmationResult()),
-        child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+      ClickableButton(
+        variant: .secondary,
+        onPress: () => Navigator.pop(context, const _ConfirmationResult()),
+        child: ButtonText(MaterialLocalizations.of(context).cancelButtonLabel),
       ),
     ],
     children: [
       Text(widget.enable ? translations.storageMigration.confirmDialog.message.enable : translations.storageMigration.confirmDialog.message.disable),
-      ListTile(
+      ClickableTile(
         title: Text(translations.miscellaneous.backupCheckbox.checkbox),
-        contentPadding: EdgeInsets.zero,
-        trailing: Checkbox(
+        onPress: () {
+          setState(() => createBackup = !createBackup);
+        },
+        suffix: FCheckbox(
           value: createBackup,
-          onChanged: (value) {
-            setState(() => createBackup = value ?? !createBackup);
+          onChange: (value) {
+            setState(() => createBackup = value);
           },
         ),
       ),
@@ -207,22 +184,28 @@ class _ConfirmationDialogState extends State<_ConfirmationDialog> {
         Form(
           key: backupPasswordFormKey,
           child: PasswordFormField(
-            initialValue: backupPassword,
-            onChanged: (value) => backupPassword = value,
+            control: .managed(controller: backupPasswordController),
             validator: isBackupPasswordValid,
-            decoration: FormLabelWithIcon(
-              icon: Icons.save,
+            label: FormLabelWithIcon(
+              icon: FIcons.save,
               text: translations.miscellaneous.backupCheckbox.input.text,
-              hintText: translations.miscellaneous.backupCheckbox.input.hint,
             ),
+            hint: translations.miscellaneous.backupCheckbox.input.hint,
           ),
         ),
     ],
   );
 
+  @override
+  void dispose() {
+    backupPasswordController.dispose();
+    super.dispose();
+  }
+
   /// Checks whether the backup password is valid.
   String? isBackupPasswordValid(String? value) {
-    if (createBackup && (backupPassword == null || backupPassword!.isEmpty)) {
+    value ??= backupPasswordController.text;
+    if (createBackup && value.isEmpty) {
       return translations.error.validation.empty;
     }
     return null;
@@ -250,31 +233,32 @@ class _StorageMigrationDeletedTotpPolicyPickerDialog extends StatelessWidget {
   Widget build(BuildContext context) => AppDialog(
     title: Text(translations.storageMigration.deletedTotpPolicyPickerDialog.title),
     actions: [
-      TextButton(
-        onPressed: () => Navigator.pop(context),
-        child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+      ClickableButton(
+        variant: .secondary,
+        onPress: () => Navigator.pop(context),
+        child: ButtonText(MaterialLocalizations.of(context).cancelButtonLabel),
       ),
     ],
     children: [
       Text(translations.storageMigration.deletedTotpPolicyPickerDialog.message),
-      ListTile(
-        leading: const Icon(Icons.delete),
+      ClickableTile(
+        prefix: const Icon(FIcons.trash),
         title: Text(translations.storageMigration.deletedTotpPolicyPickerDialog.delete.title),
         subtitle: Text(translations.storageMigration.deletedTotpPolicyPickerDialog.delete.subtitle),
-        onTap: () => Navigator.pop(context, StorageMigrationDeletedTotpPolicy.delete),
+        onPress: () => Navigator.pop(context, StorageMigrationDeletedTotpPolicy.delete),
       ),
-      ListTile(
-        leading: const Icon(Icons.restore),
+      ClickableTile(
+        prefix: const Icon(FIcons.upload),
         title: Text(translations.storageMigration.deletedTotpPolicyPickerDialog.restore.title),
         subtitle: Text(translations.storageMigration.deletedTotpPolicyPickerDialog.restore.subtitle),
-        onTap: () => Navigator.pop(context, StorageMigrationDeletedTotpPolicy.keep),
+        onPress: () => Navigator.pop(context, StorageMigrationDeletedTotpPolicy.keep),
       ),
     ],
   );
 
   /// Opens the dialog.
-  static Future<StorageMigrationDeletedTotpPolicy?> openDialog(BuildContext context) => showDialog<StorageMigrationDeletedTotpPolicy>(
+  static Future<StorageMigrationDeletedTotpPolicy?> openDialog(BuildContext context) => showFDialog<StorageMigrationDeletedTotpPolicy>(
     context: context,
-    builder: (context) => _StorageMigrationDeletedTotpPolicyPickerDialog(),
+    builder: (context, style, animation) => _StorageMigrationDeletedTotpPolicyPickerDialog(),
   );
 }

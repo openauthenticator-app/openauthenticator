@@ -15,28 +15,13 @@
 #include "include/firebase/app/future_manager.h"
 #include "firebase/internal/future_impl.h"
 
-#include "firebase/app_check.h"
-
 using FunctionRegistryCallback = void (*)(void*);
-
-class PlatformAppCheckProvider : public firebase::app_check::AppCheckProvider {
- public:
-  void GetToken(std::function<void(firebase::app_check::AppCheckToken, int, const std::string&)> completion_callback) override;
-  static std::string GetPublisher();
-};
-
-class PlatformAppCheckProviderFactory : public firebase::app_check::AppCheckProviderFactory {
- public:
-  static PlatformAppCheckProviderFactory* GetInstance();
-  firebase::app_check::AppCheckProvider* CreateProvider(firebase::App* app) override;
-};
 
 // A window that does nothing but host a Flutter view.
 class FlutterWindow : public Win32Window {
  public:
   static inline FlutterWindow* FlutterWindow::instance = nullptr;
   std::unique_ptr<flutter::MethodChannel<>> method_channel_auth;
-  std::unique_ptr<flutter::MethodChannel<>> method_channel_app_check;
 
   virtual ~FlutterWindow();
   static FlutterWindow* GetInstance(const flutter::DartProject& project);

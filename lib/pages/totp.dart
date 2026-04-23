@@ -1,32 +1,40 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:open_authenticator/app.dart';
+import 'package:forui/forui.dart';
+import 'package:open_authenticator/i18n/localizable_exception.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/main.dart';
 import 'package:open_authenticator/model/crypto.dart';
 import 'package:open_authenticator/model/totp/algorithm.dart';
 import 'package:open_authenticator/model/totp/decrypted.dart';
+import 'package:open_authenticator/model/totp/limit.dart';
 import 'package:open_authenticator/model/totp/repository.dart';
 import 'package:open_authenticator/model/totp/totp.dart';
 import 'package:open_authenticator/pages/home/page.dart';
+import 'package:open_authenticator/spacing.dart';
 import 'package:open_authenticator/utils/brightness_listener.dart';
 import 'package:open_authenticator/utils/form_label.dart';
 import 'package:open_authenticator/utils/result.dart';
 import 'package:open_authenticator/utils/utils.dart';
+import 'package:open_authenticator/widgets/app_scaffold.dart';
+import 'package:open_authenticator/widgets/button_text.dart';
+import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/confirmation_dialog.dart';
 import 'package:open_authenticator/widgets/dialog/logo_search/dialog.dart';
-import 'package:open_authenticator/widgets/dialog/totp_limit.dart';
+import 'package:open_authenticator/widgets/dialog/totp_limit_dialog.dart';
+import 'package:open_authenticator/widgets/expandable_tile.dart';
 import 'package:open_authenticator/widgets/form/password_form_field.dart';
-import 'package:open_authenticator/widgets/list/expand_list_tile.dart';
-import 'package:open_authenticator/widgets/list/list_tile_padding.dart';
-import 'package:open_authenticator/widgets/snackbar_icon.dart';
+import 'package:open_authenticator/widgets/toast.dart';
 import 'package:open_authenticator/widgets/totp/image.dart';
 import 'package:open_authenticator/widgets/waiting_overlay.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 /// Allows to edit a TOTP.
 class TotpPage extends ConsumerStatefulWidget {
+  /// The default image size.
+  static const double kDefaultTotpImageSize = 150;
+
   /// The TOTP page name.
   static const String name = '/totp';
 
@@ -43,7 +51,7 @@ class TotpPage extends ConsumerStatefulWidget {
   const TotpPage({
     super.key,
     this.totp,
-    this.imageSize = 150,
+    this.imageSize = kDefaultTotpImageSize,
     bool? add,
   }) : add = add ?? totp == null;
 
@@ -58,7 +66,11 @@ class TotpPage extends ConsumerStatefulWidget {
       return;
     }
     if (totp == null) {
-      SnackBarIcon.showErrorSnackBar(context, text: translations.totp.page.uriError);
+      showErrorToast(
+        context,
+        text: cryptoStore == null ? translations.error.generic.noException : translations.totp.page.uriError,
+      );
+      return;
     }
     Navigator.pushNamedAndRemoveUntil(
       context,
@@ -98,6 +110,57 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
   /// The TOTP validity.
   late Duration? validity = widget.totp?.validity;
 
+  /// The label controller.
+  late final TextEditingController labelController = TextEditingController(text: label)
+    ..addListener(() {
+      if (mounted) {
+        setState(() => label = labelController.value.text);
+      }
+    });
+
+  /// The secret controller.
+  late final TextEditingController secretController = TextEditingController(text: secret)
+    ..addListener(() {
+      if (mounted) {
+        setState(() => secret = secretController.value.text);
+      }
+    });
+
+  /// The issuer controller.
+  late final TextEditingController issuerController = TextEditingController(text: issuer)
+    ..addListener(() {
+      if (mounted) {
+        setState(() => issuer = issuerController.value.text);
+      }
+    });
+
+  /// The algorithm controller.
+  late final FSelectController<Algorithm> algorithmController =
+      FSelectController(
+        value: algorithm,
+      )..addListener(() {
+        if (mounted) {
+          setState(() => algorithm = algorithmController.value);
+        }
+      });
+
+  /// The digits controller.
+  late final TextEditingController digitsController = TextEditingController(text: digits?.toString())
+    ..addListener(() {
+      if (mounted) {
+        setState(() => digits = int.tryParse(digitsController.value.text));
+      }
+    });
+
+  /// The validity controller.
+  late final TextEditingController validityController = TextEditingController(text: validity?.inSeconds.toString())
+    ..addListener(() {
+      if (mounted) {
+        int? validity = int.tryParse(validityController.value.text);
+        setState(() => this.validity = validity == null ? null : Duration(seconds: validity));
+      }
+    });
+
   /// Whether the form is enabled.
   bool enabled = true;
 
@@ -112,251 +175,257 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(
-      title: Text(widget.add ? translations.totp.page.title.add : translations.totp.page.title.edit),
-      systemOverlayStyle: SystemUiOverlayStyle(
-        systemNavigationBarColor: Theme.of(context).colorScheme.secondaryContainer,
-      ),
-      actions: [
-        if (!widget.add)
-          IconButton(
-            onPressed: () async {
-              bool confirmation = await ConfirmationDialog.ask(
-                context,
-                title: translations.totp.actions.deleteConfirmationDialog.title,
-                message: translations.totp.actions.deleteConfirmationDialog.message,
-              );
-              if (!confirmation || !context.mounted) {
-                return;
-              }
-              Result result = await showWaitingOverlay(
-                context,
-                future: ref.read(totpRepositoryProvider.notifier).deleteTotp(widget.totp!.uuid),
-              );
-              if (!context.mounted) {
-                return;
-              }
-              context.showSnackBarForResult(result);
-              if (result is ResultSuccess) {
-                Navigator.pop(context);
-              }
-            },
-            icon: const Icon(Icons.delete),
-          ),
-      ],
-    ),
-    body: Form(
-      key: formKey,
-      child: ListView(
-        children: [
-          UnconstrainedBox(
-            child: SizedBox(
-              width: widget.imageSize,
-              child: enabled
-                  ? Stack(
-                      children: [
-                        createImageWidget(),
-                        Positioned.fill(
-                          child: Material(
-                            shape: const CircleBorder(),
-                            clipBehavior: Clip.antiAlias,
-                            color: Colors.transparent,
-                            child: InkWell(
-                              splashColor: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.25),
-                              customBorder: const CircleBorder(),
-                              onTap: () async {
-                                String? imageUrl = await LogoPickerDialog.openDialog(context, initialSearchKeywords: issuer);
-                                if (imageUrl != null && mounted) {
-                                  setState(() => this.imageUrl = imageUrl);
-                                }
-                              },
-                            ),
-                          ),
-                        ),
-                      ],
-                    )
-                  : createImageWidget(),
+  Widget build(BuildContext context) => Form(
+    key: formKey,
+    child: AppScaffold.scrollable(
+      header: FHeader.nested(
+        title: Text(widget.add ? translations.totp.page.title.add : translations.totp.page.title.edit),
+        prefixes: [
+          if (widget.add)
+            ClickableHeaderAction.back(
+              onPress: () => Navigator.pop(context),
+            )
+          else
+            ClickableHeaderAction.x(
+              onPress: () => Navigator.pop(context),
             ),
-          ),
-          ListTilePadding(
-            top: 10,
-            bottom: 10,
-            child: TextFormField(
-              initialValue: label,
-              onChanged: (value) {
-                setState(() => label = value);
+        ],
+        suffixes: [
+          if (!widget.add)
+            ClickableHeaderAction(
+              onPress: () async {
+                bool confirmation = await ConfirmationDialog.ask(
+                  context,
+                  title: translations.totp.actions.deleteConfirmationDialog.title,
+                  message: translations.totp.actions.deleteConfirmationDialog.message,
+                  okButtonVariant: .destructive,
+                );
+                if (!confirmation || !context.mounted) {
+                  return;
+                }
+                Result result = await showWaitingOverlay(
+                  context,
+                  future: ref.read(totpRepositoryProvider.notifier).deleteTotp(widget.totp!.uuid),
+                );
+                if (!context.mounted) {
+                  return;
+                }
+                context.handleResult(result);
+                if (result is ResultSuccess) {
+                  Navigator.pop(context);
+                }
               },
-              decoration: FormLabelWithIcon(
-                icon: Icons.label,
-                text: translations.totp.page.label.text,
-                hintText: translations.totp.page.label.hint,
+              icon: Icon(
+                FIcons.trash,
+                color: context.theme.colors.destructive,
               ),
-              validator: validateLabel,
-              enabled: enabled,
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-            ),
-          ),
-          ListTilePadding(
-            bottom: 10,
-            child: PasswordFormField(
-              initialValue: secret,
-              onChanged: (value) {
-                setState(() => secret = value);
-              },
-              enabled: widget.add && enabled,
-              decoration: FormLabelWithIcon(
-                icon: Icons.key,
-                text: translations.totp.page.secret.text,
-                hintText: translations.totp.page.secret.hint,
-              ),
-              validator: validateSecret,
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-            ),
-          ),
-          ListTilePadding(
-            child: TextFormField(
-              initialValue: issuer,
-              onChanged: (value) {
-                setState(() => issuer = value);
-              },
-              decoration: FormLabelWithIcon(
-                icon: Icons.web,
-                text: translations.totp.page.issuer.text,
-                hintText: translations.totp.page.issuer.hint,
-              ),
-              validator: validateIssuer,
-              enabled: enabled,
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 10),
-            child: ExpandListTile(
-              title: Text(translations.totp.page.advancedOptions),
-              enabled: enabled,
-              children: createAdvancedOptionsWidgets(),
-            ),
-          ),
-          if (isValidTotp)
-            ExpandListTile(
-              title: Text(translations.totp.page.showQrCode),
-              enabled: enabled,
-              children: [createQrCodeWidget(context)],
             ),
         ],
       ),
-    ),
-    bottomNavigationBar: FilledButton.tonalIcon(
-      style: ButtonStyle(
-        padding: WidgetStatePropertyAll(
-          EdgeInsets.only(
-            top: 20,
-            bottom: 20 + MediaQuery.paddingOf(context).bottom,
+      footer: ClickableButton(
+        style: .delta(
+          contentStyle: .delta(
+            padding: .value(
+              EdgeInsets.only(
+                top: kBigSpace,
+                right: kBigSpace,
+                bottom: kBigSpace + MediaQuery.paddingOf(context).bottom,
+                left: kBigSpace,
+              ),
+            ),
+          ),
+          decoration: .delta(
+            [
+              .all(
+                const .boxDelta(borderRadius: BorderRadius.zero),
+              ),
+            ],
           ),
         ),
-        shape: const WidgetStatePropertyAll(RoundedRectangleBorder()),
+        onPress: isValidTotp && enabled
+            ? () async {
+                bool validateResult = formKey.currentState!.validate();
+                if (!validateResult) {
+                  return;
+                }
+                setState(() => enabled = false);
+                formKey.currentState!.save();
+                Result editResult = await (widget.add ? addTotp() : updateTotp());
+                if (!context.mounted) {
+                  return;
+                }
+                setState(() => enabled = true);
+                context.handleResult(editResult);
+                if (editResult is ResultSuccess) {
+                  Navigator.pop(context);
+                }
+              }
+            : null,
+        prefix: const Icon(FIcons.check),
+        child: ButtonText(translations.totp.page.save),
       ),
-      onPressed: isValidTotp && enabled
-          ? () async {
-              bool validateResult = formKey.currentState!.validate();
-              if (!validateResult) {
-                return;
-              }
-              setState(() => enabled = false);
-              Result editResult = await (widget.add ? addTotp() : updateTotp());
-              if (!context.mounted) {
-                return;
-              }
-              setState(() => enabled = true);
-              context.showSnackBarForResult(editResult);
-              if (editResult is ResultSuccess) {
-                Navigator.pop(context);
-              }
-            }
-          : null,
-      icon: const Icon(Icons.check),
-      label: Text(translations.totp.page.save),
+      children: [
+        ClickableTile.raw(
+          child: Column(
+            spacing: kSpace,
+            children: [
+              if (enabled)
+                FTappable(
+                  builder: (context, states, child) => Container(
+                    decoration: BoxDecoration(
+                      color: (states.contains(FTappableVariant.hovered) || states.contains(FTappableVariant.pressed)) ? context.theme.colors.secondary : context.theme.colors.background,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: context.theme.colors.border),
+                    ),
+                    width: widget.imageSize + 2,
+                    height: widget.imageSize + 2,
+                    child: child!,
+                  ),
+                  child: createImageWidget(),
+                  onPress: () async {
+                    String? imageUrl = await LogoPickerDialog.openDialog(context, initialSearchKeywords: issuer);
+                    if (imageUrl != null && mounted) {
+                      setState(() => this.imageUrl = imageUrl);
+                    }
+                  },
+                ).clickable()
+              else
+                createImageWidget(),
+              FTextFormField(
+                label: FormLabelWithIcon(
+                  icon: FIcons.tag,
+                  text: translations.totp.page.label.text,
+                ),
+                hint: translations.totp.page.label.hint,
+                control: .managed(controller: labelController),
+                validator: validateLabel,
+                enabled: enabled,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+              ),
+              PasswordFormField(
+                label: FormLabelWithIcon(
+                  icon: FIcons.rectangleEllipsis,
+                  text: translations.totp.page.secret.text,
+                ),
+                hint: translations.totp.page.secret.hint,
+                control: .managed(controller: secretController),
+                enabled: widget.add && enabled,
+                validator: validateSecret,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+              ),
+              FTextFormField(
+                label: FormLabelWithIcon(
+                  icon: FIcons.rectangleEllipsis,
+                  text: translations.totp.page.issuer.text,
+                ),
+                hint: translations.totp.page.issuer.hint,
+                control: .managed(controller: issuerController),
+                validator: validateIssuer,
+                enabled: enabled,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+              ),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: kBigSpace),
+          child: ExpandableTile(
+            title: Text(translations.totp.page.advancedOptions),
+            children: createAdvancedOptionsWidgets(),
+          ),
+        ),
+        if (isValidTotp)
+          Padding(
+            padding: const EdgeInsets.only(top: kBigSpace),
+            child: ExpandableTile(
+              title: Text(translations.totp.page.showQrCode),
+              children: [createQrCodeWidget(context)],
+            ),
+          ),
+      ],
     ),
   );
 
   /// Creates the advanced options widgets.
   List<Widget> createAdvancedOptionsWidgets() => [
-    ListTilePadding(
-      bottom: 10,
-      child: DropdownButtonFormField<Algorithm>(
-        initialValue: algorithm ?? Totp.kDefaultAlgorithm,
-        decoration: FormLabelWithIcon(
-          icon: Icons.tag,
-          text: translations.totp.page.algorithm,
-        ),
-        items: [
-          for (Algorithm algorithm in Algorithm.values)
-            DropdownMenuItem<Algorithm>(
-              value: algorithm,
-              child: Text(algorithm.name.toUpperCase()),
-            ),
-        ],
-        onChanged: enabled
-            ? (value) {
-                if (value != null) {
-                  setState(() => algorithm = value);
-                }
-              }
-            : null,
+    FSelect<Algorithm>(
+      control: .managed(controller: algorithmController),
+      label: FormLabelWithIcon(
+        icon: FIcons.tag,
+        text: translations.totp.page.algorithm,
       ),
+      items: {
+        for (Algorithm algorithm in Algorithm.values) algorithm.name.toUpperCase(): algorithm,
+      },
+      hint: Totp.kDefaultAlgorithm.name.toUpperCase(),
+      enabled: enabled,
     ),
-    ListTilePadding(
-      bottom: 10,
-      child: TextFormField(
-        initialValue: digits?.toString(),
-        onChanged: (value) {
-          setState(() => digits = int.tryParse(value));
-        },
-        keyboardType: const TextInputType.numberWithOptions(),
-        decoration: FormLabelWithIcon(
-          icon: Icons.dialpad,
-          text: translations.totp.page.digits,
-          hintText: Totp.kDefaultDigits.toString(),
-        ),
-        validator: validateDigits,
-        enabled: enabled,
+    FTextFormField(
+      control: .managed(controller: digitsController),
+      keyboardType: const TextInputType.numberWithOptions(),
+      label: FormLabelWithIcon(
+        icon: FIcons.binary,
+        text: translations.totp.page.digits,
       ),
+      hint: Totp.kDefaultDigits.toString(),
+      validator: validateDigits,
+      enabled: enabled,
     ),
-    ListTilePadding(
-      bottom: 10,
-      child: TextFormField(
-        initialValue: validity?.inSeconds.toString(),
-        onChanged: (value) {
-          int? validity = int.tryParse(value);
-          setState(() => this.validity = validity == null ? null : Duration(seconds: validity));
-        },
-        keyboardType: const TextInputType.numberWithOptions(),
-        decoration: FormLabelWithIcon(
-          icon: Icons.schedule,
-          text: translations.totp.page.validity,
-          hintText: Totp.kDefaultValidity.inSeconds.toString(),
-        ),
-        validator: validateValidity,
-        enabled: enabled,
+    FTextFormField(
+      control: .managed(controller: validityController),
+      keyboardType: const TextInputType.numberWithOptions(),
+      label: FormLabelWithIcon(
+        icon: FIcons.clock,
+        text: translations.totp.page.validity,
       ),
+      hint: Totp.kDefaultValidity.inSeconds.toString(),
+      validator: validateValidity,
+      enabled: enabled,
     ),
+    if (kDebugMode && widget.totp != null)
+      FTextFormField(
+        control: .lifted(
+          value: TextEditingValue(text: widget.totp!.uuid),
+          onChange: (_) {},
+        ),
+        label: const FormLabelWithIcon(
+          icon: FIcons.idCard,
+          text: 'UUID',
+        ),
+        enabled: false,
+      ),
   ];
 
+  @override
+  void dispose() {
+    labelController.dispose();
+    secretController.dispose();
+    issuerController.dispose();
+    algorithmController.dispose();
+    digitsController.dispose();
+    validityController.dispose();
+    super.dispose();
+  }
+
   /// Creates the image widget.
-  Widget createImageWidget() => TotpImageWidget(
-    label: label,
-    issuer: issuer,
-    imageUrl: imageUrl,
-    size: widget.imageSize,
+  Widget createImageWidget() => UnconstrainedBox(
+    child: SizedBox(
+      height: widget.imageSize,
+      width: widget.imageSize,
+      child: TotpImage(
+        label: label,
+        issuer: issuer,
+        imageUrl: imageUrl,
+        size: widget.imageSize,
+      ),
+    ),
   );
 
   /// Creates the QR code widget.
   Widget createQrCodeWidget(BuildContext context) {
-    Color color = currentBrightness == Brightness.light ? Theme.of(context).colorScheme.primary : Colors.white;
-    return ListTilePadding(
-      top: 10,
-      bottom: 10,
+    Color color = currentBrightness == Brightness.light ? context.theme.colors.primary : Colors.white;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: kSpace),
       child: Center(
         child: QrImageView(
           data: DecryptedTotp.toUri(
@@ -448,21 +517,14 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
     bool willExceed = (await ref.read(totpLimitProvider.future)).willExceedIfAddMore(count: 1);
     if (willExceed) {
       if (mounted) {
-        await TotpLimitDialog.show(
-          context,
-          title: translations.totpLimit.addDialog.title,
-          message: translations.totpLimit.addDialog.message(
-            count: App.freeTotpsLimit.toString(),
-          ),
-          cancelButton: true,
-        );
+        await TotpLimitDialog.show(context);
       }
       return const ResultCancelled();
     }
 
     DecryptedTotp? totp = await _createTotp();
     if (totp == null) {
-      return ResultError();
+      return ResultError(exception: _TotpCreationFailed());
     }
     return await ref.read(totpRepositoryProvider.notifier).addTotp(totp);
   }
@@ -471,13 +533,13 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
   Future<Result> updateTotp() async {
     DecryptedTotp? totp = await _createTotp();
     if (totp == null) {
-      return ResultError();
+      return ResultError(exception: _TotpCreationFailed());
     }
     return await ref.read(totpRepositoryProvider.notifier).updateTotp(totp);
   }
 
   /// Creates a [DecryptedTotp] corresponding to the current fields.
-  Future<DecryptedTotp?> _createTotp() async => await DecryptedTotp.create(
+  Future<DecryptedTotp?> _createTotp() async => DecryptedTotp.create(
     cryptoStore: await ref.read(cryptoStoreProvider.future),
     uuid: widget.totp?.uuid,
     secret: secret.toUpperCase(),
@@ -488,4 +550,13 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
     validity: validity,
     imageUrl: imageUrl,
   );
+}
+
+/// Triggered when TOTP creation has failed.
+class _TotpCreationFailed extends LocalizableException {
+  /// Creates a new TOTP creation failed exception instance.
+  _TotpCreationFailed()
+    : super(
+        localizedErrorMessage: translations.error.totp.create,
+      );
 }

@@ -5,7 +5,6 @@
   },
   "logIn": {
     "waitingLoginMessage": "Faça login na janela aberta. Não feche o aplicativo.",
-    "waitingConfirmationMessage": "Enviamos um link de confirmação por e-mail. Clique nele para continuar. Não feche o aplicativo.",
     "successNeedConfirmation": "Sucesso! Você receberá um e-mail de confirmação em breve. Clique no link neste dispositivo para fazer login.",
     "success": "Login realizado com sucesso!"
   },
@@ -21,7 +20,7 @@
     "title": "Excluir conta",
     "message": "Deseja realmente excluir sua conta? Como esta é uma ação sensível, exigimos que você se reautentique antes de continuar."
   },
-  "firebaseAuthenticationProvider": {
+  "authenticationProvider(map)": {
     "email": {
       "name": "E-mail",
       "description": "Use seu e-mail para fazer login. Não é necessária senha, um link de confirmação será enviado."
@@ -61,6 +60,14 @@
       "button": "Enviar um link"
     },
     "separator": "Ou:"
+  },
+  "invalidSessionDialog": {
+    "title": "Sessão inválida",
+    "message": "A sua sessão expirou ou é inválida. Por favor, inicie sessão novamente para sincronizar os seus TOTPs.",
+    "button": {
+      "logIn": "Entrar",
+      "logOut": "Sair"
+    }
   },
   "providerPickerDialogTitle": "Escolha um método de login"
 }

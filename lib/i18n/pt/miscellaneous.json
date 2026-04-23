@@ -1,8 +1,8 @@
 {
-  "waitingDialog": {
-    "defaultMessage": "Por favor, aguarde...",
-    "countdown(rich)": "Tempo restante: $countdown."
-  },
+  "refreshUserInfo": "Atualizar usuário",
+  "disableTotpSync": "Você deve primeiro desabilitar a sincronização de TOTP.",
+  "urlCopiedToClipboard": "URL copiada para a área de transferência!",
+  "waitingDialogDefaultMessage": "Por favor, aguarde...",
   "masterPasswordDialog": {
     "title": "Senha mestra",
     "message": "Por favor, insira sua senha mestra para continuar."
@@ -14,5 +14,8 @@
       "hint": "Digite a senha do backup"
     }
   },
-  "urlCopiedToClipboard": "URL copiada para a área de transferência!"
+  "toast": {
+    "success": "Sucesso",
+    "error": "Erro"
+  }
 }

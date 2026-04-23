@@ -1,9 +1,7 @@
-import 'package:open_authenticator/model/totp/decrypted.dart';
-import 'package:open_authenticator/model/totp/repository.dart';
-import 'package:open_authenticator/model/totp/totp.dart';
+part of '../page.dart';
 
 /// Allows to search through the TOTP list.
-extension Search on TotpList {
+extension _Search on List<Totp> {
   /// Searches through the TOTP list.
   List<Totp> search(String query) {
     String lowercaseQuery = query.toLowerCase();

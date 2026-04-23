@@ -2,42 +2,35 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/app_unlock/reason.dart';
-import 'package:open_authenticator/model/authentication/firebase_authentication.dart';
-import 'package:open_authenticator/model/authentication/providers/email_link.dart';
-import 'package:open_authenticator/model/authentication/providers/provider.dart';
+import 'package:open_authenticator/model/backend/user.dart';
 import 'package:open_authenticator/model/settings/app_unlock_method.dart';
-import 'package:open_authenticator/model/storage/online.dart';
 import 'package:open_authenticator/utils/result.dart';
-import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
-import 'package:open_authenticator/widgets/dialog/authentication_provider_picker.dart';
 import 'package:open_authenticator/widgets/dialog/confirmation_dialog.dart';
 import 'package:open_authenticator/widgets/dialog/sign_in_dialog.dart';
-import 'package:open_authenticator/widgets/snackbar_icon.dart';
+import 'package:open_authenticator/widgets/dialog/toggle_link_dialog.dart';
 import 'package:open_authenticator/widgets/waiting_overlay.dart';
 
 /// Contains some useful methods for logging and linking the user's current account.
 class AccountUtils {
   /// Prompts the user to choose an authentication provider, and use it to login.
-  static Future<void> trySignIn(BuildContext context, WidgetRef ref) async {
-    SignInDialogResult? result = await SignInDialog.openDialog(context);
-    if (result == null || !context.mounted) {
-      return;
+  static Future<Result> tryRequestSignIn(BuildContext context) async {
+    SignInDialogAction? action = await SignInDialog.openDialog(context);
+    if (action == null || !context.mounted) {
+      return const ResultCancelled();
     }
-    await _tryTo(
+    return await _tryTo(
       context,
-      ref,
-      result.provider,
       waitingDialogMessage: translations.authentication.logIn.waitingLoginMessage,
-      action: result.signIn,
-      timeoutMessage: translations.error.timeout.authentication,
+      action: action,
+      handleResult: (result) => result is! ResultSuccess,
     );
   }
 
   /// Prompts the user to choose an authentication provider, and use it to link or unlink its current account.
-  static Future<void> tryToggleLink(BuildContext context, WidgetRef ref) async {
-    AuthenticationProviderToggleLinkResult? result = await AuthenticationProviderPickerDialog.openDialog(context, dialogMode: DialogMode.toggleLink);
+  static Future<Result> tryRequestToggleLink(BuildContext context) async {
+    ToggleLinkDialogResult? result = await ToggleLinkDialog.openDialog(context);
     if (result == null || !context.mounted) {
-      return;
+      return const ResultCancelled();
     }
     bool unlink = !result.link;
     if (unlink &&
@@ -45,216 +38,66 @@ class AccountUtils {
           context,
           title: translations.authentication.link.unlinkConfirmationDialog.title,
           message: translations.authentication.link.unlinkConfirmationDialog.message,
+          okButtonVariant: .destructive,
         ))) {
-      return;
+      return const ResultCancelled();
     }
     if (!context.mounted) {
-      return;
+      return const ResultCancelled();
     }
-    await _tryTo<LinkProvider>(
+    return await _tryTo(
       context,
-      ref,
-      result.provider,
-      showLoadingDialog: unlink ? true : null,
-      defaultSuccessMessage: unlink ? translations.authentication.link.unlinkSuccess : translations.authentication.link.linkSuccess,
       waitingDialogMessage: unlink ? null : translations.authentication.logIn.waitingLoginMessage,
       action: result.action,
-      timeoutMessage: unlink ? translations.error.timeout.unlink : translations.error.timeout.authentication,
+      handleResult: (result) => result is! ResultSuccess,
     );
   }
 
   /// Prompts the user to choose an authentication provider, use it to re-authenticate and delete its account.
-  static Future<void> tryDeleteAccount(BuildContext context, WidgetRef ref) async {
+  static Future<Result> tryDeleteAccount(
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
     bool confirm = await ConfirmationDialog.ask(
       context,
       title: translations.authentication.deleteConfirmationDialog.title,
       message: translations.authentication.deleteConfirmationDialog.message,
+      okButtonVariant: .destructive,
     );
     if (!confirm || !context.mounted) {
-      return;
+      return const ResultCancelled();
     }
 
     AppUnlockMethodSettingsEntry appUnlockerMethodsSettingsEntry = ref.read(appUnlockMethodSettingsEntryProvider.notifier);
     Result unlockResult = await appUnlockerMethodsSettingsEntry.unlockWithCurrentMethod(context, UnlockReason.sensibleAction);
     if (unlockResult is! ResultSuccess || !context.mounted) {
-      return;
+      return unlockResult;
     }
-
-    AuthenticationProviderReAuthenticateResult? result = await AuthenticationProviderPickerDialog.openDialog(context, dialogMode: DialogMode.reAuthenticate);
-    if (result == null || !context.mounted) {
-      return;
-    }
-    Result<AuthenticationObject> reAuthenticationResult = await _tryTo(
-      context,
-      ref,
-      result.provider,
-      waitingDialogMessage: translations.authentication.logIn.waitingLoginMessage,
-      action: result.action,
-      timeoutMessage: translations.error.timeout.authentication,
-      handleResult: false,
-    );
     if (!context.mounted) {
-      return;
+      return const ResultCancelled();
     }
-    if (reAuthenticationResult is! ResultSuccess<AuthenticationObject>) {
-      handleAuthenticationResult(
-        context,
-        ref,
-        reAuthenticationResult,
-        handleDifferentCredentialError: true,
-      );
-      return;
-    }
-    Result deleteResult = await showWaitingOverlay(
+    return _tryTo(
       context,
-      future: () async {
-        try {
-          OnlineStorage onlineStorage = ref.read(onlineStorageProvider);
-          await onlineStorage.clearTotps();
-          await onlineStorage.deleteUserDocument();
-          return await ref.read(firebaseAuthenticationProvider.notifier).deleteUser();
-        } catch (ex, stacktrace) {
-          return ResultError(
-            exception: ex,
-            stacktrace: stacktrace,
-          );
-        }
-      }(),
+      action: () => ref.read(userProvider.notifier).deleteUser(),
+      handleResult: (_) => true,
     );
-    if (context.mounted) {
-      context.showSnackBarForResult(deleteResult, retryIfError: true);
-    }
   }
 
   /// Tries to do the specified [action].
-  static Future<Result<AuthenticationObject>> _tryTo<T extends FirebaseAuthenticationProvider>(
-    BuildContext context,
-    WidgetRef ref,
-    T provider, {
-    required Future<Result<AuthenticationObject>> Function(BuildContext, T) action,
-    bool? showLoadingDialog,
-    String? defaultSuccessMessage,
+  static Future<Result> _tryTo(
+    BuildContext context, {
+    required Future<Result> Function() action,
     String? waitingDialogMessage,
-    String? timeoutMessage,
-    bool handleResult = true,
+    bool Function(Result result)? handleResult,
   }) async {
-    Result<AuthenticationObject> result;
-    if (showLoadingDialog ?? provider.showLoadingDialog) {
-      result = await showWaitingOverlay(
-        context,
-        future: action(context, provider),
-        message: waitingDialogMessage,
-        timeout: provider is FallbackAuthenticationProvider && provider.shouldFallback ? provider.fallbackTimeout : null,
-        timeoutMessage: timeoutMessage,
-      );
-    } else {
-      result = await action(context, provider);
-    }
-    if (context.mounted && handleResult) {
-      handleAuthenticationResult(
-        context,
-        ref,
-        result,
-        defaultSuccessMessage: defaultSuccessMessage,
-        handleDifferentCredentialError: true,
-      );
+    Result result = await showWaitingOverlay(
+      context,
+      future: action(),
+      message: waitingDialogMessage,
+    );
+    if ((handleResult?.call(result) ?? true) && context.mounted) {
+      context.handleResult(result);
     }
     return result;
-  }
-
-  /// Handles the [result].
-  static Future<void> handleAuthenticationResult(
-    BuildContext context,
-    WidgetRef ref,
-    Result<AuthenticationObject> result, {
-    String? defaultSuccessMessage,
-    bool handleDifferentCredentialError = false,
-  }) async {
-    switch (result) {
-      case ResultSuccess(:final value):
-        if (value is EmailLinkAuthenticationObject && value.needValidation) {
-          ref.read(emailLinkConfirmationStateProvider.notifier).markNeedsConfirmation(value.email);
-          context.showSnackBarForResult(
-            result,
-            successMessage: translations.authentication.logIn.successNeedConfirmation,
-          );
-        } else {
-          context.showSnackBarForResult(
-            result,
-            successMessage: defaultSuccessMessage ?? translations.authentication.logIn.success,
-          );
-        }
-        break;
-      case ResultCancelled(:final timedOut):
-        if (timedOut) {
-          showDialog(
-            context: context,
-            builder: (context) => AppDialog(
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text(MaterialLocalizations.of(context).okButtonLabel),
-                ),
-              ],
-              children: [
-                Text(translations.error.timeout.authentication),
-              ],
-            ),
-          );
-        }
-        break;
-      case ResultError(:final exception):
-        if (exception is! FirebaseAuthenticationException) {
-          if (exception == null) {
-            context.showSnackBarForResult(result, retryIfError: true);
-          } else {
-            SnackBarIcon.showErrorSnackBar(context, text: translations.error.authentication.firebaseException(exception: exception));
-          }
-          break;
-        }
-        switch (exception) {
-          case FirebaseAuthenticationErrorAccountExistsWithDifferentCredential():
-            if (handleDifferentCredentialError) {
-              showDialog(
-                context: context,
-                builder: (context) => AppDialog(
-                  title: Text(translations.error.authentication.accountExistsWithDifferentCredentialsDialog.title),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: Text(MaterialLocalizations.of(context).closeButtonLabel),
-                    ),
-                  ],
-                  children: [
-                    Text(translations.error.authentication.accountExistsWithDifferentCredentialsDialog.message),
-                  ],
-                ),
-              );
-            } else {
-              SnackBarIcon.showErrorSnackBar(context, text: translations.error.authentication.accountExistsWithDifferentCredentialsDialog.message);
-            }
-            break;
-          case FirebaseAuthenticationErrorInvalidCredential():
-            SnackBarIcon.showErrorSnackBar(context, text: translations.error.authentication.invalidCredential);
-            break;
-          case FirebaseAuthenticationErrorOperationNotAllowed():
-            SnackBarIcon.showErrorSnackBar(context, text: translations.error.authentication.operationNotAllowed);
-            break;
-          case FirebaseAuthenticationErrorUserDisabled():
-            SnackBarIcon.showErrorSnackBar(context, text: translations.error.authentication.userDisabled);
-            break;
-          case FirebaseAuthenticationFirebaseError(:final exception):
-            SnackBarIcon.showErrorSnackBar(context, text: translations.error.authentication.firebaseException(exception: exception));
-            break;
-          case FirebaseAuthenticationGenericError(:final exception):
-            if (exception == null) {
-              SnackBarIcon.showErrorSnackBar(context, text: translations.error.generic.tryAgain);
-            } else {
-              SnackBarIcon.showErrorSnackBar(context, text: translations.error.authentication.firebaseException(exception: exception));
-            }
-            break;
-        }
-        break;
-    }
   }
 }

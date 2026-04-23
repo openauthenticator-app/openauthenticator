@@ -1,12 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:open_authenticator/model/app_unlock/method.dart';
-import 'package:open_authenticator/model/app_unlock/state.dart';
-import 'package:open_authenticator/model/crypto.dart';
-import 'package:open_authenticator/model/totp/repository.dart';
+part of '../page.dart';
 
 /// Allows to require a crypto store, the totp list or both.
-class RequireProviderValueWidget<T, U extends AsyncNotifier<T>> extends ConsumerWidget {
+class _RequireProviderValueWidget<T, U extends AsyncNotifier<T>> extends ConsumerWidget {
   /// The child to show if the crypto store is non null.
   final Widget child;
 
@@ -20,7 +15,7 @@ class RequireProviderValueWidget<T, U extends AsyncNotifier<T>> extends Consumer
   final AsyncNotifierProvider<U, T> provider;
 
   /// Creates a new require provider widget instance.
-  const RequireProviderValueWidget({
+  const _RequireProviderValueWidget({
     super.key,
     required this.child,
     this.childIfAbsent = const SizedBox.shrink(),
@@ -29,11 +24,11 @@ class RequireProviderValueWidget<T, U extends AsyncNotifier<T>> extends Consumer
   });
 
   /// Creates a new require crypto store widget instance.
-  static RequireProviderValueWidget<CryptoStore?, StoredCryptoStore> cryptoStore({
+  static _RequireProviderValueWidget<CryptoStore?, StoredCryptoStore> cryptoStore({
     required Widget child,
     Widget childIfAbsent = const SizedBox.shrink(),
     bool showChildIfLocked = true,
-  }) => RequireProviderValueWidget(
+  }) => _RequireProviderValueWidget(
     provider: cryptoStoreProvider,
     childIfAbsent: childIfAbsent,
     showChildIfLocked: showChildIfLocked,
@@ -41,15 +36,15 @@ class RequireProviderValueWidget<T, U extends AsyncNotifier<T>> extends Consumer
   );
 
   /// Creates a new require crypto store widget instance.
-  static RequireProviderValueWidget<CryptoStore?, StoredCryptoStore> cryptoStoreAndTotpList({
+  static _RequireProviderValueWidget<CryptoStore?, StoredCryptoStore> cryptoStoreAndTotpList({
     required Widget child,
     Widget childIfAbsent = const SizedBox.shrink(),
     bool showChildIfLocked = true,
-  }) => RequireProviderValueWidget(
+  }) => _RequireProviderValueWidget(
     provider: cryptoStoreProvider,
     childIfAbsent: childIfAbsent,
     showChildIfLocked: showChildIfLocked,
-    child: RequireProviderValueWidget(
+    child: _RequireProviderValueWidget(
       provider: totpRepositoryProvider,
       childIfAbsent: childIfAbsent,
       child: child,

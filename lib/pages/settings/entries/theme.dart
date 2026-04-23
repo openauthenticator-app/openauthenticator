@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:forui/forui.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/settings/theme.dart';
+import 'package:open_authenticator/pages/settings/entries/widgets.dart';
+import 'package:open_authenticator/widgets/button_text.dart';
+import 'package:open_authenticator/widgets/clickable.dart';
+import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
 
 /// Allows to configure [themeSettingsEntryProvider].
-class ThemeSettingsEntryWidget extends ConsumerWidget {
+class ThemeSettingsEntryWidget extends ConsumerWidget with FTileMixin {
   /// Creates a new theme settings entry widget instance.
   const ThemeSettingsEntryWidget({
     super.key,
@@ -13,50 +18,54 @@ class ThemeSettingsEntryWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     AsyncValue<ThemeMode> theme = ref.watch(themeSettingsEntryProvider);
-    return ListTile(
+    return ClickableTile(
       enabled: theme.hasValue,
       title: Text(translations.settings.application.theme.title),
       subtitle: Text(translations.settings.application.theme.subtitle),
-      leading: Icon(theme.value?.icon),
-      trailing: const Padding(
-        padding: EdgeInsets.symmetric(horizontal: 10),
-        child: Icon(Icons.chevron_right),
-      ),
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => _ThemeRouteWidget(),
-          ),
-        );
+      prefix: Icon(theme.value?.icon),
+      suffix: const RightChevronSuffix(),
+      onPress: () async {
+        ThemeMode? themeMode = await _ThemePickerDialog.show(context);
+        if (themeMode != null) {
+          await ref.read(themeSettingsEntryProvider.notifier).changeValue(themeMode);
+        }
       },
     );
   }
 }
 
 /// Allows to configure the theme.
-class _ThemeRouteWidget extends ConsumerWidget {
+class _ThemePickerDialog extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     AsyncValue<ThemeMode> theme = ref.watch(themeSettingsEntryProvider);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(translations.settings.application.theme.title),
-      ),
-      body: ListView(
-        children: [
-          for (ThemeMode mode in ThemeMode.values)
-            ListTile(
-              leading: Icon(mode.icon),
-              title: Text(translations.settings.application.theme.name[mode.name]!),
-              subtitle: Text(translations.settings.application.theme.description[mode.name]!),
-              trailing: theme.value == mode ? const Icon(Icons.check) : null,
-              onTap: () => ref.read(themeSettingsEntryProvider.notifier).changeValue(mode),
-            ),
-        ],
-      ),
+    return AppDialog(
+      title: Text(translations.settings.application.theme.title),
+      actions: [
+        ClickableButton(
+          variant: .secondary,
+          onPress: () => Navigator.pop(context),
+          child: ButtonText(MaterialLocalizations.of(context).closeButtonLabel),
+        ),
+      ],
+      children: [
+        for (ThemeMode mode in ThemeMode.values)
+          ClickableTile(
+            prefix: Icon(mode.icon),
+            title: Text(translations.settings.application.theme.themePickerDialog.theme.name[mode.name]!),
+            subtitle: Text(translations.settings.application.theme.themePickerDialog.theme.description[mode.name]!),
+            suffix: theme.value == mode ? const Icon(FIcons.check) : null,
+            onPress: () => Navigator.pop(context, mode),
+          ),
+      ],
     );
   }
+
+  /// Shows a theme selection dialog.
+  static Future<ThemeMode?> show(BuildContext context) => showFDialog<ThemeMode>(
+    context: context,
+    builder: (context, style, animation) => _ThemePickerDialog(),
+  );
 }
 
 /// Allows to associate an icon with a theme mode.
@@ -66,11 +75,11 @@ extension _Icon on ThemeMode? {
     switch (this) {
       case null:
       case ThemeMode.system:
-        return Icons.auto_awesome;
+        return FIcons.sunMoon;
       case ThemeMode.dark:
-        return Icons.dark_mode;
+        return FIcons.moon;
       case ThemeMode.light:
-        return Icons.light_mode;
+        return FIcons.sun;
     }
   }
 }

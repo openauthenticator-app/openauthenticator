@@ -3,10 +3,15 @@ import 'package:hashlib_codecs/hashlib_codecs.dart';
 import 'package:open_authenticator/model/crypto.dart';
 import 'package:open_authenticator/model/totp/algorithm.dart';
 import 'package:open_authenticator/model/totp/totp.dart';
+import 'package:open_authenticator/utils/uri_builder.dart';
 import 'package:uuid/uuid.dart';
 
 /// Represents a TOTP, in its decrypted state.
 class DecryptedTotp extends Totp {
+  /// The period key.
+  /// Used in `otpauth` URIs.
+  static const String _kPeriodKey = 'period';
+
   /// Creates a new decrypted TOTP instance.
   const DecryptedTotp({
     required super.uuid,
@@ -14,6 +19,7 @@ class DecryptedTotp extends Totp {
     super.algorithm,
     super.digits,
     super.validity,
+    required super.updatedAt,
   }) : super(
          encryptedData: decryptedData,
        );
@@ -28,6 +34,7 @@ class DecryptedTotp extends Totp {
          algorithm: totp.algorithm,
          digits: totp.digits,
          validity: totp.validity,
+         updatedAt: totp.updatedAt,
        );
 
   /// Returns the decrypted data.
@@ -68,10 +75,34 @@ class DecryptedTotp extends Totp {
   }
 
   @override
-  Future<Totp> decrypt(CryptoStore? cryptoStore) => Future.value(this);
+  Totp decrypt(CryptoStore? cryptoStore) => this;
+
+  @override
+  Totp copyWith({
+    EncryptedData? encryptedData,
+    Algorithm? algorithm,
+    int? digits,
+    Duration? validity,
+    DateTime? updatedAt,
+  }) => encryptedData is DecryptedData
+      ? DecryptedTotp(
+          uuid: uuid,
+          decryptedData: encryptedData,
+          algorithm: algorithm ?? this.algorithm,
+          digits: digits ?? this.digits,
+          validity: validity ?? this.validity,
+          updatedAt: updatedAt ?? this.updatedAt,
+        )
+      : super.copyWith(
+          encryptedData: encryptedData,
+          algorithm: algorithm,
+          digits: digits,
+          validity: validity,
+          updatedAt: updatedAt,
+        );
 
   /// Manually creates a [DecryptedTotp].
-  static Future<DecryptedTotp?> create({
+  static DecryptedTotp? create({
     required CryptoStore? cryptoStore,
     String? uuid,
     required String secret,
@@ -81,8 +112,9 @@ class DecryptedTotp extends Totp {
     int? digits,
     Duration? validity,
     String? imageUrl,
-  }) async {
-    EncryptedData? encryptedData = await EncryptedData.encrypt(
+    DateTime? updatedAt,
+  }) {
+    EncryptedData? encryptedData = EncryptedData.encrypt(
       cryptoStore: cryptoStore,
       secret: secret,
       label: label,
@@ -104,6 +136,7 @@ class DecryptedTotp extends Totp {
       algorithm: algorithm,
       digits: digits,
       validity: validity,
+      updatedAt: updatedAt ?? DateTime.now(),
     );
   }
 
@@ -116,7 +149,7 @@ class DecryptedTotp extends Totp {
     if (label.startsWith('/')) {
       label = label.substring(1);
     }
-    int? validity = uri.queryParameters.containsKey(Totp.kValidityKey) ? int.tryParse(uri.queryParameters[Totp.kValidityKey]!) : null;
+    int? validity = uri.queryParameters.containsKey(_kPeriodKey) ? int.tryParse(uri.queryParameters[_kPeriodKey]!) : null;
     return create(
       cryptoStore: cryptoStore,
       secret: uri.queryParameters[Totp.kSecretKey]!,
@@ -147,26 +180,25 @@ class DecryptedTotp extends Totp {
     int? digits,
     Duration? validity,
   }) {
-    Map<String, dynamic> queryParameters = {};
-    queryParameters[Totp.kSecretKey] = secret;
-    if (issuer != null) {
-      queryParameters[Totp.kIssuerKey] = issuer;
-    }
-    if (algorithm != null) {
-      queryParameters[Totp.kAlgorithmKey] = algorithm.name.toLowerCase();
-    }
-    if (digits != null) {
-      queryParameters[Totp.kDigitsKey] = digits.toString();
-    }
-    if (validity != null) {
-      queryParameters[Totp.kValidityKey] = validity.inSeconds.toString();
-    }
-    return Uri(
+    UriBuilder builder = UriBuilder(
       scheme: 'otpauth',
       host: 'totp',
       path: label,
-      queryParameters: queryParameters,
     );
+    builder.appendQueryParameter(Totp.kSecretKey, secret);
+    if (issuer != null) {
+      builder.appendQueryParameter(Totp.kIssuerKey, issuer);
+    }
+    if (algorithm != null) {
+      builder.appendQueryParameter(Totp.kAlgorithmKey, algorithm.name.toLowerCase());
+    }
+    if (digits != null) {
+      builder.appendQueryParameter(Totp.kDigitsKey, digits.toString());
+    }
+    if (validity != null) {
+      builder.appendQueryParameter(_kPeriodKey, validity.inSeconds.toString());
+    }
+    return builder.build();
   }
 }
 
@@ -223,34 +255,34 @@ class DecryptedData extends EncryptedData {
        );
 
   /// Decrypts the passed [encryptedData].
-  static Future<DecryptedData?> decrypt({
+  static DecryptedData? decrypt({
     CryptoStore? cryptoStore,
     required EncryptedData encryptedData,
-  }) async {
+  }) {
     if (encryptedData is DecryptedData) {
       return encryptedData;
     }
-    String? decryptedSecret = await cryptoStore?.decrypt(encryptedData.encryptedSecret);
+    String? decryptedSecret = cryptoStore?.decrypt(encryptedData.encryptedSecret);
     if (decryptedSecret == null) {
       return null;
     }
     String? decryptedLabel;
     if (encryptedData.encryptedLabel != null) {
-      decryptedLabel = await cryptoStore?.decrypt(encryptedData.encryptedLabel!);
+      decryptedLabel = cryptoStore?.decrypt(encryptedData.encryptedLabel!);
       if (decryptedLabel == null) {
         return null;
       }
     }
     String? decryptedIssuer;
     if (encryptedData.encryptedIssuer != null) {
-      decryptedIssuer = await cryptoStore?.decrypt(encryptedData.encryptedIssuer!);
+      decryptedIssuer = cryptoStore?.decrypt(encryptedData.encryptedIssuer!);
       if (decryptedIssuer == null) {
         return null;
       }
     }
     String? decryptedImageUrl;
     if (encryptedData.encryptedImageUrl != null) {
-      decryptedImageUrl = await cryptoStore?.decrypt(encryptedData.encryptedImageUrl!);
+      decryptedImageUrl = cryptoStore?.decrypt(encryptedData.encryptedImageUrl!);
       if (decryptedImageUrl == null) {
         return null;
       }
@@ -265,11 +297,11 @@ class DecryptedData extends EncryptedData {
   }
 
   /// Changes the encryption key of the current TOTP.
-  Future<DecryptedData?> changeEncryptionKey(CryptoStore newCryptoStore) async {
-    if (await canDecryptData(newCryptoStore)) {
+  DecryptedData? changeEncryptionKey(CryptoStore newCryptoStore) {
+    if (canDecryptData(newCryptoStore)) {
       return this;
     }
-    EncryptedData? encryptedData = await EncryptedData.encrypt(
+    EncryptedData? encryptedData = EncryptedData.encrypt(
       cryptoStore: newCryptoStore,
       secret: decryptedSecret,
       issuer: decryptedIssuer,

@@ -1,55 +1,105 @@
 {
-  "noError": "Erfolgreich!",
-  "appUnlock": "Die App konnte nicht entsperrt werden. Bitte versuchen Sie es erneut.",
-  "totpDecrypt": "Dieses TOTP konnte nicht entschlüsselt werden. Bitte stellen Sie sicher, dass Sie das richtige Passwort eingegeben haben.",
-  "validation": {
-    "number": "Sie müssen eine gültige Zahl eingeben.",
-    "empty": "Dieses Feld ist erforderlich.",
-    "email": "Ungültige E-Mail.",
-    "secret": "Ungültiges Geheimnis eingegeben.",
-    "totpDigits": "Diese Zahl muss mindestens 6 betragen.",
-    "masterPassword": "Ungültiges Passwort eingegeben.",
-    "confirmation": "Die Bestätigung stimmt nicht überein."
+  "noError": "Die Aktion war erfolgreich.",
+  "widget": {
+    "title": "Fehler",
+    "stackTrace": {
+      "show": "Zeige Stacktrace",
+      "hide": "Verberge Stacktrace"
+    },
+    "button": {
+      "report": "Melden",
+      "retry": "Erneut versuchen"
+    }
   },
-  "timeout": {
-    "generic": "Es ist eine Zeitüberschreitung aufgetreten. Bitte versuchen Sie es später erneut.",
-    "authentication": "Zeitüberschreitung bei der Anmeldung über den ausgewählten Anbieter. Bitte versuchen Sie es erneut.",
-    "unlink": "Zeitüberschreitung beim Aufheben der Verknüpfung Ihres Kontos mit diesem Authentifizierungsanbieter. Bitte versuchen Sie es erneut.",
-    "contributorPlan": "Zeitüberschreitung beim Warten auf den Kauf Ihres Mitwirkender-Plan-Abonnements. Bitte versuchen Sie es erneut."
+  "validation": {
+    "number": "Sie müssen eine gültige Zahl eingeben",
+    "empty": "Dieses Feld ist erforderlich",
+    "email": "Ungültige E-Mail",
+    "secret": "Ungültiges Geheimnis eingegeben",
+    "totpDigits": "Diese Zahl muss mindestens 6 betragen",
+    "masterPassword": "Ungültiges Passwort eingegeben",
+    "confirmation": "Die Bestätigung stimmt nicht überein",
+    "url": "Ungültige URL."
   },
   "generic": {
-    "noTryAgain": "Ups, da ist etwas schiefgelaufen.",
-    "tryAgain": "Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.",
-    "withException": "Es ist ein Fehler aufgetreten (Fehlermeldung: $exception). Bitte versuchen Sie es später erneut."
+    "noException": "Hoppla, da ist etwas schiefgelaufen.",
+    "withException": "Ein Fehler ist aufgetreten (Ausnahme: $exception).",
+    "tryAgain": "Bitte versuche es später erneut."
   },
-  "authentication": {
-    "accountExistsWithDifferentCredentialsDialog": {
-      "title": "Es existiert bereits ein Konto",
-      "message": "Ein Konto mit derselben E-Mail-Adresse existiert bereits in unserer Datenbank, aber der ausgewählte Authentifizierungsanbieter wurde noch nicht damit verknüpft."
-    },
-    "invalidCredential": "Ungültige Anmeldedaten.",
-    "operationNotAllowed": "Operation nicht erlaubt. Dies sollte nicht passieren, bitte melden Sie diesen Fehler.",
-    "userDisabled": "Ihr Konto wurde deaktiviert.",
-    "firebaseException": "Bei der Authentifizierung Ihres Kontos ist ein Fehler aufgetreten (Fehlermeldung: $exception). Bitte versuchen Sie es später erneut."
+  "backup": {
+    "fileDoesNotExist": "Die Backup-Datei existiert nicht: $path.",
+    "invalidPassword": "Ungültiges Passwort eingegeben.",
+    "invalidContent": "Ungültiges Backup-Inhalt.",
+    "crypto": "Ein kryptographisches Fehler ist aufgetreten."
+  },
+  "appUnlock": {
+    "generic": "Beim Entsperren der App ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+    "localAuthenticationDeviceNotSupported": "Die App kann nicht entsperrt werden, da Ihr Gerät die lokale Authentifizierung nicht unterstützt. Deaktivieren Sie diese Sperrmethode mit der Schaltfläche unten.",
+    "noPasswordVerificationMethodAvailable": "Die App kann nicht mit Ihrem Passwort entsperrt werden, da die Integrität der App-Daten verändert wurde. Bitte ändern Sie Ihr Master-Passwort, um fortzufahren.\nBeachten Sie, dass Ihre TOTP-Codes weiterhin manuell entschlüsselt werden müssen."
+  },
+  "backend": {
+    "invalidJsonResponse": "Ungültige Antwort vom $route (HTTP $statusCode) : $body.",
+    "noEmailToConfirm": "Keine E-Mail zum Bestätigen.",
+    "invalidSession": "Ihre Sitzung ist ungültig. Bitte versuchen Sie sich erneut einzuloggen.",
+    "noSession": "Sie müssen sich einloggen, um fortzufahren.",
+    "emailAlreadySent": "Eine E-Mail wurde bereits an diese Adresse gesendet. Bitte überprüfen Sie Ihre Postfach oder versuchen Sie es in wenigen Minuten erneut.",
+    "noCancelCode": "Kein Abbruch-Code wurde vom Server erhalten. Dies ist kein normaler Fall. Bitte versuchen Sie es später erneut.",
+    "expiredSession": "Ihre Sitzung ist abgelaufen. Bitte versuchen Sie sich erneut einzuloggen.",
+    "invalidPayload": "Ihre Payload ist ungültig. Bitte versuchen Sie es später erneut",
+    "invalidToken": "Ihr Token ist ungültig. Bitte versuchen Sie sich erneut einzuloggen.",
+    "invalidVerificationCode": "Ihr Bestätigungscode ist ungültig.",
+    "invalidAppVersion": "Ihre App-Version ist ungültig. Bitte aktualisieren Sie auf die letzte Version.",
+    "invalidBackendUrl": "Ungültige URL für den Backend.",
+    "providerUserAlreadyExists": "Ein Benutzer mit dem gleichen Authentifizierungsanbieter existiert bereits, daher kann es nicht verknüpft werden mit Ihrem Konto."
   },
   "scan": {
     "noUri": "Dieser QR-Code konnte nicht gelesen werden. Bitte stellen Sie sicher, dass es sich um einen gültigen TOTP-QR-Code handelt.",
-    "accessDeniedDialog": {
-      "title": "Zugriff verweigert",
-      "message": "Der Zugriff auf Ihre Kamera ist fehlgeschlagen (Zugriff verweigert: $exception). Möchten Sie es erneut versuchen?"
-    },
+    "accessDenied": "Der Zugriff auf Ihre Kamera ist fehlgeschlagen (Zugriff verweigert: $exception).",
     "controllerUninitialized": "Nicht initialisierter Controller (Code: $exception).",
     "unsupported": "Das Scannen wird von diesem Gerät nicht unterstützt (Code: $exception)."
   },
-  "storageMigration(map)": {
+  "storageMigration": {
+    "getTotps": "Beim Abrufen Ihrer TOTP-Codes ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
     "backupError": "Beim Erstellen der Sicherung ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+    "anotherDeletedTotpPolicyShouldBeUsed": "Eine andere gelöschte TOTP-Strategie sollte verwendet werden.",
     "currentStoragePasswordMismatch": "Ungültiges Master-Passwort eingegeben.",
-    "encryptionKeyChangeFailed": "Beim Verschlüsseln Ihrer Daten ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.",
-    "genericError": "Beim Migrieren Ihrer Daten ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut."
+    "generic": "Beim Migrieren Ihrer Daten ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut."
   },
-  "authenticationValidation": {
-    "incorrectPath": "Etwas ist schiefgelaufen (Pfad: '$path'). Bitte melden Sie diesen Fehler.",
-    "generic": "Anfrage konnte nicht validiert werden (Fehlermeldung: $exception). Bitte versuchen Sie es später erneut.",
-    "oauth2": "Anmeldung mit $name nicht möglich. Bitte versuchen Sie es später erneut."
+  "revenueCat": {
+    "noClient": "Kein RevenueCat-Client verfügbar.",
+    "cannotRestorePurchases": "Dieser RevenueCat-Client kann keine Bestellungen wiederherstellen."
+  },
+  "totp": {
+    "create": "Dieses TOTP konnte nicht erstellt werden.",
+    "decrypt": "Entschlüsselung des TOTP fehlgeschlagen. Bitte stelle sicher, dass du das richtige Passwort eingegeben hast.",
+    "changeCryptoStore": {
+      "noCryptoStore": "Aktueller Krypto-Speicher konnte nicht geladen werden. Bitte schließe die App und öffne sie erneut.",
+      "generic": "Verschlüsselung des TOTP mit dem aktuellen Krypto-Speicher fehlgeschlagen."
+    }
+  },
+  "pushOperationErrorKind": {
+    "invalidUuid": "Ungültige Vorgangs-ID.",
+    "invalidTotp": "Ungültige TOTP-Daten.",
+    "invalidUpdateTimestamp": "Ungültiges Aktualisierungsdatum.",
+    "deletedTotp": "Dieses TOTP wurde bereits gelöscht.",
+    "invalidDeleteTimestamp": "Ungültiges Löschdatum.",
+    "maxOperationsCountExceeded": "Zu viele ausstehende Änderungen.",
+    "tooManyTotps": "TOTP-Limit erreicht.",
+    "genericError": "Synchronisierung fehlgeschlagen."
+  },
+  "passwordMismatch": "Das neue Passwort für den Krypto-Speicher ist nicht korrekt.",
+  "migrator": {
+    "message": "Beim Migrieren Ihrer Daten ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+    "noFirebaseUser": "Kein Firebase-Benutzer verfügbar. Bitte versuchen Sie es später erneut oder kontaktieren Sie uns.",
+    "idToken": "ID-Token konnte nicht abgerufen werden. Bitte versuche es später erneut.",
+    "httpError": "Migration fehlgeschlagen. HTTP-Fehler $statusCode: $body.",
+    "migrationCancelled": "Migration abgebrochen.",
+    "firebaseUserNotFound": "Firebase-Benutzer konnte nicht gefunden werden. Bitte kontaktieren Sie uns.",
+    "invalidIdToken": "Ungültiges ID-Token. Bitte kontaktieren Sie uns.",
+    "invalidUserId": "Ungültige Benutzer-ID. Bitte kontaktieren Sie uns.",
+    "userAlreadyMigrated": "Ihr Konto wurde bereits erfolgreich migriert. Bitte melden Sie sich mit Ihren Zugangsdaten an.",
+    "noSupportedAuthenticationProvider": "Wir konnten keinen unterstützten Authentifizierungsanbieter finden. Bitte kontaktieren Sie uns.",
+    "userWithProviderIdAlreadyExists": "Ein Benutzer mit derselben Provider-ID existiert bereits, daher ist eine Migration Ihres Kontos mit Ihren aktuellen Zugangsdaten nicht möglich. Bitte kontaktieren Sie uns.",
+    "userCreationFailed": "Beim Erstellen Ihres Kontos ist ein Fehler aufgetreten. Bitte kontaktieren Sie uns."
   }
 }

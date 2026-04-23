@@ -1,11 +1,11 @@
 include: package:flutter_lints/flutter.yaml
+plugins:
+  riverpod_lint: 3.1.3
 
 analyzer:
   errors:
     unreachable_switch_default: ignore
     unused_element_parameter: ignore
-  plugins:
-    - custom_lint
   exclude:
     - '**.g.dart'
 

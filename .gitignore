@@ -12,6 +12,7 @@
 .swiftpm/
 migrate_working_dir/
 .env
+.codex
 
 # IntelliJ related
 *.iml
@@ -65,7 +66,7 @@ flatpak/repo
 flatpak/OpenAuthenticatorFlatpak
 flatpak/*.flatpak
 flatpak/*.tar.gz
-flatpak-build-publish.sh
+flatpak/public-key.asc
 
 # Firebase files
 firebase

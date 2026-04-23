@@ -1,11 +1,11 @@
 <div align="center">
   <a href="https://openauthenticator.app">
-    <img src="https://github.com/Skyost/OpenAuthenticator/raw/main/docs/public/images/logo.svg" alt="Logo" width="120" height="120">
+    <img src="https://github.com/openauthenticator-app/openauthenticator/raw/main/docs/public/images/logo.svg" alt="Logo" width="120" height="120">
   </a>
 
-<h3 align="center">Open Authenticator</h3>
+  <h3>Open Authenticator</h3>
 
-  <p align="center">
+  <p>
     A cross-platform OTP app, free and open-source.
     <br />
     <a href="https://openauthenticator.app/#download"><strong>Download now »</strong></a>
@@ -13,130 +13,153 @@
     <br />
     <a href="https://openauthenticator.app">Website</a>
     ·
-    <a href="https://github.com/Skyost/OpenAuthenticator/issues">Issue tracker</a>
+    <a href="https://github.com/openauthenticator-app/openauthenticator">App</a>
     ·
-    <a href="https://github.com/Skyost/OpenAuthenticator/#contribute">Contribute</a>
+    <a href="https://github.com/openauthenticator-app/backend">Backend</a>
+    ·
+    <a href="https://openauthenticator.app/#contribute">Contribute</a>
+  </p>
+
+  <p>
+    <img src="https://img.shields.io/github/license/openauthenticator-app/openauthenticator" alt="License">
+    <img src="https://img.shields.io/github/languages/top/openauthenticator-app/openauthenticator" alt="Top language">
+    <img src="https://img.shields.io/github/stars/openauthenticator-app/openauthenticator" alt="GitHub stars">
   </p>
 </div>
 
-![GitHub License](https://img.shields.io/github/license/Skyost/OpenAuthenticator)
-![GitHub top language](https://img.shields.io/github/languages/top/Skyost/OpenAuthenticator)
-![GitHub Repo stars](https://img.shields.io/github/stars/Skyost/OpenAuthenticator)
+## Overview
 
-## Motivations
+**Open Authenticator** was created as an alternative to closed OTP applications that lock users into
+a single ecosystem or make migration difficult.
 
-It's pretty simple : I was using Twilio Authy as my main TOTP app without any problem so far.
-Back in January 2024, my Authy for Windows app started displaying me the following message :
+The project focuses on three core ideas :
 
-> The Authy Desktop apps Linux, MacOS, and Windows, will reach their End-of-Life (EOL) on March 19, 2024.
+- freedom : your authenticator should stay usable on every major platform ;
+- transparency : the app is open-source and auditable ;
+- interoperability : sync is available, and the backend can be self-hosted.
 
-Wow. So Twilio has decided to shutdown all their desktop apps, leaving only three months (!) to users like me
-to find an alternative.
-Add to that that there is almost no way to export your TOTPs from this app, and it was enough for me
-to consider creating an alternative.
+Open Authenticator currently targets Android, iOS, Windows, macOS and Linux.
 
-That's how **Open Authenticator** was born, with open-sourceness, interoperability and freedom in mind.
+> [!TIP]
+> If you like this project, consider starring it on GitHub !
 
 ## Features
 
-* Open-source, and will always be.
-* Free to use.
-* Multilanguage. Currently, only english and french are supported, but you can [help translating the app](#help-translating-it) into your language !
-* Cross-platform.
-* TOTPs synchronization supported through Firebase Firestore.
+- Cross-platform Flutter application for mobile and desktop.
+- Free and open-source software under the [GPL v3.0 license](https://github.com/openauthenticator-app/openauthenticator/blob/main/LICENSE).
+- Secure local storage for your OTP data.
+- QR code scanning and `otpauth://` link handling.
+- Optional synchronization across devices with self-hostable backend support.
+- Backup management and recovery flows.
+- Local authentication support on compatible devices.
+- Multi-language support, with [community translations](https://openauthenticator.app/translate/).
 
 ## Screenshots
 
-<img src="https://github.com/Skyost/OpenAuthenticator/raw/main/docs/public/images/screenshots/home.png" height="400">
+<img src="https://openauthenticator.app/images/screenshots/readme/home.png" alt="Main page" height="400">
+<img src="https://openauthenticator.app/images/screenshots/readme/edit.png" alt="Edit TOTP page" height="400">
+<img src="https://openauthenticator.app/images/screenshots/readme/settings.png" alt="Settings page" height="400">
 
 ## Download
 
-Download links are available on the [Open Authenticator website](https://openauthenticator.app/#download).
+Prebuilt packages and store links are available on the [official website](https://openauthenticator.app/#download).
 
-## Build and run
+## Development Setup
 
-### App
+### Prerequisites
 
-First, you'll have to compile SVG files into `.si`.  In order to do that, you can use the following command :
+- A recent stable version of **Flutter**.
+- **Dart** SDK `>=3.10.0 <4.0.0`.
+- Platform toolchains for the targets you want to run.
 
-```shell
-dart run "open_authenticator:compile_svg"
+It is recommended to stay on Flutter stable :
+
+```sh
+flutter channel stable
+flutter --version
 ```
 
-Then, you'll have to generate your own `app.dart` file.
-It contains all credentials needed to run the app (Firebase, Sign-In providers, RevenueCat, ...).
+### Clone the repository and install dependencies
 
-To do so, you can run the following utility :
+To clone the repository and install dependencies, run in a shell :
 
-```shell
-dart run "open_authenticator:generate"
+```sh
+git clone https://github.com/openauthenticator-app/openauthenticator.git
+cd openauthenticator
+flutter pub get
 ```
 
-And then, you'll also need to link the app to Firebase. You can follow the steps [here](https://firebase.google.com/docs/flutter/setup)
-for that.
+### Generate required files
 
-This should allow you to run the app in its minimal state.
-For advanced features, like synchronization, sign-in using providers, ... you'll also need
-to configure them on your side.
+Some files used by the app are generated or refreshed during setup.
 
-Use the links below to do so :
+First, compile SVG assets to `.si` :
 
-* [Configure Firebase Auth](https://firebase.google.com/docs/auth/flutter/start).
-* [Configure Firebase Firestore](https://firebase.google.com/docs/firestore).
-* [Configure Firebase Dynamic Links](https://firebase.google.com/docs/dynamic-links).
-* [Configure RevenueCat](https://www.revenuecat.com/docs/getting-started/entitlements).
-* [Configure Stripe with RevenueCat](https://www.revenuecat.com/docs/getting-started/entitlements/stripe-products).
-* [Configure Stripe payment links](https://docs.stripe.com/payment-links)
-
-### Website
-
-The website has been created using [Nuxt 3](https://nuxt.com/). Just run the following commands
-to start a dev server :
-
-```shell
-cd docs
-npm install
-npm run dev
+```sh
+dart run open_authenticator:compile_svg
 ```
 
-You'll be able to access it on [localhost:3000](http//localhost:3000).
+Then, generate source files used by code generation :
 
-## What's next
+```sh
+dart run build_runner build --delete-conflicting-outputs
+dart run slang
+```
 
-If this project becomes popular, I would like to provide its own backend to Open Authenticator.
-Currently, it's using Firebase Auth / Firestore, which is perfect for this project in its current
-state. Having a dedicated server would be too expensive for the moment.
+Last but not least, generate `lib/app.dart` for your local build :
 
-If it's sustainable enough, we could even consider completely removing any TOTPs limit from the app.
+```sh
+dart run open_authenticator:generate
+```
+
+`open_authenticator:generate` lets you customize values such as:
+
+- the app name and package identifiers ;
+- the backend URL ;
+- repository and translation links ;
+- Sentry DSN ;
+- RevenueCat public keys and offering ID ;
+- store identifiers and legal links.
+
+You can inspect the available options with:
+
+```sh
+dart run open_authenticator:generate --help
+```
+
+The generated file is intended for local or custom builds, so make sure it matches the environment
+you want to run against.
+
+### Run the app
+
+To run the app :
+
+```sh
+flutter run
+```
+
+## Contributing
+
+Contributions are more than welcome. For setup details, contribution rules and PR expectations, read the
+[guidelines](https://github.com/openauthenticator-app/backend/blob/main/CONTRIBUTING.md).
+
+You can also help by :
+
+- reporting bugs or suggesting features in the
+  [issue tracker](https://github.com/openauthenticator-app/openauthenticator/issues) ;
+- improving translations through the
+  [translation page](https://openauthenticator.app/translate/) ;
+- submitting fixes for documentation, UI text or code.
+
+## Support the project
+
+If you want to support Open Authenticator financially, you can use :
+
+- [Ko-fi](https://ko-fi.com/Skyost)
+- [PayPal](https://paypal.me/Skyost)
+- [GitHub Sponsors](https://github.com/sponsors/Skyost)
 
 ## License
 
-Open Authenticator is licensed under the [GNU General Public License v3.0](https://choosealicense.com/licenses/gpl-3.0/).
-
-## Contribute
-
-If you like this project, there are a lot of ways for you to contribute to it !
-Please read the [contribution guide](https://github.com/Skyost/OpenAuthenticator/blob/main/CONTRIBUTING.md)
-before getting started.
-
-### Help translating it
-
-We're looking for translators. If you want to help but know nothing about code, just go on the
-[translation page](https://openauthenticator.app/translate/) on the website.
-
-You can also translate the app into your language by submitting a pull request targeting the files located
-in the `lib/i18n` folder (for the app) and `docs/locales` (for the website).
-Feel also free to submit a pull request for any typo you encounter.
-
-### Report bugs or suggest new features
-
-You can report bugs or suggest new features in the [issue tracker](https://github.com/Skyost/OpenAuthenticator/issues).
-If you don't want to create a Github account, you can also [contact the developer](https://openauthenticator.app/contact) directly.
-
-### Donate
-
-You can donate for this project using either [PayPal](http://paypal.me/Skyost),
-[Ko-Fi](https://ko-fi.com/Skyost) or [Github sponsors](https://github.com/sponsors/Skyost).
-
-If you don't want to donate, any [kind message](https://openauthenticator.app/contact) is also
-appreciated !
+Open Authenticator is licensed under the
+[GNU General Public License v3.0](https://github.com/openauthenticator-app/openauthenticator/blob/main/LICENSE).

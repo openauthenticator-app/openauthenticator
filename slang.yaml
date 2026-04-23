@@ -8,4 +8,3 @@ key_case: camel
 key_map_case: camel
 param_case: camel
 namespaces: true
-output_format: multiple_files

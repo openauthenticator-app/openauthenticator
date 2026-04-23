@@ -5,7 +5,6 @@
   },
   "logIn": {
     "waitingLoginMessage": "Please login yourself in the opened window. Do not close the application.",
-    "waitingConfirmationMessage": "We have sent a confirmation link by email. Please click on it to continue. Do not close the application.",
     "successNeedConfirmation": "Success ! You will receive a confirmation email soon. Please click on the link on this device in order to log in.",
     "success": "Logged in with success !"
   },
@@ -21,7 +20,7 @@
     "title": "Delete account",
     "message": "Do you really want to delete your account ? Note that, because it is a sensitive action, we require you to reauthenticate before proceeding."
   },
-  "firebaseAuthenticationProvider": {
+  "authenticationProvider(map)": {
     "email": {
       "name": "Email",
       "description": "Use your email to login. No password required, a confirmation link will be sent."
@@ -61,6 +60,14 @@
       "button": "Send a link"
     },
     "separator": "Or :"
+  },
+  "invalidSessionDialog": {
+    "title": "Invalid session",
+    "message": "Your session has either expired or is invalid. Please log in again to synchronize your TOTPs.",
+    "button": {
+      "logIn": "Log in",
+      "logOut": "Log out"
+    }
   },
   "providerPickerDialogTitle": "Pick a login method"
 }

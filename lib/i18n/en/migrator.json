@@ -1,0 +1,8 @@
+{
+  "title": "Hello back !",
+  "message": "The app has been updated to a brand new version. Please consider migrating your TOTPs to keep using them. If you were logged-in, your account will also migrated during this process.",
+  "button": {
+    "migrate": "Migrate",
+    "dontMigrate": "Don't migrate"
+  }
+}

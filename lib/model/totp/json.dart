@@ -6,28 +6,34 @@ import 'package:open_authenticator/model/totp/totp.dart';
 
 /// Gives some useful properties for serializing TOTPs.
 extension JsonTotp on Totp {
+  /// Force creating a new TOTP from the specified JSON data.
+  static Totp fromJson(Map<String, dynamic> data, {String? uuid}) => tryFromJson(data, uuid: uuid)!;
+
   /// Creates a new TOTP from the specified JSON data.
-  static Totp? fromJson(Map<String, dynamic> data) {
+  static Totp? tryFromJson(Map<String, dynamic> data, {String? uuid}) {
     EncryptedData? encryptedData = JsonEncryptedData.fromJson(data);
-    if (encryptedData == null || data[Totp.kUuidKey] is! String) {
+    uuid ??= data[Totp.kUuidKey];
+    if (encryptedData == null || uuid == null) {
       return null;
     }
     return Totp(
-      uuid: data[Totp.kUuidKey],
+      uuid: uuid,
       encryptedData: encryptedData,
       algorithm: data[Totp.kAlgorithmKey] is! String ? null : Algorithm.fromString(data[Totp.kAlgorithmKey]),
       digits: data[Totp.kDigitsKey] is! int ? null : data[Totp.kDigitsKey],
       validity: data[Totp.kValidityKey] is! int ? null : Duration(seconds: data[Totp.kValidityKey]),
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(data[Totp.kUpdatedAtKey]),
     );
   }
 
   /// Converts this TOTP to a JSON compatible map.
-  Map<String, dynamic> toJson() => {
-    Totp.kUuidKey: uuid,
+  Map<String, dynamic> toJson({bool includeUuid = true}) => {
+    if (includeUuid) Totp.kUuidKey: uuid,
     ...encryptedData.toJson(),
-    if (algorithm != null) Totp.kAlgorithmKey: algorithm!.name,
+    if (algorithm != null) Totp.kAlgorithmKey: algorithm!.name.toUpperCase(),
     if (digits != null) Totp.kDigitsKey: digits,
     if (validity != null) Totp.kValidityKey: validity!.inSeconds,
+    Totp.kUpdatedAtKey: updatedAt.millisecondsSinceEpoch,
   };
 }
 

@@ -1,7 +1,7 @@
 {
-  "subscribe": {
-    "waitingDialogMessage": "Completa il tuo acquisto...",
-    "success": "Piano Contributore sottoscritto con successo. Grazie mille!"
+  "subscribeSuccess": {
+    "immediate": "Ti sei abbonato con successo al Piano Contributore. Grazie mille !",
+    "delayed": "L'acquisto è andato a buon fine ! Potrebbe essere necessario attendere alcuni minuti o riavviare l'app."
   },
   "fallbackPaywall": {
     "title(rich)": "Piano ${title(Contributore)}",
@@ -21,13 +21,14 @@
         "annual": "Anno",
         "monthly": "Mese"
       },
-      "priceSubtitle(rich)": "$subtitle\n$price / $interval.",
+      "price(rich)": "$price / $interval",
       "subtitle(map)": {
         "annual": "Ricevi la fatturazione ogni anno.",
         "monthly": "Ricevi la fatturazione ogni mese."
       }
     },
     "button": {
+      "subscribed": "Abbonamento effettuato!",
       "privacyPolicy": "Privacy policy",
       "termsOfService": "Termini del servizio",
       "restorePurchases": "Ripristina acquisti"

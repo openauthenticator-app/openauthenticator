@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:forui/forui.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/utils/form_label.dart';
+import 'package:open_authenticator/utils/utils.dart';
 import 'package:open_authenticator/widgets/form/password_form_field.dart';
 
 /// A form to prompt for the master password.
@@ -45,8 +47,26 @@ class _MasterPasswordFormState extends State<MasterPasswordForm> {
   /// The password input.
   late String passwordInput = widget.defaultPassword ?? '';
 
+  /// The password text editing controller.
+  late final TextEditingController passwordController = TextEditingController(text: passwordInput)
+    ..addListener(() {
+      if (mounted) {
+        setState(() => passwordInput = passwordController.value.text);
+        notifyChangesIfNeeded(password: passwordController.value.text);
+      }
+    });
+
   /// The confirmation input.
   late String confirmationInput = passwordInput;
+
+  /// The confirmation text editing controller.
+  late final TextEditingController confirmationController = TextEditingController(text: confirmationInput)
+    ..addListener(() {
+      if (mounted) {
+        setState(() => confirmationInput = confirmationController.value.text);
+        notifyChangesIfNeeded(confirmation: confirmationController.value.text);
+      }
+    });
 
   @override
   Widget build(BuildContext context) => Form(
@@ -55,45 +75,44 @@ class _MasterPasswordFormState extends State<MasterPasswordForm> {
     child: Column(
       children: [
         PasswordFormField(
-          initialValue: widget.defaultPassword,
-          decoration: FormLabelWithIcon(
-            icon: Icons.password,
+          control: .managed(controller: passwordController),
+          label: FormLabelWithIcon(
+            icon: FIcons.rectangleEllipsis,
             text: widget.inputText,
-            hintText: widget.hintText,
           ),
-          onChanged: (value) {
-            setState(() => passwordInput = value);
-            notifyChangesIfNeeded(password: value);
-          },
+          hint: widget.hintText,
           validator: validatePassword,
         ),
         SizedBox(
           width: MediaQuery.sizeOf(context).width,
           child: Text(
             translations.masterPassword.form.securityScore(score: '$securityScore/40'),
-            style: Theme.of(context).textTheme.labelSmall!.copyWith(
-              fontWeight: FontWeight.bold,
+            style: context.theme.typography.sm.copyWith(
+              fontWeight: .bold,
               color: securityScoreColor,
             ),
             textAlign: TextAlign.right,
           ),
         ),
         PasswordFormField(
-          initialValue: widget.defaultPassword,
-          decoration: FormLabelWithIcon(
-            icon: Icons.check,
+          control: .managed(controller: confirmationController),
+          label: FormLabelWithIcon(
+            icon: FIcons.check,
             text: translations.masterPassword.form.confirmation.input,
-            hintText: translations.masterPassword.form.confirmation.hint,
           ),
-          onChanged: (value) {
-            confirmationInput = value;
-            notifyChangesIfNeeded(confirmation: value);
-          },
+          hint: translations.masterPassword.form.confirmation.hint,
           validator: validateConfirmation,
         ),
       ],
     ),
   );
+
+  @override
+  void dispose() {
+    passwordController.dispose();
+    confirmationController.dispose();
+    super.dispose();
+  }
 
   /// Calls [widget.onChanged] if the password has changed.
   void notifyChangesIfNeeded({String? password, String? confirmation}) {
@@ -153,13 +172,13 @@ class _MasterPasswordFormState extends State<MasterPasswordForm> {
   Color get securityScoreColor {
     int securityScore = this.securityScore;
     if (securityScore <= 5) {
-      return Colors.red.shade900;
+      return context.theme.colors.error.darken(amount: 0.25);
     }
     if (securityScore <= 10) {
-      return Colors.red.shade700;
+      return context.theme.colors.error.darken(amount: 0.125);
     }
-    if (securityScore <= 10) {
-      return Colors.red;
+    if (securityScore <= 15) {
+      return context.theme.colors.error;
     }
     if (securityScore <= 20) {
       return Colors.orange.shade800;
@@ -168,11 +187,11 @@ class _MasterPasswordFormState extends State<MasterPasswordForm> {
       return Colors.orange;
     }
     if (securityScore <= 30) {
-      return Colors.green;
+      return context.theme.colors.primary.lighten(amount: 0.125);
     }
     if (securityScore <= 35) {
-      return Colors.green.shade600;
+      return context.theme.colors.primary;
     }
-    return Colors.green.shade800;
+    return context.theme.colors.primary.darken(amount: 0.125);
   }
 }

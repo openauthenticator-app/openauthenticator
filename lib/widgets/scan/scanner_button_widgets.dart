@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:forui/forui.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:open_authenticator/widgets/clickable.dart';
 
 /// The button that allows to switch camera.
 class SwitchCameraButton extends StatelessWidget {
@@ -26,16 +28,10 @@ class SwitchCameraButton extends StatelessWidget {
         return const SizedBox.shrink();
       }
 
-      return IconButton(
-        iconSize: 32,
-        icon: switch (state.cameraDirection) {
-          CameraFacing.front => const Icon(Icons.camera_front),
-          CameraFacing.back => const Icon(Icons.camera_rear),
-          _ => const Icon(Icons.camera_alt),
-        },
-        onPressed: () async {
-          await controller.switchCamera();
-        },
+      return ClickableButton.icon(
+        variant: .secondary,
+        onPress: controller.switchCamera,
+        child: const Icon(FIcons.switchCamera),
       );
     },
   );
@@ -55,46 +51,29 @@ class ToggleFlashlightButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) => ValueListenableBuilder(
     valueListenable: controller,
-    builder: (context, state, child) {
-      if (!state.isInitialized || !state.isRunning) {
-        return const SizedBox.shrink();
-      }
-
-      switch (state.torchState) {
-        case TorchState.auto:
-          return IconButton(
-            iconSize: 32,
-            icon: const Icon(Icons.flash_auto),
-            onPressed: () async {
-              await controller.toggleTorch();
-            },
-          );
-        case TorchState.off:
-          return IconButton(
-            iconSize: 32,
-            icon: const Icon(Icons.flash_off),
-            onPressed: () async {
-              await controller.toggleTorch();
-            },
-          );
-        case TorchState.on:
-          return IconButton(
-            iconSize: 32,
-            icon: const Icon(Icons.flash_on),
-            onPressed: () async {
-              await controller.toggleTorch();
-            },
-          );
-        case TorchState.unavailable:
-          return SizedBox.square(
-            dimension: 48,
-            child: Icon(
-              Icons.no_flash,
-              size: 32,
-              color: Theme.of(context).disabledColor,
+    builder: (context, state, child) => state.isInitialized && state.isRunning
+        ? switch (state.torchState) {
+            TorchState.auto => ClickableButton.icon(
+              variant: .secondary,
+              onPress: controller.toggleTorch,
+              child: const Icon(FIcons.sparkles),
             ),
-          );
-      }
-    },
+            TorchState.off => ClickableButton.icon(
+              variant: .secondary,
+              onPress: controller.toggleTorch,
+              child: const Icon(FIcons.zapOff),
+            ),
+            TorchState.on => ClickableButton.icon(
+              variant: .secondary,
+              onPress: controller.toggleTorch,
+              child: const Icon(FIcons.zap),
+            ),
+            TorchState.unavailable => ClickableButton.icon(
+              variant: .secondary,
+              onPress: null,
+              child: const Icon(Icons.flash_off),
+            ),
+          }
+        : const SizedBox.shrink(),
   );
 }

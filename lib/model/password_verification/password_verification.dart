@@ -15,10 +15,10 @@ class PasswordVerification extends AsyncNotifier<List<PasswordVerificationMethod
   FutureOr<List<PasswordVerificationMethod>> build() async {
     CryptoStoreVerificationMethod cryptoStoreVerificationMethod = await ref.watch(cryptoStoreVerificationMethodProvider.future);
     PasswordSignatureVerificationMethod passwordSignatureVerificationMethod = await ref.watch(passwordSignatureVerificationMethodProvider.future);
-    return [
+    return List.unmodifiable([
       if (cryptoStoreVerificationMethod.enabled) cryptoStoreVerificationMethod,
       if (passwordSignatureVerificationMethod.enabled) passwordSignatureVerificationMethod,
-    ];
+    ]);
   }
 }
 
@@ -39,10 +39,10 @@ extension PasswordValidity on List<PasswordVerificationMethod> {
         }
       }
       return ResultSuccess(value: verificationCount == length);
-    } catch (ex, stacktrace) {
+    } catch (ex, stackTrace) {
       return ResultError(
         exception: ex,
-        stacktrace: stacktrace,
+        stackTrace: stackTrace,
       );
     }
   }

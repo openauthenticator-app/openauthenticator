@@ -3,11 +3,16 @@
     "decrypt": "Entschlüsseln",
     "mobileDialog": {
       "title": "TOTP-Aktionen",
-      "edit": "TOTP bearbeiten",
-      "delete": "TOTP löschen"
+      "edit": {
+        "title": "TOTP bearbeiten",
+        "subtitle": "Bearbeiten Sie die Parameter dieses TOTP oder zeigen Sie das QR-Code."
+      },
+      "delete": {
+        "title": "TOTP löschen",
+        "subtitle": "Löschen Sie dieses TOTP aus Ihrem Gerät."
+      }
     },
     "desktopButtons": {
-      "copy": "Code kopieren",
       "edit": "Bearbeiten",
       "delete": "Löschen"
     },

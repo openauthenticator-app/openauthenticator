@@ -1,5 +1,16 @@
 {
-  "noError": "Succès !",
+  "noError": "Opération effectuée avec succès.",
+  "widget": {
+    "title": "Erreur",
+    "stackTrace": {
+      "show": "Afficher la trace",
+      "hide": "Masquer la trace"
+    },
+    "button": {
+      "report": "Signaler",
+      "retry": "Réessayer"
+    }
+  },
   "validation": {
     "number": "Vous devez entrer un nombre valide",
     "empty": "Ce champ est requis",
@@ -7,49 +18,88 @@
     "secret": "Secret invalide",
     "totpDigits": "Le nombre entré doit être supérieur ou égal à 6",
     "masterPassword": "Mot de passe invalide",
-    "confirmation": "La confirmation ne correspond pas"
+    "confirmation": "La confirmation ne correspond pas",
+    "url": "URL invalide"
   },
-  "timeout": {
-    "generic": "Délai d'attente dépassé. Veuillez réessayer plus tard.",
-    "authentication": "Délai d'attente dépassé pendant la connexion au fournisseur sélectionné. Veuillez réessayer.",
-    "unlink": "Délai d'attente dépassé pendant la suppression de la liaison de votre compte au fournisseur d'authentification. Veuillez réessayer.",
-    "contributorPlan": "Délai d'attente de la souscription à l'Abonnement Contributeur dépassé. Veuillez réessayer."
-  },
-  "appUnlock": "Impossible de déverrouiller l'application. Veuillez réessayer.",
   "generic": {
-    "noTryAgain": "Oops, quelque chose s'est mal passé.",
-    "tryAgain": "Quelque chose s'est mal passé. Veuillez réessayer plus tard.",
-    "withException": "Une erreur est survenue ($exception). Veuillez réessayer plus tard."
+    "noException": "Oups, une erreur est survenue.",
+    "withException": "Une erreur est survenue (exception : $exception).",
+    "tryAgain": "Veuillez réessayer plus tard."
   },
-  "authentication": {
-    "accountExistsWithDifferentCredentialsDialog": {
-      "title": "Un compte existe déjà",
-      "message": "Un compte avec la même adresse mail existe dans notre base de données, mais le fournisseur d'authentification sélectionné n'y est pas relié.\nVeuillez vous connecter en utilisant un fournisseur d'authentification qui y est déjà relié."
-    },
-    "invalidCredential": "Identifiants incorrects.",
-    "operationNotAllowed": "Opération non autorisée. Cela ne doit pas arriver, veuillez reporter cette erreur.",
-    "userDisabled": "Votre compte a été désactivé.",
-    "firebaseException": "Une erreur est survenue pendant la connexion à votre compte (erreur : $exception). Veuillez réessayer plus tard."
+  "backup": {
+    "fileDoesNotExist": "Le fichier de sauvegarde n'existe pas : $path.",
+    "invalidPassword": "Mot de passe invalide.",
+    "invalidContent": "Contenu invalide.",
+    "crypto": "Une erreur de chiffrement est survenue."
+  },
+  "appUnlock": {
+    "generic": "Impossible de déverrouiller l'application. Veuillez réessayer.",
+    "localAuthenticationDeviceNotSupported": "Impossible de déverrouiller l'application car votre appareil n'est pas pris en charge par l'authentification locale. Désactivez cette méthode avec le bouton ci-dessous.",
+    "noPasswordVerificationMethodAvailable": "Impossible de déverrouiller l'application avec votre mot de passe car les données de l'application ont été altérées. Veuillez changer votre mot de passe maître pour continuer.\nVeuillez noter que vos TOTPs devront être déchiffrés manuellement."
+  },
+  "backend": {
+    "invalidJsonResponse": "Réponse invalide du $route (HTTP $statusCode) : $body.",
+    "noEmailToConfirm": "Aucun email à confirmer.",
+    "invalidSession": "Votre session est invalide. Veuillez réessayer de vous connecter.",
+    "noSession": "Vous devez être connecté pour continuer.",
+    "emailAlreadySent": "Un email a déjà été envoyé à cette adresse. Veuillez vérifier votre boîte mail ou réessayer dans quelques minutes.",
+    "noCancelCode": "Aucun code d'annulation n'a été fourni par le serveur. C'est ce qui est normal. Veuillez réessayer plus tard.",
+    "expiredSession": "Votre session a expiré. Veuillez réessayer de vous connecter.",
+    "invalidPayload": "Votre charge utile est invalide. Veuillez réessayer plus tard.",
+    "invalidToken": "Votre jeton est invalide. Veuillez réessayer de vous connecter.",
+    "invalidVerificationCode": "Votre code de vérification est invalide.",
+    "invalidAppVersion": "Votre version de l'application est invalide. Veuillez mettre à jour à la dernière version.",
+    "invalidBackendUrl": "URL de serveur backend invalide.",
+    "providerUserAlreadyExists": "Un utilisateur avec le même fournisseur existe déjà, il est donc impossible de le lier à votre compte."
   },
   "scan": {
     "noUri": "Impossible de lire ce QR code. Assurez-vous qu'il s'agit d'un QR code de TOTP valide.",
-    "accessDeniedDialog": {
-      "title": "Accès refusé",
-      "message": "Impossible d'accéder à votre caméra (accès refusé : $exception). Voulez-vous réessayer ?"
-    },
+    "accessDenied": "Impossible d'accéder à votre caméra (accès refusé : $exception).",
     "controllerUninitialized": "Controlleur non initialisé (code : $exception).",
     "unsupported": "Le scan n'est pas supporté par cet appareil (code : $exception)."
   },
-  "storageMigration(map)": {
+  "storageMigration": {
+    "getTotps": "Une erreur est survenue pendant la récupération de vos TOTPs distants. Veuillez réessayer plus tard.",
     "backupError": "Une erreur est survenue durant la sauvegarde. Veuillez réessayer.",
-    "currentStoragePasswordMismatch": "Mot de passe maître invalide.",
-    "encryptionKeyChangeFailed": "Une erreur est survenue pendant le chiffrement de vos données. Veuillez réessayer plus tard.",
-    "genericError": "Une erreur est survenue pendant la migration de vos données. Veuillez réessayer plus tard."
+    "anotherDeletedTotpPolicyShouldBeUsed": "Une autre politique de suppression de TOTP devrait être utilisée.",
+    "currentStoragePasswordMismatch": "Mot de passe invalide.",
+    "generic": "Une erreur est survenue pendant la migration de vos données. Veuillez réessayer plus tard."
   },
-  "authenticationValidation": {
-    "incorrectPath": "Une erreur est survenue (le chemin est '$path'). Veuillez reporter cette erreur.",
-    "generic": "Impossible de valider votre requête (erreur : $exception). Veuillez réessayer plus tard.",
-    "oauth2": "Impossible de se connecter avec $name. Veuillez réessayer plus tard."
+  "revenueCat": {
+    "noClient": "Aucun client RevenueCat disponible.",
+    "cannotRestorePurchases": "Ce client RevenueCat ne peut pas restaurer les achats."
   },
-  "totpDecrypt": "Impossible de déchiffrer ce TOTP. Veuillez vous assurer d'avoir entré le bon mot de passe."
+  "totp": {
+    "create": "Ce TOTP ne peut pas être créé.",
+    "decrypt": "Impossible de déchiffrer ce TOTP. Assurez-vous d'avoir entré le bon mot de passe.",
+    "changeCryptoStore": {
+      "noCryptoStore": "Impossible de récupérer le magasin de chiffrement actuel. Veuillez fermer et rouvrir l'application.",
+      "generic": "Impossible de chiffrer le TOTP avec le magasin de chiffrement actuel."
+    }
+  },
+  "pushOperationErrorKind": {
+    "invalidUuid": "Identifiant d'opération invalide.",
+    "invalidTotp": "Données TOTP invalides.",
+    "invalidUpdateTimestamp": "Date de mise à jour invalide.",
+    "deletedTotp": "Ce TOTP a déjà été supprimé.",
+    "invalidDeleteTimestamp": "Date de suppression invalide.",
+    "maxOperationsCountExceeded": "Trop de changements en attente.",
+    "tooManyTotps": "Limite de TOTP atteinte.",
+    "genericError": "Synchronisation échouée."
+  },
+  "passwordMismatch": "Le mot de passe du magasin de chiffrement est incorrect.",
+  "migrator": {
+    "message": "Une erreur est survenue lors de la migration de vos données. Veuillez réessayer.",
+    "noFirebaseUser": "Aucun utilisateur Firebase disponible. Veuillez réessayer plus tard ou nous contacter.",
+    "idToken": "Impossible de récupérer le jeton d'identification. Veuillez réessayer plus tard.",
+    "httpError": "Migration échouée. Erreur HTTP $statusCode : $body.",
+    "migrationCancelled": "Migration annulée.",
+    "firebaseUserNotFound": "Utilisateur Firebase introuvable. Veuillez nous contacter.",
+    "invalidIdToken": "Jeton ID invalide. Veuillez nous contacter.",
+    "invalidUserId": "ID utilisateur invalide. Veuillez nous contacter.",
+    "userAlreadyMigrated": "Votre compte a déjà été migré avec succès. Veuillez vous connecter avec vos identifiants.",
+    "noSupportedAuthenticationProvider": "Aucun fournisseur d'authentification pris en charge n'a été trouvé. Veuillez nous contacter.",
+    "userWithProviderIdAlreadyExists": "Un utilisateur avec le même identifiant de fournisseur existe déjà, il n'est donc pas possible de migrer votre compte avec vos identifiants actuels. Veuillez nous contacter.",
+    "userCreationFailed": "Une erreur est survenue lors de la création de votre compte. Veuillez nous contacter."
+  }
 }

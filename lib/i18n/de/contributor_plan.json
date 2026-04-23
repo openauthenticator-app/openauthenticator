@@ -1,7 +1,7 @@
 {
-  "subscribe": {
-    "waitingDialogMessage": "Warten auf Ihren Kauf...",
-    "success": "Sie haben sich erfolgreich für den Mitwirkender-Plan angemeldet. Herzlichen Dank!"
+  "subscribeSuccess": {
+    "immediate": "Sie haben den Mitwirkender-Plan erfolgreich abonniert. Vielen Dank !",
+    "delayed": "Der Kauf war erfolgreich ! Möglicherweise müssen Sie einige Minuten warten oder die App neu starten."
   },
   "fallbackPaywall": {
     "title(rich)": "${title(Mitwirkender)}-Plan",
@@ -21,13 +21,14 @@
         "annual": "Jahr",
         "monthly": "Monat"
       },
-      "priceSubtitle(rich)": "$subtitle\n$price / $interval.",
+      "price(rich)": "$price / $interval",
       "subtitle(map)": {
         "annual": "Abrechnung erfolgt jährlich.",
         "monthly": "Abrechnung erfolgt monatlich."
       }
     },
     "button": {
+      "subscribed": "Abonnement erfolgreich!",
       "privacyPolicy": "Datenschutzbestimmungen",
       "termsOfService": "Allgemeine Geschäftsbedingungen",
       "restorePurchases": "Käufe wiederherstellen"

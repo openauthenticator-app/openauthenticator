@@ -1,35 +1,42 @@
+import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/app.dart';
-import 'package:open_authenticator/model/authentication/firebase_authentication.dart';
-import 'package:open_authenticator/model/authentication/state.dart';
+import 'package:open_authenticator/model/backend/user.dart';
+import 'package:open_authenticator/model/purchases/clients/dart.dart';
 import 'package:open_authenticator/model/purchases/clients/method_channel.dart';
-import 'package:open_authenticator/model/purchases/clients/rest.dart';
+import 'package:open_authenticator/model/settings/backend_url.dart';
 import 'package:open_authenticator/utils/platform.dart';
-import 'package:open_authenticator/utils/result.dart';
-import 'package:purchases_flutter/models/offering_wrapper.dart';
-import 'package:purchases_flutter/models/package_wrapper.dart';
 import 'package:purchases_flutter/models/purchases_configuration.dart' as rc_purchases_configuration;
+import 'package:purchases_flutter/purchases_flutter.dart';
 
 /// The RevenueCat client provider.
-final revenueCatClientProvider = Provider((ref) {
-  FirebaseAuthenticationState authenticationState = ref.watch(firebaseAuthenticationProvider);
-  if (authenticationState is! FirebaseAuthenticationStateLoggedIn) {
+final revenueCatClientProvider = FutureProvider((ref) async {
+  String? backendHost = Uri.tryParse(await ref.watch(backendUrlSettingsEntryProvider.future))?.host;
+  if (backendHost == null) {
     return null;
   }
-  PurchasesConfiguration? configuration = switch (currentPlatform) {
-    Platform.android => PurchasesConfiguration(apiKey: AppCredentials.revenueCatPublicKeyAndroid),
-    Platform.iOS || Platform.macOS => PurchasesConfiguration(apiKey: AppCredentials.revenueCatPublicKeyDarwin),
-    Platform.windows => PurchasesConfiguration(apiKey: AppCredentials.revenueCatPublicKeyWindows),
-    Platform.linux => PurchasesConfiguration(apiKey: AppCredentials.revenueCatPublicKeyLinux),
+  User? user = await ref.watch(userProvider.future);
+  if (user == null) {
+    return null;
+  }
+  String? apiKey = switch (currentPlatform) {
+    Platform.android => AppCredentials.revenueCatPublicKeyAndroid,
+    Platform.iOS || Platform.macOS => AppCredentials.revenueCatPublicKeyDarwin,
+    Platform.windows => AppCredentials.revenueCatPublicKeyWindows,
+    Platform.linux => AppCredentials.revenueCatPublicKeyLinux,
     _ => null,
   };
-  if (configuration == null) {
+  if (apiKey == null || apiKey.isEmpty) {
     return null;
   }
-  configuration = configuration
-    ..appUserID = authenticationState.user.uid
-    ..email = authenticationState.user.email;
-  return RevenueCatClient.fromPlatform(purchasesConfiguration: configuration);
+  return RevenueCatClient.fromPlatform(
+    purchasesConfiguration: PurchasesConfiguration(
+      apiKey: apiKey,
+      user: user,
+    ),
+    backendHost: backendHost,
+  );
 });
 
 /// A RevenueCat client.
@@ -40,73 +47,121 @@ abstract class RevenueCatClient {
   /// The purchase timeout.
   final Duration? purchaseTimeout;
 
+  /// The backend host.
+  final String backendHost;
+
   /// Creates a new RevenueCat client instance.
   RevenueCatClient({
     required this.purchasesConfiguration,
     this.purchaseTimeout = Duration.zero,
+    required this.backendHost,
   }) : assert(purchasesConfiguration.appUserID != null);
 
   /// Creates a new RevenueCat client instance that corresponds to the given [platform].
   factory RevenueCatClient.fromPlatform({
     required PurchasesConfiguration purchasesConfiguration,
     Platform? platform,
+    required String backendHost,
   }) {
     platform ??= currentPlatform;
-    switch (platform) {
-      case Platform.android:
-      case Platform.iOS:
-      case Platform.macOS:
-        return RevenueCatMethodChannelClient(purchasesConfiguration: purchasesConfiguration);
-      default:
-        return RevenueCatRestClient(purchasesConfiguration: purchasesConfiguration);
-    }
+    return (switch (platform) {
+      Platform.android || Platform.iOS || Platform.macOS => RevenueCatMethodChannelClient.new,
+      _ => RevenueCatDartClient.new,
+    })(
+      purchasesConfiguration: purchasesConfiguration,
+      backendHost: backendHost,
+    );
   }
 
+  /// Returns the user's attributes.
+  @protected
+  Map<String, String> get attributes => {
+    'backend': backendHost,
+  };
+
   /// Initializes this client instance.
-  Future<void> initialize() async {}
+  Future<void> initialize(Ref ref) async {}
+
+  /// Returns the customer info.
+  Future<CustomerInfo?> getCustomerInfo();
+
+  /// Returns the offerings.
+  Future<Offerings?> getOfferings();
 
   /// Returns the available package types.
   /// Note that only RevenueCat default identifiers are supported.
-  Future<List<PackageType>> getAvailablePackageTypes(String offeringId);
+  Future<List<PackageType>> getAvailablePackageTypes(String offeringId) async {
+    Offerings? offerings = await getOfferings();
+    Offering? offering = offerings?.getOffering(offeringId);
+    return offering?.availablePackages.map((package) => package.packageType).toList() ?? [];
+  }
 
-  /// Returns whether the user has the given [entitlementId].
-  Future<bool> hasEntitlement(String entitlementId);
+  /// Purchases the given [purchasable].
+  /// Returns whether the user info should be refreshed.
+  Future<bool> purchase(Purchasable purchasable, PackageType packageType) async {
+    Offerings? offerings = await getOfferings();
+    Offering? offering = offerings?.getOffering(purchasable.offeringId);
+    if (offering == null) {
+      return false;
+    }
 
-  /// Purchases the given item.
-  Future<List<String>> purchaseManually(Purchasable purchasable, PackageType packageType);
+    Package? package = offering.availablePackages.firstWhereOrNull((package) => package.packageType == packageType);
+    if (package != null) {
+      return await purchasePackage(package);
+    }
+    return false;
+  }
 
-  /// Returns the list of offerings.
-  Future<Map<String, Offering>> getOfferings();
+  /// Purchases the given [package].
+  /// Returns whether the user info should be refreshed.
+  Future<bool> purchasePackage(Package package);
 
   /// Returns the prices of the [purchasable].
-  Future<Map<PackageType, Price>> getPrices(Purchasable purchasable);
-
-  /// Restores the user purchases, if possible.
-  Future<Result> restorePurchases();
+  Future<Map<PackageType, Price>> getPrices(Purchasable purchasable) async {
+    Offerings? offerings = await getOfferings();
+    Offering? offering = offerings?.getOffering(purchasable.offeringId);
+    if (offering == null) {
+      return {};
+    }
+    Map<PackageType, Price> result = {};
+    for (Package package in offering.availablePackages) {
+      result[package.packageType] = Price(
+        amount: package.storeProduct.price / 100,
+        currencyCode: package.storeProduct.currencyCode,
+      );
+    }
+    return result;
+  }
 
   /// Returns the user management URL.
-  Future<String?> getManagementUrl(String entitlementId);
+  Future<String?> getManagementUrl() async {
+    CustomerInfo? customerInfo = await getCustomerInfo();
+    return customerInfo?.managementURL;
+  }
+}
 
-  /// Invalidates the user info.
-  Future<void> invalidateUserInfo() => Future.value();
+/// Allows to restore the user purchases.
+mixin CanRestorePurchases on RevenueCatClient {
+  /// Restores the user purchases, if possible.
+  Future<void> restorePurchases();
 }
 
 /// Represents a price.
-class Price {
+class Price with EquatableMixin {
   /// The raw amount.
   final double amount;
 
-  /// The formatted amount, with the currency.
-  final String formattedAmount;
+  /// The currency code.
+  final String currencyCode;
 
   /// Creates a new price instance.
   const Price({
     required this.amount,
-    required this.formattedAmount,
+    required this.currencyCode,
   });
 
   @override
-  String toString() => formattedAmount;
+  List<Object?> get props => [amount, currencyCode];
 }
 
 /// Represents a purchasable item.
@@ -114,28 +169,16 @@ enum Purchasable {
   /// Allows to subscribe to the Contributor Plan.
   contributorPlan(
     offeringId: AppContributorPlan.offeringId,
-    stripeBuyUrls: AppContributorPlan.stripeBuyUrls,
-    stripePrices: AppContributorPlan.stripePrices,
-  );
+  )
+  ;
 
   /// The offering ID.
   final String offeringId;
 
-  /// The Stripe "buy" URLs.
-  final Map<PackageType, String> stripeBuyUrls;
-
-  /// The Stripe prices ids.
-  final Map<PackageType, String> stripePrices;
-
   /// Creates a new purchasable instance.
   const Purchasable({
     required this.offeringId,
-    required this.stripeBuyUrls,
-    required this.stripePrices,
   });
-
-  /// Returns the Stripe "buy" URL corresponding to the [packageType].
-  Uri? getStripeBuyUrl(PackageType packageType) => stripeBuyUrls.containsKey(packageType) ? Uri.https('buy.stripe.com', stripeBuyUrls[packageType]!) : null;
 }
 
 /// The purchases configuration object.
@@ -146,6 +189,9 @@ class PurchasesConfiguration extends rc_purchases_configuration.PurchasesConfigu
   /// Creates a new purchases configuration instance.
   PurchasesConfiguration({
     required String apiKey,
-    this.email,
-  }) : super(apiKey);
+    required User user,
+  }) : email = user.email,
+       super(apiKey) {
+    appUserID = user.id;
+  }
 }

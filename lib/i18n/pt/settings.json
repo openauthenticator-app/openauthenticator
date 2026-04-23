@@ -33,15 +33,20 @@
     "theme": {
       "title": "Tema",
       "subtitle": "Altere o tema da aplicação e a luminosidade.",
-      "name(map)": {
-        "system": "Sistema",
-        "light": "Claro",
-        "dark": "Escuro"
-      },
-      "description(map)": {
-        "system": "Use o tema do sistema.",
-        "light": "Use o tema escuro.",
-        "dark": "Use o tema escuro."
+      "themePickerDialog": {
+        "title": "Tema",
+        "theme": {
+          "name(map)": {
+            "system": "Sistema",
+            "light": "Claro",
+            "dark": "Escuro"
+          },
+          "description(map)": {
+            "system": "Use o tema do sistema.",
+            "light": "Use o tema escuro.",
+            "dark": "Use o tema escuro."
+          }
+        }
       }
     }
   },
@@ -69,11 +74,7 @@
       "title": "Vincular outros provedores",
       "subtitle": {
         "text": "Vincule sua conta a outros provedores de autenticação para poder usá-los para fazer login.",
-        "linkedProviders(rich)": "\nConta atualmente vinculada a: $providers.",
-        "providers(map)": {
-          "emailLink": "Endereço de e-mail",
-          "password": "Endereço de e-mail"
-        }
+        "linkedProviders(rich)": "\nConta atualmente vinculada a: $providers."
       }
     },
     "accountLogin": {
@@ -83,32 +84,12 @@
       },
       "logOut": {
         "title": "Sair",
-        "subtitle(rich)": "Saia para interromper a sincronização dos seus TOTPs com este dispositivo.\nAtualmente conectado como: $email."
+        "subtitle(rich)": "Saia para interromper a sincronização dos seus TOTPs com este dispositivo.\nAtualmente conectado como $user."
       }
     },
     "confirmEmail": {
       "title": "Confirme seu e-mail",
-      "subtitle(rich)": "Um e-mail de confirmação foi enviado para o endereço: $email.\nClique no link para concluir o login. Você também pode tocar nesta opção para digitá-lo manualmente.",
-      "success": "E-mail confirmado com sucesso.",
-      "confirmActionPickerDialog": {
-        "title": "O que você deseja fazer?",
-        "confirm": {
-          "title": "Confirmar sua conta",
-          "subtitle": "Cole o link que recebeu por e-mail para confirmar sua conta."
-        },
-        "cancelConfirmation": {
-          "title": "Cancelar confirmação da conta",
-          "subtitle": "Cancelar a confirmação da sua conta.",
-          "validationDialog": {
-            "title": "Confirmação",
-            "message": "Tem certeza?"
-          }
-        }
-      },
-      "linkDialog": {
-        "title": "Link de confirmação",
-        "message": "Acesse o link com este dispositivo ou cole-o abaixo para confirmar seu e-mail."
-      }
+      "subtitle(rich)": "Um e-mail de confirmação foi enviado para o endereço: $email.\nClique no link para concluir o login. Você também pode tocar nesta opção para digitá-lo manualmente."
     },
     "synchronizeTotps": {
       "title": "Sincronizar TOTPs",
@@ -136,8 +117,8 @@
       "title": "Gerenciar backups",
       "subtitle": {
         "zero": "Você não possui nenhum backup armazenado.",
-        "one": "Atualmente, você possui $n backup armazenado.",
-        "other": "Atualmente, você possui $n backups armazenados."
+        "one(rich)": "Atualmente, você possui $backups backup armazenado.",
+        "more(rich)": "Atualmente, você possui $backups backups armazenados."
       },
       "backupsDialogTitle": "Gerenciar backups",
       "restoreBackupPasswordDialog": {
@@ -181,6 +162,14 @@
   },
   "dangerZone": {
     "title": "Zona de perigo",
+    "changeBackendUrl": {
+      "title": "Alterar URL do backend",
+      "subtitle": "Altere a URL do servidor backend.",
+      "inputDialog": {
+        "title": "URL do servidor backend",
+        "message": "Digite a URL do servidor backend. O valor padrão é \"$defaultBackendUrl\"."
+      }
+    },
     "deleteAccount": {
       "title": "Excluir sua conta",
       "subtitle": "Exclua sua conta e todos os seus dados sincronizados."

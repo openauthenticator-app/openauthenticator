@@ -1,0 +1,22 @@
+{
+  "confirmActionPickerDialog": {
+    "title": "What do you want to do ?",
+    "confirm": {
+      "title": "Confirm your account",
+      "subtitle": "Paste the code you received by email to confirm your account."
+    },
+    "cancelConfirmation": {
+      "title": "Cancel account confirmation",
+      "subtitle": "Cancel your account confirmation.",
+      "validationDialog": {
+        "title": "Confirmation",
+        "message": "Are you sure ?"
+      }
+    }
+  },
+  "success": "Email confirmed with success.",
+  "codeDialog": {
+    "title": "Confirmation code",
+    "message": "Either visit the link with this device or paste the code below to confirm your email address."
+  }
+}

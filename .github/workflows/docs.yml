@@ -1,0 +1,32 @@
+name: Trigger docs build
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - lib/i18n/**
+      - pubspec.yaml
+  pull_request:
+    branches:
+      - main
+      - master
+    paths:
+      - docs/**
+      - lib/i18n/**
+      - pubspec.yaml
+
+jobs:
+  dispatch:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+    steps:
+      - name: Dispatch 👋
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.DOCS_DISPATCH_TOKEN }}
+          repository: openauthenticator-app/docs
+          event-type: app-updated

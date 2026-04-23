@@ -1,14 +1,7 @@
 {
-  "common": {
-    "goToSettings": "Zu den Einstellungen"
-  },
   "android": {
     "signInTitle": "Authentifizierung erforderlich",
     "signInHint": "Identität bestätigen"
-  },
-  "methodChannel": {
-    "title": "Authentifizierung erforderlich",
-    "wrongPassword": "Falsches Passwort. Versuchen Sie es erneut."
   },
   "fallbackMessage": "Beim Überprüfen der lokalen Authentifizierung auf Ihrem Gerät ist ein Fehler aufgetreten. Bitte geben Sie unten Ihr Master-Passwort ein, um fortzufahren und die lokale Authentifizierung zu deaktivieren."
 }

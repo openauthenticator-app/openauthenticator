@@ -1,8 +1,9 @@
 [Desktop Entry]
 Name=Open Authenticator
 Comment=A cross-platform OTP app, free and open-source
-Exec=open_authenticator
+Exec=open_authenticator %u
 Icon=app.openauthenticator.OpenAuthenticator
 Terminal=false
 Type=Application
 Categories=Utility;Security;
+MimeType=x-scheme-handler/openauthenticator;x-scheme-handler/otpauth;x-scheme-handler/rc-653ef11675;

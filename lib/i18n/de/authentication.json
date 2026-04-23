@@ -5,7 +5,6 @@
   },
   "logIn": {
     "waitingLoginMessage": "Bitte melden Sie sich im geöffneten Fenster an. Bitte schließen Sie die Anwendung nicht.",
-    "waitingConfirmationMessage": "Wir haben Ihnen einen Bestätigungslink per E-Mail geschickt. Bitte klicken Sie darauf, um fortzufahren. Bitte schließen Sie die Anwendung nicht.",
     "successNeedConfirmation": "Erfolgreich! Sie erhalten in Kürze eine Bestätigungs-E-Mail. Bitte klicken Sie auf den Link auf diesem Gerät, um sich anzumelden.",
     "success": "Erfolgreich angemeldet!"
   },
@@ -21,7 +20,7 @@
     "title": "Konto löschen",
     "message": "Möchten Sie Ihr Konto wirklich löschen? Bitte beachten Sie, dass wir eine erneute Authentifizierung verlangen, da es sich um eine sensible Aktion handelt."
   },
-  "firebaseAuthenticationProvider": {
+  "authenticationProvider(map)": {
     "email": {
       "name": "E-Mail",
       "description": "Verwenden Sie Ihre E-Mail zur Anmeldung. Es ist kein Passwort erforderlich, ein Bestätigungslink wird Ihnen per E-Mail zugesandt."
@@ -61,6 +60,14 @@
       "button": "Senden Sie einen Link"
     },
     "separator": "Oder:"
+  },
+  "invalidSessionDialog": {
+    "title": "Ungültige Sitzung",
+    "message": "Ihre Sitzung ist entweder abgelaufen oder ungültig. Bitte melden Sie sich erneut an, um Ihre TOTPs zu synchronisieren.",
+    "button": {
+      "logIn": "Anmeldung",
+      "logOut": "Abmelden"
+    }
   },
   "providerPickerDialogTitle": "Wählen Sie eine Anmeldemethode"
 }

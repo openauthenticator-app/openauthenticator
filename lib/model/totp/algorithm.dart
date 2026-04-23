@@ -10,7 +10,8 @@ enum Algorithm {
   sha256(hashlib.sha256),
 
   /// The SHA512 algorithm.
-  sha512(hashlib.sha512);
+  sha512(hashlib.sha512)
+  ;
 
   /// The corresponding [totp_lib.Algorithm] enum entry.
   final hashlib.BlockHashBase mapsTo;
@@ -19,5 +20,8 @@ enum Algorithm {
   const Algorithm(this.mapsTo);
 
   /// Tries to convert the given [string] to an [Algorithm].
-  static Algorithm? fromString(String string) => Algorithm.values.firstWhereOrNull((algorithm) => algorithm.name.toLowerCase() == string);
+  static Algorithm? fromString(String string) {
+    String normalized = string.toLowerCase();
+    return Algorithm.values.firstWhereOrNull((algorithm) => algorithm.name.toLowerCase() == normalized);
+  }
 }

@@ -8,20 +8,19 @@
     "title": "Synchronisieren Sie Ihre TOTPs",
     "firstParagraph": "Klicken Sie unten auf „Anmelden“, um Ihre TOTPs zwischen Ihren Geräten zu synchronisieren.",
     "secondParagraph": "Dieser Vorgang ist vollkommen freiwillig.",
-    "thirdParagraph": "Beachten Sie, dass wir Sie bei Aktivierung dieser Option auf $limit TOTPs beschränken müssen, um eine übermäßige Serverauslastung zu verhindern.",
+    "thirdParagraph": "Beachten Sie, dass wir, wenn Sie diese Option aktivieren, die Anzahl Ihrer TOTPs begrenzen müssen, um eine übermäßige Servernutzung zu verhindern.",
     "fourthParagraph": "Dieses Limit kann jederzeit aufgehoben werden, indem Sie in den $app-Einstellungen den Mitwirkender-Plan abonnieren.",
     "button": {
       "loggedOut": "Einloggen",
-      "verifyEmail": "E-Mail-Adresse bestätigen",
       "loggedIn": "Erfolgreich eingeloggt",
-      "error": "Authentifizierung nicht möglich"
+      "confirmEmail": "E-Mail bestätigen"
     }
   },
   "password": {
     "title": "Schützen Sie Ihre Daten",
     "firstParagraph": "Um die Sicherheit Ihrer Daten zu gewährleisten, müssen Sie ein Master-Passwort festlegen.",
     "secondParagraph": "Dieses Passwort wird verwendet, um Ihre Daten zu verschlüsseln, und wird niemals an einen entfernten Server gesendet.",
-    "thirdParagraph": "Falls Sie es vergessen, können wir es nicht wiederherstellen. Bewahren Sie es daher an einem sicheren Ort auf."
+    "thirdParagraph": "Sie es vergessen, können wir es nicht wiederherstellen. Bewahren Sie es daher an einem sicheren Ort auf."
   },
   "button": {
     "next": "Weiter",

@@ -1,12 +1,15 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:forui/forui.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/app_unlock/reason.dart';
 import 'package:open_authenticator/model/settings/app_unlock_method.dart';
 import 'package:open_authenticator/model/totp/repository.dart';
 import 'package:open_authenticator/utils/form_label.dart';
 import 'package:open_authenticator/utils/result.dart';
+import 'package:open_authenticator/widgets/button_text.dart';
+import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
 import 'package:open_authenticator/widgets/form/master_password_form.dart';
 import 'package:open_authenticator/widgets/form/password_form_field.dart';
@@ -31,9 +34,9 @@ class MasterPasswordUtils {
         return const ResultCancelled();
       }
     }
-    _ChangeMasterPasswordDialogResult? result = await showDialog<_ChangeMasterPasswordDialogResult>(
+    _ChangeMasterPasswordDialogResult? result = await showFDialog<_ChangeMasterPasswordDialogResult>(
       context: context,
-      builder: (context) => _ChangeMasterPasswordDialog(
+      builder: (context, style, animation) => _ChangeMasterPasswordDialog(
         defaultPassword: password,
       ),
     );
@@ -45,7 +48,7 @@ class MasterPasswordUtils {
       future: ref.read(totpRepositoryProvider.notifier).changeMasterPassword(result.newPassword!, backupPassword: result.backupPassword),
     );
     if (context.mounted) {
-      context.showSnackBarForResult(changeResult);
+      context.handleResult(changeResult);
     }
     return changeResult;
   }
@@ -79,27 +82,34 @@ class _ChangeMasterPasswordDialogState extends ConsumerState<_ChangeMasterPasswo
   /// The backup password form key.
   final GlobalKey<FormState> backupPasswordFormKey = GlobalKey<FormState>();
 
-  /// The backup password.
-  String? backupPassword;
+  /// The backup password text editing controller.
+  late final TextEditingController backupPasswordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) => AppDialog(
     title: Text(translations.masterPassword.changeDialog.title),
     actions: [
-      TextButton(
-        onPressed: () async {
+      ClickableButton(
+        onPress: () async {
           if (!newPasswordFormKey.currentState!.validate() || (createBackup && !backupPasswordFormKey.currentState!.validate())) {
             return;
           }
           if (context.mounted) {
-            Navigator.pop(context, _ChangeMasterPasswordDialogResult(newPassword: newPassword, backupPassword: createBackup ? backupPassword : null));
+            Navigator.pop(
+              context,
+              _ChangeMasterPasswordDialogResult(
+                newPassword: newPassword,
+                backupPassword: createBackup ? backupPasswordController.text : null,
+              ),
+            );
           }
         },
-        child: Text(MaterialLocalizations.of(context).continueButtonLabel),
+        child: ButtonText(MaterialLocalizations.of(context).continueButtonLabel),
       ),
-      TextButton(
-        onPressed: () => Navigator.pop(context),
-        child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+      ClickableButton(
+        variant: .secondary,
+        onPress: () => Navigator.pop(context),
+        child: ButtonText(MaterialLocalizations.of(context).cancelButtonLabel),
       ),
     ],
     children: [
@@ -109,36 +119,39 @@ class _ChangeMasterPasswordDialogState extends ConsumerState<_ChangeMasterPasswo
         inputText: translations.masterPassword.changeDialog.newLabel,
         onChanged: (value) => newPassword = value ?? '',
       ),
-      ListTile(
-        title: Text(translations.miscellaneous.backupCheckbox.checkbox),
-        contentPadding: EdgeInsets.zero,
-        trailing: Checkbox(
-          value: createBackup,
-          onChanged: (value) {
-            setState(() => createBackup = value ?? !createBackup);
-          },
-        ),
+      FCheckbox(
+        label: Text(translations.miscellaneous.backupCheckbox.checkbox),
+        value: createBackup,
+        onChange: (value) {
+          setState(() => createBackup = value);
+        },
       ),
       if (createBackup)
         Form(
           key: backupPasswordFormKey,
           child: PasswordFormField(
-            initialValue: backupPassword,
-            onChanged: (value) => backupPassword = value,
+            control: .managed(controller: backupPasswordController),
             validator: isBackupPasswordValid,
-            decoration: FormLabelWithIcon(
-              icon: Icons.save,
+            label: FormLabelWithIcon(
+              icon: FIcons.save,
               text: translations.miscellaneous.backupCheckbox.input.text,
-              hintText: translations.miscellaneous.backupCheckbox.input.hint,
             ),
+            hint: translations.miscellaneous.backupCheckbox.input.hint,
           ),
         ),
     ],
   );
 
+  @override
+  void dispose() {
+    backupPasswordController.dispose();
+    super.dispose();
+  }
+
   /// Checks whether the backup password is valid.
   String? isBackupPasswordValid(String? value) {
-    if (createBackup && (backupPassword == null || backupPassword!.isEmpty)) {
+    value ??= backupPasswordController.text;
+    if (createBackup && value.isEmpty) {
       return translations.error.validation.empty;
     }
     return null;

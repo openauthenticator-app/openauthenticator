@@ -1,5 +1,16 @@
 {
-  "noError": "Sucesso!",
+  "noError": "Operação realizada com sucesso.",
+  "widget": {
+    "title": "Erro",
+    "stackTrace": {
+      "show": "Mostrar a pilha",
+      "hide": "Ocultar a pilha"
+    },
+    "button": {
+      "report": "Reportar",
+      "retry": "Tentar novamente"
+    }
+  },
   "validation": {
     "number": "Você deve inserir um número válido",
     "empty": "Este campo é obrigatório",
@@ -7,49 +18,88 @@
     "secret": "Segredo inválido inserido",
     "totpDigits": "Este número deve ser maior ou igual a 6",
     "masterPassword": "Senha inválida inserida",
-    "confirmation": "A confirmação não corresponde"
+    "confirmation": "A confirmação não corresponde",
+    "url": "URL inválida"
   },
-  "timeout": {
-    "generic": "Tempo limite excedido. Tente novamente mais tarde.",
-    "authentication": "Tempo limite excedido ao fazer login com o provedor selecionado. Tente novamente.",
-    "unlink": "Tempo limite excedido ao tentar desvincular sua conta deste provedor de autenticação. Tente novamente.",
-    "contributorPlan": "Tempo limite excedido ao aguardar a compra da sua assinatura do Plano Contributor. Tente novamente."
-  },
-  "appUnlock": "Falha ao desbloquear o aplicativo. Tente novamente.",
   "generic": {
-    "noTryAgain": "Ops, algo deu errado.",
-    "tryAgain": "Algo deu errado. Tente novamente mais tarde.",
-    "withException": "Ocorreu um erro (exceção: $exception). Tente novamente mais tarde."
+    "noException": "Ops, algo deu errado.",
+    "withException": "Ocorreu um erro (exceção: $exception).",
+    "tryAgain": "Tente novamente mais tarde."
   },
-  "authentication": {
-    "accountExistsWithDifferentCredentialsDialog": {
-      "title": "Uma conta já existe",
-      "message": "Uma conta com o mesmo endereço de e-mail já existe em nosso banco de dados, mas o provedor de autenticação selecionado ainda não foi vinculado a ela.\nTente fazer login usando um provedor de autenticação já vinculado."
-    },
-    "invalidCredential": "Credenciais inválidas fornecidas.",
-    "operationNotAllowed": "Operação não permitida. Isso não deveria acontecer, por favor, reporte este erro.",
-    "userDisabled": "Sua conta foi desativada.",
-    "firebaseException": "Ocorreu um erro ao tentar autenticar sua conta (exceção: $exception). Tente novamente mais tarde."
+  "backup": {
+    "fileDoesNotExist": "O arquivo de backup não existe: $path.",
+    "invalidPassword": "Senha mestra inválida inserida.",
+    "invalidContent": "Conteúdo inválido.",
+    "crypto": "Ocorreu um erro de criptografia."
+  },
+  "appUnlock": {
+    "generic": "Falha ao desbloquear a aplicação. Tente novamente.",
+    "localAuthenticationDeviceNotSupported": "Falha ao desbloquear a aplicação porque seu dispositivo não é suportado por autenticação local. Desative esta método com o botão abaixo.",
+    "noPasswordVerificationMethodAvailable": "Falha ao desbloquear a aplicação com sua senha porque as informações da aplicação foram alteradas. Altere sua senha mestra para continuar.\nNota que seus TOTPs serão descriptografados manualmente."
+  },
+  "backend": {
+    "invalidJsonResponse": "Resposta inválida do $route (HTTP $statusCode) : $body.",
+    "noEmailToConfirm": "Nenhum e-mail para confirmar.",
+    "invalidSession": "Sua sessão é inválida. Tente novamente para fazer login.",
+    "noSession": "Você deve estar logado para prosseguir.",
+    "emailAlreadySent": "Um e-mail já foi enviado para este endereço. Verifique sua caixa de entrada ou tente novamente em alguns minutos.",
+    "noCancelCode": "Nenhum código de cancelamento foi fornecido pelo servidor. Isso não é normal. Tente novamente mais tarde.",
+    "expiredSession": "Sua sessão expirou. Tente novamente para fazer login.",
+    "invalidPayload": "Seu payload é inválido. Tente novamente mais tarde.",
+    "invalidToken": "Seu token é inválido. Tente novamente para fazer login.",
+    "invalidVerificationCode": "Seu código de verificação é inválido.",
+    "invalidAppVersion": "Sua versão da aplicação é inválida. Atualize para a última versão.",
+    "invalidBackendUrl": "URL do servidor backend inválida.",
+    "providerUserAlreadyExists": "Um usuário com o mesmo provedor já existe, portanto não é possível associá-lo ao seu conta."
   },
   "scan": {
     "noUri": "Falha ao ler este código QR. Certifique-se de que é um código QR TOTP válido.",
-    "accessDeniedDialog": {
-      "title": "Acesso negado",
-      "message": "Falha ao acessar sua câmera (acesso negado: $exception). Deseja tentar novamente?"
-    },
+    "accessDenied": "Falha ao acessar sua câmera (acesso negado: $exception).",
     "controllerUninitialized": "Controlador não inicializado (código: $exception).",
     "unsupported": "A digitalização não é suportada neste dispositivo (código: $exception)."
   },
-  "storageMigration(map)": {
+  "storageMigration": {
+    "getTotps": "Ocorreu um erro ao obter seus TOTPs remotos. Tente novamente mais tarde.",
     "backupError": "Ocorreu um erro ao fazer o backup. Tente novamente.",
+    "anotherDeletedTotpPolicyShouldBeUsed": "Outra política de TOTP excluída deve ser usada.",
     "currentStoragePasswordMismatch": "Senha mestra inválida inserida.",
-    "encryptionKeyChangeFailed": "Ocorreu um erro ao criptografar seus dados. Tente novamente mais tarde.",
-    "genericError": "Ocorreu um erro ao migrar seus dados. Tente novamente mais tarde."
+    "generic": "Ocorreu um erro ao migrar seus dados. Tente novamente mais tarde."
   },
-  "authenticationValidation": {
-    "incorrectPath": "Algo deu errado (o caminho é '$path'). Por favor, reporte este erro.",
-    "generic": "Não foi possível validar a solicitação (exceção: $exception). Tente novamente mais tarde.",
-    "oauth2": "Não foi possível fazer login usando $name. Tente novamente mais tarde."
+  "revenueCat": {
+    "noClient": "Nenhum cliente RevenueCat disponível.",
+    "cannotRestorePurchases": "Este cliente RevenueCat não pode restaurar compras."
   },
-  "totpDecrypt": "Falha ao descriptografar este TOTP. Certifique-se de que inseriu a senha correta."
+  "totp": {
+    "create": "Este TOTP não pode ser criado.",
+    "decrypt": "Falha ao descriptografar este TOTP. Certifique-se de que você tenha inserido a senha correta.",
+    "changeCryptoStore": {
+      "noCryptoStore": "Não foi possível obter o armazenamento de criptografia atual. Feche e abra novamente a aplicação.",
+      "generic": "Falha ao criptografar este TOTP com o armazenamento de criptografia atual."
+    }
+  },
+  "pushOperationErrorKind": {
+    "invalidUuid": "ID da operação inválido.",
+    "invalidTotp": "Dados TOTP inválidos.",
+    "invalidUpdateTimestamp": "Data de atualização inválida.",
+    "deletedTotp": "Este TOTP já foi excluído.",
+    "invalidDeleteTimestamp": "Data de exclusão inválida.",
+    "maxOperationsCountExceeded": "Muitas alterações pendentes.",
+    "tooManyTotps": "Limite de TOTP atingido.",
+    "genericError": "Sincronização falhou."
+  },
+  "passwordMismatch": "A senha do armazenamento de criptografia está incorreta.",
+  "migrator": {
+    "message": "Ocorreu um erro ao migrar os seus dados. Por favor, tente novamente.",
+    "noFirebaseUser": "Nenhum utilizador Firebase disponível. Por favor, tente novamente mais tarde ou contacte-nos.",
+    "idToken": "Não foi possível obter o token de identificação. Tente novamente mais tarde.",
+    "httpError": "Migração falhou. Erro HTTP $statusCode : $body.",
+    "migrationCancelled": "Migração cancelada.",
+    "firebaseUserNotFound": "Utilizador Firebase não encontrado. Por favor, contacte-nos.",
+    "invalidIdToken": "Token de ID inválido. Por favor, contacte-nos.",
+    "invalidUserId": "ID de utilizador inválido. Por favor, contacte-nos.",
+    "userAlreadyMigrated": "A sua conta foi migrada com sucesso anteriormente. Por favor, inicie sessão com as suas credenciais.",
+    "noSupportedAuthenticationProvider": "Não conseguimos encontrar nenhum fornecedor de autenticação suportado. Por favor, contacte-nos.",
+    "userWithProviderIdAlreadyExists": "Já existe um utilizador com o mesmo ID de fornecedor, pelo que não é possível migrar a sua conta com as suas credenciais atuais. Por favor, contacte-nos.",
+    "userCreationFailed": "Ocorreu un erro ao criar a sua conta. Por favor, contacte-nos."
+  }
 }

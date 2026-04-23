@@ -1,31 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:forui/forui.dart';
 import 'package:open_authenticator/model/purchases/contributor_plan.dart';
-import 'package:open_authenticator/widgets/form/dropdown_list_tile.dart';
 
 /// Allows to change the Contributor Plan state for debugging purposes.
-class ContributorPlanStateEntryWidget extends ConsumerWidget {
+class ContributorPlanStateSettingsEntryWidget extends ConsumerWidget with FTileMixin {
   /// Creates a new Contributor Plan state entry widget instance.
-  const ContributorPlanStateEntryWidget({
+  const ContributorPlanStateSettingsEntryWidget({
     super.key,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     AsyncValue<ContributorPlanState> state = ref.watch(contributorPlanStateProvider);
-    return DropdownListTile(
-      leading: const Icon(Icons.bug_report),
+    return FSelectMenuTile<ContributorPlanState>.fromMap(
+      {
+        for (ContributorPlanState state in ContributorPlanState.values) state.name: state,
+      },
+      selectControl: FMultiValueControl.managedRadio(
+        initial: state.value ?? ContributorPlanState.impossible,
+        onChange: (choices) => ref.read(contributorPlanStateProvider.notifier).debugChangeState(choices.first),
+      ),
       enabled: state.hasValue,
+      prefix: const Icon(FIcons.bug),
       title: const Text('Contributor Plan state'),
-      value: state.value,
-      choices: [
-        for (ContributorPlanState state in ContributorPlanState.values)
-          DropdownListTileChoice(
-            title: state.name,
-            value: state,
-          ),
-      ],
-      onChoiceSelected: (choice) => ref.read(contributorPlanStateProvider.notifier).debugChangeState(choice.value),
+      subtitle: const Text('Change the Contributor Plan state for debugging purposes.'),
+      detailsBuilder: (_, values, _) => Text(values.first.name),
     );
   }
 }

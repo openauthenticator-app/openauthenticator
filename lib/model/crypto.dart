@@ -1,17 +1,19 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:typed_data';
 
+import 'package:cipherlib/cipherlib.dart';
+import 'package:cipherlib/random.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hashlib/hashlib.dart';
 import 'package:open_authenticator/app.dart';
-import 'package:open_authenticator/model/app_unlock/method.dart';
+import 'package:open_authenticator/i18n/localizable_exception.dart';
+import 'package:open_authenticator/i18n/translations.g.dart';
+import 'package:open_authenticator/model/app_unlock/methods/method.dart';
 import 'package:open_authenticator/model/password_verification/methods/password_signature.dart';
 import 'package:open_authenticator/model/settings/app_unlock_method.dart';
 import 'package:open_authenticator/utils/utils.dart';
 import 'package:simple_secure_storage/simple_secure_storage.dart';
-import 'package:webcrypto/webcrypto.dart';
 
 /// The crypto store provider.
 final cryptoStoreProvider = AsyncNotifierProvider<StoredCryptoStore, CryptoStore?>(StoredCryptoStore.new);
@@ -34,7 +36,7 @@ class StoredCryptoStore extends AsyncNotifier<CryptoStore?> {
     }
 
     return CryptoStore._(
-      key: await AesGcmSecretKey.importRawKey(base64.decode(derivedKey)),
+      key: base64.decode(derivedKey),
       salt: salt,
     );
   }
@@ -48,27 +50,31 @@ class StoredCryptoStore extends AsyncNotifier<CryptoStore?> {
   }
 
   /// Uses the [cryptoStore] as [state].
-  void use(CryptoStore cryptoStore) => state = AsyncData(cryptoStore);
+  void use(CryptoStore cryptoStore) {
+    if (ref.mounted) {
+      state = AsyncData(cryptoStore);
+    }
+  }
 
   /// Changes the current crypto store password, preserving the current salt if possible.
   Future<CryptoStore> changeCryptoStore(String newPassword, {CryptoStore? newCryptoStore, bool checkSettings = true}) async {
     Salt? salt = newCryptoStore?.salt;
     if (salt == null) {
       CryptoStore? currentCryptoStore = await future;
-      salt = currentCryptoStore?.salt ?? (await Salt.generate());
+      salt = currentCryptoStore?.salt ?? Salt.generate();
     }
     if (newCryptoStore == null) {
-      newCryptoStore = await CryptoStore.fromPassword(newPassword, salt);
+      newCryptoStore = CryptoStore.fromPassword(newPassword, salt);
     } else {
-      if (!(await newCryptoStore.checkPasswordValidity(newPassword))) {
-        throw Exception('Password mismatch.');
+      if (!(newCryptoStore.checkPasswordValidity(newPassword))) {
+        throw _PasswordMismatchException();
       }
     }
-    Future<void> saveCryptoStoreOnLocalStorage() async => await SimpleSecureStorage.write(_kPasswordDerivedKeyKey, base64.encode(await newCryptoStore!.key.exportRawKey()));
+    Future<void> saveCryptoStoreOnLocalStorage() async => await SimpleSecureStorage.write(_kPasswordDerivedKeyKey, base64.encode(newCryptoStore!.key));
     await salt.saveToLocalStorage();
     if (checkSettings) {
-      AppUnlockMethod unlockMethod = await ref.read(appUnlockMethodSettingsEntryProvider.future);
-      if (unlockMethod is MasterPasswordAppUnlockMethod) {
+      String unlockMethod = await ref.read(appUnlockMethodSettingsEntryProvider.future);
+      if (unlockMethod == MasterPasswordAppUnlockMethod.kMethodId) {
         await ref.read(passwordSignatureVerificationMethodProvider.notifier).enable(newPassword);
       } else {
         await saveCryptoStoreOnLocalStorage();
@@ -90,7 +96,8 @@ class CryptoStore {
   static const int _initializationVectorLength = 96 ~/ 8;
 
   /// The key instance.
-  final AesGcmSecretKey key;
+  @visibleForTesting
+  final Uint8List key;
 
   /// The salt.
   final Salt salt;
@@ -102,17 +109,14 @@ class CryptoStore {
   });
 
   /// Creates a [CryptoStoreWithPasswordSignature] from the given [password].
-  static Future<CryptoStore> fromPassword(String password, Salt salt) async {
-    Uint8List derivedKey = await _deriveKey(password, salt);
-    return CryptoStore._(
-      key: await AesGcmSecretKey.importRawKey(derivedKey),
+  CryptoStore.fromPassword(String password, Salt salt) : this._(
+      key: _deriveKey(password, salt),
       salt: salt,
     );
-  }
 
   /// Generates a derived key from the given [password] and save it to the device secure storage.
   /// Also returns the salt that has been used.
-  static Future<Uint8List> _deriveKey(String password, Salt salt) async {
+  static Uint8List _deriveKey(String password, Salt salt) {
     Argon2 argon2 = Argon2(
       iterations: Argon2Parameters.iterations,
       memorySizeKB: Argon2Parameters.memorySize,
@@ -123,35 +127,33 @@ class CryptoStore {
   }
 
   /// Encrypts the given text.
-  Future<Uint8List?> encrypt(String text) async {
-    Uint8List initializationVector = Uint8List(_initializationVectorLength);
-    fillRandomBytes(initializationVector);
-    Uint8List data = utf8.encode(text);
+  Uint8List? encrypt(String text) {
+    Uint8List initializationVector = randomBytes(_initializationVectorLength);
     return Uint8List.fromList([
       ...initializationVector,
-      ...await key.encryptBytes(data, initializationVector),
+      ...AES(key).gcm(initializationVector).encryptString(text, utf8),
     ]);
   }
 
   /// Decrypts the given bytes.
   /// Returns `null` if not possible.
-  Future<String?> decrypt(Uint8List encryptedData) async {
+  String? decrypt(Uint8List encryptedData) {
     try {
       Uint8List initializationVector = encryptedData.sublist(0, _initializationVectorLength);
       Uint8List encryptedBytes = encryptedData.sublist(_initializationVectorLength);
-      return utf8.decode(await key.decryptBytes(encryptedBytes, initializationVector));
-    } catch (ex, stacktrace) {
-      if (ex.toString() != 'error:1e000065:Cipher functions:OPENSSL_internal:BAD_DECRYPT') {
-        handleException(ex, stacktrace);
+      return utf8.decode(AES(key).gcm(initializationVector).decrypt(encryptedBytes));
+    } catch (ex, stackTrace) {
+      if (ex is! StateError) {
+        handleException(ex, stackTrace);
       }
     }
     return null;
   }
 
   /// Checks if the given password is valid.
-  Future<bool> checkPasswordValidity(String password) async {
-    Uint8List derivedKey = await _deriveKey(password, salt);
-    return memEquals(derivedKey, await key.exportRawKey());
+  bool checkPasswordValidity(String password) {
+    Uint8List derivedKey = _deriveKey(password, salt);
+    return memEquals(derivedKey, key);
   }
 
   /// Checks if the given [encryptedData] could be decrypted using [decrypt].
@@ -159,7 +161,10 @@ class CryptoStore {
   /// The authentication tag doesn't seems to be accessible, BUT it should be checked
   /// before any decryption. So, if the validation fails, then the decryption exits immediately.
   /// The caveat is, if it works, then the whole data has to be proceeded.
-  Future<bool> canDecrypt(Uint8List encryptedData) async => await decrypt(encryptedData) != null;
+  bool canDecrypt(Uint8List encryptedData) => decrypt(encryptedData) != null;
+
+  /// Returns the HMAC secret key corresponding to the [key].
+  MACHashBase createHmacKey() => sha256.hmac.by(key);
 }
 
 /// Represents a decoded salt.
@@ -190,13 +195,9 @@ class Salt {
   }
 
   /// Generates a random salt.
-  static Future<Salt> generate() async {
-    Uint8List salt = Uint8List(_saltLength);
-    fillRandomBytes(salt);
-    return Salt.fromRawValue(
-      value: salt,
-    );
-  }
+  static Salt generate() => Salt.fromRawValue(
+    value: randomBytes(_saltLength),
+  );
 
   /// Deletes the salt from local storage.
   static Future<void> deleteFromLocalStorage() async => await SimpleSecureStorage.delete(_kPasswordDerivedKeySaltKey);
@@ -206,4 +207,13 @@ class Salt {
 
   @override
   String toString() => base64.encode(value);
+}
+
+/// Thrown when the password entered for a new crypto store is incorrect.
+class _PasswordMismatchException extends LocalizableException {
+  /// Creates a new password mismatch exception instance.
+  _PasswordMismatchException()
+    : super(
+        localizedErrorMessage: translations.error.passwordMismatch,
+      );
 }

@@ -5,7 +5,6 @@
   },
   "logIn": {
     "waitingLoginMessage": "Effettua l'accesso nella finestra aperta. Non chiudere l'applicazione.",
-    "waitingConfirmationMessage": "Ti abbiamo inviato un link di conferma via email. Utilizzalo per continuare. Non chiudere l'applicazione.",
     "successNeedConfirmation": "Fatto! Riceverai presto un'email di conferma. Utilizza il link da questo dispositivo per effettuare l'accesso.",
     "success": "Accesso effettuato con successo!"
   },
@@ -21,7 +20,7 @@
     "title": "Elimina account",
     "message": "Vuoi davvero eliminare il tuo account? Nota che, trattandosi di un'azione sensibile, ti chiediamo di autenticarti nuovamente prima di procedere."
   },
-  "firebaseAuthenticationProvider": {
+  "authenticationProvider(map)": {
     "email": {
       "name": "Email",
       "description": "Usa la tua email per accedere. Non è richiesta password, verrà inviato un link di conferma."
@@ -61,6 +60,14 @@
       "button": "Invia un link"
     },
     "separator": "Oppure:"
+  },
+  "invalidSessionDialog": {
+    "title": "Sessione non valida",
+    "message": "La tua sessione è scaduta o non è valida. Effettua nuovamente l'accesso per sincronizzare i tuoi TOTP.",
+    "button": {
+      "logIn": "Accedi",
+      "logOut": "Esci"
+    }
   },
   "providerPickerDialogTitle": "Scegli un metodo di accesso"
 }

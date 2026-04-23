@@ -1,7 +1,7 @@
 {
-  "subscribe": {
-    "waitingDialogMessage": "En attente de votre paiement...",
-    "success": "Vous avez souscrit à l'Abonnement Contributeur avec succès. Merci beaucoup !"
+  "subscribeSuccess": {
+    "immediate": "Vous vous êtes abonné avec succès à l'Abonnement Contributeur. Merci beaucoup !",
+    "delayed": "L'achat a réussi ! Vous devrez peut-être attendre quelques minutes ou redémarrer l'application."
   },
   "fallbackPaywall": {
     "title(rich)": "Abonnement ${title(Contributeur)}",
@@ -21,13 +21,14 @@
         "annual": "An",
         "monthly": "Mois"
       },
-      "priceSubtitle(rich)": "$subtitle\n$price / $interval.",
+      "price(rich)": "$price / $interval",
       "subtitle(map)": {
         "annual": "Une facturation par an.",
         "monthly": "Une facturation par mois."
       }
     },
     "button": {
+      "subscribed": "Abonnement effectué !",
       "privacyPolicy": "Politique de confidentialité",
       "termsOfService": "Conditions d'utilisation",
       "restorePurchases": "Restaurer les achats"

@@ -1,0 +1,8 @@
+{
+  "title": "Willkommen zurück!",
+  "message": "Die App wurde auf eine brandneue Version aktualisiert. Bitte erwägen Sie, Ihre TOTPs zu migrieren, um sie weiterhin verwenden zu können. Wenn Sie angemeldet waren, wird Ihr Konto ebenfalls während dieses Vorgangs migriert.",
+  "button": {
+    "migrate": "Migrieren",
+    "dontMigrate": "Nicht migrieren"
+  }
+}

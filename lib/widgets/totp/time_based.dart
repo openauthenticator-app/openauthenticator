@@ -32,9 +32,13 @@ abstract class TimeBasedTotpWidgetState<T extends TimeBasedTotpWidget> extends S
   @override
   void didUpdateWidget(covariant T oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.totp.validity != widget.totp.validity) {
-      _cancelUpdates();
-      _scheduleUpdates();
+    if (oldWidget.totp != widget.totp) {
+      if (oldWidget.totp.validity != widget.totp.validity) {
+        _cancelUpdates();
+        _scheduleUpdates();
+      } else {
+        onTotpChanged(oldWidget);
+      }
     }
   }
 
@@ -49,6 +53,10 @@ abstract class TimeBasedTotpWidgetState<T extends TimeBasedTotpWidget> extends S
 
   /// Triggered when the state should be updated.
   void updateState();
+
+  /// Triggered when the TOTP changes.
+  @protected
+  void onTotpChanged(covariant T oldWidget) => updateState();
 
   /// Schedule the updates.
   void _scheduleUpdates() {

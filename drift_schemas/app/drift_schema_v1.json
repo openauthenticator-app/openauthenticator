@@ -1,0 +1,157 @@
+{
+  "_meta": {
+    "description": "This file contains a serialized version of schema entities for drift.",
+    "version": "1.3.0"
+  },
+  "options": {
+    "store_date_time_values_as_text": false
+  },
+  "entities": [
+    {
+      "id": 0,
+      "references": [],
+      "type": "table",
+      "data": {
+        "name": "totps",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "uuid",
+            "getter_name": "uuid",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "secret",
+            "getter_name": "secret",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [],
+            "type_converter": {
+              "dart_expr": "const _Uint8ListConverter()",
+              "dart_type_name": "Uint8List"
+            }
+          },
+          {
+            "name": "label",
+            "getter_name": "label",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [],
+            "type_converter": {
+              "dart_expr": "const _Uint8ListConverter()",
+              "dart_type_name": "Uint8List"
+            }
+          },
+          {
+            "name": "issuer",
+            "getter_name": "issuer",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [],
+            "type_converter": {
+              "dart_expr": "const _Uint8ListConverter()",
+              "dart_type_name": "Uint8List"
+            }
+          },
+          {
+            "name": "algorithm",
+            "getter_name": "algorithm",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [],
+            "type_converter": {
+              "dart_expr": "const EnumNameConverter<Algorithm>(Algorithm.values)",
+              "dart_type_name": "Algorithm"
+            }
+          },
+          {
+            "name": "digits",
+            "getter_name": "digits",
+            "moor_type": "int",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "validity",
+            "getter_name": "validity",
+            "moor_type": "int",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [],
+            "type_converter": {
+              "dart_expr": "const _DurationConverter()",
+              "dart_type_name": "Duration"
+            }
+          },
+          {
+            "name": "image_url",
+            "getter_name": "imageUrl",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [],
+            "type_converter": {
+              "dart_expr": "const _Uint8ListConverter()",
+              "dart_type_name": "Uint8List"
+            }
+          },
+          {
+            "name": "encryption_salt",
+            "getter_name": "encryptionSalt",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [],
+            "type_converter": {
+              "dart_expr": "const _Uint8ListConverter()",
+              "dart_type_name": "Uint8List"
+            }
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [],
+        "explicit_pk": [
+          "uuid"
+        ]
+      }
+    }
+  ],
+  "fixed_sql": [
+    {
+      "name": "totps",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TABLE IF NOT EXISTS \"totps\" (\"uuid\" TEXT NOT NULL, \"secret\" TEXT NOT NULL, \"label\" TEXT NULL, \"issuer\" TEXT NULL, \"algorithm\" TEXT NULL, \"digits\" INTEGER NULL, \"validity\" INTEGER NULL, \"image_url\" TEXT NULL, \"encryption_salt\" TEXT NOT NULL, PRIMARY KEY (\"uuid\"));"
+        }
+      ]
+    }
+  ]
+}

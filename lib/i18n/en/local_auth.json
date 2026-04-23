@@ -1,14 +1,7 @@
 {
-  "common": {
-    "goToSettings": "Go to settings"
-  },
   "android": {
     "signInTitle": "Authentication required",
     "signInHint": "Verify identity"
-  },
-  "methodChannel": {
-    "title": "Authentication required",
-    "wrongPassword": "Wrong password. Try again."
   },
   "fallbackMessage": "An error occurred while checking for local authentication on your device. Please enter your master password below to proceed and to disable local authentication as well."
 }

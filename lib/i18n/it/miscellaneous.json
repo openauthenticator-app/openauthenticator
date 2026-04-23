@@ -1,8 +1,8 @@
 {
-  "waitingDialog": {
-    "defaultMessage": "Attendere prego...",
-    "countdown(rich)": "Tempo rimanente: $countdown."
-  },
+  "refreshUserInfo": "Aggiorna l'utente",
+  "disableTotpSync": "Devi prima disabilitare la sincronizzazione di TOTP.",
+  "urlCopiedToClipboard": "URL copiato negli appunti!",
+  "waitingDialogDefaultMessage": "Attendere prego...",
   "masterPasswordDialog": {
     "title": "Password principale",
     "message": "Inserisci la tua password principale per continuare."
@@ -14,5 +14,8 @@
       "hint": "Inserisci la password del backup"
     }
   },
-  "urlCopiedToClipboard": "URL copiato negli appunti!"
+  "toast": {
+    "success": "Successo",
+    "error": "Errore"
+  }
 }

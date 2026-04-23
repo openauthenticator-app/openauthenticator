@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:forui/forui.dart';
+import 'package:open_authenticator/utils/utils.dart';
 
 /// Allows to display the current progress of an operation.
 class StepProgressIndicator extends StatelessWidget {
@@ -24,28 +26,25 @@ class StepProgressIndicator extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
-    return SizedBox(
-      width: (steps - 1) * stepsSize + currentStepSize + 10 * steps,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          for (int i = 0; i < steps; i++)
-            if (i == currentStep - 1)
-              Container(
-                color: colorScheme.primary,
-                width: currentStepSize,
-                height: currentStepSize,
-              )
-            else
-              Container(
-                color: colorScheme.secondaryContainer,
-                width: stepsSize,
-                height: stepsSize,
-              ),
-        ],
-      ),
-    );
-  }
+  Widget build(BuildContext context) => SizedBox(
+    width: (steps - 1) * stepsSize + currentStepSize + 10 * steps,
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        for (int i = 0; i < steps; i++)
+          if (i == currentStep - 1)
+            Container(
+              color: context.theme.colors.primary,
+              width: currentStepSize,
+              height: currentStepSize,
+            )
+          else
+            Container(
+              color: context.theme.colors.secondary.highlight(amount: 0.25),
+              width: stepsSize,
+              height: stepsSize,
+            ),
+      ],
+    ),
+  );
 }

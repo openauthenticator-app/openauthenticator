@@ -24,8 +24,8 @@ class JovialSvgUtils {
       StringSvgParser(svg, [], siCompactBuilder, warn: (_) {}).parse();
       siCompactBuilder.si.writeToFile(outputSink);
       return true;
-    } catch (ex, stacktrace) {
-      handleException(ex, stacktrace, sendToCrashlytics: false);
+    } catch (ex, stackTrace) {
+      handleException(ex, stackTrace, sendToSentry: false);
     } finally {
       await ioSink.close();
     }

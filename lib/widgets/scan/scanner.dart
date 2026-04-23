@@ -47,7 +47,7 @@ class _QrCodeScannerState extends State<QrCodeScanner> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.sizeOf(context);
     Rect scanWindow = Rect.fromCenter(
-      center: MediaQuery.sizeOf(context).center(Offset.zero),
+      center: size.center(Offset.zero),
       width: math.min(200, size.width),
       height: math.min(200, size.height),
     );

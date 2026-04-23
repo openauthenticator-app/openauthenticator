@@ -1,13 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:forui/forui.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
-import 'package:open_authenticator/model/authentication/firebase_authentication.dart';
-import 'package:open_authenticator/model/authentication/providers/provider.dart';
-import 'package:open_authenticator/model/authentication/state.dart';
 import 'package:open_authenticator/pages/settings/entries/about.dart';
 import 'package:open_authenticator/pages/settings/entries/backup_now.dart';
 import 'package:open_authenticator/pages/settings/entries/cache_totp_pictures.dart';
+import 'package:open_authenticator/pages/settings/entries/change_backend_url.dart';
 import 'package:open_authenticator/pages/settings/entries/change_master_password.dart';
 import 'package:open_authenticator/pages/settings/entries/clear_data.dart';
 import 'package:open_authenticator/pages/settings/entries/confirm_email.dart';
@@ -18,17 +17,21 @@ import 'package:open_authenticator/pages/settings/entries/display_copy_button.da
 import 'package:open_authenticator/pages/settings/entries/display_search_button.dart';
 import 'package:open_authenticator/pages/settings/entries/enable_local_auth.dart';
 import 'package:open_authenticator/pages/settings/entries/github.dart';
-import 'package:open_authenticator/pages/settings/entries/link.dart';
+import 'package:open_authenticator/pages/settings/entries/link_input.dart';
+import 'package:open_authenticator/pages/settings/entries/link_provider.dart';
 import 'package:open_authenticator/pages/settings/entries/locale.dart';
 import 'package:open_authenticator/pages/settings/entries/log_in.dart';
 import 'package:open_authenticator/pages/settings/entries/manage_backups.dart';
-import 'package:open_authenticator/pages/settings/entries/refresh_id_token.dart';
+import 'package:open_authenticator/pages/settings/entries/migration_state.dart';
 import 'package:open_authenticator/pages/settings/entries/save_derived_key.dart';
 import 'package:open_authenticator/pages/settings/entries/show_intro_page.dart';
 import 'package:open_authenticator/pages/settings/entries/synchronize.dart';
 import 'package:open_authenticator/pages/settings/entries/theme.dart';
 import 'package:open_authenticator/pages/settings/entries/translate.dart';
+import 'package:open_authenticator/spacing.dart';
 import 'package:open_authenticator/utils/platform.dart';
+import 'package:open_authenticator/widgets/app_scaffold.dart';
+import 'package:open_authenticator/widgets/clickable.dart';
 
 /// Allows to configure the app.
 class SettingsPage extends ConsumerWidget {
@@ -41,104 +44,120 @@ class SettingsPage extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => Scaffold(
-    appBar: AppBar(
+  Widget build(BuildContext context, WidgetRef ref) => AppScaffold.scrollable(
+    header: FHeader.nested(
+      prefixes: [
+        ClickableHeaderAction.back(
+          onPress: () => Navigator.pop(context),
+        ),
+      ],
       title: Text(translations.settings.title),
     ),
-    body: Theme(
-      data: Theme.of(context).copyWith(
-        buttonTheme: const ButtonThemeData(
-          alignedDropdown: false,
+    children: [
+      Padding(
+        padding: const EdgeInsets.only(bottom: kSpace),
+        child: FTileGroup(
+          label: Text(translations.settings.application.title),
+          children: [
+            const ContributorPlanEntryWidget(),
+            const ThemeSettingsEntryWidget(),
+            CacheTotpPicturesSettingsEntryWidget(),
+            if (currentPlatform.isMobile || kDebugMode) //
+            ...[
+              DisplayCopyButtonSettingsEntryWidget(),
+              DisplaySearchButtonSettingsEntryWidget(),
+            ],
+          ],
         ),
       ),
-      child: ListView(
-        children: [
-          _SettingsPageSectionTitle(title: translations.settings.application.title),
-          const ContributorPlanEntryWidget(),
-          const ThemeSettingsEntryWidget(),
-          CacheTotpPicturesSettingsEntryWidget(),
-          if (currentPlatform.isMobile || kDebugMode) //
-          ...[
-            DisplayCopyButtonSettingsEntryWidget(),
-            DisplaySearchButtonSettingsEntryWidget(),
+      Padding(
+        padding: const EdgeInsets.only(bottom: kSpace),
+        child: FTileGroup(
+          label: Text(translations.settings.security.title),
+          children: [
+            EnableLocalAuthSettingsEntryWidget(),
+            SaveDerivedKeySettingsEntryWidget(),
+            const ChangeMasterPasswordSettingsEntryWidget(),
           ],
-          _SettingsPageSectionTitle(title: translations.settings.security.title),
-          EnableLocalAuthSettingsEntryWidget(),
-          SaveDerivedKeySettingsEntryWidget(),
-          const ChangeMasterPasswordSettingsEntryWidget(),
-          if (ref.watch(userAuthenticationProviders).availableProviders.isNotEmpty) ...[
-            const _SynchronizationSectionTitle(),
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.only(bottom: kSpace),
+        child: FTileGroup(
+          label: Text(translations.settings.synchronization.title),
+          children: [
             const ConfirmEmailSettingsEntryWidget(),
             const AccountLinkSettingsEntryWidget(),
             SynchronizeSettingsEntryWidget(),
             const AccountLogInSettingsEntryWidget(),
           ],
-          _SettingsPageSectionTitle(title: translations.settings.backups.title),
-          const BackupNowSettingsEntryWidget(),
-          const ManageBackupSettingsEntryWidget(),
-          _SettingsPageSectionTitle(title: translations.settings.about.title),
-          TranslateSettingsEntryWidget(),
-          GithubSettingsEntryWidget(),
-          const AboutSettingsEntryWidget(),
-          _SettingsPageSectionTitle(title: translations.settings.dangerZone.title),
-          const DeleteAccountSettingsEntryWidget(),
-          const ClearDataSettingsEntryWidget(),
-          if (kDebugMode) ...[
-            const _SettingsPageSectionTitle(title: 'Debug'),
-            const ShowIntroPageSettingsEntryWidget(),
-            const ContributorPlanStateEntryWidget(),
-            const LocaleEntryWidget(),
-            const RefreshUserSettingsEntryWidget(),
-          ],
-        ],
+        ),
       ),
-    ),
+      Padding(
+        padding: const EdgeInsets.only(bottom: kSpace),
+        child: FTileGroup(
+          label: Text(translations.settings.backups.title),
+          children: [
+            const BackupNowSettingsEntryWidget(),
+            const ManageBackupSettingsEntryWidget(),
+          ],
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.only(bottom: kSpace),
+        child: FTileGroup(
+          label: Text(translations.settings.about.title),
+          children: [
+            TranslateSettingsEntryWidget(),
+            GithubSettingsEntryWidget(),
+            const AboutSettingsEntryWidget(),
+          ],
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.only(bottom: kDebugMode ? kSpace : 0),
+        child: FTileGroup(
+          style: .delta(
+            labelTextStyle: .delta([
+              .all(
+                .delta(color: context.theme.colors.destructive),
+              ),
+            ]),
+            tileStyles: .delta([
+              .all(
+                .delta(
+                  contentStyle: .delta(
+                    prefixIconStyle: .delta(
+                      [
+                        .all(
+                          .delta(color: context.theme.colors.destructive),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ]),
+          ),
+          label: Text(translations.settings.dangerZone.title),
+          children: [
+            const ChangeBackendUrlSettingsEntryWidget(),
+            const DeleteAccountSettingsEntryWidget(),
+            const ClearDataSettingsEntryWidget(),
+          ],
+        ),
+      ),
+      if (kDebugMode)
+        FTileGroup(
+          label: const Text('Debug'),
+          children: [
+            const ShowIntroPageSettingsEntryWidget(),
+            const ContributorPlanStateSettingsEntryWidget(),
+            const MigrationStateSettingsEntryWidget(),
+            const LocaleSettingsEntryWidget(),
+            const LinkInputSettingsEntryWidget(),
+          ],
+        ),
+    ],
   );
-}
-
-/// A settings section title.
-class _SettingsPageSectionTitle extends StatelessWidget {
-  /// The title.
-  final String title;
-
-  /// Creates a new settings page section title instance.
-  const _SettingsPageSectionTitle({
-    required this.title,
-  });
-
-  @override
-  Widget build(BuildContext context) => ListTile(
-    title: Text(
-      title,
-      style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Theme.of(context).colorScheme.primary),
-    ),
-  );
-}
-
-/// The "Synchronization" page section title.
-class _SynchronizationSectionTitle extends ConsumerWidget with RequiresAuthenticationProvider {
-  /// Creates a new synchronization section title.
-  const _SynchronizationSectionTitle();
-
-  @override
-  Widget buildWidgetWithAuthenticationProviders(BuildContext context, WidgetRef ref) => _SettingsPageSectionTitle(title: translations.settings.synchronization.title);
-}
-
-/// A widget that needs some authentication providers.
-mixin RequiresAuthenticationProvider on ConsumerWidget {
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    bool hasProvider = ref.watch(userAuthenticationProviders.select((providers) => providers.availableProviders.isNotEmpty));
-    if (!hasProvider) {
-      return const SizedBox.shrink();
-    }
-    FirebaseAuthenticationState authenticationState = ref.watch(firebaseAuthenticationProvider);
-    return isAuthenticationStateValid(authenticationState) ? buildWidgetWithAuthenticationProviders(context, ref) : const SizedBox.shrink();
-  }
-
-  /// Whether this settings entry requires a specific state to be displayed.
-  bool isAuthenticationStateValid(FirebaseAuthenticationState authenticationState) => true;
-
-  /// Builds the widget when authentication providers are available.
-  Widget buildWidgetWithAuthenticationProviders(BuildContext context, WidgetRef ref);
 }

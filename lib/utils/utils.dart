@@ -1,9 +1,11 @@
-import 'dart:math';
-
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:hashlib_codecs/hashlib_codecs.dart';
-import 'package:open_authenticator/utils/firebase.dart';
+import 'package:open_authenticator/app.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
+
+/// Whether Sentry is enabled.
+bool kSentryEnabled = !kDebugMode && App.sentryDsn.isNotEmpty;
 
 /// Contains some useful iterable methods.
 extension IterableUtils<T> on Iterable<T> {
@@ -26,29 +28,21 @@ bool isValidBase32(String string) {
 }
 
 /// Handles an exception.
-void handleException(Object? ex, StackTrace? stacktrace, {bool? sendToCrashlytics}) {
+void handleException(Object? ex, StackTrace? stackTrace, {bool? sendToSentry}) {
   if (kDebugMode) {
     print(ex);
-    print(stacktrace);
+    print(stackTrace);
   }
-  if (sendToCrashlytics ?? isCrashlyticsEnabled) {
-    FirebaseCrashlytics.instance.recordError(
+  if (sendToSentry ?? kSentryEnabled) {
+    Sentry.captureException(
       ex,
-      stacktrace,
-      printDetails: false,
+      stackTrace: stackTrace,
     );
   }
 }
 
 /// Returns whether the given type [S] is a subtype of type [T].
 bool isSubtype<S, T>() => <S>[] is List<T>;
-
-/// Generates a random string.
-String generateRandomString([int length = 20]) {
-  String chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
-  Random random = Random();
-  return String.fromCharCodes(Iterable.generate(length, (_) => chars.codeUnitAt(random.nextInt(chars.length))));
-}
 
 /// Compares two [Uint8List]s by comparing 8 bytes at a time.
 /// Kudos to https://stackoverflow.com/a/70751501/3608831.
@@ -152,3 +146,29 @@ Uint8List kTransparentImage = Uint8List.fromList([
   0x60,
   0x82,
 ]);
+
+/// Contains some useful color methods.
+extension ColorUtils on Color {
+  /// Highlights the color.
+  Color highlight({double amount = 0.1}) => computeLuminance() > 0.4 ? darken(amount: amount) : lighten(amount: amount);
+
+  /// Lightens the color.
+  Color lighten({double amount = 0.1}) {
+    assert(amount >= 0 && amount <= 1);
+
+    HSLColor hsl = HSLColor.fromColor(this);
+    HSLColor hslDark = hsl.withLightness((hsl.lightness + amount).clamp(0.0, 1.0));
+
+    return hslDark.toColor();
+  }
+
+  /// Darkens the color.
+  Color darken({double amount = 0.1}) {
+    assert(amount >= 0 && amount <= 1);
+
+    HSLColor hsl = HSLColor.fromColor(this);
+    HSLColor hslDark = hsl.withLightness((hsl.lightness - amount).clamp(0.0, 1.0));
+
+    return hslDark.toColor();
+  }
+}

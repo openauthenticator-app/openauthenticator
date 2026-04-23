@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:open_authenticator/i18n/localizable_exception.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/utils/utils.dart';
-import 'package:open_authenticator/widgets/snackbar_icon.dart';
+import 'package:open_authenticator/widgets/dialog/error_dialog.dart';
+import 'package:open_authenticator/widgets/toast.dart';
 
 /// Used all around the project to either return a success, a failure or a cancellation.
 sealed class Result<T> {
   /// Creates a new result instance.
   const Result();
+
+  /// Returns `null`, by default.
+  T? get valueOrNull => null;
 
   /// Converts this result to another.
   Result<U> to<U>(U? Function(T?) convert);
@@ -22,11 +27,11 @@ class ResultSuccess<T> extends Result<T> {
     T? value,
   }) : _value = value;
 
-  /// Returns the raw [_value].
-  T? get valueOrNull => _value;
-
   /// Returns the [_value], ensuring it's not null.
   T get value => _value!;
+
+  @override
+  T? get valueOrNull => value;
 
   @override
   ResultSuccess<U> to<U>(U? Function(T?) convert) => ResultSuccess(value: convert(valueOrNull));
@@ -35,24 +40,24 @@ class ResultSuccess<T> extends Result<T> {
 /// When an error occurred.
 class ResultError<T> extends Result<T> {
   /// The exception instance.
-  final Object? exception;
+  final Object exception;
 
   /// The current stacktrace.
-  final StackTrace stacktrace;
+  final StackTrace stackTrace;
 
   /// Creates a new result error instance.
   ResultError({
-    this.exception,
-    StackTrace? stacktrace,
-  }) : stacktrace = stacktrace ?? StackTrace.current {
-    handleException(exception, stacktrace);
+    required this.exception,
+    StackTrace? stackTrace,
+  }) : stackTrace = stackTrace ?? StackTrace.current {
+    handleException(exception, stackTrace);
   }
 
   /// Creates a new result error instance from another [result].
   ResultError.fromAnother(ResultError result)
     : this(
         exception: result.exception,
-        stacktrace: result.stacktrace,
+        stackTrace: result.stackTrace,
       );
 
   @override
@@ -61,19 +66,11 @@ class ResultError<T> extends Result<T> {
 
 /// When it has been cancelled. It should not be handled.
 class ResultCancelled<T> extends Result<T> {
-  /// Whether this is the result of a timeout.
-  final bool timedOut;
-
   /// Creates a new result cancelled instance.
-  const ResultCancelled({
-    this.timedOut = false,
-  });
+  const ResultCancelled();
 
   /// Creates a new result cancelled instance from another [result].
-  ResultCancelled.fromAnother(ResultCancelled result)
-    : this(
-        timedOut: result.timedOut,
-      );
+  ResultCancelled.fromAnother(ResultCancelled result) : this();
 
   @override
   ResultCancelled<U> to<U>(_) => ResultCancelled<U>.fromAnother(this);
@@ -82,20 +79,36 @@ class ResultCancelled<T> extends Result<T> {
 /// Allows to display a result into a SnackBar.
 extension DisplayResult on BuildContext {
   /// Display the given [result].
-  void showSnackBarForResult(
+  void handleResult(
     Result result, {
-    bool retryIfError = false,
+    bool Function(Object? error)? showDialogIfError,
     String? successMessage,
+    String Function(Object? error)? errorMessage,
   }) {
     switch (result) {
       case ResultSuccess():
-        SnackBarIcon.showSuccessSnackBar(this, text: successMessage ?? translations.error.noError);
+        showSuccessToast(
+          this,
+          text: successMessage ?? translations.error.noError,
+        );
         break;
-      case ResultError(:final exception):
-        if (exception == null) {
-          SnackBarIcon.showErrorSnackBar(this, text: retryIfError ? translations.error.generic.tryAgain : translations.error.generic.noTryAgain);
+      case ResultError(:final exception, :final stackTrace):
+        String? message = errorMessage?.call(exception);
+        if (showDialogIfError == null || showDialogIfError(exception)) {
+          ErrorDialog.openDialog(
+            this,
+            error: exception,
+            stackTrace: stackTrace,
+            message: message,
+          );
         } else {
-          SnackBarIcon.showErrorSnackBar(this, text: translations.error.generic.withException(exception: exception));
+          if (message == null) {
+            if (exception is LocalizableException) {
+              message = exception.localizedErrorMessage;
+            }
+            message ??= translations.error.generic.withException(exception: exception);
+          }
+          showErrorToast(this, text: message);
         }
         break;
       default:

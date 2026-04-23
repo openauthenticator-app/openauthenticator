@@ -1,33 +1,44 @@
 import 'package:flutter/material.dart';
+import 'package:forui/forui.dart';
 import 'package:open_authenticator/model/totp/decrypted.dart';
 import 'package:open_authenticator/widgets/totp/time_based.dart';
 
 /// Displays a TOTP code.
-class TotpCodeWidget extends TimeBasedTotpWidget {
+class TotpCode extends TimeBasedTotpWidget {
   /// The text style.
   final TextStyle? textStyle;
 
   /// Creates a new TOTP code widget instance.
-  const TotpCodeWidget({
+  const TotpCode({
     super.key,
     required super.totp,
     this.textStyle,
   });
 
   @override
-  State<TimeBasedTotpWidget> createState() => _TotpCodeWidgetState();
+  State<TimeBasedTotpWidget> createState() => _TotpCodeState();
 }
 
 /// The TOTP code widget state.
-class _TotpCodeWidgetState extends TimeBasedTotpWidgetState<TotpCodeWidget> {
+class _TotpCodeState extends TimeBasedTotpWidgetState<TotpCode> {
   /// The current code.
   late String code = currentTimeCode;
 
   @override
-  Widget build(BuildContext context) => Text(
-    code,
-    style: widget.textStyle,
-  );
+  Widget build(BuildContext context) {
+    TextStyle textStyle = widget.textStyle ?? context.theme.typography.md;
+    return Container(
+      decoration: BoxDecoration(
+        color: context.theme.colors.primary.withValues(alpha: 0.15),
+        borderRadius: context.theme.style.borderRadius.md,
+      ),
+      padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
+      child: Text(
+        code,
+        style: textStyle,
+      ),
+    );
+  }
 
   @override
   void updateState() {

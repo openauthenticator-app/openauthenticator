@@ -1,9 +1,8 @@
 {
+  "refreshUserInfo": "Benutzer aktualisieren",
+  "disableTotpSync": "Sie müssen zuerst die TOTP-Synchronisation deaktivieren.",
   "urlCopiedToClipboard": "URL in die Zwischenablage kopiert!",
-  "waitingDialog": {
-    "defaultMessage": "Bitte warten...",
-    "countdown(rich)": "Verbleibende Zeit: $countdown."
-  },
+  "waitingDialogDefaultMessage": "Bitte warten...",
   "masterPasswordDialog": {
     "title": "Master-Passwort",
     "message": "Bitte geben Sie Ihr Master-Passwort ein, um fortzufahren."
@@ -14,5 +13,9 @@
       "text": "Passwort für die Sicherung",
       "hint": "Geben Sie das Passwort für die Sicherung ein"
     }
+  },
+  "toast": {
+    "success": "Erfolgreich",
+    "error": "Fehler"
   }
 }

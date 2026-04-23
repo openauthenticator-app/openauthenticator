@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:forui/forui.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
+import 'package:open_authenticator/widgets/button_text.dart';
+import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
 import 'package:open_authenticator/widgets/dialog/logo_search/widget.dart';
 
@@ -22,13 +25,14 @@ class LogoPickerDialog extends StatelessWidget {
   Widget build(BuildContext context) => AppDialog(
     title: Text(translations.logoSearch.dialogTitle),
     actions: [
-      TextButton(
-        onPressed: () => Navigator.pop(context),
-        child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+      ClickableButton(
+        variant: .secondary,
+        onPress: () => Navigator.pop(context),
+        child: ButtonText(MaterialLocalizations.of(context).cancelButtonLabel),
       ),
     ],
     children: [
-      LogoSearchWidget(
+      LogoSearch(
         initialSearchKeywords: initialSearchKeywords,
         onLogoClicked: onLogoClicked,
       ),
@@ -39,9 +43,9 @@ class LogoPickerDialog extends StatelessWidget {
   static Future<String?> openDialog(
     BuildContext context, {
     String? initialSearchKeywords,
-  }) => showDialog<String>(
+  }) => showFDialog<String>(
     context: context,
-    builder: (context) => LogoPickerDialog(
+    builder: (context, style, animation) => LogoPickerDialog(
       initialSearchKeywords: initialSearchKeywords,
       onLogoClicked: (logo) => Navigator.pop(context, logo),
     ),

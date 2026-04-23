@@ -3,7 +3,11 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/app.dart';
+import 'package:open_authenticator/i18n/localizable_exception.dart';
+import 'package:open_authenticator/i18n/translations.g.dart';
+import 'package:open_authenticator/model/backend/user.dart';
 import 'package:open_authenticator/model/purchases/clients/client.dart';
+import 'package:open_authenticator/model/settings/backend_url.dart';
 import 'package:open_authenticator/utils/result.dart';
 import 'package:purchases_flutter/purchases_flutter.dart' hide Price;
 
@@ -14,28 +18,33 @@ final contributorPlanStateProvider = AsyncNotifierProvider<ContributorPlan, Cont
 class ContributorPlan extends AsyncNotifier<ContributorPlanState> {
   @override
   FutureOr<ContributorPlanState> build() async {
-    RevenueCatClient? client = await ref.watch(revenueCatClientProvider);
-    if (client == null) {
-      return ContributorPlanState.impossible;
+    if (AppContributorPlan.offeringId.isEmpty) {
+      return .impossible;
     }
-    await client.initialize();
-    return await client.hasEntitlement(AppContributorPlan.entitlementId) ? ContributorPlanState.active : ContributorPlanState.inactive;
+    bool hasBackendUrlChanged = ref.watch(backendUrlSettingsEntryProvider).value?.hasBackendUrlChanged ?? false;
+    if (hasBackendUrlChanged && !kDebugMode) {
+      return .impossible;
+    }
+    RevenueCatClient? client = await ref.watch(revenueCatClientProvider.future);
+    if (client == null) {
+      return .impossible;
+    }
+    await client.initialize(ref);
+    User? user = await ref.watch(userProvider.future);
+    return user?.contributorPlan == true ? .active : .inactive;
   }
 
   /// Changes the state to [newState].
   void debugChangeState(ContributorPlanState newState) {
-    if (kDebugMode) {
+    if (kDebugMode && ref.mounted) {
       state = AsyncData(newState);
     }
   }
 
-  /// Returns the purchase timeout.
-  Duration? getPurchaseTimeout() => ref.read(revenueCatClientProvider)?.purchaseTimeout;
-
   /// Returns the prices of the contributor plan.
   Future<Result<Prices>> getPrices() async {
     try {
-      RevenueCatClient? revenueCatClient = ref.read(revenueCatClientProvider);
+      RevenueCatClient? revenueCatClient = await ref.read(revenueCatClientProvider.future);
       if (revenueCatClient == null) {
         throw _NoRevenueCatClientException();
       }
@@ -62,31 +71,38 @@ class ContributorPlan extends AsyncNotifier<ContributorPlanState> {
           promotions: promotions,
         ),
       );
-    } catch (ex, stacktrace) {
+    } catch (ex, stackTrace) {
       return ResultError(
         exception: ex,
-        stacktrace: stacktrace,
+        stackTrace: stackTrace,
       );
     }
   }
 
   /// Tries to restore the subscription.
-  Future<Result> restore() async {
+  Future<Result<ContributorPlanState>> restore() async {
     try {
-      RevenueCatClient? revenueCatClient = ref.read(revenueCatClientProvider);
+      RevenueCatClient? revenueCatClient = await ref.read(revenueCatClientProvider.future);
       if (revenueCatClient == null) {
         throw _NoRevenueCatClientException();
       }
-      Result result = await revenueCatClient.restorePurchases();
-      if (result is! ResultSuccess) {
-        return result;
+      if (revenueCatClient is! CanRestorePurchases) {
+        throw _RevenueCatClientCannotRestorePurchasesException();
       }
-      state = AsyncData(await revenueCatClient.hasEntitlement(AppContributorPlan.entitlementId) ? ContributorPlanState.active : ContributorPlanState.inactive);
-      return const ResultSuccess();
-    } catch (ex, stacktrace) {
+      await revenueCatClient.restorePurchases();
+      if (!ref.mounted) {
+        return const ResultCancelled();
+      }
+      await Future.delayed(const Duration(seconds: 5));
+      if (!ref.mounted) {
+        return const ResultCancelled();
+      }
+      Result<User> result = await ref.read(userProvider.notifier).refreshUserInfo();
+      return result.to((user) => user?.contributorPlan == true ? .active : .inactive);
+    } catch (ex, stackTrace) {
       return ResultError(
         exception: ex,
-        stacktrace: stacktrace,
+        stackTrace: stackTrace,
       );
     }
   }
@@ -94,35 +110,44 @@ class ContributorPlan extends AsyncNotifier<ContributorPlanState> {
   /// Tries to refresh the subscription state.
   Future<Result<ContributorPlanState>> refresh() async {
     try {
-      RevenueCatClient? revenueCatClient = ref.read(revenueCatClientProvider);
+      RevenueCatClient? revenueCatClient = await ref.read(revenueCatClientProvider.future);
       if (revenueCatClient == null) {
         throw _NoRevenueCatClientException();
       }
-      ContributorPlanState contributorPlanState = await revenueCatClient.hasEntitlement(AppContributorPlan.entitlementId) ? ContributorPlanState.active : ContributorPlanState.inactive;
-      state = AsyncData(contributorPlanState);
-      return ResultSuccess(value: contributorPlanState);
-    } catch (ex, stacktrace) {
+      Result<User> result = await ref.read(userProvider.notifier).refreshUserInfo();
+      if (!ref.mounted) {
+        return const ResultCancelled();
+      }
+      return result.to((user) => user?.contributorPlan == true ? .active : .inactive);
+    } catch (ex, stackTrace) {
       return ResultError(
         exception: ex,
-        stacktrace: stacktrace,
+        stackTrace: stackTrace,
       );
     }
   }
 
   /// Purchases the given item.
-  Future<Result> purchaseManually(PackageType packageType) async {
+  Future<Result<ContributorPlanState>> purchase(PackageType packageType) async {
     try {
-      RevenueCatClient? revenueCatClient = ref.read(revenueCatClientProvider);
-      List<String>? entitlements = await revenueCatClient?.purchaseManually(Purchasable.contributorPlan, packageType);
-      if (entitlements != null && entitlements.contains(AppContributorPlan.entitlementId)) {
-        state = const AsyncData(ContributorPlanState.active);
-        return const ResultSuccess();
+      RevenueCatClient? revenueCatClient = await ref.read(revenueCatClientProvider.future);
+      if (revenueCatClient == null) {
+        throw _NoRevenueCatClientException();
       }
-      return const ResultCancelled();
-    } catch (ex, stacktrace) {
+      bool shouldRefreshUser = await revenueCatClient.purchase(Purchasable.contributorPlan, packageType);
+      if (shouldRefreshUser) {
+        await Future.delayed(const Duration(seconds: 5));
+        if (!ref.mounted) {
+          return const ResultCancelled();
+        }
+        Result<User> result = await ref.read(userProvider.notifier).refreshUserInfo();
+        return result.to((user) => user?.contributorPlan == true ? .active : .inactive);
+      }
+      return const ResultSuccess(value: .inactive);
+    } catch (ex, stackTrace) {
       return ResultError(
         exception: ex,
-        stacktrace: stacktrace,
+        stackTrace: stackTrace,
       );
     }
   }
@@ -170,7 +195,19 @@ enum ContributorPlanState {
 }
 
 /// Thrown when no RevenueCat client is available.
-class _NoRevenueCatClientException implements Exception {
-  @override
-  String toString() => 'No RevenueCat client available';
+class _NoRevenueCatClientException extends LocalizableException {
+  /// Creates a new no RevenueCat client exception instance.
+  _NoRevenueCatClientException()
+    : super(
+        localizedErrorMessage: translations.error.revenueCat.noClient,
+      );
+}
+
+/// Thrown when the RevenueCat client cannot restore purchases.
+class _RevenueCatClientCannotRestorePurchasesException extends LocalizableException {
+  /// Creates a new RevenueCat cannot restore purchases exception instance.
+  _RevenueCatClientCannotRestorePurchasesException()
+    : super(
+        localizedErrorMessage: translations.error.revenueCat.cannotRestorePurchases,
+      );
 }

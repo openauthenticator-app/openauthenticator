@@ -2,9 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:cipherlib/hashlib.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/app.dart';
+import 'package:open_authenticator/i18n/localizable_exception.dart';
+import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/crypto.dart';
 import 'package:open_authenticator/model/totp/decrypted.dart';
 import 'package:open_authenticator/model/totp/json.dart';
@@ -13,15 +16,14 @@ import 'package:open_authenticator/model/totp/totp.dart';
 import 'package:open_authenticator/utils/result.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:webcrypto/webcrypto.dart';
 
 /// The backup store provider.
-final backupStoreProvider = AsyncNotifierProvider<BackupStore, List<Backup>>(BackupStore.new);
+final backupStoreProvider = AsyncNotifierProvider.autoDispose<BackupStore, List<Backup>>(BackupStore.new);
 
 /// Contains all backups.
 class BackupStore extends AsyncNotifier<List<Backup>> {
   /// The backup filename regex.
-  static const String _kBackupFilenameRegex = r'\d{10}\.bak';
+  static const String _kBackupFilenameRegex = r'\d{13}\.bak';
 
   @override
   FutureOr<List<Backup>> build() => _listBackups();
@@ -33,7 +35,13 @@ class BackupStore extends AsyncNotifier<List<Backup>> {
     }
     DateTime? dateTime = _fromBackupFilename(backupFile);
     Backup backup = Backup._(ref: ref, dateTime: dateTime ?? DateTime.now());
-    state = AsyncData([...(await future), backup]..sort());
+    List<Backup> backups = [...(await future), backup]..sort();
+    Directory directory = await getBackupsDirectory(create: true);
+    backupFile.copySync(join(directory.path, backup.filename));
+    if (!ref.mounted) {
+      return const ResultCancelled();
+    }
+    state = AsyncData(backups);
     return ResultSuccess(value: backup);
   }
 
@@ -44,7 +52,11 @@ class BackupStore extends AsyncNotifier<List<Backup>> {
     if (result is! ResultSuccess) {
       return result.to<Backup>((value) => null);
     }
-    state = AsyncData([...(await future), backup]..sort());
+    List<Backup> backups = [...(await future), backup]..sort();
+    if (!ref.mounted) {
+      return const ResultCancelled();
+    }
+    state = AsyncData(backups);
     return ResultSuccess(value: backup);
   }
 
@@ -114,8 +126,12 @@ class Backup implements Comparable<Backup> {
     if (!file.existsSync()) {
       return false;
     }
-    Map<String, dynamic> jsonData = jsonDecode(file.readAsStringSync());
-    return jsonData[kTotpsKey] is List && jsonData[kSaltKey] is String && jsonData[kPasswordSignatureKey] is String;
+    try {
+      Map<String, dynamic> jsonData = jsonDecode(file.readAsStringSync());
+      return jsonData[kTotpsKey] is List && jsonData[kSaltKey] is String && jsonData[kPasswordSignatureKey] is String;
+    } on FormatException {
+      return false;
+    }
   }
 
   /// Restore this backup.
@@ -131,34 +147,34 @@ class Backup implements Comparable<Backup> {
       }
 
       Map<String, dynamic> jsonData = jsonDecode(file.readAsStringSync());
-      CryptoStore cryptoStore = await CryptoStore.fromPassword(password, Salt.fromRawValue(value: base64.decode(jsonData[kSaltKey])));
-      HmacSecretKey hmacSecretKey = await HmacSecretKey.importRawKey(await cryptoStore.key.exportRawKey(), Hash.sha256);
-      if (!(await hmacSecretKey.verifyBytes(base64.decode(jsonData[kPasswordSignatureKey]), utf8.encode(password)))) {
-        throw _InvalidPasswordException();
+      CryptoStore cryptoStore = CryptoStore.fromPassword(password, Salt.fromRawValue(value: base64.decode(jsonData[kSaltKey])));
+      MACHashBase hmacSecretKey = cryptoStore.createHmacKey();
+      if (!(hmacSecretKey.verify(base64.decode(jsonData[kPasswordSignatureKey]), utf8.encode(password)))) {
+        throw InvalidPasswordException();
       }
 
       CryptoStore? currentCryptoStore = await _ref.read(cryptoStoreProvider.future);
       if (currentCryptoStore == null) {
-        throw const _EncryptionError(operationName: 'decryption');
+        throw _CryptoError();
       }
 
       List jsonTotps = jsonData[kTotpsKey];
       List<Totp> totps = [];
       for (dynamic jsonTotp in jsonTotps) {
-        Totp? totp = JsonTotp.fromJson(jsonTotp);
+        Totp? totp = JsonTotp.tryFromJson(jsonTotp);
         if (totp != null) {
-          DecryptedTotp? decryptedTotp = await totp.changeEncryptionKey(cryptoStore, currentCryptoStore);
+          DecryptedTotp? decryptedTotp = totp.changeEncryptionKey(cryptoStore, currentCryptoStore);
           totps.add(decryptedTotp ?? totp);
         }
       }
-      if (totps.isEmpty) {
-        throw _InvalidPasswordException();
+      if (totps.isEmpty && jsonTotps.isNotEmpty) {
+        throw InvalidPasswordException();
       }
       return await _ref.read(totpRepositoryProvider.notifier).replaceBy(totps);
-    } catch (ex, stacktrace) {
+    } catch (ex, stackTrace) {
       return ResultError(
         exception: ex,
-        stacktrace: stacktrace,
+        stackTrace: stackTrace,
       );
     }
   }
@@ -168,20 +184,20 @@ class Backup implements Comparable<Backup> {
     try {
       CryptoStore? currentCryptoStore = await _ref.read(cryptoStoreProvider.future);
       if (currentCryptoStore == null) {
-        throw const _EncryptionError(operationName: 'encryption');
+        throw _CryptoError();
       }
-      CryptoStore newStore = await CryptoStore.fromPassword(password, await Salt.generate());
-      TotpList totps = await _ref.read(totpRepositoryProvider.future);
+      CryptoStore newStore = CryptoStore.fromPassword(password, Salt.generate());
+      List<Totp> totps = await _ref.read(totpRepositoryProvider.future);
       List<Totp> toBackup = [];
       for (Totp totp in totps) {
-        DecryptedTotp? decryptedTotp = await totp.changeEncryptionKey(currentCryptoStore, newStore);
+        DecryptedTotp? decryptedTotp = totp.changeEncryptionKey(currentCryptoStore, newStore);
         toBackup.add(decryptedTotp ?? totp);
       }
-      HmacSecretKey hmacSecretKey = await HmacSecretKey.importRawKey(await newStore.key.exportRawKey(), Hash.sha256);
+      MACHashBase hmacSecretKey = newStore.createHmacKey();
       File file = await getBackupPath(createDirectory: true);
-      file.writeAsString(
+      await file.writeAsString(
         jsonEncode({
-          kPasswordSignatureKey: base64.encode(await hmacSecretKey.signBytes(utf8.encode(password))),
+          kPasswordSignatureKey: hmacSecretKey.string(password, utf8).base64(),
           kSaltKey: base64.encode(newStore.salt.value),
           kTotpsKey: [
             for (Totp totp in toBackup) totp.toJson(),
@@ -189,10 +205,10 @@ class Backup implements Comparable<Backup> {
         }),
       );
       return const ResultSuccess();
-    } catch (ex, stacktrace) {
+    } catch (ex, stackTrace) {
       return ResultError(
         exception: ex,
-        stacktrace: stacktrace,
+        stackTrace: stackTrace,
       );
     }
   }
@@ -206,10 +222,10 @@ class Backup implements Comparable<Backup> {
       }
       _ref.invalidateSelf();
       return const ResultSuccess();
-    } catch (ex, stacktrace) {
+    } catch (ex, stackTrace) {
       return ResultError(
         exception: ex,
-        stacktrace: stacktrace,
+        stackTrace: stackTrace,
       );
     }
   }
@@ -228,41 +244,38 @@ class Backup implements Comparable<Backup> {
 }
 
 /// Thrown when the file does not exist.
-class _BackupFileDoesNotExistException implements Exception {
-  /// The file path.
-  final String path;
-
+class _BackupFileDoesNotExistException extends LocalizableException {
   /// Creates a new backup file doesn't exist exception instance.
-  const _BackupFileDoesNotExistException({
-    required this.path,
-  });
-
-  @override
-  String toString() => 'Backup file does not exist : "$path"';
+  _BackupFileDoesNotExistException({
+    required String path,
+  }) : super(
+         localizedErrorMessage: translations.error.backup.fileDoesNotExist(path: path),
+       );
 }
 
 /// Thrown when an invalid password has been provided.
-class _InvalidPasswordException implements Exception {
-  @override
-  String toString() => 'Invalid password exception';
+class InvalidPasswordException extends LocalizableException {
+  /// Creates a new invalid password exception instance.
+  InvalidPasswordException()
+    : super(
+        localizedErrorMessage: translations.error.backup.invalidPassword,
+      );
 }
 
 /// Thrown when the backup content is invalid.
-class _InvalidBackupContentException implements Exception {
-  @override
-  String toString() => 'Invalid backup content';
+class _InvalidBackupContentException extends LocalizableException {
+  /// Creates a new invalid backup content exception instance.
+  _InvalidBackupContentException()
+    : super(
+        localizedErrorMessage: translations.error.backup.invalidContent,
+      );
 }
 
 /// Thrown when there is an encryption error.
-class _EncryptionError implements Exception {
-  /// The operation name.
-  final String operationName;
-
-  /// Creates a new encryption error instance.
-  const _EncryptionError({
-    required this.operationName,
-  });
-
-  @override
-  String toString() => 'Error while doing $operationName.';
+class _CryptoError extends LocalizableException {
+  /// Creates a new crypto error instance.
+  _CryptoError()
+    : super(
+        localizedErrorMessage: translations.error.backup.crypto,
+      );
 }

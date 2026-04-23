@@ -1,6 +1,5 @@
 {
   "empty": "No TOTP for the moment.\nFeel free to add one !",
-  "refreshButton": "Refresh",
   "addDialog": {
     "title": "Add a TOTP",
     "qrCode": {
@@ -15,13 +14,5 @@
   "noCryptoStore": {
     "message": "An error occurred while loading your crypto store. This means that we cannot do any encryption / decryption operation. Please restart the app or enter a new master password using the button below.",
     "resetButton": "Reset master password"
-  },
-  "logInFailed": {
-    "message": "Failed to log in. Either retry, relogin or change storage type.",
-    "button": {
-      "retry": "Retry",
-      "relogIn": "Relog-in",
-      "changeStorageType": "Change storage type"
-    }
   }
 }

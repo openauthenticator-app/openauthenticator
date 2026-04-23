@@ -1,78 +1,98 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:forui/forui.dart';
 import 'package:open_authenticator/app.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
-import 'package:open_authenticator/model/authentication/firebase_authentication.dart';
-import 'package:open_authenticator/model/authentication/providers/provider.dart';
-import 'package:open_authenticator/model/authentication/state.dart';
-import 'package:open_authenticator/model/totp/repository.dart';
+import 'package:open_authenticator/model/backend/authentication/providers/provider.dart';
+import 'package:open_authenticator/model/backend/user.dart';
 import 'package:open_authenticator/pages/intro/slides/slide.dart';
 import 'package:open_authenticator/pages/settings/entries/synchronize.dart';
+import 'package:open_authenticator/spacing.dart';
 import 'package:open_authenticator/utils/account.dart';
-import 'package:open_authenticator/widgets/app_filled_button.dart';
+import 'package:open_authenticator/utils/email_confirmation.dart';
+import 'package:open_authenticator/widgets/button_text.dart';
+import 'package:open_authenticator/widgets/clickable.dart';
 
-/// The slide that allows the user to login to Firebase.
-class LogInIntroPageSlide extends IntroPageSlide {
-  /// Creates a new login intro page content instance.
-  LogInIntroPageSlide()
-    : super(
-        name: 'logIn',
-      );
+/// The log-in intro page.
+class LogInIntroPageSlide extends StatelessWidget {
+  /// Creates a new log-in intro page instance.
+  const LogInIntroPageSlide({
+    super.key,
+  });
 
   @override
-  Widget createWidget(BuildContext context, int remainingSteps) => IntroPageSlideWidget(
+  Widget build(BuildContext context) => IntroPageSlideWidget(
     titleWidget: Text(translations.intro.logIn.title),
-    slide: this,
+    slide: .logIn,
     children: [
-      IntroPageSlideParagraphWidget(text: translations.intro.logIn.firstParagraph),
+      IntroPageSlideParagraphWidget(
+        text: translations.intro.logIn.firstParagraph,
+        padding: kBigSpace,
+      ),
       IntroPageSlideParagraphWidget(
         text: translations.intro.logIn.secondParagraph,
-        textStyle: const TextStyle(fontStyle: FontStyle.italic),
+        textStyle: const TextStyle(fontStyle: .italic),
       ),
       Padding(
-        padding: const EdgeInsets.only(bottom: IntroPageSlideParagraphWidget.kDefaultPadding),
+        padding: const EdgeInsets.only(bottom: kSpace),
         child: _LogInButton(),
       ),
+      Consumer(
+        builder: (context, ref, child) {
+          EmailConfirmationData? emailToConfirm = ref.watch(emailConfirmationStateProvider).value;
+          return Padding(
+            padding: EdgeInsets.only(bottom: emailToConfirm == null ? kSpace : kBigSpace),
+            child: child,
+          );
+        },
+        child: _ConfirmEmailButton(),
+      ),
       SynchronizeSettingsEntryWidget.intro(),
-      IntroPageSlideParagraphWidget(text: translations.intro.logIn.thirdParagraph(limit: App.freeTotpsLimit.toString())),
       IntroPageSlideParagraphWidget(
-        text: translations.intro.logIn.fourthParagraph(app: App.appName),
-        padding: 0,
+        text: translations.intro.logIn.thirdParagraph,
+        padding: kBigSpace,
+      ),
+      FAlert(
+        title: Text(translations.settings.application.contributorPlan.title),
+        subtitle: Text(
+          translations.intro.logIn.fourthParagraph(app: App.appName),
+        ),
       ),
     ],
   );
-
-  @override
-  Future<bool> shouldSkip(WidgetRef ref) async {
-    if (ref.read(userAuthenticationProviders).availableProviders.isEmpty) {
-      return true;
-    }
-    TotpList totps = await ref.read(totpRepositoryProvider.future);
-    if (totps.isNotEmpty) {
-      return true;
-    }
-    return false;
-  }
 }
 
 /// The log-in button.
 class _LogInButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    FirebaseAuthenticationState authenticationState = ref.watch(firebaseAuthenticationProvider);
-    switch (authenticationState) {
-      case FirebaseAuthenticationStateLoggedOut():
-        return AppFilledButton(
-          onPressed: () => AccountUtils.trySignIn(context, ref),
-          icon: const Icon(Icons.login),
-          label: Text(translations.intro.logIn.button.loggedOut),
-        );
-      case FirebaseAuthenticationStateLoggedIn():
-        return AppFilledButton(
-          onPressed: null,
-          icon: const Icon(Icons.check),
-          label: Text(translations.intro.logIn.button.loggedIn),
-        );
-    }
+    User? user = ref.watch(userProvider).value;
+    return user == null
+        ? ClickableButton(
+            onPress: () => AccountUtils.tryRequestSignIn(context),
+            prefix: const Icon(FIcons.logIn),
+            child: ButtonText(translations.intro.logIn.button.loggedOut),
+          )
+        : ClickableButton(
+            onPress: null,
+            prefix: const Icon(FIcons.check),
+            child: ButtonText(translations.intro.logIn.button.loggedIn),
+          );
+  }
+}
+
+/// The confirm email button.
+class _ConfirmEmailButton extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    AsyncValue<EmailConfirmationData?> emailToConfirm = ref.watch(emailConfirmationStateProvider);
+    return emailToConfirm.value == null
+        ? const SizedBox.shrink()
+        : ClickableButton(
+            onPress: () => EmailConfirmationUtils.askForConfirmation(context, ref),
+            variant: .ghost,
+            prefix: const Icon(FIcons.mail),
+            child: ButtonText(translations.intro.logIn.button.confirmEmail),
+          );
   }
 }

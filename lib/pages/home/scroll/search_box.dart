@@ -1,9 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:open_authenticator/model/settings/display_search_button.dart';
+part of '../page.dart';
 
 /// A widget that triggers a callback when the user scrolls, so that the search box can be hidden or shown.
-class RevealSearchBoxWidget extends ConsumerWidget {
+class _RevealSearchBoxWidget extends ConsumerWidget {
   /// Called when the user scrolls up.
   final VoidCallback? onShowSearchBox;
 
@@ -14,7 +12,7 @@ class RevealSearchBoxWidget extends ConsumerWidget {
   final Widget child;
 
   /// Creates a new reveal search box widget instance.
-  const RevealSearchBoxWidget({
+  const _RevealSearchBoxWidget({
     super.key,
     this.onShowSearchBox,
     this.onHideSearchBox,

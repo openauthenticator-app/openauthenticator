@@ -1,40 +1,43 @@
 import 'dart:async';
 
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:forui/forui.dart';
 import 'package:open_authenticator/app.dart';
-import 'package:open_authenticator/firebase_options.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/app_links.dart';
-import 'package:open_authenticator/model/authentication/providers/email_link.dart';
-import 'package:open_authenticator/model/authentication/providers/provider.dart';
+import 'package:open_authenticator/model/backend/authentication/providers/provider.dart';
+import 'package:open_authenticator/model/backend/authentication/session.dart';
 import 'package:open_authenticator/model/crypto.dart';
 import 'package:open_authenticator/model/settings/show_intro.dart';
 import 'package:open_authenticator/model/settings/theme.dart';
-import 'package:open_authenticator/model/storage/online.dart';
-import 'package:open_authenticator/model/totp/repository.dart';
+import 'package:open_authenticator/model/totp/limit.dart';
 import 'package:open_authenticator/pages/contributor_plan_paywall/page.dart';
 import 'package:open_authenticator/pages/home/page.dart';
 import 'package:open_authenticator/pages/intro/page.dart';
 import 'package:open_authenticator/pages/scan.dart';
 import 'package:open_authenticator/pages/settings/page.dart';
+import 'package:open_authenticator/pages/sync_issues.dart';
 import 'package:open_authenticator/pages/totp.dart';
-import 'package:open_authenticator/utils/account.dart';
-import 'package:open_authenticator/utils/firebase.dart';
-import 'package:open_authenticator/utils/firebase_app_check/firebase_app_check.dart';
+import 'package:open_authenticator/themes.dart';
 import 'package:open_authenticator/utils/platform.dart';
 import 'package:open_authenticator/utils/rate_my_app.dart';
 import 'package:open_authenticator/utils/result.dart';
+import 'package:open_authenticator/utils/utils.dart';
+import 'package:open_authenticator/widgets/animated_theme.dart';
+import 'package:open_authenticator/widgets/app_scaffold.dart';
 import 'package:open_authenticator/widgets/centered_circular_progress_indicator.dart';
-import 'package:open_authenticator/widgets/dialog/totp_limit.dart';
+import 'package:open_authenticator/widgets/dialog/invalid_session_dialog.dart';
+import 'package:open_authenticator/widgets/dialog/totp_limit_dialog.dart';
+import 'package:open_authenticator/widgets/error.dart';
+import 'package:open_authenticator/widgets/migrator.dart';
 import 'package:open_authenticator/widgets/unlock_challenge.dart';
 import 'package:open_authenticator/widgets/waiting_overlay.dart';
+import 'package:open_authenticator/widgets/window_frame.dart';
 import 'package:rate_my_app/rate_my_app.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:simple_secure_storage/simple_secure_storage.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -50,6 +53,8 @@ Future<void> main() async {
         size: Size(800, 600),
         minimumSize: Size(400, 400),
         center: true,
+        titleBarStyle: TitleBarStyle.hidden,
+        windowButtonVisibility: false,
       ),
       () async {
         await windowManager.show();
@@ -57,32 +62,20 @@ Future<void> main() async {
       },
     );
   }
-  if (isFirebaseSupported) {
-    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-    await FirebaseAppCheck.instance.activate();
-    if (isCrashlyticsEnabled) {
-      FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
-      PlatformDispatcher.instance.onError = (error, stack) {
-        FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-        return true;
-      };
-    }
-  }
   await LocaleSettings.useDeviceLocale();
-  runApp(
+  void appRunner() => runApp(
     ProviderScope(
-      retry: (retryCount, error) {
-        if (error is NotLoggedInException) {
-          return null;
-        }
-
-        return ProviderContainer.defaultRetry(retryCount, error);
-      },
       child: TranslationProvider(
         child: const OpenAuthenticatorApp(),
       ),
     ),
   );
+  return kSentryEnabled
+      ? SentryFlutter.init(
+          (options) => options..dsn = App.sentryDsn,
+          appRunner: appRunner,
+        )
+      : appRunner();
 }
 
 /// Allows to initialize [SimpleSecureStorage] with parameters that depend on the current mode.
@@ -120,12 +113,19 @@ class OpenAuthenticatorApp extends ConsumerWidget {
         locale: locale,
         initialRoute: value ? IntroPage.name : HomePage.name,
       ),
-      AsyncError(:final error) => _createMaterialApp(
+      AsyncError(:final error, :final stackTrace) => _createMaterialApp(
         showIntroState: 'error',
         theme: theme,
         locale: locale,
-        home: Center(
-          child: Text('Error : $error.'),
+        home: Builder(
+          builder: (context) => AppScaffold.scrollable(
+            children: [
+              ErrorAlert(
+                error: error,
+                stackTrace: stackTrace,
+              ),
+            ],
+          ),
         ),
       ),
       _ => _createMaterialApp(
@@ -145,13 +145,8 @@ class OpenAuthenticatorApp extends ConsumerWidget {
     String? initialRoute,
     Widget? home,
   }) {
-    ColorScheme light = ColorScheme.fromSeed(
-      seedColor: Colors.green,
-    );
-    ColorScheme dark = ColorScheme.fromSeed(
-      seedColor: Colors.green,
-      brightness: Brightness.dark,
-    );
+    FThemeData light = currentPlatform.isDesktop ? greenTheme.light.desktop : greenTheme.light.touch;
+    FThemeData dark = currentPlatform.isDesktop ? greenTheme.dark.desktop : greenTheme.dark.touch;
     return MaterialApp(
       key: ValueKey('materialApp.$showIntroState'),
       title: App.appName,
@@ -161,57 +156,18 @@ class OpenAuthenticatorApp extends ConsumerWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
+      // debugShowCheckedModeBanner: false,
       supportedLocales: AppLocaleUtils.supportedLocales,
       themeMode: theme.value,
-      darkTheme: ThemeData(
-        brightness: Brightness.dark,
-        appBarTheme: AppBarTheme(
-          systemOverlayStyle: SystemUiOverlayStyle(
-            statusBarIconBrightness: Brightness.light,
-            systemNavigationBarColor: dark.surface,
+      darkTheme: dark.toApproximateMaterialTheme(),
+      theme: light.toApproximateMaterialTheme(),
+      builder: (context, child) => AnimatedFTheme(
+        light: light,
+        dark: dark,
+        child: FToaster(
+          child: DesktopWindowFrame(
+            child: child!,
           ),
-          shape: const RoundedRectangleBorder(),
-          surfaceTintColor: Colors.green,
-        ),
-        colorScheme: dark,
-        // iconButtonTheme: IconButtonThemeData(
-        //   style: ButtonStyle(
-        //     foregroundColor: MaterialStatePropertyAll(Colors.green.shade300),
-        //   ),
-        // ),
-        buttonTheme: const ButtonThemeData(
-          alignedDropdown: true,
-        ),
-        floatingActionButtonTheme: FloatingActionButtonThemeData(
-          shape: const CircleBorder(),
-          backgroundColor: Colors.green.shade700,
-          foregroundColor: Colors.green.shade50,
-        ),
-      ),
-      theme: ThemeData(
-        colorScheme: light,
-        appBarTheme: AppBarTheme(
-          systemOverlayStyle: SystemUiOverlayStyle(
-            statusBarIconBrightness: Brightness.dark,
-            systemNavigationBarColor: light.surface,
-          ),
-          shape: const RoundedRectangleBorder(),
-        ),
-        buttonTheme: const ButtonThemeData(
-          alignedDropdown: true,
-        ),
-        floatingActionButtonTheme: FloatingActionButtonThemeData(
-          shape: const CircleBorder(),
-          backgroundColor: Colors.green.shade50,
-          foregroundColor: Colors.green.shade700,
-        ),
-        inputDecorationTheme: InputDecorationTheme(
-          disabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.grey.shade400),
-          ),
-        ),
-        dividerTheme: const DividerThemeData(
-          color: Colors.black12,
         ),
       ),
       routes: home == null
@@ -239,6 +195,9 @@ class OpenAuthenticatorApp extends ConsumerWidget {
                   ),
                 );
               },
+              SyncIssuesPage.name: (_) => const _RouteWidget(
+                child: SyncIssuesPage(),
+              ),
               ContributorPlanPaywallPage.name: (_) => const _RouteWidget(
                 child: ContributorPlanPaywallPage(),
               ),
@@ -281,12 +240,12 @@ class _RouteWidgetState extends ConsumerState<_RouteWidget> {
       ref.listenManual(
         appLinksListenerProvider,
         (previous, next) async {
-          if (previous == next || next is! AsyncData<Uri?> || next.value == null) {
+          if (previous?.value == next.value || next is! AsyncData<Uri?> || next.value == null) {
             return;
           }
           Uri uri = next.value!;
-          if (uri.host == Uri.parse(App.firebaseLoginUrl).host) {
-            WidgetsBinding.instance.addPostFrameCallback((_) => handleLoginLink(uri));
+          if (uri.scheme == 'openauthenticator') {
+            WidgetsBinding.instance.addPostFrameCallback((_) => handleAppLink(uri));
             return;
           }
           if (uri.scheme == 'otpauth') {
@@ -299,10 +258,22 @@ class _RouteWidgetState extends ConsumerState<_RouteWidget> {
       ref.listenManual(
         totpLimitProvider,
         (previous, next) async {
-          if (previous == next || next is! AsyncData<TotpLimit> || !next.value.isExceeded) {
+          if (previous?.value == next.value || next is! AsyncData<TotpLimit> || !next.value.isExceeded) {
             return;
           }
           WidgetsBinding.instance.addPostFrameCallback((_) => handleTotpLimitExceeded());
+        },
+        fireImmediately: true,
+      );
+      ref.listenManual(
+        sessionRefreshManagerProvider,
+        (previous, next) {
+          if (previous == next) {
+            return;
+          }
+          if (next is SessionRefreshStateInvalidSession) {
+            WidgetsBinding.instance.addPostFrameCallback((_) => handleInvalidSession());
+          }
         },
         fireImmediately: true,
       );
@@ -316,7 +287,8 @@ class _RouteWidgetState extends ConsumerState<_RouteWidget> {
           conditions: [
             SupportedPlatformsCondition(),
           ],
-        )..populateWithDefaultConditions();
+        );
+        rateMyApp.populateWithDefaultConditions();
         await rateMyApp.init();
         if (rateMyApp.shouldOpenDialog && mounted) {
           rateMyApp.showRateDialog(context);
@@ -326,31 +298,30 @@ class _RouteWidgetState extends ConsumerState<_RouteWidget> {
   }
 
   @override
-  Widget build(BuildContext context) => UnlockChallengeWidget(
-    child: widget.child,
+  Widget build(BuildContext context) => UnlockChallenge(
+    child: Migrator(
+      child: widget.child,
+    ),
   );
 
-  /// Handles a login link.
-  Future<void> handleLoginLink(Uri loginLink) async {
-    if (!mounted) {
-      return;
-    }
-    Uri? link = Uri.tryParse(loginLink.queryParameters['link'] ?? '');
-    if (link == null) {
-      return;
-    }
-    String? mode = link.queryParameters['mode'];
-    switch (mode) {
-      case 'signIn':
-        String? emailToConfirm = await ref.read(emailLinkConfirmationStateProvider.future);
-        if (emailToConfirm == null || !mounted) {
-          return;
-        }
-        Result<AuthenticationObject> result = await ref.read(emailLinkConfirmationStateProvider.notifier).confirm(context, link.toString());
-        if (mounted) {
-          AccountUtils.handleAuthenticationResult(context, ref, result);
-        }
-        break;
+  /// Handles an in-app link.
+  Future<void> handleAppLink(Uri appLink) async {
+    if (appLink.host == 'auth' && appLink.path.startsWith('/provider/') && appLink.pathSegments.length >= 2) {
+      String? providerId = appLink.pathSegments[1];
+      AuthenticationProvider? provider = ref.read(authenticationProviders).findProvider(providerId);
+      if (provider == null) {
+        return;
+      }
+      Result<RedirectResult> result = await showWaitingOverlay(
+        context,
+        future: provider.onRedirectReceived(appLink),
+      );
+      if (mounted) {
+        context.handleResult(
+          result,
+          successMessage: result.valueOrNull?.localizedMessage,
+        );
+      }
     }
   }
 
@@ -368,6 +339,13 @@ class _RouteWidgetState extends ConsumerState<_RouteWidget> {
   Future<void> handleTotpLimitExceeded() async {
     if (mounted) {
       TotpLimitDialog.showAndBlock(context);
+    }
+  }
+
+  /// Handles an invalid session.
+  Future<void> handleInvalidSession() async {
+    if (mounted) {
+      await InvalidSessionDialog.openDialog(context, ref, handleResult: true);
     }
   }
 }

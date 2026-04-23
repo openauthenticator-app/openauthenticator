@@ -1,19 +1,20 @@
 {
-  "autoDialog": {
-    "title": "Limite de TOTPs atingido",
-    "message": "Atualmente, você está sincronizando seus TOTPs e ultrapassou o limite de $count TOTPs antes de precisar assinar o Plano de Contribuidor. Você deve escolher entre armazená-los localmente (o que significa que não haverá mais sincronização) ou assinar o Plano de Contribuidor.",
-    "actions": {
-      "subscribe": "Assinar",
-      "stopSynchronization": "Parar sincronização"
+  "title": "Limite de TOTP atingido",
+  "message": {
+    "error": "Você atingiu o número máximo de TOTPs sincronizáveis, mas não conseguimos mostrar as opções disponíveis para estender este limite. Tente novamente mais tarde ou entre em contato conosco se precisar de ajuda.",
+    "notSubscribed": {
+      "auto": "Você está sincronizando seus TOTPs e excedeu o limite de $count TOTPs antes de precisar assinar o Plano de Colaborador. Então você precisa armazená-los localmente (o que significa, sem mais sincronização) ou assinar o Plano de Colaborador.",
+      "manual": "Você está sincronizando seus TOTPs e tem um limite de $count TOTPs antes de precisar assinar o Plano de Colaborador. Então você precisa armazená-los localmente (o que significa, sem mais sincronização) ou assinar o Plano de Colaborador para adicionar outro TOTP."
+    },
+    "alreadySubscribed": {
+      "auto": "Você está sincronizando seus TOTPs e excedeu o limite de $count TOTPs. Então você precisa armazená-los localmente (o que significa, sem mais sincronização). Para contornar esse limite, você pode hospedar o servidor backend por conta própria.",
+      "manual": "Você está sincronizando seus TOTPs e tem um limite de $count TOTPs. Então você precisa armazená-los localmente (o que significa, sem mais sincronização) para adicionar outro TOTP. Para contornar esse limite, você pode hospedar o servidor backend por conta própria."
     }
   },
-  "addDialog": {
-    "title": "Limite de TOTPs atingido",
-    "message": "Atualmente, você está sincronizando seus TOTPs e tem um limite de $count TOTPs antes de precisar assinar o Plano de Contribuidor. Você deve escolher entre armazená-los localmente (o que significa que não haverá mais sincronização) ou assinar o Plano de Contribuidor para adicionar outro TOTP.",
-    "actions": {
-      "subscribe": "Assinar",
-      "stopSynchronization": "Parar sincronização",
-      "cancel": "Cancelar"
-    }
+  "actions": {
+    "subscribe": "Assinar",
+    "stopSynchronization": "Parar sincronização",
+    "selfHost": "Auto-hospedar",
+    "cancel": "Cancelar"
   }
 }

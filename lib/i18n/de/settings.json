@@ -33,15 +33,20 @@
     "theme": {
       "title": "Thema",
       "subtitle": "Ändern Sie den Anwendungsthemen und Helligkeit.",
-      "name(map)": {
-        "system": "System",
-        "light": "Hell",
-        "dark": "Dunkel"
-      },
-      "description(map)": {
-        "system": "Verwenden Sie das Systemthema.",
-        "light": "Verwenden Sie das Hellenthema.",
-        "dark": "Verwenden Sie das Dunkelthema."
+      "themePickerDialog": {
+        "title": "Thema",
+        "theme": {
+          "name(map)": {
+            "system": "System",
+            "light": "Hell",
+            "dark": "Dunkel"
+          },
+          "description(map)": {
+            "system": "Verwenden Sie das Systemthema.",
+            "light": "Verwenden Sie das Hellenthema.",
+            "dark": "Verwenden Sie das Dunkelthema."
+          }
+        }
       }
     }
   },
@@ -69,11 +74,7 @@
       "title": "Verknüpfung mit anderen Anbietern",
       "subtitle": {
         "text": "Verknüpfen Sie Ihr Konto mit anderen Authentifizierungsanbietern, damit Sie sich mit diesen anmelden können.",
-        "linkedProviders(rich)": "Aktuell verknüpft mit: $providers.",
-        "providers(map)": {
-          "emailLink": "E-Mail Adresse",
-          "password": "E-Mail Adresse"
-        }
+        "linkedProviders(rich)": "Aktuell verknüpft mit: $providers."
       }
     },
     "accountLogin": {
@@ -83,32 +84,12 @@
       },
       "logOut": {
         "title": "Ausloggen",
-        "subtitle(rich)": "Melden Sie sich ab, um die Synchronisierung mit diesem Gerät zu beenden. Angemeldet als: $email."
+        "subtitle(rich)": "Melden Sie sich ab, um die Synchronisierung mit diesem Gerät zu beenden. Angemeldet als $user."
       }
     },
     "confirmEmail": {
       "title": "E-Mail bestätigt.",
-      "subtitle(rich)": "Eine Bestätigungs-E-Mail wurde an $email gesendet. Klicken Sie auf den Link, um die Anmeldung abzuschließen, oder tippen Sie hier, um den Code manuell einzugeben.",
-      "success": "E-Mail erfolgreich bestätigt.",
-      "confirmActionPickerDialog": {
-        "title": "Was möchten Sie tun?",
-        "confirm": {
-          "title": "Bestätigen Sie Ihr Konto",
-          "subtitle": "Fügen Sie den Link ein, den Sie per E-Mail erhalten haben, um Ihr Konto zu bestätigen."
-        },
-        "cancelConfirmation": {
-          "title": "Kontobestätigung aufheben",
-          "subtitle": "Heben Sie Ihre Kontobestätigung auf.",
-          "validationDialog": {
-            "title": "Bestätigung",
-            "message": "Sind Sie sicher?"
-          }
-        }
-      },
-      "linkDialog": {
-        "title": "Bestätigungslink",
-        "message": "Rufen Sie entweder den Link mit diesem Gerät auf oder fügen Sie ihn unten ein, um Ihre E-Mail-Adresse zu bestätigen."
-      }
+      "subtitle(rich)": "Eine Bestätigungs-E-Mail wurde an $email gesendet. Klicken Sie auf den Link, um die Anmeldung abzuschließen, oder tippen Sie hier, um den Code manuell einzugeben."
     },
     "synchronizeTotps": {
       "title": "TOTPs synchronisieren",
@@ -136,8 +117,8 @@
       "title": "Sicherungen verwalten",
       "subtitle": {
         "zero": "Sie haben keine Sicherung gespeichert.",
-        "one": "Sie haben derzeit $n Sicherung gespeichert.",
-        "other": "Sie haben derzeit $n Sicherungen gespeichert."
+        "one(rich)": "Sie haben derzeit $backups Sicherung gespeichert.",
+        "more(rich)": "Sie haben derzeit $backups Sicherungen gespeichert."
       },
       "backupsDialogTitle": "Sicherungen verwalten",
       "restoreBackupPasswordDialog": {
@@ -181,6 +162,14 @@
   },
   "dangerZone": {
     "title": "Gefährliche Zone",
+    "changeBackendUrl": {
+      "title": "Server-URL ändern",
+      "subtitle": "Ändern Sie die Server-URL.",
+      "inputDialog": {
+        "title": "Server-URL",
+        "message": "Bitte geben Sie die Server-URL ein. Der Standardwert ist \"$defaultBackendUrl\"."
+      }
+    },
     "deleteAccount": {
       "title": "Ihr Konto löschen",
       "subtitle": "Löschen Sie Ihr Konto und alle Ihre synchronisierten Daten."

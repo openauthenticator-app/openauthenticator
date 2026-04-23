@@ -1,0 +1,14 @@
+{
+  "title": "Problemi di sincronizzazione",
+  "operations": {
+    "empty": "Va tutto bene!",
+    "title": "Errore $errorCode",
+    "expandable": {
+      "permanent": "Questo errore è permanente e l'operazione non verrà ritentata.",
+      "date": "Data:",
+      "code": "Codice:",
+      "details": "Dettagli:",
+      "deleteButton": "Elimina"
+    }
+  }
+}

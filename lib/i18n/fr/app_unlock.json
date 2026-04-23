@@ -1,8 +1,5 @@
 {
-  "widget": {
-    "text": "$app est verrouillé.",
-    "button": "Déverrouiller"
-  },
+  "widget": "$app est verrouillé.",
   "authenticationRequired": "Authentification requise",
   "localAuthentication(map)": {
     "openApp": "Authentifiez-vous pour accéder à l'application.",
@@ -11,14 +8,9 @@
     "disable":  "Authentifiez-vous pour désactiver l'authentification locale."
   },
   "masterPasswordDialogMessage": "Veuillez entrer votre mot de passe maître pour déverrouiller l'application.",
-  "cannotUnlock": {
-    "localAuthentication": {
-      "deviceNotSupported": "Impossible de déverouiller l'application car l'authentification locale n'est pas supportée. Désactivez cette méthode de verrouillage avec le bouton ci-dessous.",
-      "button": "Désactiver"
-    },
-    "masterPassword": {
-      "noPasswordVerificationMethodAvailable": "Impossible de déverouiller l'application parce que l'intégrité des données de l'application a été altérée.\nVeuillez modifier votre mot de passe maître pour continuer.\nNotez que vos TOTPs devront tout de même être déchiffrés manuellement.",
-      "button": "Changer le mot de passe maître"
-    }
+  "button": {
+    "disable": "Désactiver",
+    "changeMasterPassword": "Changer le mot de passe maître",
+    "unlock": "Déverrouiller"
   }
 }

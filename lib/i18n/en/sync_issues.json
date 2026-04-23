@@ -1,0 +1,14 @@
+{
+  "title": "Synchronization issues",
+  "operations": {
+    "empty": "It's all good !",
+    "title": "Error $errorCode",
+    "expandable": {
+      "permanent": "This error is permanent and the operation will not be retried.",
+      "date": "Date :",
+      "code": "Code :",
+      "details": "Details :",
+      "deleteButton": "Delete"
+    }
+  }
+}

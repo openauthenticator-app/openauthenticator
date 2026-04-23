@@ -1,8 +1,5 @@
 {
-  "widget": {
-    "text": "$app è bloccata.",
-    "button": "Sblocca"
-  },
+  "widget": "$app è bloccata.",
   "authenticationRequired": "Autenticazione richiesta",
   "localAuthentication(map)": {
     "openApp": "Autenticati per accedere all'app.",
@@ -11,14 +8,9 @@
     "disable": "Autenticati per disabilitare l'autenticazione locale."
   },
   "masterPasswordDialogMessage": "Inserisci la tua password principale per sbloccare l'app.",
-  "cannotUnlock": {
-    "localAuthentication": {
-      "deviceNotSupported": "Impossibile sbloccare l'app perché il tuo dispositivo non è supportato dall'autenticazione locale. Disabilita questo metodo di blocco con il pulsante qui sotto.",
-      "button": "Disabilita"
-    },
-    "masterPassword": {
-      "noPasswordVerificationMethodAvailable": "Impossibile sbloccare l'app con la tua password perché l'integrità dei dati dell'app è stata alterata. Cambia la tua password principale per continuare.\nNota che i tuoi TOTP dovranno comunque essere decifrati manualmente.",
-      "button": "Cambia password principale"
-    }
+  "button": {
+    "disable": "Disabilitare",
+    "changeMasterPassword": "Cambiare la password principale",
+    "unlock": "Sbloccare"
   }
 }

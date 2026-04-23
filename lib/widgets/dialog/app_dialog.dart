@@ -1,53 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:open_authenticator/utils/brightness_listener.dart';
+import 'package:forui/forui.dart';
+import 'package:open_authenticator/spacing.dart';
 import 'package:open_authenticator/utils/platform.dart';
-import 'package:open_authenticator/widgets/list/expand_list_tile.dart';
-import 'package:open_authenticator/widgets/list/list_tile_padding.dart';
-
-/// The classic content dialog padding on mobile.
-const EdgeInsets kClassicContentDialogPaddingMobile = EdgeInsets.symmetric(
-  vertical: 12,
-  horizontal: 24,
-);
-
-/// The classic content dialog padding on desktop.
-const EdgeInsets kClassicContentDialogPaddingDesktop = EdgeInsets.symmetric(
-  vertical: 12,
-  horizontal: 24,
-);
-
-/// The classic list dialog padding on mobile.
-const EdgeInsets kClassicChoiceDialogPaddingMobile = EdgeInsets.zero;
-
-/// The classic list dialog padding on desktop.
-const EdgeInsets kClassicChoiceDialogPaddingDesktop = EdgeInsets.symmetric(
-  vertical: 12,
-  horizontal: 0,
-);
+import 'package:open_authenticator/widgets/clickable.dart';
 
 /// A scrollable full-width app-styled and adaptive alert dialog.
 class AppDialog extends StatelessWidget {
   /// The classic content padding.
-  static final EdgeInsets classicContentDialogPadding = currentPlatform.isMobile ? kClassicContentDialogPaddingMobile : kClassicContentDialogPaddingDesktop;
+  static const EdgeInsets kDefaultContentPadding = EdgeInsets.symmetric(
+    vertical: kSpace,
+    horizontal: kBigSpace,
+  );
 
-  /// The classic content padding.
-  static final EdgeInsets classicChoiceDialogPadding = currentPlatform.isMobile ? kClassicChoiceDialogPaddingMobile : kClassicChoiceDialogPaddingDesktop;
+  /// The dialog animation.
+  final Animation<double>? animation;
 
   /// The dialog title.
   final Widget? title;
-
-  /// Whether to ellipsis title on overflow.
-  final bool? ellipsisTitleOnOverflow;
 
   /// The dialog children.
   final List<Widget> children;
 
   /// The dialog actions.
   final List<Widget>? actions;
-
-  /// The dialog border radius.
-  final double borderRadius;
 
   /// Whether to display a close button.
   final bool? displayCloseButton;
@@ -61,11 +36,10 @@ class AppDialog extends StatelessWidget {
   /// Creates a new app dialog instance.
   const AppDialog({
     super.key,
+    this.animation,
     this.title,
-    this.ellipsisTitleOnOverflow,
     this.children = const [],
     this.actions,
-    this.borderRadius = 28,
     this.displayCloseButton,
     this.contentPadding,
     this.scrollable = true,
@@ -73,142 +47,270 @@ class AppDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    EdgeInsets? listViewPadding = contentPadding;
-    int listTileCount = this.children.where((child) => child is ListTile || child is ListTilePadding || child is ExpandListTile).length;
-    bool isListDialog = listTileCount == this.children.length;
-    if (listViewPadding == null) {
-      if (isListDialog) {
-        listViewPadding = classicChoiceDialogPadding;
-      } else {
-        listViewPadding = classicContentDialogPadding;
-      }
-      if (title != null && currentPlatform.isMobile) {
-        listViewPadding = listViewPadding.copyWith(top: 0);
-      }
-    }
+    EdgeInsets? listViewPadding = contentPadding ?? kDefaultContentPadding;
     List<Widget> children = [
       for (int i = 0; i < this.children.length; i++)
         Padding(
-          padding: listViewPadding.copyWith(top: i == 0 ? null : 0, bottom: i == this.children.length - 1 ? null : 0),
+          padding: listViewPadding.copyWith(
+            top: i == 0 ? null : kSpace / 2,
+            bottom: i == this.children.length - 1 ? null : kSpace / 2,
+          ),
           child: this.children[i],
         ),
     ];
-    children = [
-      if (title != null)
-        Transform.translate(
-          offset: const Offset(0, -1),
-          child: _AppDialogTitle(
-            title: title!,
-            ellipsisTitleOnOverflow: ellipsisTitleOnOverflow,
-            displayCloseButton: displayCloseButton,
-            borderRadius: borderRadius,
-          ),
-        ),
-      ...children,
-    ];
-    Widget dialog = AlertDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(
-          Radius.circular(borderRadius),
-        ),
-      ),
-      contentPadding: EdgeInsets.zero,
-      content: SizedBox(
-        width: MediaQuery.sizeOf(context).width,
-        child: scrollable
-            ? ListView(
-                shrinkWrap: true,
-                children: children,
-              )
-            : Column(
-                mainAxisSize: MainAxisSize.min,
-                children: children,
+    return FDialog.raw(
+      builder: (context, style) => _AppDialogContent(
+        style: style.contentStyle.resolve({context.platformVariant}),
+        slideableActions: style.slideableActions.resolve({context.platformVariant}),
+        title: title == null
+            ? null
+            : _AppDialogTitle(
+                title: title!,
+                displayCloseButton: displayCloseButton,
               ),
+        body: SizedBox(
+          width: MediaQuery.sizeOf(context).width,
+          child: scrollable
+              ? ListView(
+                  padding: .zero,
+                  shrinkWrap: true,
+                  children: children,
+                )
+              : Column(
+                  mainAxisSize: .min,
+                  children: children,
+                ),
+        ),
+        actions: [
+          for (int i = 0; i < (actions?.length ?? 0); i++)
+            _AdaptiveActionPadding(
+              actionIndex: i,
+              actionsCount: actions!.length,
+              action: actions![i],
+            ),
+        ],
       ),
-      actions: actions,
-    );
-    ThemeData theme = Theme.of(context);
-    return isListDialog && currentPlatform.isMobile
-        ? Theme(
-            data: theme.copyWith(
-              listTileTheme: theme.listTileTheme.copyWith(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 30),
+      style: .delta(
+        contentStyle: .delta(
+          [
+            .all(
+              const .delta(
+                padding: .value(EdgeInsets.zero),
+                titlePadding: .value(EdgeInsets.zero),
+                bodyPadding: .value(EdgeInsets.zero),
+                titleSpacing: 0,
+                contentSpacing: 0,
+                actionSpacing: 0,
               ),
             ),
-            child: dialog,
-          )
-        : dialog;
+          ],
+        ),
+      ),
+      animation: animation,
+    );
   }
 }
 
-/// The app dialog title widget.
-class _AppDialogTitle extends ConsumerStatefulWidget {
+/// Mimics ForUI's dialog content, but allows the text to be aligned at the start by default.
+class _AppDialogContent extends StatelessWidget {
+  /// The dialog content's style.
+  final FDialogContentStyle style;
+
+  /// Whether the dialog's actions support pressing an action and sliding to another.
+  final bool slideableActions;
+
+  /// The alignment of the content.
+  final CrossAxisAlignment alignment;
+
   /// The dialog title.
-  final Widget title;
+  final Widget? title;
 
-  /// Whether to ellipsis title on overflow.
-  final bool? ellipsisTitleOnOverflow;
+  /// The alignment of the title.
+  final TextAlign titleTextAlign;
 
-  /// The dialog border radius.
-  final double borderRadius;
+  /// The dialog body.
+  final Widget? body;
 
-  /// Whether to display a close button.
-  final bool? displayCloseButton;
+  /// The alignment of the body.
+  final TextAlign bodyTextAlign;
 
-  /// Creates a new app dialog title instance.
-  const _AppDialogTitle({
+  /// The dialog actions.
+  final List<Widget> actions;
+
+  /// Creates a new app dialog content instance.
+  const _AppDialogContent({
+    required this.style,
+    required this.slideableActions,
+    this.alignment = .start,
     required this.title,
-    this.ellipsisTitleOnOverflow,
-    this.displayCloseButton,
-    this.borderRadius = 10,
+    this.titleTextAlign = .start,
+    required this.body,
+    this.bodyTextAlign = .start,
+    required this.actions,
+    super.key,
   });
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _AppDialogTitleState();
+  Widget build(BuildContext context) => Padding(
+    padding: style.padding,
+    child: Column(
+      mainAxisSize: .min,
+      crossAxisAlignment: alignment,
+      children: [
+        if (title case final title?)
+          Padding(
+            padding: style.titlePadding,
+            child: Semantics(
+              container: true,
+              child: DefaultTextStyle.merge(textAlign: titleTextAlign, style: style.titleTextStyle, child: title),
+            ),
+          ),
+        if (title != null && body != null) SizedBox(height: style.titleSpacing),
+        if (body case final body?)
+          Flexible(
+            child: Padding(
+              padding: style.bodyPadding,
+              child: Semantics(
+                container: true,
+                child: DefaultTextStyle.merge(textAlign: bodyTextAlign, style: style.bodyTextStyle, child: body),
+              ),
+            ),
+          ),
+        if (title != null && body != null) SizedBox(height: style.contentSpacing),
+        if (slideableActions) FTappableGroup(child: _createActions(context, style)) else _createActions(context, style),
+      ],
+    ),
+  );
+
+  /// Creates the dialog actions.
+  Widget _createActions(BuildContext context, FDialogContentStyle style) => MediaQuery.sizeOf(context).width < context.theme.breakpoints.sm
+      ? Column(
+          spacing: style.actionSpacing,
+          mainAxisSize: .min,
+          children: actions,
+        )
+      : Row(
+          spacing: style.actionSpacing,
+          mainAxisAlignment: .end,
+          children: actions.reversed.toList(),
+        );
 }
 
-/// The app dialog title state.
-class _AppDialogTitleState extends ConsumerState<_AppDialogTitle> with BrightnessListener {
+/// An adaptive action padding widget.
+class _AdaptiveActionPadding extends StatelessWidget {
+  /// The index of the action.
+  final int actionIndex;
+
+  /// The number of actions.
+  final int actionsCount;
+
+  /// The action widget.
+  final Widget action;
+
+  /// The gap between two actions.
+  final double gap;
+
+  /// The gap between the action and the edge of the dialog.
+  final double bigGap;
+
+  /// Creates a new adaptive action padding instance.
+  const _AdaptiveActionPadding({
+    super.key,
+    required this.actionIndex,
+    required this.actionsCount,
+    required this.action,
+    this.gap = kSpace / 2,
+    this.bigGap = kBigSpace,
+  });
+
   @override
-  Widget build(BuildContext context) {
-    Widget child = widget.title;
-    if (currentPlatform.isDesktop && widget.displayCloseButton != false) {
-      child = Row(
-        children: [
-          Expanded(child: child),
-          IconButton(
-            color: textColor?.withValues(alpha: 0.75),
-            tooltip: MaterialLocalizations.of(context).closeButtonLabel,
-            icon: const Icon(Icons.close),
-            onPressed: () => Navigator.pop(context),
+  Widget build(BuildContext context) => MediaQuery.sizeOf(context).width < context.theme.breakpoints.sm
+      ? Padding(
+          padding: .only(
+            top: actionIndex == 0 ? bigGap : gap,
+            right: bigGap,
+            bottom: actionIndex == actionsCount - 1 ? bigGap : gap,
+            left: bigGap,
           ),
-        ],
-      );
-    }
-    return Container(
-      padding: padding,
-      decoration: boxDecoration,
-      child: DefaultTextStyle(
-        style: (Theme.of(context).textTheme.headlineSmall ?? const TextStyle()).copyWith(color: textColor),
-        maxLines: widget.ellipsisTitleOnOverflow != false ? null : 1,
-        overflow: widget.ellipsisTitleOnOverflow != false ? TextOverflow.clip : TextOverflow.ellipsis,
-        child: child,
+          child: action,
+        )
+      : Padding(
+          padding: .only(
+            top: bigGap,
+            right: actionIndex == 0 ? bigGap : gap,
+            bottom: bigGap,
+            left: actionIndex == actionsCount - 1 ? bigGap : gap,
+          ),
+          child: action,
+        );
+}
+
+/// The app dialog title widget.
+class _AppDialogTitle extends StatelessWidget {
+  /// The dialog title.
+  final Widget title;
+
+  /// Whether to display a close button.
+  final bool displayCloseButton;
+
+  /// Creates a new app dialog title instance.
+  _AppDialogTitle({
+    required this.title,
+    bool? displayCloseButton,
+  }) : displayCloseButton = currentPlatform.isDesktop && displayCloseButton != false;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    mainAxisSize: .min,
+    children: [
+      MediaQuery.removePadding(
+        removeTop: true,
+        removeRight: true,
+        removeBottom: true,
+        removeLeft: true,
+        context: context,
+        child: FHeader(
+          title: Align(
+            alignment: .centerLeft,
+            child: title,
+          ),
+          style: .delta(
+            titleTextStyle: .delta(
+              fontSize: context.theme.typography.xl.fontSize,
+              fontWeight: FontWeight.normal,
+              height: 1,
+            ),
+            padding: displayCloseButton
+                ? .value(
+                    AppDialog.kDefaultContentPadding.copyWith(
+                      top: kBigSpace,
+                      bottom: kBigSpace - 6,
+                    ),
+                  )
+                : const .value(AppDialog.kDefaultContentPadding),
+          ),
+          suffixes: [
+            if (displayCloseButton)
+              Tooltip(
+                message: MaterialLocalizations.of(context).closeButtonLabel,
+                child: ClickableButton.icon(
+                  variant: .destructive,
+                  child: const Icon(FIcons.x),
+                  onPress: () => Navigator.pop(context),
+                ),
+              ),
+          ],
+        ),
       ),
-    );
-  }
-
-  /// Returns the padding.
-  EdgeInsets get padding => currentPlatform.isMobile ? const EdgeInsets.all(24) : const EdgeInsets.symmetric(horizontal: 16, vertical: 12);
-
-  /// Returns the text color.
-  Color? get textColor => currentPlatform.isMobile ? null : Colors.white;
-
-  /// Creates the box decoration.
-  BoxDecoration? get boxDecoration => BoxDecoration(
-    borderRadius: BorderRadius.only(
-      topLeft: Radius.circular(widget.borderRadius),
-      topRight: Radius.circular(widget.borderRadius),
-    ),
-    color: currentPlatform.isMobile || currentBrightness == Brightness.dark ? null : Theme.of(context).colorScheme.primary,
+      const FDivider(
+        style: .delta(
+          padding: .value(
+            EdgeInsets.only(
+              bottom: kSpace * 3 / 2,
+            ),
+          ),
+        ),
+      ),
+    ],
   );
 }

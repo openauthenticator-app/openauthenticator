@@ -2,16 +2,19 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:forui/forui.dart';
 import 'package:http/http.dart' as http;
 import 'package:open_authenticator/i18n/translations.g.dart';
+import 'package:open_authenticator/spacing.dart';
 import 'package:open_authenticator/utils/debounce.dart';
 import 'package:open_authenticator/utils/form_label.dart';
 import 'package:open_authenticator/widgets/centered_circular_progress_indicator.dart';
+import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/logo_search/sources.dart';
 import 'package:open_authenticator/widgets/smart_image.dart';
 
 /// Allows to search for logos on various sources.
-class LogoSearchWidget extends StatefulWidget {
+class LogoSearch extends StatefulWidget {
   /// The initial search keywords to use.
   final String? initialSearchKeywords;
 
@@ -22,7 +25,7 @@ class LogoSearchWidget extends StatefulWidget {
   final double imageWidth;
 
   /// Creates a new Wikimedia logo search instance.
-  const LogoSearchWidget({
+  const LogoSearch({
     super.key,
     this.initialSearchKeywords,
     this.onLogoClicked,
@@ -30,11 +33,11 @@ class LogoSearchWidget extends StatefulWidget {
   });
 
   @override
-  State<StatefulWidget> createState() => _LogoSearchWidgetState();
+  State<StatefulWidget> createState() => _LogoSearchState();
 }
 
 /// The Wikimedia logo search state.
-class _LogoSearchWidgetState extends State<LogoSearchWidget> {
+class _LogoSearchState extends State<LogoSearch> {
   /// The default search term.
   static const String kDefaultSearch = 'microsoft';
 
@@ -45,7 +48,12 @@ class _LogoSearchWidgetState extends State<LogoSearchWidget> {
   final http.Client client = http.Client();
 
   /// The search keywords.
-  late String? searchKeywords = widget.initialSearchKeywords;
+  late TextEditingController searchKeywordsController = TextEditingController(text: widget.initialSearchKeywords ?? kDefaultSearch)
+    ..addListener(() {
+      if (mounted) {
+        debounce.milliseconds(500, search);
+      }
+    });
 
   /// All searches triggered by the user.
   final Map<String, List<String>> searches = {};
@@ -62,25 +70,30 @@ class _LogoSearchWidgetState extends State<LogoSearchWidget> {
   Widget build(BuildContext context) => Column(
     mainAxisSize: MainAxisSize.min,
     children: [
-      TextFormField(
-        initialValue: searchKeywords,
-        decoration: FormLabelWithIcon(
-          icon: Icons.search,
-          text: translations.logoSearch.keywords.text,
-          hintText: translations.logoSearch.keywords.hint,
+      FTextFormField(
+        control: .managed(controller: searchKeywordsController),
+        style: .delta(
+          color: .delta(
+            [
+              .base(context.theme.tileStyles.base.decoration.base.color),
+            ],
+          ),
         ),
-        onChanged: (value) {
-          searchKeywords = value;
-          debounce.milliseconds(500, search);
-        },
+        label: FormLabelWithIcon(
+          icon: FIcons.search,
+          text: translations.logoSearch.keywords.text,
+        ),
+        hint: translations.logoSearch.keywords.hint,
       ),
       SizedBox(
         width: double.infinity,
         child: Padding(
-          padding: const EdgeInsets.only(bottom: 20),
+          padding: const EdgeInsets.only(top: kSpace, bottom: kBigSpace),
           child: Text(
             translations.logoSearch.credits(sources: Source.sources.map((source) => source.name).join(' / ')),
-            style: Theme.of(context).textTheme.labelSmall,
+            style: context.theme.typography.xs.copyWith(
+              color: context.theme.colors.foreground.withValues(alpha: 0.75),
+            ),
             textAlign: TextAlign.right,
           ),
         ),
@@ -89,6 +102,7 @@ class _LogoSearchWidgetState extends State<LogoSearchWidget> {
         Wrap(
           alignment: WrapAlignment.center,
           spacing: widget.imageWidth / 10,
+          runSpacing: widget.imageWidth / 10,
           children: [
             for (String logo in searches[filteredSearchKeywords]!) //
               buildImageWidget(logo),
@@ -104,17 +118,25 @@ class _LogoSearchWidgetState extends State<LogoSearchWidget> {
     ],
   );
 
+  @override
+  void dispose() {
+    debounce.clear(search);
+    client.close();
+    searchKeywordsController.dispose();
+    super.dispose();
+  }
+
   /// Returns the search keywords, non null and lowercased.
-  String get filteredSearchKeywords => searchKeywords == null || searchKeywords!.trim().isEmpty ? kDefaultSearch : searchKeywords!.toLowerCase();
+  String get filteredSearchKeywords => searchKeywordsController.text.trim().isEmpty ? kDefaultSearch : searchKeywordsController.text.trim().toLowerCase();
 
   /// Triggers the search.
   Future<void> search() async {
-    if (!mounted || searches.containsKey(searchKeywords)) {
+    String keywords = filteredSearchKeywords;
+    if (!mounted || searches.containsKey(keywords)) {
       return;
     }
 
     setState(searches.clear);
-    String keywords = filteredSearchKeywords;
     List<Uri> logos = await Source.sources.search(client, keywords);
     setState(() => searches.putIfAbsent(keywords, () => []));
     for (Uri logo in logos) {
@@ -135,7 +157,7 @@ class _LogoSearchWidgetState extends State<LogoSearchWidget> {
     Widget image = UnconstrainedBox(
       child: SizedBox(
         width: widget.imageWidth,
-        child: SmartImageWidget(
+        child: ResolvedSmartImage(
           source: imageUrl,
           height: widget.imageWidth,
           width: widget.imageWidth,
@@ -161,12 +183,17 @@ class _LogoSearchWidgetState extends State<LogoSearchWidget> {
     }
     return widget.onLogoClicked == null
         ? image
-        : InkWell(
-            onTap: () => widget.onLogoClicked!.call(imageUrl),
-            child: Padding(
-              padding: const EdgeInsets.all(10),
-              child: image,
+        : FTappable(
+            builder: (context, states, child) => Container(
+              decoration: BoxDecoration(
+                color: (states.contains(FTappableVariant.hovered) || states.contains(FTappableVariant.pressed)) ? context.theme.colors.secondary : context.theme.colors.background,
+                borderRadius: context.theme.style.borderRadius.md,
+              ),
+              padding: const EdgeInsets.all(kSpace),
+              child: child!,
             ),
-          );
+            child: image,
+            onPress: () => widget.onLogoClicked!.call(imageUrl),
+          ).clickable();
   }
 }

@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:forui/forui.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/password_verification/password_verification.dart';
 import 'package:open_authenticator/utils/result.dart';
+import 'package:open_authenticator/widgets/button_text.dart';
+import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
 import 'package:open_authenticator/widgets/form/password_form_field.dart';
 
@@ -26,6 +30,12 @@ class TextInputDialog extends StatefulWidget {
   /// The initial value.
   final String initialValue;
 
+  /// The input formatters.
+  final List<TextInputFormatter>? inputFormatters;
+
+  /// The text capitalization.
+  final TextCapitalization? textCapitalization;
+
   /// Additional children to display.
   final List<Widget>? children;
 
@@ -38,6 +48,8 @@ class TextInputDialog extends StatefulWidget {
     this.validator,
     this.keyboardType,
     String? initialValue,
+    this.inputFormatters,
+    this.textCapitalization,
     this.children,
   }) : initialValue = initialValue ?? '';
 
@@ -53,16 +65,20 @@ class TextInputDialog extends StatefulWidget {
     FormFieldValidator<String>? validator,
     TextInputType? keyboardType,
     String? initialValue,
+    List<TextInputFormatter>? inputFormatters,
+    TextCapitalization? textCapitalization,
     List<Widget>? children,
-  }) => showDialog<String>(
+  }) => showFDialog<String>(
     context: context,
-    builder: (context) => TextInputDialog(
+    builder: (context, style, animation) => TextInputDialog(
       title: title,
       message: message,
       password: password,
       validator: validator,
       keyboardType: keyboardType,
       initialValue: initialValue,
+      inputFormatters: inputFormatters,
+      textCapitalization: textCapitalization,
       children: children,
     ),
   );
@@ -84,60 +100,82 @@ class _TextInputDialogState extends State<TextInputDialog> {
   /// The current value.
   late String value = widget.initialValue;
 
+  /// The password text editing controller.
+  late final TextEditingController valueController = TextEditingController(text: value)
+    ..addListener(() {
+      if (mounted) {
+        onChanged(valueController.value.text);
+      }
+    });
+
   /// Whether the input is valid.
-  late bool valid = widget.validator == null ? true : (widget.validator!.call(value) != null);
+  late bool valid = widget.validator == null ? true : (widget.validator!(value) == null);
 
   @override
-  Widget build(BuildContext context) => AppDialog(
-    title: Text(widget.title),
-    actions: [
-      TextButton(
-        onPressed: valid ? (() => Navigator.pop(context, value)) : null,
-        child: Text(MaterialLocalizations.of(context).okButtonLabel),
-      ),
-      TextButton(
-        onPressed: () => Navigator.pop(context),
-        child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
-      ),
-    ],
-    children: [
-      Text(
-        widget.message,
-        textAlign: TextAlign.left,
-      ),
-      if (widget.children != null) ...widget.children!,
-      if (widget.password)
-        PasswordFormField(
-          initialValue: value,
-          onChanged: onChanged,
-          autofocus: true,
-          onFieldSubmitted: (value) => Navigator.pop(context, value),
-          textInputAction: TextInputAction.go,
-          validator: widget.validator,
-          keyboardType: widget.keyboardType,
-          autovalidateMode: AutovalidateMode.always,
-        )
-      else
-        TextFormField(
-          initialValue: value,
-          onChanged: onChanged,
-          autofocus: true,
-          onFieldSubmitted: (value) => Navigator.pop(context, value),
-          textInputAction: TextInputAction.go,
-          validator: widget.validator,
-          keyboardType: widget.keyboardType,
-          autovalidateMode: AutovalidateMode.always,
+  Widget build(BuildContext context) {
+    void onSubmit(String value) {
+      bool valid = onChanged(value);
+      if (valid) {
+        Navigator.pop(context, value);
+      }
+    }
+
+    return AppDialog(
+      title: Text(widget.title),
+      actions: [
+        ClickableButton(
+          onPress: valid ? (() => Navigator.pop(context, value)) : null,
+          child: ButtonText(MaterialLocalizations.of(context).okButtonLabel),
         ),
-    ],
-  );
+        ClickableButton(
+          variant: .secondary,
+          onPress: () => Navigator.pop(context),
+          child: ButtonText(MaterialLocalizations.of(context).cancelButtonLabel),
+        ),
+      ],
+      children: [
+        Text(
+          widget.message,
+          textAlign: TextAlign.left,
+        ),
+        if (widget.children != null) ...widget.children!,
+        if (widget.password)
+          PasswordFormField(
+            control: .managed(controller: valueController),
+            autofocus: true,
+            onSubmit: onSubmit,
+            textInputAction: TextInputAction.go,
+            validator: widget.validator,
+            keyboardType: widget.keyboardType,
+            autovalidateMode: AutovalidateMode.always,
+            inputFormatters: widget.inputFormatters,
+            textCapitalization: widget.textCapitalization ?? .none,
+          )
+        else
+          FTextFormField(
+            control: .managed(controller: valueController),
+            autofocus: true,
+            onSubmit: onSubmit,
+            textInputAction: TextInputAction.go,
+            validator: widget.validator,
+            keyboardType: widget.keyboardType,
+            autovalidateMode: AutovalidateMode.always,
+            inputFormatters: widget.inputFormatters,
+            textCapitalization: widget.textCapitalization ?? .none,
+          ),
+      ],
+    );
+  }
 
   /// Triggered when changed.
-  void onChanged(String newValue) {
+  bool onChanged(String newValue) {
     value = newValue;
     if (widget.validator != null) {
       bool result = widget.validator!(newValue) == null;
       setState(() => valid = result);
+      return result;
     }
+    return true;
   }
 }
 
@@ -166,9 +204,9 @@ class MasterPasswordInputDialog extends ConsumerStatefulWidget {
     BuildContext context, {
     String? title,
     String? message,
-  }) => showDialog<String>(
+  }) => showFDialog<String>(
     context: context,
-    builder: (context) => MasterPasswordInputDialog(
+    builder: (context, style, animation) => MasterPasswordInputDialog(
       title: title,
       message: message,
     ),
@@ -183,10 +221,7 @@ class MasterPasswordInputDialog extends ConsumerStatefulWidget {
         }
         return translations.error.validation.masterPassword;
       case ResultError<bool>(:final exception):
-        if (exception != null) {
-          return translations.error.generic.withException(exception: exception);
-        }
-        break;
+        return translations.error.generic.withException(exception: exception);
       default:
         break;
     }
@@ -202,6 +237,14 @@ class _MasterPasswordInputDialogState extends ConsumerState<MasterPasswordInputD
   /// The password.
   String password = '';
 
+  /// The password text editing controller.
+  late final TextEditingController passwordController = TextEditingController(text: password)
+    ..addListener(() {
+      if (mounted) {
+        password = passwordController.value.text;
+      }
+    });
+
   /// The master password validation result.
   Result<bool> oldPasswordValidationResult = const ResultSuccess(value: false);
 
@@ -209,13 +252,14 @@ class _MasterPasswordInputDialogState extends ConsumerState<MasterPasswordInputD
   Widget build(BuildContext context) => AppDialog(
     title: Text(widget.title),
     actions: [
-      TextButton(
-        onPressed: onOkPressed,
-        child: Text(MaterialLocalizations.of(context).okButtonLabel),
+      ClickableButton(
+        onPress: onOkPress,
+        child: ButtonText(MaterialLocalizations.of(context).okButtonLabel),
       ),
-      TextButton(
-        onPressed: () => Navigator.pop(context),
-        child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+      ClickableButton(
+        variant: .secondary,
+        onPress: () => Navigator.pop(context),
+        child: ButtonText(MaterialLocalizations.of(context).cancelButtonLabel),
       ),
     ],
     children: [
@@ -226,10 +270,9 @@ class _MasterPasswordInputDialogState extends ConsumerState<MasterPasswordInputD
       Form(
         key: formFieldKey,
         child: PasswordFormField(
-          initialValue: password,
-          onChanged: (value) => password = value,
+          control: .managed(controller: passwordController),
           autofocus: true,
-          onFieldSubmitted: (value) => onOkPressed(password: value),
+          onSubmit: (value) => onOkPress(password: value),
           textInputAction: TextInputAction.go,
           validator: (_) => MasterPasswordInputDialog.validateMasterPassword(oldPasswordValidationResult),
           autovalidateMode: AutovalidateMode.disabled,
@@ -238,8 +281,14 @@ class _MasterPasswordInputDialogState extends ConsumerState<MasterPasswordInputD
     ],
   );
 
+  @override
+  void dispose() {
+    passwordController.dispose();
+    super.dispose();
+  }
+
   /// Triggered when the ok button has been pressed.
-  Future<void> onOkPressed({String? password}) async {
+  Future<void> onOkPress({String? password}) async {
     password ??= this.password;
     oldPasswordValidationResult = await (await ref.read(passwordVerificationProvider.future)).isPasswordValid(password);
     if (!formFieldKey.currentState!.validate() || !mounted) {

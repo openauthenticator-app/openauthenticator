@@ -1,0 +1,22 @@
+{
+  "confirmActionPickerDialog": {
+    "title": "Cosa vuoi fare?",
+    "confirm": {
+      "title": "Conferma il tuo account",
+      "subtitle": "Incolla il codice che hai ricevuto via email per confermare il tuo account."
+    },
+    "cancelConfirmation": {
+      "title": "Annulla la conferma dell'account",
+      "subtitle": "Annulla la conferma del tuo account.",
+      "validationDialog": {
+        "title": "Conferma",
+        "message": "Sei sicuro?"
+      }
+    }
+  },
+  "success": "Email confermata con successo.",
+  "codeDialog": {
+    "title": "Codice di conferma",
+    "message": "Visita il link con questo dispositivo o incolla il codice qui sotto per confermare il tuo indirizzo email."
+  }
+}

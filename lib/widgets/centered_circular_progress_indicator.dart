@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:forui/forui.dart';
 
 /// A centered circular progress indicator.
 class CenteredCircularProgressIndicator extends StatelessWidget {
@@ -9,6 +10,6 @@ class CenteredCircularProgressIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const Center(
-    child: CircularProgressIndicator(),
+    child: FCircularProgress(),
   );
 }
