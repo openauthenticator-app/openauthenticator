@@ -58,7 +58,17 @@ class MasterPasswordAppUnlockMethod extends AppUnlockMethod<String> {
   Future<CannotUnlockException?> canUnlock() async {
     Salt? salt = await Salt.readFromLocalStorage();
     if (salt == null) {
-      return MasterPasswordNoSalt();
+      try {
+        List<Totp> totps = await _ref.read(totpRepositoryProvider.future);
+        salt = totps.firstOrNull?.encryptedData.encryptionSalt;
+        if (salt == null) {
+          return MasterPasswordNoSalt();
+        }
+        await salt.saveToLocalStorage();
+      } catch (ex, stackTrace) {
+        handleException(ex, stackTrace);
+        return MasterPasswordNoSalt();
+      }
     }
     List<PasswordVerificationMethod> passwordVerificationMethods = await _ref.read(passwordVerificationProvider.future);
     if (passwordVerificationMethods.isEmpty) {
