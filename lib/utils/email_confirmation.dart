@@ -32,7 +32,7 @@ class EmailConfirmationUtils {
     if ((handleResult?.call(result) ?? true) && context.mounted) {
       context.handleResult(
         result,
-        successMessage: confirmAction == .tryConfirm ? (result as ResultSuccess<RedirectResult>).valueOrNull?.localizedMessage : null,
+        successMessage: (value) => confirmAction == .tryConfirm ? value.localizedMessage : null,
       );
     }
     return result;

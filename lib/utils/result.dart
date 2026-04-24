@@ -31,7 +31,7 @@ class ResultSuccess<T> extends Result<T> {
   T get value => _value!;
 
   @override
-  T? get valueOrNull => value;
+  T? get valueOrNull => _value;
 
   @override
   ResultSuccess<U> to<U>(U? Function(T?) convert) => ResultSuccess(value: convert(valueOrNull));
@@ -49,8 +49,13 @@ class ResultError<T> extends Result<T> {
   ResultError({
     required this.exception,
     StackTrace? stackTrace,
+    bool? sendToSentry,
   }) : stackTrace = stackTrace ?? StackTrace.current {
-    handleException(exception, stackTrace);
+    handleException(
+      exception,
+      stackTrace,
+      sendToSentry: sendToSentry,
+    );
   }
 
   /// Creates a new result error instance from another [result].
@@ -79,17 +84,17 @@ class ResultCancelled<T> extends Result<T> {
 /// Allows to display a result into a SnackBar.
 extension DisplayResult on BuildContext {
   /// Display the given [result].
-  void handleResult(
-    Result result, {
+  void handleResult<T>(
+    Result<T> result, {
     bool Function(Object? error)? showDialogIfError,
-    String? successMessage,
-    String Function(Object? error)? errorMessage,
+    String? Function(T value)? successMessage,
+    String? Function(Object? error)? errorMessage,
   }) {
     switch (result) {
-      case ResultSuccess():
+      case ResultSuccess(:final value):
         showSuccessToast(
           this,
-          text: successMessage ?? translations.error.noError,
+          text: successMessage?.call(value) ?? translations.error.noError,
         );
         break;
       case ResultError(:final exception, :final stackTrace):

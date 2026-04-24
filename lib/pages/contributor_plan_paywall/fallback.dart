@@ -239,7 +239,7 @@ class _ContributorPlanFallbackPaywallState extends ConsumerState<ContributorPlan
     }
     context.handleResult(
       result,
-      successMessage: successMessage?.call(result.valueOrNull),
+      successMessage: successMessage,
     );
     if (result.valueOrNull == .active) {
       widget.onPurchaseCompleted();
