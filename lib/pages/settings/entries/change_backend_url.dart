@@ -13,6 +13,7 @@ import 'package:open_authenticator/utils/result.dart';
 import 'package:open_authenticator/utils/storage_migration.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/text_input_dialog.dart';
+import 'package:open_authenticator/widgets/toast.dart';
 import 'package:open_authenticator/widgets/waiting_overlay.dart';
 
 /// Allows to change the backend URL.
@@ -57,12 +58,15 @@ class ChangeBackendUrlSettingsEntryWidget extends ConsumerWidget with FTileMixin
       if (url == null || !context.mounted) {
         return;
       }
-      Result<PingBackendResponse> pingBackendResponse = await ref
-          .read(backendClientProvider.notifier)
-          .sendHttpRequest(
-            const PingBackendRequest(),
-            backendUrl: url,
-          );
+      Result<PingBackendResponse> pingBackendResponse = await showWaitingOverlay(
+        context,
+        future: ref
+            .read(backendClientProvider.notifier)
+            .sendHttpRequest(
+              const PingBackendRequest(),
+              backendUrl: url,
+            ),
+      );
       if (!context.mounted) {
         return;
       }
@@ -77,17 +81,30 @@ class ChangeBackendUrlSettingsEntryWidget extends ConsumerWidget with FTileMixin
       if (!context.mounted) {
         return;
       }
-      await showWaitingOverlay(
+      Result cancelConfirmationResult = await showWaitingOverlay(
         context,
         future: ref.read(authenticationProviders).email.cancelConfirmation(),
       );
       if (!context.mounted) {
         return;
       }
+      if (cancelConfirmationResult is! ResultSuccess) {
+        context.handleResult(
+          pingBackendResponse,
+          showDialogIfError: (_) => false,
+        );
+        return;
+      }
       await showWaitingOverlay(
         context,
         future: ref.read(backendUrlSettingsEntryProvider.notifier).changeValue(BackendUrl(url)),
       );
+      if (context.mounted) {
+        showSuccessToast(
+          context,
+          text: translations.error.noError,
+        );
+      }
     },
   );
 }
