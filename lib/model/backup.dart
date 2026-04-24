@@ -160,7 +160,14 @@ class Backup implements Comparable<Backup> {
 
       List jsonTotps = jsonData[kTotpsKey];
       List<Totp> totps = [];
+      int defaultUpdatedAt = file.lastModifiedSync().millisecondsSinceEpoch;
       for (dynamic jsonTotp in jsonTotps) {
+        if (jsonTotp is! Map<String, dynamic>) {
+          continue;
+        }
+        if (jsonTotp[Totp.kUpdatedAtKey] == null) {
+          jsonTotp[Totp.kUpdatedAtKey] = defaultUpdatedAt;
+        }
         Totp? totp = JsonTotp.tryFromJson(jsonTotp);
         if (totp != null) {
           DecryptedTotp? decryptedTotp = totp.changeEncryptionKey(cryptoStore, currentCryptoStore);
@@ -175,6 +182,7 @@ class Backup implements Comparable<Backup> {
       return ResultError(
         exception: ex,
         stackTrace: stackTrace,
+        sendToSentry: ex is! InvalidPasswordException,
       );
     }
   }
