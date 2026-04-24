@@ -25,6 +25,9 @@ final pushOperationsQueueProvider = AsyncNotifierProvider<PushOperationsQueue, L
 
 /// Allows to manage the push operations queue.
 class PushOperationsQueue extends AsyncNotifier<List<PushOperation>> {
+  /// The push operation timeout.
+  static const Duration _kPushOperationTimeout = Duration(seconds: 20);
+
   @override
   Future<List<PushOperation>> build() async {
     AppDatabase database = ref.watch(appDatabaseProvider);
@@ -71,6 +74,7 @@ class PushOperationsQueue extends AsyncNotifier<List<PushOperation>> {
           SynchronizationPushRequest(
             operations: compactedOperations.reversed.toList(),
           ),
+          timeout: _kPushOperationTimeout,
         );
     if (result is! ResultSuccess<SynchronizationPushResponse>) {
       return result;
@@ -93,6 +97,9 @@ final synchronizationControllerProvider = NotifierProvider<SynchronizationContro
 
 /// Allows to control the synchronization process.
 class SynchronizationController extends Notifier<SynchronizationStatus> with WidgetsBindingObserver {
+  /// The synchronization pull timeout.
+  static const Duration _kPullTimeout = Duration(seconds: 20);
+
   /// The synchronization periodic interval.
   static const Duration _kPeriodicInterval = Duration(minutes: 10);
 
@@ -301,6 +308,7 @@ class SynchronizationController extends Notifier<SynchronizationStatus> with Wid
             },
             deleted: deletedTotps,
           ),
+          timeout: _kPullTimeout,
         );
 
     if (result is! ResultSuccess<SynchronizationPullResponse>) {

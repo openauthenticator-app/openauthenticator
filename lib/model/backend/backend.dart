@@ -23,7 +23,10 @@ final backendClientProvider = AsyncNotifierProvider<BackendClient, Map<String, S
 /// Allows to communicate with the backend.
 class BackendClient extends AsyncNotifier<Map<String, String>> {
   /// The default timeout in seconds.
-  static const int _kDefaultTimeout = 10;
+  static const Duration _kDefaultTimeout = Duration(seconds: 10);
+
+  /// The app client ID storage key.
+  static const String _kAppClientIdKey = 'appClientId';
 
   /// The HTTP client instance.
   final http.Client _client = http.Client();
@@ -31,7 +34,7 @@ class BackendClient extends AsyncNotifier<Map<String, String>> {
   @override
   FutureOr<Map<String, String>> build() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    String? appClientId = await SimpleSecureStorage.read('appClientId');
+    String? appClientId = await SimpleSecureStorage.read(_kAppClientIdKey);
     ref.onDispose(_client.close);
     return {
       'App-Version': packageInfo.version,
@@ -46,7 +49,7 @@ class BackendClient extends AsyncNotifier<Map<String, String>> {
     if (!headers.containsKey('App-Client-Id')) {
       String appClientId = currentPlatform.generateAppClientId();
       headers['App-Client-Id'] = appClientId;
-      await SimpleSecureStorage.write('appClientId', appClientId);
+      await SimpleSecureStorage.write(_kAppClientIdKey, appClientId);
       if (ref.mounted) {
         state = AsyncData(headers);
       }
@@ -60,6 +63,7 @@ class BackendClient extends AsyncNotifier<Map<String, String>> {
     String? backendUrl,
     Session? session,
     bool autoRefreshAccessToken = true,
+    Duration timeout = _kDefaultTimeout,
   }) async {
     try {
       bool isConnected = await ref.read(connectivityStateProvider.future);
@@ -89,7 +93,7 @@ class BackendClient extends AsyncNotifier<Map<String, String>> {
             ).build(),
             headers: headers,
           )
-          .timeout(const Duration(seconds: _kDefaultTimeout));
+          .timeout(timeout);
       return ResultSuccess(
         value: request.toResponse(response),
       );
