@@ -88,7 +88,26 @@ popd > /dev/null
 
 rm -rf "$repo_dir" "$base_dir/appdir"
 
-flatpak-builder --force-clean "$base_dir/appdir" "$base_dir/app.yaml" --repo="$repo_dir"
+builder_args=(
+  --force-clean
+  "$base_dir/appdir"
+  "$base_dir/app.yaml"
+  --repo="$repo_dir"
+)
+
+if [[ -n "${FLATPAK_REPO_DEFAULT_BRANCH:-}" ]]; then
+  builder_args+=(--default-branch="$FLATPAK_REPO_DEFAULT_BRANCH")
+fi
+
+if [[ -n "${FLATPAK_GPG_KEY_ID:-}" ]]; then
+  builder_args+=(--gpg-sign="$FLATPAK_GPG_KEY_ID")
+
+  if [[ -n "${FLATPAK_GPG_HOMEDIR:-}" ]]; then
+    builder_args+=(--gpg-homedir="$FLATPAK_GPG_HOMEDIR")
+  fi
+fi
+
+flatpak-builder "${builder_args[@]}"
 
 update_repo_args=(
   --generate-static-deltas
