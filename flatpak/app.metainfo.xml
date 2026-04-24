@@ -74,6 +74,22 @@
   </branding>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="2.0.1" date="2026-04-24">
+      <url type="details">https://github.com/openauthenticator-app/openauthenticator/releases/tag/2.0.1</url>
+      <description type="changelog">
+        <ul>
+          <li>Instead of failing, the app now tries to get the salt back from TOTP list.</li>
+          <li>Fixed a bug with old backups restoring.</li>
+          <li>Fixed some app links being consumed more than once.</li>
+          <li>Fixed some user related errors being incorrectly sent to Sentry.</li>
+          <li>Backend URL change now displays more info.</li>
+          <li>Fixed some app links being consumed more than once.</li>
+          <li>Improved `Result`s handling.</li>
+          <li>Updated push and pull timeouts.</li>
+          <li>Now using `xdg_desktop_portal` instead of `connectivity_plus`.</li>
+        </ul>
+      </description>
+    </release>
     <release version="2.0.0" date="2026-04-24">
       <url type="details">https://github.com/openauthenticator-app/openauthenticator/releases/tag/2.0.0</url>
       <description type="changelog">

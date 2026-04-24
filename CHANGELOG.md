@@ -1,5 +1,18 @@
 # 📰 Open Authenticator changelog
 
+## v2.0.1
+Released on April 24, 2026.
+
+* **FEAT**: Instead of failing, the app now tries to get the salt back from TOTP list. ([#3da8a66](https://github.com/openauthenticator-app/openauthenticator/commit/3da8a66))
+* **FIX**: Fixed a bug with old backups restoring. ([#fb95911](https://github.com/openauthenticator-app/openauthenticator/commit/fb95911))
+* **FIX**: Fixed some app links being consumed more than once. ([#29cdfcf](https://github.com/openauthenticator-app/openauthenticator/commit/29cdfcf))
+* **FIX**: Fixed some user related errors being incorrectly sent to Sentry. ([#5b11363](https://github.com/openauthenticator-app/openauthenticator/commit/5b11363))
+* **CHORE**: Backend URL change now displays more info. ([#5448423](https://github.com/openauthenticator-app/openauthenticator/commit/5448423))
+* **CHORE**: Fixed some app links being consumed more than once. ([#0c01a83](https://github.com/openauthenticator-app/openauthenticator/commit/0c01a83))
+* **CHORE**: Improved `Result`s handling. ([#c35cc8c](https://github.com/openauthenticator-app/openauthenticator/commit/c35cc8c))
+* **CHORE**: Updated push and pull timeouts. ([#c604633](https://github.com/openauthenticator-app/openauthenticator/commit/c604633))
+* **REFACTOR**: Now using `xdg_desktop_portal` instead of `connectivity_plus`. ([#1eac66e](https://github.com/openauthenticator-app/openauthenticator/commit/1eac66e))
+
 ## v2.0.0
 Released on April 24, 2026.
 
