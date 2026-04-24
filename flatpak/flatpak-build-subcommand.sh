@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 set -x
 
 projectName=OpenAuthenticator
@@ -14,8 +14,11 @@ mkdir -p $projectName
 tar -xf $projectName-Linux-Portable.tar.gz -C $projectName
 
 # Copy the portable app to the Flatpak-based location.
-cp -r $projectName /app/
+cp -a $projectName /app/
 chmod +x /app/$projectName/$executableName
+if [[ -f "/app/$projectName/lib/crashpad_handler" ]]; then
+  chmod +x "/app/$projectName/lib/crashpad_handler"
+fi
 mkdir -p /app/bin
 ln -s /app/$projectName/$executableName /app/bin/$executableName
 
