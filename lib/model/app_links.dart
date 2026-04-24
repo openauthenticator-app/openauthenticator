@@ -8,6 +8,9 @@ final appLinksListenerProvider = AsyncNotifierProvider<AppLinksListener, Uri?>(A
 
 /// Allows to listen to [AppLinks].
 class AppLinksListener extends AsyncNotifier<Uri?> {
+  /// The consumed links.
+  final Set<String> _consumedLinks = {};
+
   @override
   Future<Uri?> build() {
     AppLinks appLinks = AppLinks();
@@ -22,4 +25,7 @@ class AppLinksListener extends AsyncNotifier<Uri?> {
       state = AsyncData(uri);
     }
   }
+
+  /// Consumes the [uri], returning whether it had not been consumed before.
+  bool consumeLink(Uri uri) => _consumedLinks.add(uri.toString());
 }
