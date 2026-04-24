@@ -117,6 +117,15 @@ class BackendClient extends AsyncNotifier<Map<String, String>> {
       return ResultError(
         exception: ex,
         stackTrace: stackTrace,
+        sendToSentry: switch (ex) {
+          SocketException(:final osError) => osError?.errorCode != 7,
+          TimeoutException() => false,
+          ProviderUserAlreadyExists() => false,
+          ExpiredCodeError() => false,
+          InvalidVerificationCodeError() => false,
+          InvalidAuthorizationCodeError() => false,
+          _ => true,
+        },
       );
     }
   }

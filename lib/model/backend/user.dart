@@ -11,7 +11,9 @@ import 'package:open_authenticator/model/backend/backend.dart';
 import 'package:open_authenticator/model/backend/request/request.dart';
 import 'package:open_authenticator/model/backend/request/response.dart';
 import 'package:open_authenticator/utils/result.dart';
+import 'package:open_authenticator/utils/utils.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 /// Represents a user, got from the backend.
 class User with EquatableMixin {
@@ -225,6 +227,15 @@ class UserNotifier extends AsyncNotifier<User?> {
     if (result is! ResultSuccess<GetUserInfoResponse>) {
       return result.to((_) => null);
     }
+    if (kSentryEnabled) {
+      Sentry.configureScope(
+        (scope) => scope.setUser(
+          SentryUser(
+            id: result.value.user.id,
+          ),
+        ),
+      );
+    }
     await changeUser(result.value.user);
     return ResultSuccess(value: result.value.user);
   }
@@ -238,7 +249,7 @@ class UserNotifier extends AsyncNotifier<User?> {
   }
 
   /// Logs out the user.
-  Future<Result> logoutUser({bool forceClearLocally = true}) async {
+  Future<Result> logoutUser() async {
     try {
       Session? session = await ref.read(storedSessionProvider.future);
       if (session == null) {
@@ -258,13 +269,7 @@ class UserNotifier extends AsyncNotifier<User?> {
         stackTrace: stackTrace,
       );
     } finally {
-      if (forceClearLocally) {
-        await User._clearCache();
-        await ref.read(storedSessionProvider.notifier).clear();
-        // if (ref.mounted) {
-        //   state = const AsyncData(null);
-        // }
-      }
+      await _clearUser();
     }
   }
 
@@ -276,11 +281,7 @@ class UserNotifier extends AsyncNotifier<User?> {
           .sendHttpRequest(
             const DeleteUserRequest(),
           );
-      await User._clearCache();
-      await ref.read(storedSessionProvider.notifier).clear();
-      // if (ref.mounted) {
-      //   state = const AsyncData(null);
-      // }
+      await _clearUser();
       return result;
     } catch (ex, stackTrace) {
       return ResultError<DeleteUserResponse>(
@@ -288,5 +289,16 @@ class UserNotifier extends AsyncNotifier<User?> {
         stackTrace: stackTrace,
       );
     }
+  }
+
+  Future<void> _clearUser() async {
+    if (kSentryEnabled) {
+      Sentry.configureScope((scope) => scope.setUser(null));
+    }
+    await User._clearCache();
+    await ref.read(storedSessionProvider.notifier).clear();
+    // if (ref.mounted) {
+    //   state = const AsyncData(null);
+    // }
   }
 }

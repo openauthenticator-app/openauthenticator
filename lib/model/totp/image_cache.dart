@@ -117,7 +117,7 @@ class TotpImageCacheManager extends AsyncNotifier<Map<String, CacheObject>> {
         });
       }
     } catch (ex, stackTrace) {
-      handleException(ex, stackTrace);
+      handleException(ex, stackTrace, sendToSentry: ex is! HttpException);
     }
   }
 

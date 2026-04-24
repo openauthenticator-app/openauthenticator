@@ -39,6 +39,7 @@
   },
   "backend": {
     "invalidJsonResponse": "Ungültige Antwort vom $route (HTTP $statusCode) : $body.",
+    "expiredCode": "Der Bestätigungscode ist abgelaufen. Bitte versuchen Sie sich erneut einzuloggen.",
     "noEmailToConfirm": "Keine E-Mail zum Bestätigen.",
     "invalidSession": "Ihre Sitzung ist ungültig. Bitte versuchen Sie sich erneut einzuloggen.",
     "noSession": "Sie müssen sich einloggen, um fortzufahren.",

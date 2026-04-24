@@ -245,10 +245,16 @@ class _RouteWidgetState extends ConsumerState<_RouteWidget> {
           }
           Uri uri = next.value!;
           if (uri.scheme == 'openauthenticator') {
+            if (!ref.read(appLinksListenerProvider.notifier).consumeLink(uri)) {
+              return;
+            }
             WidgetsBinding.instance.addPostFrameCallback((_) => handleAppLink(uri));
             return;
           }
           if (uri.scheme == 'otpauth') {
+            if (!ref.read(appLinksListenerProvider.notifier).consumeLink(uri)) {
+              return;
+            }
             WidgetsBinding.instance.addPostFrameCallback((_) => handleTotpLink(uri));
             return;
           }
@@ -319,7 +325,7 @@ class _RouteWidgetState extends ConsumerState<_RouteWidget> {
       if (mounted) {
         context.handleResult(
           result,
-          successMessage: result.valueOrNull?.localizedMessage,
+          successMessage: (value) => value.localizedMessage,
         );
       }
     }

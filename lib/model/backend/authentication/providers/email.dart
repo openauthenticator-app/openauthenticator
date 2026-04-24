@@ -76,6 +76,9 @@ class EmailAuthenticationProvider extends AuthenticationProvider {
             ),
           );
       if (response is! ResultSuccess<EmailConfirmResponse>) {
+        if (response is ResultError<EmailConfirmResponse> && response.exception is ExpiredCodeError) {
+          await _ref.read(emailConfirmationStateProvider.notifier)._cancelConfirmation();
+        }
         return response.to((_) => null);
       }
       Uri uri = response.value.url;

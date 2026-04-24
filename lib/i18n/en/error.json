@@ -39,6 +39,7 @@
   },
   "backend": {
     "invalidJsonResponse": "Invalid response from $route (HTTP $statusCode) : $body.",
+    "expiredCode": "The verification code has expired. Please try to log-in again.",
     "noEmailToConfirm": "No email to confirm.",
     "invalidSession": "Your session is invalid. Please try to log-in again.",
     "noSession": "You must be logged-in to proceed.",

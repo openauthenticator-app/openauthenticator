@@ -40,6 +40,7 @@
   "backend": {
     "invalidJsonResponse": "Réponse invalide du $route (HTTP $statusCode) : $body.",
     "noEmailToConfirm": "Aucun email à confirmer.",
+    "expiredCode": "Le code de vérification a expiré. Veuillez réessayer de vous connecter.",
     "invalidSession": "Votre session est invalide. Veuillez réessayer de vous connecter.",
     "noSession": "Vous devez être connecté pour continuer.",
     "emailAlreadySent": "Un email a déjà été envoyé à cette adresse. Veuillez vérifier votre boîte mail ou réessayer dans quelques minutes.",
