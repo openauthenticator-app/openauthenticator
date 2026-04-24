@@ -8,14 +8,14 @@
   <developer id="fr.skyost">
     <name>Skyost</name>
   </developer>
-  <url type="bugtracker">https://github.com/Skyost/OpenAuthenticator/issues</url>
+  <url type="bugtracker">https://github.com/openauthenticator-app/openauthenticator/issues</url>
   <url type="homepage">https://openauthenticator.app</url>
-  <url type="donation">https://github.com/Skyost/OpenAuthenticator?tab=readme-ov-file#donate</url>
+  <url type="donation">https://github.com/openauthenticator-app/openauthenticator?tab=readme-ov-file#donate</url>
   <url type="contact">https://openauthenticator.app/contact/</url>
   <url type="faq">https://openauthenticator.app/faq/</url>
   <url type="translate">https://openauthenticator.app/translate/</url>
-  <url type="contribute">https://github.com/Skyost/OpenAuthenticator?tab=readme-ov-file#contribute</url>
-  <url type="vcs-browser">https://github.com/Skyost/OpenAuthenticator</url>
+  <url type="contribute">https://github.com/openauthenticator-app/openauthenticator?tab=readme-ov-file#contribute</url>
+  <url type="vcs-browser">https://github.com/openauthenticator-app/openauthenticator</url>
   <description>
     <p>Protect your online accounts with Open Authenticator</p>
     <p>Open Authenticator generates Time-Based One-Time Passwords (TOTPs), which serve as the second factor in the 2FA process. These temporary codes are valid for a short period of time and are used alongside your password to verify your identity when logging into your accounts. This significantly enhances the security of your online accounts and protects them from unauthorized access.</p>
@@ -32,7 +32,7 @@
     <ul>
       <li>
         Check it out on Github :
-        <a href="https://github.com/Skyost/OpenAuthenticator">https://github.com/Skyost/OpenAuthenticator</a>
+        <a href="https://github.com/openauthenticator-app/openauthenticator">https://github.com/openauthenticator-app/openauthenticator</a>
       </li>
       <li>
         Visit our website :
@@ -75,7 +75,7 @@
   <content_rating type="oars-1.1"/>
   <releases>
     <release version="2.0.0" date="2026-04-24">
-      <url type="details">https://github.com/Skyost/OpenAuthenticator/releases/tag/2.0.0</url>
+      <url type="details">https://github.com/openauthenticator-app/openauthenticator/releases/tag/2.0.0</url>
       <description type="changelog">
         <ul>
           <li>Fixed various bugs with backups.</li>
@@ -112,7 +112,7 @@
       </description>
     </release>
     <release version="1.4.3" date="2025-12-23">
-      <url type="details">https://github.com/Skyost/OpenAuthenticator/releases/tag/1.4.3</url>
+      <url type="details">https://github.com/openauthenticator-app/openauthenticator/releases/tag/1.4.3</url>
       <description type="changelog">
         <ul>
           <li>Added an experimental way to build Flatpaks.</li>

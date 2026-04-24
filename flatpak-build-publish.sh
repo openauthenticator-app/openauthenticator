@@ -4,17 +4,36 @@ set -x
 
 script_dir=$(cd "$(dirname "$0")" && pwd)
 flatpak_dir="$script_dir/flatpak"
+env_file="${FLATPAK_ENV_FILE:-}"
 
 app_id="app.openauthenticator.OpenAuthenticator"
 repo_clone_dir="${FLATPAK_PUBLISH_CLONE_DIR:-$flatpak_dir/OpenAuthenticatorFlatpak}"
-publish_remote="${FLATPAK_PUBLISH_REMOTE:-git@github.com:Skyost/OpenAuthenticatorFlatpak.git}"
+publish_remote="${FLATPAK_PUBLISH_REMOTE:-https://github.com/openauthenticator-app/flatpak.git}"
 publish_branch="${FLATPAK_PUBLISH_BRANCH:-main}"
-repo_url="${FLATPAK_REPO_URL:-https://skyost.github.io/OpenAuthenticatorFlatpak/repo}"
-repo_title="${FLATPAK_REPO_TITLE:-OpenAuthenticator Flatpak}"
+force_sync="${FLATPAK_PUBLISH_FORCE_SYNC:-1}"
+repo_url="${FLATPAK_REPO_URL:-https://flatpak.openauthenticator.app/repo}"
+repo_title="${FLATPAK_REPO_TITLE:-Open Authenticator Flatpak}"
 repo_name="${FLATPAK_REPO_NAME:-app.openauthenticator.OpenAuthenticator}"
 default_branch="${FLATPAK_REPO_DEFAULT_BRANCH:-master}"
 flatpakrepo_output_name="${FLATPAK_PUBLISH_REPO_FILE:-openauthenticator.flatpakrepo}"
 flatpakref_output_name="${FLATPAK_PUBLISH_REF_FILE:-openauthenticator.flatpakref}"
+
+load_env_file() {
+  local candidate="$1"
+
+  if [[ -z "$candidate" || ! -f "$candidate" ]]; then
+    return 0
+  fi
+
+  set -a
+  # shellcheck disable=SC1090
+  . "$candidate"
+  set +a
+}
+
+strip_trailing_cr() {
+  printf '%s' "${1%$'\r'}"
+}
 
 write_flatpakref_file() {
   local destination_file="$1"
@@ -42,6 +61,62 @@ EOF
   fi
 }
 
+if [[ -n "$env_file" ]]; then
+  load_env_file "$env_file"
+else
+  load_env_file "$script_dir/.env"
+  load_env_file "$flatpak_dir/.env"
+fi
+
+repo_clone_dir="${FLATPAK_PUBLISH_CLONE_DIR:-$repo_clone_dir}"
+publish_remote="${FLATPAK_PUBLISH_REMOTE:-$publish_remote}"
+publish_branch="${FLATPAK_PUBLISH_BRANCH:-$publish_branch}"
+force_sync="${FLATPAK_PUBLISH_FORCE_SYNC:-$force_sync}"
+repo_url="${FLATPAK_REPO_URL:-$repo_url}"
+repo_title="${FLATPAK_REPO_TITLE:-$repo_title}"
+repo_name="${FLATPAK_REPO_NAME:-$repo_name}"
+default_branch="${FLATPAK_REPO_DEFAULT_BRANCH:-$default_branch}"
+flatpakrepo_output_name="${FLATPAK_PUBLISH_REPO_FILE:-$flatpakrepo_output_name}"
+flatpakref_output_name="${FLATPAK_PUBLISH_REF_FILE:-$flatpakref_output_name}"
+
+repo_clone_dir=$(strip_trailing_cr "$repo_clone_dir")
+publish_remote=$(strip_trailing_cr "$publish_remote")
+publish_branch=$(strip_trailing_cr "$publish_branch")
+repo_url=$(strip_trailing_cr "$repo_url")
+repo_title=$(strip_trailing_cr "$repo_title")
+repo_name=$(strip_trailing_cr "$repo_name")
+default_branch=$(strip_trailing_cr "$default_branch")
+flatpakrepo_output_name=$(strip_trailing_cr "$flatpakrepo_output_name")
+flatpakref_output_name=$(strip_trailing_cr "$flatpakref_output_name")
+force_sync=$(strip_trailing_cr "$force_sync")
+if [[ -n "${FLATPAK_GPG_KEY_ID:-}" ]]; then
+  FLATPAK_GPG_KEY_ID=$(strip_trailing_cr "$FLATPAK_GPG_KEY_ID")
+fi
+if [[ -n "${FLATPAK_GPG_HOMEDIR:-}" ]]; then
+  FLATPAK_GPG_HOMEDIR=$(strip_trailing_cr "$FLATPAK_GPG_HOMEDIR")
+fi
+if [[ -n "${FLATPAK_GPG_IMPORT:-}" ]]; then
+  FLATPAK_GPG_IMPORT=$(strip_trailing_cr "$FLATPAK_GPG_IMPORT")
+fi
+if [[ -n "${FLATPAK_REPO_COMMENT:-}" ]]; then
+  FLATPAK_REPO_COMMENT=$(strip_trailing_cr "$FLATPAK_REPO_COMMENT")
+fi
+if [[ -n "${FLATPAK_REPO_DESCRIPTION:-}" ]]; then
+  FLATPAK_REPO_DESCRIPTION=$(strip_trailing_cr "$FLATPAK_REPO_DESCRIPTION")
+fi
+if [[ -n "${FLATPAK_REPO_HOMEPAGE:-}" ]]; then
+  FLATPAK_REPO_HOMEPAGE=$(strip_trailing_cr "$FLATPAK_REPO_HOMEPAGE")
+fi
+if [[ -n "${FLATPAK_REPO_ICON:-}" ]]; then
+  FLATPAK_REPO_ICON=$(strip_trailing_cr "$FLATPAK_REPO_ICON")
+fi
+if [[ -n "${FLATPAK_RUNTIME_REPO:-}" ]]; then
+  FLATPAK_RUNTIME_REPO=$(strip_trailing_cr "$FLATPAK_RUNTIME_REPO")
+fi
+if [[ -n "${FLATPAK_PUBLISH_COMMIT_MESSAGE:-}" ]]; then
+  FLATPAK_PUBLISH_COMMIT_MESSAGE=$(strip_trailing_cr "$FLATPAK_PUBLISH_COMMIT_MESSAGE")
+fi
+
 if [[ -z "${FLATPAK_GPG_KEY_ID:-}" ]]; then
   echo "FLATPAK_GPG_KEY_ID is required." >&2
   exit 1
@@ -63,9 +138,19 @@ if [[ ! -d "$repo_clone_dir/.git" ]]; then
   git clone "$publish_remote" "$repo_clone_dir"
 fi
 
+git -C "$repo_clone_dir" remote set-url origin "$publish_remote"
 git -C "$repo_clone_dir" fetch origin
 git -C "$repo_clone_dir" checkout "$publish_branch"
-git -C "$repo_clone_dir" pull --ff-only origin "$publish_branch"
+
+if [[ "$force_sync" == "1" ]]; then
+  git -C "$repo_clone_dir" reset --hard "origin/$publish_branch"
+else
+  if ! git -C "$repo_clone_dir" pull --ff-only origin "$publish_branch"; then
+    echo "Publication clone is diverged from origin/$publish_branch." >&2
+    echo "Run with FLATPAK_PUBLISH_FORCE_SYNC=1 to reset the publication clone to the remote branch." >&2
+    exit 1
+  fi
+fi
 
 (
   cd "$flatpak_dir"
@@ -98,5 +183,5 @@ if git -C "$repo_clone_dir" diff --cached --quiet; then
   exit 0
 fi
 
-git -C "$repo_clone_dir" commit -m "${FLATPAK_PUBLISH_COMMIT_MESSAGE:-chore: update Flatpak repo}"
+git -C "$repo_clone_dir" commit -m "${FLATPAK_PUBLISH_COMMIT_MESSAGE:-chore: Updated the Flatpak repo.}"
 git -C "$repo_clone_dir" push origin "$publish_branch"

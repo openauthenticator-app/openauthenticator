@@ -65,6 +65,7 @@ flatpak/appdir
 flatpak/repo
 flatpak/OpenAuthenticatorFlatpak
 flatpak/*.flatpak
+flatpak/*.flatpakrepo
 flatpak/*.tar.gz
 flatpak/public-key.asc
 

@@ -8,13 +8,13 @@ icon: snap/gui/icon.svg
 website:
   - https://openauthenticator.app
 donation:
-  - https://github.com/Skyost/OpenAuthenticator?tab=readme-ov-file#donate
+  - https://github.com/openauthenticator-app/openauthenticator?tab=readme-ov-file#donate
 source-code:
-  - https://github.com/Skyost/OpenAuthenticator
+  - https://github.com/openauthenticator-app/openauthenticator
 contact:
   - https://openauthenticator.app/contact/
 issues:
-  - https://github.com/Skyost/OpenAuthenticator/issues/
+  - https://github.com/openauthenticator-app/openauthenticator/issues/
 
 base: core24
 confinement: strict
