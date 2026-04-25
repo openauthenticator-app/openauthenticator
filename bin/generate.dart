@@ -133,7 +133,7 @@ class AppCredentials {
   static const String revenueCatPublicKeyDarwin = '${results['revenue-cat-public-key-darwin']}';
 
   /// The RevenueCat Windows public key.
-  static const String revenueCatPublicKeyWindows = '${results['revenue-cat-public-key-windows']}';
+  static const String revenueCatPublicKeyWindows = '${results['revenue-cat-public-key-windows-linux']}';
 
   /// The RevenueCat Linux public key.
   static const String revenueCatPublicKeyLinux = revenueCatPublicKeyWindows;
