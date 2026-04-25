@@ -45,6 +45,27 @@ parts:
     source: .
     plugin: flutter
     flutter-target: lib/main.dart
+    override-build: |
+      flutter pub get
+      dart run open_authenticator:compile_svg
+      dart run build_runner build --delete-conflicting-outputs
+      dart run slang
+      dart run open_authenticator:generate
+
+      if command -v craftctl >/dev/null 2>&1; then
+        craftctl default
+      elif command -v snapcraftctl >/dev/null 2>&1; then
+        snapcraftctl build
+      elif [ -x /usr/libexec/snapcraft/craftctl ]; then
+        /usr/libexec/snapcraft/craftctl default
+      elif [ -x /usr/libexec/snapcraft/snapcraftctl ]; then
+        /usr/libexec/snapcraft/snapcraftctl build
+      elif [ -x /usr/bin/scriptlet-bin/snapcraftctl ]; then
+        /usr/bin/scriptlet-bin/snapcraftctl build
+      else
+        echo "Could not find craftctl or snapcraftctl." >&2
+        exit 1
+      fi
     build-packages:
       - default-jdk-headless
       - libcurl4-openssl-dev
@@ -77,4 +98,3 @@ parts:
 plugs:
   polkit:
     action-prefix: app.openauthenticator
-
