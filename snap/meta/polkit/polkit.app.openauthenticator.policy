@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<policyconfig>
+  <action id="app.openauthenticator.openApp">
+    <description gettext-domain="polkit.app.openauthenticator">Authentication required</description>
+    <message gettext-domain="polkit.app.openauthenticator">Authenticate to access the app.</message>
+    <defaults>
+      <allow_any>auth_self</allow_any>
+      <allow_inactive>auth_self</allow_inactive>
+      <allow_active>auth_self</allow_active>
+    </defaults>
+  </action>
+  <action id="app.openauthenticator.sensibleAction">
+    <description gettext-domain="polkit.app.openauthenticator">Authentication required</description>
+    <message gettext-domain="polkit.app.openauthenticator">Authenticate to continue.</message>
+    <defaults>
+      <allow_any>auth_self</allow_any>
+      <allow_inactive>auth_self</allow_inactive>
+      <allow_active>auth_self</allow_active>
+    </defaults>
+  </action>
+  <action id="app.openauthenticator.enable">
+    <description gettext-domain="polkit.app.openauthenticator">Authentication required</description>
+    <message gettext-domain="polkit.app.openauthenticator">Authenticate to enable local authentication.</message>
+    <defaults>
+      <allow_any>auth_self</allow_any>
+      <allow_inactive>auth_self</allow_inactive>
+      <allow_active>auth_self</allow_active>
+    </defaults>
+  </action>
+  <action id="app.openauthenticator.disable">
+    <description gettext-domain="polkit.app.openauthenticator">Authentication required</description>
+    <message gettext-domain="polkit.app.openauthenticator">Authenticate to disable local authentication.</message>
+    <defaults>
+      <allow_any>auth_self</allow_any>
+      <allow_inactive>auth_self</allow_inactive>
+      <allow_active>auth_self</allow_active>
+    </defaults>
+  </action>
+</policyconfig>

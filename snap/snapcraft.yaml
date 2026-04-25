@@ -20,6 +20,18 @@ base: core24
 confinement: strict
 grade: stable
 
+platforms:
+  amd64:
+    build-on:
+      - amd64
+    build-for:
+      - amd64
+  arm64:
+    build-on:
+      - arm64
+    build-for:
+      - arm64
+
 slots:
   open-authenticator-dbus:
     interface: dbus
@@ -60,7 +72,11 @@ parts:
       dart run open_authenticator:compile_svg
       dart run build_runner build --delete-conflicting-outputs
       dart run slang
-      dart run open_authenticator:generate
+      dart run open_authenticator:generate \
+        --sentry-dsn="https://62d37f58cce344048c4ef701da3c949c@romantic-goat.pikapod.net/1" \
+        --revenue-cat-public-key-windows-linux="rcb_wJJfvBJCRpmDQpLnyJZGSkKbGshZ" \
+        --revenue-cat-offering-id="contributor_plan_v2" \
+        --logo-dev-api-key="pk_LtANBAqSSKuTTIoVjJ6O-w"
       dart run open_authenticator:generate_polkit_policy
       flutter build linux --release --verbose --target lib/main.dart
 
