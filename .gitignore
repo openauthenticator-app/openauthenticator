@@ -56,7 +56,6 @@ lib/app.dart
 /assets/images/**/*.si
 
 # Snap
-snap/meta/polkit
 open-authenticator_*.snap
 
 # Flatpak
