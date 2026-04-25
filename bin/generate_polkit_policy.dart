@@ -38,7 +38,7 @@ Future<void> main() async {
 ''';
   }
   policyFileContent += '</policyconfig>';
-  for (String path in ['snap/meta/polkit/polkit.app.openauthenticator.policy', 'docs/public/polkit/app.openauthenticator.policy']) {
+  for (String path in ['snap/meta/polkit/polkit.app.openauthenticator.policy']) {
     File policyFile = File(path);
     policyFile.parent.createSync(recursive: true);
     policyFile.writeAsStringSync(policyFileContent);

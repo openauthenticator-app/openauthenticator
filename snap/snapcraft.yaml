@@ -61,6 +61,7 @@ parts:
       dart run build_runner build --delete-conflicting-outputs
       dart run slang
       dart run open_authenticator:generate
+      dart run open_authenticator:generate_polkit_policy
       flutter build linux --release --verbose --target lib/main.dart
 
       cp -r build/linux/*/release/bundle/* "$CRAFT_PART_INSTALL/"
