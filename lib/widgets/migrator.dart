@@ -110,9 +110,9 @@ class Migrator extends ConsumerWidget {
       return;
     }
     switch (result) {
-      case ResultSuccess(:final value):
+      case ResultSuccess(:final valueOrNull):
         context.handleResult(result);
-        if (value == .shared) {
+        if (valueOrNull == .shared) {
           Navigator.pushNamed(context, SettingsPage.name);
           await AccountUtils.tryRequestSignIn(context);
         }

@@ -56,8 +56,7 @@ class EmailAuthenticationProvider extends AuthenticationProvider {
       uriBuilder.appendQueryParameter('mode', 'login');
     }
     uriBuilder.appendQueryParameter('timestamp', DateTime.now().millisecondsSinceEpoch.toString());
-    await launchUrl(uriBuilder.build());
-    return const ResultSuccess();
+    return await _launchAuthenticationUri(uriBuilder);
   }
 
   /// Confirms the email.

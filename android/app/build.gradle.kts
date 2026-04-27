@@ -70,4 +70,6 @@ flutter {
     source = "../.."
 }
 
-dependencies {}
+dependencies {
+    implementation("androidx.browser:browser:1.9.0")
+}

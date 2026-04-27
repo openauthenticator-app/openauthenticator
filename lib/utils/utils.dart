@@ -1,11 +1,26 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hashlib_codecs/hashlib_codecs.dart';
 import 'package:open_authenticator/app.dart';
+import 'package:open_authenticator/model/backend/request/error.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 /// Whether Sentry is enabled.
 bool kSentryEnabled = !kDebugMode && App.sentryDsn.isNotEmpty;
+
+/// Returns whether an exception should be sent to Sentry.
+bool shouldSendErrorToSentry(Object? ex) => switch (ex) {
+  SocketException(:final osError) => osError?.errorCode != 7,
+  TimeoutException() => false,
+  ProviderUserAlreadyExists() => false,
+  ExpiredCodeError() => false,
+  InvalidVerificationCodeError() => false,
+  InvalidAuthorizationCodeError() => false,
+  _ => true,
+};
 
 /// Contains some useful iterable methods.
 extension IterableUtils<T> on Iterable<T> {

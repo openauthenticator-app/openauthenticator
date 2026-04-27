@@ -312,22 +312,23 @@ class _RouteWidgetState extends ConsumerState<_RouteWidget> {
 
   /// Handles an in-app link.
   Future<void> handleAppLink(Uri appLink) async {
-    if (appLink.host == 'auth' && appLink.path.startsWith('/provider/') && appLink.pathSegments.length >= 2) {
-      String? providerId = appLink.pathSegments[1];
-      AuthenticationProvider? provider = ref.read(authenticationProviders).findProvider(providerId);
-      if (provider == null) {
-        return;
-      }
-      Result<RedirectResult> result = await showWaitingOverlay(
-        context,
-        future: provider.onRedirectReceived(appLink),
+    String? providerId = AuthenticationProvider.extractProviderId(appLink);
+    if (providerId == null) {
+      return;
+    }
+    AuthenticationProvider? provider = ref.read(authenticationProviders).findProvider(providerId);
+    if (provider == null) {
+      return;
+    }
+    Result<RedirectResult> result = await showWaitingOverlay(
+      context,
+      future: provider.onRedirectReceived(appLink),
+    );
+    if (mounted) {
+      context.handleResult(
+        result,
+        successMessage: (valueOrNull) => valueOrNull?.localizedMessage,
       );
-      if (mounted) {
-        context.handleResult(
-          result,
-          successMessage: (value) => value.localizedMessage,
-        );
-      }
     }
   }
 

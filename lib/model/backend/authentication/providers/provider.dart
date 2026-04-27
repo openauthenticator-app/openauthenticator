@@ -1,9 +1,11 @@
 import 'dart:async';
 
 import 'package:equatable/equatable.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/i18n/localizable_exception.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
+import 'package:open_authenticator/model/backend/authentication/native_web_auth.dart';
 import 'package:open_authenticator/model/backend/authentication/session.dart';
 import 'package:open_authenticator/model/backend/backend.dart';
 import 'package:open_authenticator/model/backend/request/error.dart';
@@ -12,6 +14,7 @@ import 'package:open_authenticator/model/backend/request/response.dart';
 import 'package:open_authenticator/model/backend/user.dart';
 import 'package:open_authenticator/model/settings/backend_url.dart';
 import 'package:open_authenticator/model/settings/entry.dart';
+import 'package:open_authenticator/utils/platform.dart';
 import 'package:open_authenticator/utils/result.dart';
 import 'package:open_authenticator/utils/shared_preferences_with_prefix.dart';
 import 'package:open_authenticator/utils/uri_builder.dart';
@@ -62,6 +65,14 @@ sealed class AuthenticationProvider {
     required Ref ref,
   }) : _ref = ref;
 
+  /// Extracts the provider id from the given uri.
+  static String? extractProviderId(Uri? uri) {
+    if (uri == null || uri.scheme != 'openauthenticator' || uri.host != 'auth' || uri.pathSegments.length < 2 || uri.pathSegments.first != 'provider') {
+      return null;
+    }
+    return uri.pathSegments[1];
+  }
+
   /// Changes the provider id of the user.
   User _changeId(User user, String? providerUserId);
 
@@ -84,6 +95,29 @@ sealed class AuthenticationProvider {
       }
       return result;
     } catch (ex, stackTrace) {
+      return ResultError(
+        exception: ex,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  /// Launches the authentication uri.
+  Future<Result> _launchAuthenticationUri(UriBuilder uriBuilder) async {
+    try {
+      if (currentPlatform.isMobile || currentPlatform == Platform.macOS) {
+        await NativeWebAuth.launch(
+          url: uriBuilder.build(),
+          callbackUrlScheme: 'openauthenticator',
+        );
+      } else {
+        await launchUrl(uriBuilder.build());
+      }
+      return const ResultSuccess();
+    } catch (ex, stackTrace) {
+      if (ex is PlatformException && ex.code == 'cancelled') {
+        return const ResultCancelled();
+      }
       return ResultError(
         exception: ex,
         stackTrace: stackTrace,
@@ -212,8 +246,7 @@ mixin OAuthenticationProvider on AuthenticationProvider {
       uriBuilder.appendQueryParameter('mode', 'login');
     }
     uriBuilder.appendQueryParameter('timestamp', DateTime.now().millisecondsSinceEpoch.toString());
-    await launchUrl(uriBuilder.build());
-    return const ResultSuccess();
+    return await _launchAuthenticationUri(uriBuilder);
   }
 }
 

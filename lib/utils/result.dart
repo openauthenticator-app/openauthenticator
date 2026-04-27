@@ -87,14 +87,14 @@ extension DisplayResult on BuildContext {
   void handleResult<T>(
     Result<T> result, {
     bool Function(Object? error)? showDialogIfError,
-    String? Function(T value)? successMessage,
+    String? Function(T? valueOrNull)? successMessage,
     String? Function(Object? error)? errorMessage,
   }) {
     switch (result) {
-      case ResultSuccess(:final value):
+      case ResultSuccess(:final valueOrNull):
         showSuccessToast(
           this,
-          text: successMessage?.call(value) ?? translations.error.noError,
+          text: successMessage?.call(valueOrNull) ?? translations.error.noError,
         );
         break;
       case ResultError(:final exception, :final stackTrace):
