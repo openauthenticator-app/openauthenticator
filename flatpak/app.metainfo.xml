@@ -47,13 +47,16 @@
   <launchable type="desktop-id">app.openauthenticator.OpenAuthenticator</launchable>
   <screenshots>
     <screenshot type="default">
-      <image>https://dashboard.snapcraft.io/site_media/appmedia/2025/05/1-1748336574.png</image>
+      <image>https://flatpak.openauthenticator.app/screenshots/1.png</image>
     </screenshot>
     <screenshot>
-      <image>https://dashboard.snapcraft.io/site_media/appmedia/2025/05/2-1748336574.png</image>
+      <image>https://flatpak.openauthenticator.app/screenshots/2.png</image>
     </screenshot>
     <screenshot>
-      <image>https://dashboard.snapcraft.io/site_media/appmedia/2025/05/3-1748336574.png</image>
+      <image>https://flatpak.openauthenticator.app/screenshots/3.png</image>
+    </screenshot>
+    <screenshot>
+      <image>https://flatpak.openauthenticator.app/screenshots/4.png</image>
     </screenshot>
   </screenshots>
   <categories>
