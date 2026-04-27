@@ -237,6 +237,7 @@ class EmailConfirmRequest extends BackendPostRequest<EmailConfirmResponse> {
   Object? get jsonBody => {
     'email': email,
     'verificationCode': verificationCode,
+    'locale': translations.$meta.locale.languageCode,
   };
 
   @override

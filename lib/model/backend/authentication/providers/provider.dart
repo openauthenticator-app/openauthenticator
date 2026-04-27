@@ -200,6 +200,9 @@ mixin OAuthenticationProvider on AuthenticationProvider {
     UriBuilder uriBuilder = UriBuilder.prefix(
       prefix: backendUrl,
       path: '/auth/provider/$id/redirect',
+      queryParameters: {
+        'locale': translations.$meta.locale.languageCode,
+      },
     );
     if (link) {
       User? user = await _ref.read(userProvider.future);
