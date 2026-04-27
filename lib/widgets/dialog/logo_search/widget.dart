@@ -58,6 +58,9 @@ class _LogoSearchState extends State<LogoSearch> {
   /// All searches triggered by the user.
   final Map<String, List<String>> searches = {};
 
+  /// The images that failed to render.
+  final Set<String> imageErrors = {};
+
   @override
   void initState() {
     super.initState();
@@ -68,7 +71,7 @@ class _LogoSearchState extends State<LogoSearch> {
 
   @override
   Widget build(BuildContext context) => Column(
-    mainAxisSize: MainAxisSize.min,
+    mainAxisSize: .min,
     children: [
       FTextFormField(
         control: .managed(controller: searchKeywordsController),
@@ -90,17 +93,22 @@ class _LogoSearchState extends State<LogoSearch> {
         child: Padding(
           padding: const EdgeInsets.only(top: kSpace, bottom: kBigSpace),
           child: Text(
-            translations.logoSearch.credits(sources: Source.sources.map((source) => source.name).join(' / ')),
+            translations.logoSearch.credits(
+              sources: [
+                for (Source source in Source.sources)
+                  if (source is! DirectSource) source.name,
+              ].join(' / '),
+            ),
             style: context.theme.typography.xs.copyWith(
               color: context.theme.colors.foreground.withValues(alpha: 0.75),
             ),
-            textAlign: TextAlign.right,
+            textAlign: .right,
           ),
         ),
       ),
       if (searches[filteredSearchKeywords]?.isNotEmpty == true)
         Wrap(
-          alignment: WrapAlignment.center,
+          alignment: .center,
           spacing: widget.imageWidth / 10,
           runSpacing: widget.imageWidth / 10,
           children: [
@@ -140,7 +148,7 @@ class _LogoSearchState extends State<LogoSearch> {
     List<Uri> logos = await Source.sources.search(client, keywords);
     setState(() => searches.putIfAbsent(keywords, () => []));
     for (Uri logo in logos) {
-      if (await Source.check(client, logo) && mounted && searches.containsKey(keywords)) {
+      if (await Source.check(client, logo) && mounted && searches.containsKey(keywords) && !imageErrors.contains(logo.toString())) {
         setState(() => searches[keywords]?.add(logo.toString()));
       }
       if (!searches.containsKey(keywords)) {
@@ -152,8 +160,25 @@ class _LogoSearchState extends State<LogoSearch> {
     }
   }
 
+  /// Removes an image from the displayed results after a rendering error.
+  void removeImageError(String imageUrl) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !imageErrors.add(imageUrl)) {
+        return;
+      }
+      setState(() {
+        searches.updateAll((_, logos) => logos..remove(imageUrl));
+        searches.removeWhere((_, logos) => logos.isEmpty);
+      });
+    });
+  }
+
   /// Builds the image widget that corresponds to the [imageUrl].
   Widget buildImageWidget(String imageUrl) {
+    if (imageErrors.contains(imageUrl)) {
+      return const SizedBox.shrink();
+    }
+
     Widget image = UnconstrainedBox(
       child: SizedBox(
         width: widget.imageWidth,
@@ -161,7 +186,10 @@ class _LogoSearchState extends State<LogoSearch> {
           source: imageUrl,
           height: widget.imageWidth,
           width: widget.imageWidth,
-          errorBuilder: (context) => const SizedBox.shrink(),
+          errorBuilder: (context) {
+            removeImageError(imageUrl);
+            return const SizedBox.shrink();
+          },
         ),
       ),
     );
@@ -174,7 +202,7 @@ class _LogoSearchState extends State<LogoSearch> {
             left: 0,
             child: Text(
               imageUrl,
-              style: const TextStyle(color: Colors.red, fontSize: 6),
+              style: TextStyle(color: context.theme.colors.destructive, fontSize: 6),
               textAlign: TextAlign.left,
             ),
           ),
