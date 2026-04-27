@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:typed_data';
 
-import 'package:cipherlib/hashlib.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/model/crypto.dart';
 import 'package:open_authenticator/model/password_verification/methods/method.dart';
@@ -48,8 +46,7 @@ class PasswordSignatureVerificationMethodNotifier extends AsyncNotifier<Password
   /// Generates the [password] signature with the given [salt].
   Future<String> _generatePasswordSignature(String password, Salt salt) async {
     CryptoStore cryptoStore = CryptoStore.fromPassword(password, salt);
-    MACHashBase hmacSecretKey = cryptoStore.createHmacKey();
-    String passwordSignature = hmacSecretKey.string(password, utf8).base64();
+    String passwordSignature = cryptoStore.hmacSecretKey.string(password, utf8).base64();
     return passwordSignature;
   }
 }
@@ -77,8 +74,6 @@ class PasswordSignatureVerificationMethod with PasswordVerificationMethod {
       return false;
     }
     CryptoStore cryptoStore = CryptoStore.fromPassword(password, salt);
-    MACHashBase hmacSecretKey = cryptoStore.createHmacKey();
-    Uint8List decodedSignature = base64.decode(passwordSignature!);
-    return hmacSecretKey.verify(decodedSignature, utf8.encode(password));
+    return cryptoStore.hmacSecretKey.verify(base64.decode(passwordSignature!), utf8.encode(password));
   }
 }

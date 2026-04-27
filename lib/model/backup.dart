@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:cipherlib/hashlib.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/app.dart';
@@ -148,8 +147,7 @@ class Backup implements Comparable<Backup> {
 
       Map<String, dynamic> jsonData = jsonDecode(file.readAsStringSync());
       CryptoStore cryptoStore = CryptoStore.fromPassword(password, Salt.fromRawValue(value: base64.decode(jsonData[kSaltKey])));
-      MACHashBase hmacSecretKey = cryptoStore.createHmacKey();
-      if (!(hmacSecretKey.verify(base64.decode(jsonData[kPasswordSignatureKey]), utf8.encode(password)))) {
+      if (!(cryptoStore.hmacSecretKey.verify(base64.decode(jsonData[kPasswordSignatureKey]), utf8.encode(password)))) {
         throw InvalidPasswordException();
       }
 
@@ -201,11 +199,10 @@ class Backup implements Comparable<Backup> {
         DecryptedTotp? decryptedTotp = totp.changeEncryptionKey(currentCryptoStore, newStore);
         toBackup.add(decryptedTotp ?? totp);
       }
-      MACHashBase hmacSecretKey = newStore.createHmacKey();
       File file = await getBackupPath(createDirectory: true);
       await file.writeAsString(
         jsonEncode({
-          kPasswordSignatureKey: hmacSecretKey.string(password, utf8).base64(),
+          kPasswordSignatureKey: newStore.hmacSecretKey.string(password, utf8).base64(),
           kSaltKey: base64.encode(newStore.salt.value),
           kTotpsKey: [
             for (Totp totp in toBackup) totp.toJson(),

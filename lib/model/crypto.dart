@@ -110,20 +110,20 @@ class CryptoStore {
 
   /// Creates a [CryptoStoreWithPasswordSignature] from the given [password].
   CryptoStore.fromPassword(String password, Salt salt) : this._(
-      key: _deriveKey(password, salt),
+      key: _deriveKey(password, salt).bytes,
       salt: salt,
     );
 
   /// Generates a derived key from the given [password] and save it to the device secure storage.
   /// Also returns the salt that has been used.
-  static Uint8List _deriveKey(String password, Salt salt) {
+  static Argon2HashDigest _deriveKey(String password, Salt salt) {
     Argon2 argon2 = Argon2(
       iterations: Argon2Parameters.iterations,
       memorySizeKB: Argon2Parameters.memorySize,
       parallelism: Argon2Parameters.parallelism,
       salt: salt.value,
     );
-    return argon2.convert(utf8.encode(password)).bytes;
+    return argon2.convert(utf8.encode(password));
   }
 
   /// Encrypts the given text.
@@ -151,10 +151,7 @@ class CryptoStore {
   }
 
   /// Checks if the given password is valid.
-  bool checkPasswordValidity(String password) {
-    Uint8List derivedKey = _deriveKey(password, salt);
-    return memEquals(derivedKey, key);
-  }
+  bool checkPasswordValidity(String password) => _deriveKey(password, salt).isEqual(key);
 
   /// Checks if the given [encryptedData] could be decrypted using [decrypt].
   /// There seems to be no better way of doing this.
@@ -164,7 +161,7 @@ class CryptoStore {
   bool canDecrypt(Uint8List encryptedData) => decrypt(encryptedData) != null;
 
   /// Returns the HMAC secret key corresponding to the [key].
-  MACHashBase createHmacKey() => sha256.hmac.by(key);
+  MACHashBase get hmacSecretKey => sha256.hmac.by(key);
 }
 
 /// Represents a decoded salt.
