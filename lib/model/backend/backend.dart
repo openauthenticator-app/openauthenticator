@@ -67,8 +67,8 @@ class BackendClient extends AsyncNotifier<Map<String, String>> {
     Duration timeout = _kDefaultTimeout,
   }) async {
     try {
-      bool isConnected = await ref.read(connectivityStateProvider.future);
-      if (!isConnected) {
+      bool canSendRequests = (await ref.read(connectivityStateProvider.future)).canSendRequests;
+      if (!canSendRequests) {
         throw const SocketException('No internet connection.');
       }
 

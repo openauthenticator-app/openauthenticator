@@ -147,10 +147,10 @@ class SynchronizationController extends Notifier<SynchronizationStatus> with Wid
   }
 
   /// Triggered when the connectivity state has changed.
-  void _onConnectivityChanged(AsyncValue<bool>? previous, AsyncValue<bool> next) {
+  void _onConnectivityChanged(AsyncValue<ConnectivityState>? previous, AsyncValue<ConnectivityState> next) {
     if (ref.mounted) {
       state = state.update(
-        phase: next.value == true ? const SynchronizationPhaseIdle() : const SynchronizationPhaseOffline(),
+        phase: next.value?.canSendRequests == true ? const SynchronizationPhaseIdle() : const SynchronizationPhaseOffline(),
       );
     }
   }
@@ -212,8 +212,8 @@ class SynchronizationController extends Notifier<SynchronizationStatus> with Wid
         );
       }
 
-      bool isNotOffline = await ref.read(connectivityStateProvider.future);
-      if (isNotOffline) {
+      bool canSendRequests = (await ref.read(connectivityStateProvider.future)).canSendRequests;
+      if (canSendRequests) {
         void onFinish({bool errorOccurred = false}) {
           if (ref.mounted) {
             state = state.update(

@@ -13,8 +13,11 @@ final passwordVerificationProvider = AsyncNotifierProvider.autoDispose<PasswordV
 class PasswordVerification extends AsyncNotifier<List<PasswordVerificationMethod>> {
   @override
   FutureOr<List<PasswordVerificationMethod>> build() async {
-    CryptoStoreVerificationMethod cryptoStoreVerificationMethod = await ref.watch(cryptoStoreVerificationMethodProvider.future);
-    PasswordSignatureVerificationMethod passwordSignatureVerificationMethod = await ref.watch(passwordSignatureVerificationMethodProvider.future);
+    Future<CryptoStoreVerificationMethod> cryptoStoreVerificationMethodFuture = ref.watch(cryptoStoreVerificationMethodProvider.future);
+    Future<PasswordSignatureVerificationMethod> passwordSignatureVerificationMethodFuture = ref.watch(passwordSignatureVerificationMethodProvider.future);
+
+    CryptoStoreVerificationMethod cryptoStoreVerificationMethod = await cryptoStoreVerificationMethodFuture;
+    PasswordSignatureVerificationMethod passwordSignatureVerificationMethod = await passwordSignatureVerificationMethodFuture;
     return List.unmodifiable([
       if (cryptoStoreVerificationMethod.enabled) cryptoStoreVerificationMethod,
       if (passwordSignatureVerificationMethod.enabled) passwordSignatureVerificationMethod,
