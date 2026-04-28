@@ -30,11 +30,12 @@ class ConnectivityStateNotifier extends AsyncNotifier<ConnectivityState> {
         }
 
         void onConnectivityError(Object error, StackTrace stackTrace) {
+          handleException(error, stackTrace);
           if (!initialState.isCompleted) {
             initialState.completeError(error, stackTrace);
           }
           if (ref.mounted) {
-            state = AsyncError(error, stackTrace);
+            state = const AsyncData(.unknown);
           }
         }
 
@@ -55,8 +56,9 @@ class ConnectivityStateNotifier extends AsyncNotifier<ConnectivityState> {
         }
 
         void onConnectivityError(Object error, StackTrace stackTrace) {
+          handleException(error, stackTrace);
           if (ref.mounted) {
-            state = AsyncError(error, stackTrace);
+            state = const AsyncData(.unknown);
           }
         }
 
