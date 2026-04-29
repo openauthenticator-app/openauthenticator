@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
-import 'package:open_authenticator/model/crypto.dart';
+import 'package:open_authenticator/model/crypto/salt.dart';
+import 'package:open_authenticator/model/crypto/store.dart';
 import 'package:open_authenticator/model/totp/algorithm.dart';
 import 'package:open_authenticator/model/totp/decrypted.dart';
 

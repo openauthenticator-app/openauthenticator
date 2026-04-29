@@ -16,7 +16,7 @@ import 'package:open_authenticator/model/backend/backend.dart';
 import 'package:open_authenticator/model/backend/synchronization/push/result.dart';
 import 'package:open_authenticator/model/backend/synchronization/queue.dart';
 import 'package:open_authenticator/model/backend/synchronization/status.dart';
-import 'package:open_authenticator/model/crypto.dart';
+import 'package:open_authenticator/model/crypto/store.dart';
 import 'package:open_authenticator/model/settings/display_copy_button.dart';
 import 'package:open_authenticator/model/settings/display_search_button.dart';
 import 'package:open_authenticator/model/settings/storage_type.dart';

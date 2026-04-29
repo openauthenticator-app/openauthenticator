@@ -10,6 +10,7 @@ import 'package:open_authenticator/app.dart';
 import 'package:open_authenticator/i18n/localizable_exception.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/app_unlock/methods/method.dart';
+import 'package:open_authenticator/model/crypto/salt.dart';
 import 'package:open_authenticator/model/password_verification/methods/password_signature.dart';
 import 'package:open_authenticator/model/settings/app_unlock_method.dart';
 import 'package:open_authenticator/utils/utils.dart';
@@ -25,7 +26,7 @@ class StoredCryptoStore extends AsyncNotifier<CryptoStore?> {
 
   @override
   FutureOr<CryptoStore?> build() async {
-    Salt? salt = await Salt.readFromLocalStorage();
+    Salt? salt = await ref.watch(saltProvider.future);
     if (salt == null) {
       return null;
     }
@@ -45,7 +46,7 @@ class StoredCryptoStore extends AsyncNotifier<CryptoStore?> {
   Future<void> deleteFromLocalStorage({bool deleteSalt = false}) async {
     await SimpleSecureStorage.delete(_kPasswordDerivedKeyKey);
     if (deleteSalt) {
-      await Salt.deleteFromLocalStorage();
+      await ref.read(saltProvider.notifier).deleteFromLocalStorage();
     }
   }
 
@@ -57,7 +58,11 @@ class StoredCryptoStore extends AsyncNotifier<CryptoStore?> {
   }
 
   /// Changes the current crypto store password, preserving the current salt if possible.
-  Future<CryptoStore> changeCryptoStore(String newPassword, {CryptoStore? newCryptoStore, bool checkSettings = true}) async {
+  Future<CryptoStore> changeCryptoStore(
+    String newPassword, {
+    CryptoStore? newCryptoStore,
+    bool checkSettings = true,
+  }) async {
     Salt? salt = newCryptoStore?.salt;
     if (salt == null) {
       CryptoStore? currentCryptoStore = await future;
@@ -71,7 +76,7 @@ class StoredCryptoStore extends AsyncNotifier<CryptoStore?> {
       }
     }
     Future<void> saveCryptoStoreOnLocalStorage() async => await SimpleSecureStorage.write(_kPasswordDerivedKeyKey, base64.encode(newCryptoStore!.key));
-    await salt.saveToLocalStorage();
+    await ref.read(saltProvider.notifier).changeSalt(salt);
     if (checkSettings) {
       String unlockMethod = await ref.read(appUnlockMethodSettingsEntryProvider.future);
       if (unlockMethod == MasterPasswordAppUnlockMethod.kMethodId) {
@@ -89,9 +94,6 @@ class StoredCryptoStore extends AsyncNotifier<CryptoStore?> {
 
 /// Allows to encrypt some data according to a key.
 class CryptoStore {
-  /// The key length.
-  static const int _keyLength = 256 ~/ 8;
-
   /// The initialization vector length.
   static const int _initializationVectorLength = 96 ~/ 8;
 
@@ -109,10 +111,11 @@ class CryptoStore {
   });
 
   /// Creates a [CryptoStoreWithPasswordSignature] from the given [password].
-  CryptoStore.fromPassword(String password, Salt salt) : this._(
-      key: _deriveKey(password, salt).bytes,
-      salt: salt,
-    );
+  CryptoStore.fromPassword(String password, Salt salt)
+    : this._(
+        key: _deriveKey(password, salt).bytes,
+        salt: salt,
+      );
 
   /// Generates a derived key from the given [password] and save it to the device secure storage.
   /// Also returns the salt that has been used.
@@ -162,48 +165,6 @@ class CryptoStore {
 
   /// Returns the HMAC secret key corresponding to the [key].
   MACHashBase get hmacSecretKey => sha256.hmac.by(key);
-}
-
-/// Represents a decoded salt.
-class Salt {
-  /// The salt length.
-  static const int _saltLength = CryptoStore._keyLength;
-
-  /// The password derived key storage key.
-  static const String _kPasswordDerivedKeySaltKey = 'passwordDerivedKeySalt';
-
-  /// The salt value.
-  final Uint8List value;
-
-  /// Creates a new salt instance.
-  const Salt.fromRawValue({
-    required this.value,
-  });
-
-  /// Reads the salt from local storage.
-  static Future<Salt?> readFromLocalStorage() async {
-    String? value = await SimpleSecureStorage.read(_kPasswordDerivedKeySaltKey);
-    if (value == null) {
-      return null;
-    }
-    return Salt.fromRawValue(
-      value: base64.decode(value),
-    );
-  }
-
-  /// Generates a random salt.
-  static Salt generate() => Salt.fromRawValue(
-    value: randomBytes(_saltLength),
-  );
-
-  /// Deletes the salt from local storage.
-  static Future<void> deleteFromLocalStorage() async => await SimpleSecureStorage.delete(_kPasswordDerivedKeySaltKey);
-
-  /// Writes the salt to the secure storage.
-  Future<void> saveToLocalStorage() async => await SimpleSecureStorage.write(_kPasswordDerivedKeySaltKey, base64.encode(value));
-
-  @override
-  String toString() => base64.encode(value);
 }
 
 /// Thrown when the password entered for a new crypto store is incorrect.

@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:open_authenticator/model/crypto.dart';
+import 'package:open_authenticator/model/crypto/salt.dart';
 import 'package:open_authenticator/model/totp/algorithm.dart';
 import 'package:open_authenticator/model/totp/totp.dart';
 

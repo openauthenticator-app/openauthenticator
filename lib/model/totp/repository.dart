@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/model/backend/synchronization/push/operation.dart';
 import 'package:open_authenticator/model/backend/synchronization/queue.dart';
 import 'package:open_authenticator/model/backup.dart';
-import 'package:open_authenticator/model/crypto.dart';
+import 'package:open_authenticator/model/crypto/store.dart';
 import 'package:open_authenticator/model/database/database.dart';
 import 'package:open_authenticator/model/settings/storage_type.dart';
 import 'package:open_authenticator/model/totp/decrypted.dart';

@@ -8,7 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/model/backend/request/response.dart';
 import 'package:open_authenticator/model/backend/synchronization/push/operation.dart';
 import 'package:open_authenticator/model/backend/synchronization/push/result.dart';
-import 'package:open_authenticator/model/crypto.dart';
+import 'package:open_authenticator/model/crypto/salt.dart';
 import 'package:open_authenticator/model/database/database.steps.dart';
 import 'package:open_authenticator/model/totp/algorithm.dart';
 import 'package:open_authenticator/model/totp/json.dart';

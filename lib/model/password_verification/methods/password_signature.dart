@@ -2,7 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:open_authenticator/model/crypto.dart';
+import 'package:open_authenticator/model/crypto/salt.dart';
+import 'package:open_authenticator/model/crypto/store.dart';
 import 'package:open_authenticator/model/password_verification/methods/method.dart';
 import 'package:simple_secure_storage/simple_secure_storage.dart';
 
@@ -19,18 +20,27 @@ class PasswordSignatureVerificationMethodNotifier extends AsyncNotifier<Password
   @override
   FutureOr<PasswordSignatureVerificationMethod> build() async => PasswordSignatureVerificationMethod(
     passwordSignature: await SimpleSecureStorage.read(_kPasswordSignatureKey),
+    salt: await ref.watch(saltProvider.future),
   );
 
   /// Enables the password signature verification method.
   Future<bool> enable(String? password) async {
-    Salt? salt = await Salt.readFromLocalStorage();
-    if (password == null || salt == null) {
+    if (password == null) {
+      return false;
+    }
+    Salt? salt = await ref.read(saltProvider.future);
+    if (salt == null) {
       return false;
     }
     String passwordSignature = await _generatePasswordSignature(password, salt);
     await SimpleSecureStorage.write(_kPasswordSignatureKey, passwordSignature);
     if (ref.mounted) {
-      state = AsyncData(PasswordSignatureVerificationMethod(passwordSignature: passwordSignature));
+      state = AsyncData(
+        PasswordSignatureVerificationMethod(
+          passwordSignature: passwordSignature,
+          salt: salt,
+        ),
+      );
     }
     return true;
   }
@@ -39,7 +49,7 @@ class PasswordSignatureVerificationMethodNotifier extends AsyncNotifier<Password
   Future<void> disable() async {
     await SimpleSecureStorage.delete(_kPasswordSignatureKey);
     if (ref.mounted) {
-      state = const AsyncData(PasswordSignatureVerificationMethod(passwordSignature: null));
+      state = const AsyncData(PasswordSignatureVerificationMethod());
     }
   }
 
@@ -56,24 +66,24 @@ class PasswordSignatureVerificationMethod with PasswordVerificationMethod {
   /// The password signature.
   final String? passwordSignature;
 
+  /// The salt instance.
+  final Salt? salt;
+
   /// Creates a new password signature verification method instance.
   const PasswordSignatureVerificationMethod({
     this.passwordSignature,
+    this.salt,
   });
 
   @override
-  bool get enabled => passwordSignature != null;
+  bool get enabled => passwordSignature != null && salt != null;
 
   @override
   Future<bool> verify(String password) async {
     if (!(await super.verify(password))) {
       return false;
     }
-    Salt? salt = await Salt.readFromLocalStorage();
-    if (salt == null) {
-      return false;
-    }
-    CryptoStore cryptoStore = CryptoStore.fromPassword(password, salt);
+    CryptoStore cryptoStore = CryptoStore.fromPassword(password, salt!);
     return cryptoStore.hmacSecretKey.verify(base64.decode(passwordSignature!), utf8.encode(password));
   }
 }

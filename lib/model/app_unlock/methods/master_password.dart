@@ -30,7 +30,7 @@ class MasterPasswordAppUnlockMethod extends AppUnlockMethod<String> {
     }
 
     if (reason == .openApp) {
-      Salt? salt = await Salt.readFromLocalStorage();
+      Salt? salt = await _ref.read(saltProvider.future);
       _ref.read(cryptoStoreProvider.notifier).use(CryptoStore.fromPassword(result.value, salt!));
     }
 
@@ -62,7 +62,8 @@ class MasterPasswordAppUnlockMethod extends AppUnlockMethod<String> {
         return null;
       }
     }
-    if (!(await _ensureSaltAvailable())) {
+    Salt? salt = await _ref.read(saltProvider.future);
+    if (salt == null) {
       return MasterPasswordNoSalt();
     }
     List<PasswordVerificationMethod> passwordVerificationMethods = await _ref.read(passwordVerificationProvider.future);
@@ -70,28 +71,6 @@ class MasterPasswordAppUnlockMethod extends AppUnlockMethod<String> {
       return MasterPasswordNoPasswordVerificationMethodAvailable();
     }
     return null;
-  }
-
-  /// Ensures that the local salt exists, restoring it from the TOTP list when possible.
-  Future<bool> _ensureSaltAvailable() async {
-    if (await Salt.readFromLocalStorage() != null) {
-      return true;
-    }
-    try {
-      List<Totp> totps = await _ref.read(totpRepositoryProvider.future);
-      Salt? salt = totps.firstOrNull?.encryptedData.encryptionSalt;
-      if (salt == null) {
-        return false;
-      }
-      await salt.saveToLocalStorage();
-      _ref.invalidate(cryptoStoreProvider);
-      _ref.invalidate(cryptoStoreVerificationMethodProvider);
-      _ref.invalidate(passwordVerificationProvider);
-      return true;
-    } catch (ex, stackTrace) {
-      handleException(ex, stackTrace);
-      return false;
-    }
   }
 
   /// Prompts master password for unlock.
