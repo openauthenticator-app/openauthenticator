@@ -16,16 +16,16 @@ class ConnectivityStateNotifier extends AsyncNotifier<ConnectivityState> {
     try {
       if (currentPlatform == .linux) {
         XdgDesktopPortalClient xdgDesktopPortalClient = XdgDesktopPortalClient();
-        ref.onDispose(() => unawaited(xdgDesktopPortalClient.close()));
-        Completer<bool> initialState = Completer<bool>();
+        ref.onDispose(xdgDesktopPortalClient.close);
+        Completer<ConnectivityState> initialState = Completer();
 
         void onConnectivityChanged(XdgNetworkStatus status) {
-          bool isAvailable = status.available;
+          ConnectivityState connectivityState = status.available ? .available : .unavailable;
           if (!initialState.isCompleted) {
-            initialState.complete(isAvailable);
+            initialState.complete(connectivityState);
           }
           if (ref.mounted) {
-            state = AsyncData(isAvailable ? .available : .unavailable);
+            state = AsyncData(connectivityState);
           }
         }
 
@@ -43,9 +43,9 @@ class ConnectivityStateNotifier extends AsyncNotifier<ConnectivityState> {
           onConnectivityChanged,
           onError: onConnectivityError,
         );
-        ref.onDispose(() => unawaited(subscription.cancel()));
+        ref.onDispose(subscription.cancel);
 
-        return (await initialState.future) ? .available : .unavailable;
+        return await initialState.future;
       } else {
         Connectivity connectivity = Connectivity();
 
@@ -66,7 +66,7 @@ class ConnectivityStateNotifier extends AsyncNotifier<ConnectivityState> {
           onConnectivityChanged,
           onError: onConnectivityError,
         );
-        ref.onDispose(() => unawaited(subscription.cancel()));
+        ref.onDispose(subscription.cancel);
 
         List<ConnectivityResult> result = await connectivity.checkConnectivity();
         return result.associatedConnectivityState;

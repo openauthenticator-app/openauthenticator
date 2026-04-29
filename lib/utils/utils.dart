@@ -13,7 +13,7 @@ bool kSentryEnabled = !kDebugMode && App.sentryDsn.isNotEmpty;
 
 /// Returns whether an exception should be sent to Sentry.
 bool shouldSendErrorToSentry(Object? ex) => switch (ex) {
-  SocketException(:final osError) => osError?.errorCode != 7,
+  SocketException(:final osError) => !{7, 8}.contains(osError?.errorCode),
   TimeoutException() => false,
   ProviderUserAlreadyExists() => false,
   ExpiredCodeError() => false,

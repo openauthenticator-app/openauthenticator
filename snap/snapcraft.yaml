@@ -45,6 +45,7 @@ apps:
       - gnome
     plugs:
       - network
+      - network-status
       - polkit
     slots:
       - open-authenticator-dbus
