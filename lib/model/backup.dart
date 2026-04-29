@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart';
 import 'package:open_authenticator/app.dart';
 import 'package:open_authenticator/i18n/localizable_exception.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
@@ -29,34 +30,57 @@ class BackupStore extends AsyncNotifier<List<Backup>> {
 
   /// Imports the [backupFile].
   Future<Result<Backup>> import(File backupFile) async {
-    if (!Backup.isValidBackup(backupFile)) {
-      return ResultError(exception: _InvalidBackupContentException());
+    KeepAliveLink keepAliveLink = ref.keepAlive();
+    try {
+      if (!Backup.isValidBackup(backupFile)) {
+        return ResultError(exception: _InvalidBackupContentException());
+      }
+      DateTime? dateTime = _fromBackupFilename(backupFile);
+      Backup backup = Backup._(ref: ref, dateTime: dateTime ?? DateTime.now());
+      List<Backup> backups = [...(await future), backup]..sort();
+      Directory directory = await getBackupsDirectory(create: true);
+      backupFile.copySync(join(directory.path, backup.filename));
+      if (!ref.mounted) {
+        return const ResultCancelled();
+      }
+      state = AsyncData(backups);
+      return ResultSuccess(value: backup);
+    } catch (ex, stackTrace) {
+      return ResultError(
+        exception: ex,
+        stackTrace: stackTrace,
+      );
+    } finally {
+      keepAliveLink.close();
     }
-    DateTime? dateTime = _fromBackupFilename(backupFile);
-    Backup backup = Backup._(ref: ref, dateTime: dateTime ?? DateTime.now());
-    List<Backup> backups = [...(await future), backup]..sort();
-    Directory directory = await getBackupsDirectory(create: true);
-    backupFile.copySync(join(directory.path, backup.filename));
-    if (!ref.mounted) {
-      return const ResultCancelled();
-    }
-    state = AsyncData(backups);
-    return ResultSuccess(value: backup);
   }
 
   /// Do a backup with the given password.
   Future<Result<Backup>> doBackup(String password) async {
-    Backup backup = Backup._(ref: ref, dateTime: DateTime.now());
-    Result result = await backup.save(password);
-    if (result is! ResultSuccess) {
-      return result.to<Backup>((value) => null);
+    KeepAliveLink keepAliveLink = ref.keepAlive();
+    try {
+      Backup backup = Backup._(ref: ref, dateTime: DateTime.now());
+      Result result = await backup.save(password);
+      if (result is! ResultSuccess) {
+        return result.to<Backup>((value) => null);
+      }
+      if (!ref.mounted) {
+        return const ResultCancelled();
+      }
+      List<Backup> backups = [...(await future), backup]..sort();
+      if (!ref.mounted) {
+        return const ResultCancelled();
+      }
+      state = AsyncData(backups);
+      return ResultSuccess(value: backup);
+    } catch (ex, stackTrace) {
+      return ResultError(
+        exception: ex,
+        stackTrace: stackTrace,
+      );
+    } finally {
+      keepAliveLink.close();
     }
-    List<Backup> backups = [...(await future), backup]..sort();
-    if (!ref.mounted) {
-      return const ResultCancelled();
-    }
-    state = AsyncData(backups);
-    return ResultSuccess(value: backup);
   }
 
   /// Lists available backups.
