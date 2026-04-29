@@ -24,7 +24,7 @@ static void can_authenticate(FlMethodCall* method_call) {
     GError* error = nullptr;
     PolkitAuthority* authority = polkit_authority_get_sync(nullptr, &error);
     if (error) {
-        fl_method_call_respond(method_call, FL_METHOD_RESPONSE(fl_method_error_response_new("authCheckError", error->message, nullptr)), nullptr);
+        fl_method_call_respond(method_call, FL_METHOD_RESPONSE(fl_method_success_response_new(fl_value_new_bool(false))), nullptr);
         g_clear_error(&error);
         return;
     }
@@ -32,10 +32,22 @@ static void can_authenticate(FlMethodCall* method_call) {
         fl_method_call_respond(method_call, FL_METHOD_RESPONSE(fl_method_success_response_new(fl_value_new_bool(false))), nullptr);
         return;
     }
+
+    const gchar* snap = g_getenv("SNAP");
+    if (snap != nullptr) {
+        g_autofree gchar* snap_policy_path = g_build_filename(snap, "meta", "polkit", "polkit.app.openauthenticator.policy", nullptr);
+        gboolean success = g_file_test(snap_policy_path, G_FILE_TEST_IS_REGULAR);
+
+        g_object_unref(authority);
+        fl_method_call_respond(method_call, FL_METHOD_RESPONSE(fl_method_success_response_new(fl_value_new_bool(success))), nullptr);
+        return;
+    }
+
     GList* actions = polkit_authority_enumerate_actions_sync(authority, nullptr, &error);
     if (error) {
         fl_method_call_respond(method_call, FL_METHOD_RESPONSE(fl_method_error_response_new("authCheckError", error->message, nullptr)), nullptr);
         g_clear_error(&error);
+        g_object_unref(authority);
         return;
     }
     bool hasOpenApp = false, hasSensible = false, hasEnable = false, hasDisable = false;
@@ -61,6 +73,7 @@ static void can_authenticate(FlMethodCall* method_call) {
             break;
         }
     }
+
     gboolean success = hasOpenApp && hasSensible && hasEnable && hasDisable;
     g_list_free_full(actions, g_object_unref);
     g_object_unref(authority);
