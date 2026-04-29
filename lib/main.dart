@@ -44,7 +44,12 @@ import 'package:window_manager/window_manager.dart';
 /// Hello world !
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await SimpleSecureStorage.initialize(_OpenAuthenticatorSSSInitializationOptions());
+  await SimpleSecureStorage.initialize(
+    switch (currentPlatform) {
+      .iOS || .macOS => _OpenAuthenticatorSSSDarwinInitializationOptions(),
+      _ => _OpenAuthenticatorSSSInitializationOptions(),
+    },
+  );
   if (currentPlatform.isDesktop) {
     await windowManager.ensureInitialized();
     windowManager.waitUntilReadyToShow(
@@ -85,6 +90,17 @@ class _OpenAuthenticatorSSSInitializationOptions extends InitializationOptions {
     : super(
         appName: App.appName + (kDebugMode ? ' Debug' : ''),
         namespace: App.appPackageName + (kDebugMode ? '.debug' : ''),
+      );
+}
+
+/// Allows to initialize [SimpleSecureStorage] on Darwin platforms with parameters that depend on the current mode.
+class _OpenAuthenticatorSSSDarwinInitializationOptions extends DarwinInitializationOptions {
+  /// Creates a new Open Authenticator SimpleSecureStorage initialization options.
+  _OpenAuthenticatorSSSDarwinInitializationOptions()
+    : super(
+        appName: App.appName + (kDebugMode ? ' Debug' : ''),
+        namespace: App.appPackageName + (kDebugMode ? '.debug' : ''),
+        accessibility: .afterFirstUnlock,
       );
 }
 
