@@ -6,6 +6,7 @@ import 'package:open_authenticator/model/app_unlock/methods/method.dart';
 import 'package:open_authenticator/model/settings/app_unlock_method.dart';
 import 'package:open_authenticator/pages/settings/entries/widgets.dart';
 import 'package:open_authenticator/utils/local_authentication/local_authentication.dart';
+import 'package:open_authenticator/utils/result.dart';
 
 /// Allows to configure [enableLocalAuthSettingsEntryProvider].
 class EnableLocalAuthSettingsEntryWidget extends CheckboxSettingsEntryWidget<AppUnlockMethodSettingsEntry, String> {
@@ -33,7 +34,10 @@ class EnableLocalAuthSettingsEntryWidget extends CheckboxSettingsEntryWidget<App
   @override
   Future<void> changeValue(BuildContext context, WidgetRef ref, bool newValue) async {
     String newMethod = newValue ? LocalAuthenticationAppUnlockMethod.kMethodId : NoneAppUnlockMethod.kMethodId;
-    ref.read(appUnlockMethodSettingsEntryProvider.notifier).changeValueIfUnlockSucceed(newMethod, context);
+    Result result = await ref.read(appUnlockMethodSettingsEntryProvider.notifier).changeValueIfUnlockSucceed(newMethod, context);
+    if (context.mounted && result is! ResultSuccess) {
+      context.handleResult(result);
+    }
   }
 
   @override
