@@ -172,6 +172,9 @@ class OpenAuthenticatorApp extends ConsumerWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
+      navigatorObservers: [
+        SentryNavigatorObserver(),
+      ],
       // debugShowCheckedModeBanner: false,
       supportedLocales: AppLocaleUtils.supportedLocales,
       themeMode: theme.value,
