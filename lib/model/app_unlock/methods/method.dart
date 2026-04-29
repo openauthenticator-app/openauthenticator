@@ -5,6 +5,7 @@ import 'package:open_authenticator/i18n/localizable_exception.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/app_unlock/reason.dart';
 import 'package:open_authenticator/model/crypto.dart';
+import 'package:open_authenticator/model/password_verification/methods/crypto_store.dart';
 import 'package:open_authenticator/model/password_verification/methods/method.dart';
 import 'package:open_authenticator/model/password_verification/methods/password_signature.dart';
 import 'package:open_authenticator/model/password_verification/password_verification.dart';
@@ -47,7 +48,7 @@ sealed class AppUnlockMethod<T> {
   /// [context] is required so that we can interact with the user.
   Future<Result<T>> unlock(BuildContext context, UnlockReason reason) async {
     try {
-      CannotUnlockException? cannotUnlockException = await canUnlock();
+      CannotUnlockException? cannotUnlockException = await canUnlock(reason);
       if (cannotUnlockException != null) {
         throw cannotUnlockException;
       }
@@ -76,7 +77,7 @@ sealed class AppUnlockMethod<T> {
   AppLockState get defaultAppLockState => AppLockState.locked;
 
   /// Returns whether the app can be unlocked using this method.
-  Future<CannotUnlockException?> canUnlock() => Future.value(null);
+  Future<CannotUnlockException?> canUnlock(UnlockReason reason) => Future.value(null);
 
   /// Triggered when this method has been chosen has the app unlock method.
   /// [unlockResult] is the result of the [tryUnlock] call.

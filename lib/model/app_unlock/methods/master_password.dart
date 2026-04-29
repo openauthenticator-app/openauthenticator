@@ -55,26 +55,43 @@ class MasterPasswordAppUnlockMethod extends AppUnlockMethod<String> {
   }
 
   @override
-  Future<CannotUnlockException?> canUnlock() async {
-    Salt? salt = await Salt.readFromLocalStorage();
-    if (salt == null) {
-      try {
-        List<Totp> totps = await _ref.read(totpRepositoryProvider.future);
-        salt = totps.firstOrNull?.encryptedData.encryptionSalt;
-        if (salt == null) {
-          return MasterPasswordNoSalt();
-        }
-        await salt.saveToLocalStorage();
-      } catch (ex, stackTrace) {
-        handleException(ex, stackTrace);
-        return MasterPasswordNoSalt();
+  Future<CannotUnlockException?> canUnlock(UnlockReason reason) async {
+    if (reason != .openApp && reason != .sensibleAction) {
+      List<Totp> totps = await _ref.read(totpRepositoryProvider.future);
+      if (totps.isEmpty) {
+        return null;
       }
+    }
+    if (!(await _ensureSaltAvailable())) {
+      return MasterPasswordNoSalt();
     }
     List<PasswordVerificationMethod> passwordVerificationMethods = await _ref.read(passwordVerificationProvider.future);
     if (passwordVerificationMethods.isEmpty) {
       return MasterPasswordNoPasswordVerificationMethodAvailable();
     }
     return null;
+  }
+
+  /// Ensures that the local salt exists, restoring it from the TOTP list when possible.
+  Future<bool> _ensureSaltAvailable() async {
+    if (await Salt.readFromLocalStorage() != null) {
+      return true;
+    }
+    try {
+      List<Totp> totps = await _ref.read(totpRepositoryProvider.future);
+      Salt? salt = totps.firstOrNull?.encryptedData.encryptionSalt;
+      if (salt == null) {
+        return false;
+      }
+      await salt.saveToLocalStorage();
+      _ref.invalidate(cryptoStoreProvider);
+      _ref.invalidate(cryptoStoreVerificationMethodProvider);
+      _ref.invalidate(passwordVerificationProvider);
+      return true;
+    } catch (ex, stackTrace) {
+      handleException(ex, stackTrace);
+      return false;
+    }
   }
 
   /// Prompts master password for unlock.

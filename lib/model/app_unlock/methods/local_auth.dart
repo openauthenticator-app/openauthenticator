@@ -19,7 +19,7 @@ class LocalAuthenticationAppUnlockMethod extends AppUnlockMethod {
   }
 
   @override
-  Future<CannotUnlockException?> canUnlock() async {
+  Future<CannotUnlockException?> canUnlock(UnlockReason reason) async {
     if (!(await LocalAuthentication.instance.isSupported())) {
       return LocalAuthenticationDeviceNotSupported();
     }
