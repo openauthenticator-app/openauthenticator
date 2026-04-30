@@ -1,5 +1,24 @@
 # 📰 Open Authenticator changelog
 
+## v2.0.2
+Released on May 1, 2026.
+
+* **FEAT**: Now using `Auth Tabs` on Android and `ASWebAuthenticationSession` on Darwin to handle authentication links. ([#1153cd8](https://github.com/openauthenticator-app/openauthenticator/commit/1153cd8))
+* **FIX**: Fixed an `AccessDenied` error occurring in snap. ([#5c08b29](https://github.com/openauthenticator-app/openauthenticator/commit/5c08b29))
+* **FIX**: Fixed some `UnmountedRefException` occurring with backups. ([#69f564f](https://github.com/openauthenticator-app/openauthenticator/commit/69f564f))
+* **FIX**: Fixed the `app.dart` build script. ([#f357e3b](https://github.com/openauthenticator-app/openauthenticator/commit/f357e3b))
+* **FIX**: Networks requests will not automatically fail if there is an error in `ConnectivityStateNotifier`. ([#7fc8c48](https://github.com/openauthenticator-app/openauthenticator/commit/7fc8c48))
+* **CHORE**: Added `network-status` and silenced various network warnings. ([#2897fee](https://github.com/openauthenticator-app/openauthenticator/commit/2897fee))
+* **CHORE**: Added support for `SentryNavigatorObserver`. ([#041eb44](https://github.com/openauthenticator-app/openauthenticator/commit/041eb44))
+* **CHORE**: Improved the logo picker dialog. ([#a469a5c](https://github.com/openauthenticator-app/openauthenticator/commit/a469a5c))
+* **CHORE**: Improved the master password unlock method. ([#f711d45](https://github.com/openauthenticator-app/openauthenticator/commit/f711d45))
+* **CHORE**: Now handling errors in `EnableLocalAuthSettingsEntryWidget`. ([#22da7ce](https://github.com/openauthenticator-app/openauthenticator/commit/22da7ce))
+* **CHORE**: Now supporting localization in redirect routes. ([#3dfe096](https://github.com/openauthenticator-app/openauthenticator/commit/3dfe096))
+* **CHORE**: Now using `.afterFirstUnlock` for keychain accessibility. ([#b33a85d](https://github.com/openauthenticator-app/openauthenticator/commit/b33a85d))
+* **REFACTOR**: Added a `CryptoKey` that unifies both `Salt` and `DerivedKey`. ([#5a5bb60](https://github.com/openauthenticator-app/openauthenticator/commit/5a5bb60))
+* **REFACTOR**: Added a `StoredSalt` to add a distinction between a `Salt` object and the stored `Salt` object. ([#897a04d](https://github.com/openauthenticator-app/openauthenticator/commit/897a04d))
+* **REFACTOR**: `CryptoStore.createHmacKey()` is now `CryptoStore.hmacSecretKey`. Also dropped support of `memEquals` in favor of hashlib `isEqual`. ([#5574431](https://github.com/openauthenticator-app/openauthenticator/commit/5574431))
+
 ## v2.0.1
 Released on April 24, 2026.
 

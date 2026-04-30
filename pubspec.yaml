@@ -1,7 +1,7 @@
 name: open_authenticator
 description: A cross-platform OTP app, free and open-source.
 publish_to: none
-version: 2.0.1+26
+version: 2.0.2+27
 homepage: https://openauthenticator.app
 repository: https://github.com/openauthenticator-app/openauthenticator
 license: CC-BY-SA-4.0
@@ -59,11 +59,11 @@ dependencies:
   forui: ^0.21.3
   forui_assets: ^0.21.0
   custom_refresh_indicator: ^4.0.1
+  xdg_desktop_portal: ^0.1.14
   # TODO: Remove Firebase dependencies once migration is finished.
   firebase_core: ^4.7.0
   firebase_auth: ^6.4.0
   cloud_firestore: ^6.3.0
-  xdg_desktop_portal: ^0.1.14
 
 dev_dependencies:
   flutter_lints: ^6.0.0

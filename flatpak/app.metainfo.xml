@@ -77,6 +77,34 @@
   </branding>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="2.0.2" date="2026-05-01">
+      <url type="details">https://github.com/openauthenticator-app/openauthenticator/releases/tag/2.0.2</url>
+      <description type="changelog">
+        <ul>
+          <li>Now using `Auth Tabs` on Android and `ASWebAuthenticationSession` on Darwin to handle authentication links.</li>
+          <li>Fixed an `AccessDenied` error occurring in snap.</li>
+          <li>Fixed some `UnmountedRefException` occurring with backups.</li>
+          <li>Fixed the `app.dart` build script.</li>
+          <li>Networks requests will not automatically fail if there is an error in `ConnectivityStateNotifier`.</li>
+          <li>Added `network-status` and silenced various network warnings.</li>
+          <li>Added support for `SentryNavigatorObserver`.</li>
+          <li>Fixed an `AccessDenied` error occurring in snap.</li>
+          <li>Improved the logo picker dialog.</li>
+          <li>Improved the master password unlock method.</li>
+          <li>Now handling errors in `EnableLocalAuthSettingsEntryWidget`.</li>
+          <li>Now supporting localization in redirect routes.</li>
+          <li>Now using `.afterFirestUnlock` for keychain accessibility.</li>
+          <li>Now using `.afterFirstUnlock` for keychain accessibility.</li>
+          <li>Removed Polkit generated files.</li>
+          <li>Updated `snapcraft.yaml`.</li>
+          <li>Updated the Snapcraft build scripts.</li>
+          <li>Added a `CryptoKey` that unifies both `Salt` and `DerivedKey`.</li>
+          <li>Added a `StoredSalt` to add a distinction between a `Salt` object and the stored `Salt` object.</li>
+          <li>Fixed some deprecation warnings.</li>
+          <li>`CryptoStore.createHmacKey()` is now `CryptoStore.hmacSecretKey`. Also dropped support of `memEquals` in favor of hashlib `isEqual`.</li>
+        </ul>
+      </description>
+    </release>
     <release version="2.0.1" date="2026-04-24">
       <url type="details">https://github.com/openauthenticator-app/openauthenticator/releases/tag/2.0.1</url>
       <description type="changelog">
