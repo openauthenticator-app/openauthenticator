@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
+import 'package:open_authenticator/model/app_unlock/methods/method.dart';
+import 'package:open_authenticator/model/settings/app_unlock_method.dart';
 import 'package:open_authenticator/pages/intro/slides/slide.dart';
-import 'package:open_authenticator/pages/settings/entries/save_derived_key.dart';
 import 'package:open_authenticator/spacing.dart';
+import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/form/master_password_form.dart';
 
 /// The password intro page slide.
@@ -11,10 +14,18 @@ class PasswordIntroPageSlide extends StatelessWidget {
   /// Called when the password changes.
   final ValueChanged<String?>? onPasswordChanged;
 
+  /// Called when the save derived key checkbox changes.
+  final ValueChanged<bool?>? onSaveDerivedKeyChanged;
+
+  /// Whether to save the derived key.
+  final bool saveDerivedKey;
+
   /// Creates a new password intro page slide instance.
   const PasswordIntroPageSlide({
     super.key,
     this.onPasswordChanged,
+    this.onSaveDerivedKeyChanged,
+    this.saveDerivedKey = true,
   });
 
   @override
@@ -33,9 +44,28 @@ class PasswordIntroPageSlide extends StatelessWidget {
           child: MasterPasswordForm(onChanged: onPasswordChanged),
         ),
       ),
-      Padding(
-        padding: const EdgeInsets.only(bottom: kBigSpace),
-        child: SaveDerivedKeySettingsEntryWidget.intro(),
+      Consumer(
+        builder: (context, ref, child) {
+          String? unlockMethod = ref.watch(appUnlockMethodSettingsEntryProvider).value;
+          return {MasterPasswordAppUnlockMethod.kMethodId, LocalAuthenticationAppUnlockMethod.kMethodId}.contains(unlockMethod)
+              ? SizedBox.fromSize(
+                  size: const Size.fromHeight(kSpace),
+                )
+              : Padding(
+                  padding: const EdgeInsets.only(bottom: kBigSpace),
+                  child: ClickableTile(
+                    title: Text(translations.settings.security.saveDerivedKey.title),
+                    subtitle: Text(translations.settings.security.saveDerivedKey.subtitle),
+                    enabled: onSaveDerivedKeyChanged != null,
+                    onPress: () => onSaveDerivedKeyChanged?.call(!saveDerivedKey),
+                    suffix: FCheckbox(
+                      value: saveDerivedKey,
+                      enabled: onSaveDerivedKeyChanged != null,
+                      onChange: onSaveDerivedKeyChanged,
+                    ),
+                  ),
+                );
+        },
       ),
       IntroPageSlideParagraphWidget(
         text: translations.intro.password.secondParagraph,

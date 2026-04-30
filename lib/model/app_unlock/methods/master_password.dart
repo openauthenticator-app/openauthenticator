@@ -30,8 +30,7 @@ class MasterPasswordAppUnlockMethod extends AppUnlockMethod<String> {
     }
 
     if (reason == .openApp) {
-      Salt? salt = await _ref.read(saltProvider.future);
-      _ref.read(cryptoStoreProvider.notifier).use(CryptoStore.fromPassword(result.value, salt!));
+      await _ref.read(derivedKeyProvider.notifier).updateFromPassword(result.value, andWrite: false);
     }
 
     return ResultSuccess(value: result.value);
@@ -41,7 +40,7 @@ class MasterPasswordAppUnlockMethod extends AppUnlockMethod<String> {
   Future<void> onMethodChosen({ResultSuccess<String>? enableResult}) async {
     String? password = enableResult?.valueOrNull;
     if (await _ref.read(passwordSignatureVerificationMethodProvider.notifier).enable(password)) {
-      await _ref.read(cryptoStoreProvider.notifier).deleteFromLocalStorage();
+      await _ref.read(derivedKeyProvider.notifier).deleteFromLocalStorage();
     }
   }
 
@@ -50,7 +49,7 @@ class MasterPasswordAppUnlockMethod extends AppUnlockMethod<String> {
     await _ref.read(passwordSignatureVerificationMethodProvider.notifier).disable();
     String? password = disableResult?.valueOrNull;
     if (password != null) {
-      await _ref.read(cryptoStoreProvider.notifier).changeCryptoStore(password, checkSettings: false);
+      await _ref.read(derivedKeyProvider.notifier).updateFromPassword(password, andWrite: true);
     }
   }
 

@@ -171,7 +171,7 @@ class Backup implements Comparable<Backup> {
       }
 
       Map<String, dynamic> jsonData = jsonDecode(file.readAsStringSync());
-      CryptoStore cryptoStore = CryptoStore.fromPassword(password, Salt.fromRawValue(value: base64.decode(jsonData[kSaltKey])));
+      CryptoStore cryptoStore = CryptoStore.fromPassword(password, Salt.base64Decode(string: jsonData[kSaltKey]));
       if (!(cryptoStore.hmacSecretKey.verify(base64.decode(jsonData[kPasswordSignatureKey]), utf8.encode(password)))) {
         throw InvalidPasswordException();
       }

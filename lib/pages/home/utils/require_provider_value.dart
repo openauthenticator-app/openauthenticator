@@ -24,7 +24,7 @@ class _RequireProviderValueWidget<T, U extends AsyncNotifier<T>> extends Consume
   });
 
   /// Creates a new require crypto store widget instance.
-  static _RequireProviderValueWidget<CryptoStore?, StoredCryptoStore> cryptoStore({
+  static _RequireProviderValueWidget<CryptoStore?, CryptoStoreNotifier> cryptoStore({
     required Widget child,
     Widget childIfAbsent = const SizedBox.shrink(),
     bool showChildIfLocked = true,
@@ -36,7 +36,7 @@ class _RequireProviderValueWidget<T, U extends AsyncNotifier<T>> extends Consume
   );
 
   /// Creates a new require crypto store widget instance.
-  static _RequireProviderValueWidget<CryptoStore?, StoredCryptoStore> cryptoStoreAndTotpList({
+  static _RequireProviderValueWidget<CryptoStore?, CryptoStoreNotifier> cryptoStoreAndTotpList({
     required Widget child,
     Widget childIfAbsent = const SizedBox.shrink(),
     bool showChildIfLocked = true,

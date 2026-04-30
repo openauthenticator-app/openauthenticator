@@ -68,6 +68,7 @@ abstract class CheckboxSettingsEntryWidget<T extends SettingsEntry<U>, U> extend
     onPress: () => changeValue(context, ref, !isEnabled(value)),
     suffix: FCheckbox(
       value: isEnabled(value),
+      enabled: enabled,
       onChange: enabled ? (value) => changeValue(context, ref, value) : null,
     ),
   );

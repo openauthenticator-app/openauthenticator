@@ -86,7 +86,7 @@ class _IntroPageState extends ConsumerState<IntroPage> with BrightnessListener {
                   mainAxisSize: .min,
                   onPress: slideState.canGoToNextSlide
                       ? () async {
-                          bool shouldFinish = await ref.read(currentIntroPageSlideProvider.notifier).goToNextSlide();
+                          bool shouldFinish = await ref.read(currentIntroPageSlideProvider.notifier).goToNextSlide(context);
                           if (shouldFinish) {
                             finish();
                           }
@@ -113,14 +113,9 @@ class _IntroPageState extends ConsumerState<IntroPage> with BrightnessListener {
               remainingSlides: slideState.remainingSlideCount,
             ),
             .password => PasswordIntroPageSlide(
-              onPasswordChanged: (password) => ref
-                  .read(currentIntroPageSlideProvider.notifier)
-                  .updateState(
-                    PasswordIntroPageSlideState.fromCurrent(
-                      current: slideState,
-                      password: password,
-                    ),
-                  ),
+              saveDerivedKey: (slideState as PasswordIntroPageSlideState).saveDerivedKey,
+              onPasswordChanged: (password) => ref.read(currentIntroPageSlideProvider.notifier).updateState(slideState.overwritePassword(password)),
+              onSaveDerivedKeyChanged: (saveDerivedKey) => ref.read(currentIntroPageSlideProvider.notifier).updateState(slideState.overwriteSaveDerivedKey(saveDerivedKey)),
             ),
             .logIn => const LogInIntroPageSlide(),
           },

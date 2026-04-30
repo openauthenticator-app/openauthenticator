@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/model/backend/synchronization/push/operation.dart';
 import 'package:open_authenticator/model/backend/synchronization/queue.dart';
 import 'package:open_authenticator/model/backup.dart';
+import 'package:open_authenticator/model/crypto/derived_key.dart';
+import 'package:open_authenticator/model/crypto/salt.dart';
 import 'package:open_authenticator/model/crypto/store.dart';
 import 'package:open_authenticator/model/database/database.dart';
 import 'package:open_authenticator/model/settings/storage_type.dart';
@@ -329,7 +331,6 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
     bool updateTotps = true,
   }) async {
     try {
-      StoredCryptoStore storedCryptoStore = ref.read(cryptoStoreProvider.notifier);
       if (backupPassword != null) {
         Result<Backup> backupResult = await ref.read(backupStoreProvider.notifier).doBackup(backupPassword);
         if (backupResult is! ResultSuccess) {
@@ -337,7 +338,7 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
         }
       }
       List<Totp> totpsList = await future;
-      CryptoStore? currentCryptoStore = await storedCryptoStore.future;
+      CryptoStore? currentCryptoStore = await ref.read(cryptoStoreProvider.future);
       if (updateTotps && currentCryptoStore != null) {
         CryptoStore newCryptoStore = CryptoStore.fromPassword(password, currentCryptoStore.salt);
         List<Totp> newTotps = [];
@@ -355,10 +356,9 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
             ),
           );
         }
-        await storedCryptoStore.changeCryptoStore(password, newCryptoStore: newCryptoStore);
-      } else {
-        await storedCryptoStore.changeCryptoStore(password);
       }
+      await ref.read(saltProvider.notifier).generateIfNeeded();
+      await ref.read(derivedKeyProvider.notifier).updateFromPassword(password);
       return ResultSuccess(value: password);
     } catch (ex, stackTrace) {
       return ResultError(

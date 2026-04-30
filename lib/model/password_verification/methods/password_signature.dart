@@ -32,7 +32,8 @@ class PasswordSignatureVerificationMethodNotifier extends AsyncNotifier<Password
     if (salt == null) {
       return false;
     }
-    String passwordSignature = await _generatePasswordSignature(password, salt);
+    CryptoStore cryptoStore = CryptoStore.fromPassword(password, salt);
+    String passwordSignature = cryptoStore.hmacSecretKey.string(password, utf8).base64();
     await SimpleSecureStorage.write(_kPasswordSignatureKey, passwordSignature);
     if (ref.mounted) {
       state = AsyncData(
@@ -45,19 +46,15 @@ class PasswordSignatureVerificationMethodNotifier extends AsyncNotifier<Password
     return true;
   }
 
+  /// Updates the current password.
+  Future<void> updatePasswordSignature(String password) async => await enable(password);
+
   /// Disables the password signature verification method.
   Future<void> disable() async {
     await SimpleSecureStorage.delete(_kPasswordSignatureKey);
     if (ref.mounted) {
       state = const AsyncData(PasswordSignatureVerificationMethod());
     }
-  }
-
-  /// Generates the [password] signature with the given [salt].
-  Future<String> _generatePasswordSignature(String password, Salt salt) async {
-    CryptoStore cryptoStore = CryptoStore.fromPassword(password, salt);
-    String passwordSignature = cryptoStore.hmacSecretKey.string(password, utf8).base64();
-    return passwordSignature;
   }
 }
 

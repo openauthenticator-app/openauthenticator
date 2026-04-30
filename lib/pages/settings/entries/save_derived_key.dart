@@ -19,14 +19,6 @@ class SaveDerivedKeySettingsEntryWidget extends CheckboxSettingsEntryWidget<AppU
          subtitle: translations.settings.security.saveDerivedKey.subtitle,
        );
 
-  /// Creates a new save derived key settings entry widget instance for the intro page.
-  SaveDerivedKeySettingsEntryWidget.intro({
-    Key? key,
-  }) : this(
-         key: key,
-         icon: null,
-       );
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     AsyncValue<String> unlockMethod = ref.watch(appUnlockMethodSettingsEntryProvider);

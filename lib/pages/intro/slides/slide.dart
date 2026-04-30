@@ -5,9 +5,13 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
-import 'package:open_authenticator/model/crypto/store.dart';
+import 'package:open_authenticator/model/app_unlock/methods/method.dart';
+import 'package:open_authenticator/model/crypto/derived_key.dart';
+import 'package:open_authenticator/model/crypto/salt.dart';
+import 'package:open_authenticator/model/settings/app_unlock_method.dart';
 import 'package:open_authenticator/model/totp/repository.dart';
 import 'package:open_authenticator/spacing.dart';
+import 'package:open_authenticator/utils/result.dart';
 import 'package:open_authenticator/widgets/sized_scalable_image.dart';
 
 /// The current intro page slide provider.
@@ -29,22 +33,30 @@ class CurrentIntroPageSlideNotifier extends AsyncNotifier<CurrentIntroSlideState
 
   /// Returns `true` if the slide should be skipped.
   Future<bool> _shouldSkipSlide(IntroPageSlide slide) async => switch (slide) {
-    IntroPageSlide.password => (await ref.read(cryptoStoreProvider.future)) != null,
+    IntroPageSlide.password => (await ref.read(saltProvider.future)) != null && (await ref.read(derivedKeyProvider.future)) != null,
     IntroPageSlide.logIn => (await ref.read(totpRepositoryProvider.future)).isNotEmpty,
     _ => false,
   };
 
   /// Goes to the next slide.
   /// Returns `true` if the intro should finish.
-  Future<bool> goToNextSlide() async {
+  Future<bool> goToNextSlide(BuildContext context) async {
     CurrentIntroSlideState slideState = await future;
     if (slideState.slide == .password) {
       String? password = (slideState as PasswordIntroPageSlideState).password;
       if (password == null) {
         return false;
       }
-      StoredCryptoStore currentCryptoStore = ref.read(cryptoStoreProvider.notifier);
-      await currentCryptoStore.changeCryptoStore(password);
+      if (!slideState.saveDerivedKey) {
+        await ref
+            .read(appUnlockMethodSettingsEntryProvider.notifier)
+            .changeValue(
+              MasterPasswordAppUnlockMethod.kMethodId,
+              enableResult: ResultSuccess<String>(value: password),
+            );
+      }
+      await ref.read(saltProvider.notifier).generateIfNeeded();
+      await ref.read(derivedKeyProvider.notifier).updateFromPassword(password);
     }
     CurrentIntroSlideState? next = slideState._createNextSlideState();
     if (next == null) {
@@ -109,28 +121,38 @@ class PasswordIntroPageSlideState extends CurrentIntroSlideState {
   /// The password.
   final String? password;
 
+  /// Whether to save the derived key.
+  final bool saveDerivedKey;
+
   /// Creates a new password intro slide state.
   const PasswordIntroPageSlideState._({
     required super.slideIndex,
     required super.slides,
     this.password,
+    this.saveDerivedKey = true,
   }) : super._();
-
-  /// Creates a new password intro slide state from the current state.
-  PasswordIntroPageSlideState.fromCurrent({
-    String? password,
-    required CurrentIntroSlideState current,
-  }) : this._(
-         password: password,
-         slides: current._slides,
-         slideIndex: current.slideIndex,
-       );
 
   @override
   bool get canGoToNextSlide => password != null;
 
   @override
-  List<Object?> get props => [slide, password];
+  List<Object?> get props => [slide, password, saveDerivedKey];
+
+  /// Overwrites the password.
+  PasswordIntroPageSlideState overwritePassword(String? password) => PasswordIntroPageSlideState._(
+    slides: _slides,
+    slideIndex: slideIndex,
+    password: password,
+    saveDerivedKey: saveDerivedKey,
+  );
+
+  /// Overwrites the save derived key settings entry.
+  PasswordIntroPageSlideState overwriteSaveDerivedKey(bool? saveDerivedKey) => PasswordIntroPageSlideState._(
+    slides: _slides,
+    slideIndex: slideIndex,
+    password: password,
+    saveDerivedKey: saveDerivedKey ?? true,
+  );
 }
 
 /// A "slide" of the intro page.

@@ -8,6 +8,8 @@ import 'package:open_authenticator/model/backend/request/response.dart';
 import 'package:open_authenticator/model/backend/synchronization/push/operation.dart';
 import 'package:open_authenticator/model/backend/synchronization/queue.dart';
 import 'package:open_authenticator/model/backup.dart';
+import 'package:open_authenticator/model/crypto/derived_key.dart';
+import 'package:open_authenticator/model/crypto/salt.dart';
 import 'package:open_authenticator/model/crypto/store.dart';
 import 'package:open_authenticator/model/database/database.dart';
 import 'package:open_authenticator/model/password_verification/password_verification.dart';
@@ -98,7 +100,6 @@ class StorageTypeSettingsEntry extends EnumSettingsEntry<StorageType> {
       if (masterPassword == null || response.totps.isEmpty) {
         toAdd.addAll(currentStorageTotps);
       } else {
-        CryptoStore? currentCryptoStore = ref.read(cryptoStoreProvider).value;
         for (Totp totp in response.totps) {
           CryptoStore cryptoStore = CryptoStore.fromPassword(masterPassword, totp.encryptedData.encryptionSalt);
           if (totp.encryptedData.canDecryptData(cryptoStore)) {
@@ -108,6 +109,7 @@ class StorageTypeSettingsEntry extends EnumSettingsEntry<StorageType> {
         }
         newCryptoStore ??= CryptoStore.fromPassword(masterPassword, response.totps.first.encryptedData.encryptionSalt);
 
+        CryptoStore? currentCryptoStore = await ref.read(cryptoStoreProvider.future);
         for (Totp totp in currentStorageTotps) {
           CryptoStore oldCryptoStore;
           if (currentCryptoStore != null && totp.encryptedData.canDecryptData(currentCryptoStore)) {
@@ -127,7 +129,8 @@ class StorageTypeSettingsEntry extends EnumSettingsEntry<StorageType> {
         await database.removeDeletionMarks(tombstonesToRemove);
       }
       if (newCryptoStore != null) {
-        await ref.read(cryptoStoreProvider.notifier).changeCryptoStore(masterPassword!, newCryptoStore: newCryptoStore);
+        await ref.read(saltProvider.notifier).changeSalt(newCryptoStore.salt);
+        await ref.read(derivedKeyProvider.notifier).updateFromPassword(masterPassword!);
       }
 
       PushOperationsQueue pushOperationsQueue = ref.read(pushOperationsQueueProvider.notifier);
