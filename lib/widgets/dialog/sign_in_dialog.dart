@@ -6,7 +6,7 @@ import 'package:open_authenticator/model/backend/authentication/providers/provid
 import 'package:open_authenticator/model/backend/user.dart';
 import 'package:open_authenticator/spacing.dart';
 import 'package:open_authenticator/utils/form_label.dart';
-import 'package:open_authenticator/utils/result.dart';
+import 'package:open_authenticator/utils/result/result.dart';
 import 'package:open_authenticator/utils/utils.dart';
 import 'package:open_authenticator/widgets/authentication_provider_image.dart';
 import 'package:open_authenticator/widgets/button_text.dart';

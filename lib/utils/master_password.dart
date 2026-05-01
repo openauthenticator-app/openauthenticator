@@ -7,7 +7,8 @@ import 'package:open_authenticator/model/app_unlock/reason.dart';
 import 'package:open_authenticator/model/settings/app_unlock_method.dart';
 import 'package:open_authenticator/model/totp/repository.dart';
 import 'package:open_authenticator/utils/form_label.dart';
-import 'package:open_authenticator/utils/result.dart';
+import 'package:open_authenticator/utils/result/handler.dart';
+import 'package:open_authenticator/utils/result/result.dart';
 import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
@@ -48,7 +49,7 @@ class MasterPasswordUtils {
       future: ref.read(totpRepositoryProvider.notifier).changeMasterPassword(result.newPassword!, backupPassword: result.backupPassword),
     );
     if (context.mounted) {
-      context.handleResult(changeResult);
+      handleResult(context, changeResult);
     }
     return changeResult;
   }

@@ -8,7 +8,8 @@ import 'package:open_authenticator/model/backend/user.dart';
 import 'package:open_authenticator/model/purchases/clients/client.dart';
 import 'package:open_authenticator/model/purchases/contributor_plan.dart';
 import 'package:open_authenticator/spacing.dart';
-import 'package:open_authenticator/utils/result.dart';
+import 'package:open_authenticator/utils/result/handler.dart';
+import 'package:open_authenticator/utils/result/result.dart';
 import 'package:open_authenticator/utils/utils.dart';
 import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/centered_circular_progress_indicator.dart';
@@ -202,7 +203,7 @@ class _ContributorPlanFallbackPaywallState extends ConsumerState<ContributorPlan
     );
     _handleContributorPlanStateResult(
       result,
-      successMessage: (state) => state == .active ? translations.contributorPlan.subscribeSuccess.immediate : translations.contributorPlan.subscribeSuccess.delayed,
+      buildSuccessToastMessage: (state) => state == .active ? translations.contributorPlan.subscribeSuccess.immediate : translations.contributorPlan.subscribeSuccess.delayed,
     );
     if (result is ResultSuccess<ContributorPlanState> && result.value != .active && mounted) {
       setState(() => hasPressedPurchaseButton = true);
@@ -228,18 +229,19 @@ class _ContributorPlanFallbackPaywallState extends ConsumerState<ContributorPlan
     );
     _handleContributorPlanStateResult(
       result,
-      successMessage: (_) => translations.contributorPlan.fallbackPaywall.restorePurchasesSuccess,
+      buildSuccessToastMessage: (_) => translations.contributorPlan.fallbackPaywall.restorePurchasesSuccess,
     );
   }
 
   /// Handles the [result] of either the [ContributorPlan.purchase] or [ContributorPlan.refresh] method.
-  void _handleContributorPlanStateResult(Result<ContributorPlanState> result, {String? Function(ContributorPlanState?)? successMessage}) {
+  void _handleContributorPlanStateResult(Result<ContributorPlanState> result, {String? Function(ContributorPlanState?)? buildSuccessToastMessage}) {
     if (!mounted) {
       return;
     }
-    context.handleResult(
+    handleResult(
+      context,
       result,
-      successMessage: successMessage,
+      buildSuccessToastMessage: buildSuccessToastMessage,
     );
     if (result.valueOrNull == .active) {
       widget.onPurchaseCompleted();

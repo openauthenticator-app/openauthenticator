@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/utils/platform.dart';
-import 'package:open_authenticator/utils/utils.dart';
+import 'package:open_authenticator/utils/result/handler.dart';
 import 'package:xdg_desktop_portal/xdg_desktop_portal.dart';
 
 /// The connectivity state provider.
@@ -30,7 +30,7 @@ class ConnectivityStateNotifier extends AsyncNotifier<ConnectivityState> {
         }
 
         void onConnectivityError(Object error, StackTrace stackTrace) {
-          handleException(error, stackTrace);
+          printException(error, stackTrace);
           if (!initialState.isCompleted) {
             initialState.completeError(error, stackTrace);
           }
@@ -56,7 +56,7 @@ class ConnectivityStateNotifier extends AsyncNotifier<ConnectivityState> {
         }
 
         void onConnectivityError(Object error, StackTrace stackTrace) {
-          handleException(error, stackTrace);
+          printException(error, stackTrace);
           if (ref.mounted) {
             state = const AsyncData(.unknown);
           }
@@ -72,7 +72,7 @@ class ConnectivityStateNotifier extends AsyncNotifier<ConnectivityState> {
         return result.associatedConnectivityState;
       }
     } catch (ex, stackTrace) {
-      handleException(ex, stackTrace);
+      printException(ex, stackTrace);
       return .unknown;
     }
   }

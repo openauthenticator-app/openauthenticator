@@ -14,7 +14,8 @@ import 'package:open_authenticator/model/settings/app_unlock_method.dart';
 import 'package:open_authenticator/model/settings/entry.dart';
 import 'package:open_authenticator/model/totp/image_cache.dart';
 import 'package:open_authenticator/utils/platform.dart';
-import 'package:open_authenticator/utils/result.dart';
+import 'package:open_authenticator/utils/result/handler.dart';
+import 'package:open_authenticator/utils/result/result.dart';
 import 'package:open_authenticator/utils/shared_preferences_with_prefix.dart';
 import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
@@ -70,7 +71,11 @@ class ClearDataSettingsEntryWidget extends ConsumerWidget with FTileMixin {
             return;
           }
           if (logoutResult is! ResultSuccess) {
-            context.handleResult(logoutResult);
+            handleResult(
+              context,
+              logoutResult,
+              resultHandlers: handleErrorOnlyWithDialog,
+            );
             return;
           }
           await SimpleSecureStorage.clear();
@@ -81,9 +86,16 @@ class ClearDataSettingsEntryWidget extends ConsumerWidget with FTileMixin {
           AppDatabase database = ref.read(appDatabaseProvider);
           await database.clear();
           if (deleteBackups) {
+            List<ResultError> errors = [];
             List<Backup> backups = await ref.read(backupStoreProvider.future);
             for (Backup backup in backups) {
-              await backup.delete();
+              Result deleteResult = await backup.delete();
+              if (deleteResult is ResultError) {
+                errors.add(deleteResult);
+              }
+            }
+            for (ResultError error in errors) {
+              printException(error.exception, error.stackTrace);
             }
           }
         }(),

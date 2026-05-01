@@ -12,7 +12,7 @@ import 'package:open_authenticator/model/totp/totp.dart';
 import 'package:open_authenticator/pages/totp.dart';
 import 'package:open_authenticator/utils/image_type.dart';
 import 'package:open_authenticator/utils/jovial_svg.dart';
-import 'package:open_authenticator/utils/utils.dart';
+import 'package:open_authenticator/utils/result/handler.dart';
 import 'package:open_authenticator/widgets/totp/image.dart';
 import 'package:open_authenticator/widgets/totp/widget.dart';
 import 'package:path/path.dart';
@@ -117,10 +117,10 @@ class TotpImageCacheManager extends AsyncNotifier<Map<String, CacheObject>> {
         });
       }
     } catch (ex, stackTrace) {
-      handleException(
+      printException(
         ex,
         stackTrace,
-        sendToSentry: ex is! HttpException && shouldSendErrorToSentry(ex),
+        sendToSentry: (ex) => ex is HttpException ? false : null,
       );
     }
   }

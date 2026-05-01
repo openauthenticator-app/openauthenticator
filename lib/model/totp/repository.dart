@@ -13,7 +13,7 @@ import 'package:open_authenticator/model/settings/storage_type.dart';
 import 'package:open_authenticator/model/totp/decrypted.dart';
 import 'package:open_authenticator/model/totp/image_cache.dart';
 import 'package:open_authenticator/model/totp/totp.dart';
-import 'package:open_authenticator/utils/result.dart';
+import 'package:open_authenticator/utils/result/result.dart';
 import 'package:open_authenticator/utils/utils.dart';
 
 /// The provider instance.

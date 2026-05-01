@@ -4,7 +4,7 @@ import 'package:forui/forui.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/backend/authentication/providers/provider.dart';
 import 'package:open_authenticator/utils/brightness_listener.dart';
-import 'package:open_authenticator/utils/result.dart';
+import 'package:open_authenticator/utils/result/result.dart';
 import 'package:open_authenticator/widgets/authentication_provider_image.dart';
 import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';

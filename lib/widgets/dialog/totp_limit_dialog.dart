@@ -7,7 +7,8 @@ import 'package:open_authenticator/model/purchases/contributor_plan.dart';
 import 'package:open_authenticator/model/settings/storage_type.dart';
 import 'package:open_authenticator/spacing.dart';
 import 'package:open_authenticator/utils/contributor_plan.dart';
-import 'package:open_authenticator/utils/result.dart';
+import 'package:open_authenticator/utils/result/handler.dart';
+import 'package:open_authenticator/utils/result/result.dart';
 import 'package:open_authenticator/utils/storage_migration.dart';
 import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/centered_circular_progress_indicator.dart';
@@ -85,7 +86,7 @@ class TotpLimitDialog extends ConsumerWidget {
               if (!context.mounted) {
                 return;
               }
-              context.handleResult(result);
+              handleResult(context, result);
               if (result is ResultSuccess<User> && result.value.contributorPlan) {
                 Navigator.pop(context, true);
               }

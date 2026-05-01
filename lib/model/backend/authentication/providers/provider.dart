@@ -15,7 +15,7 @@ import 'package:open_authenticator/model/backend/user.dart';
 import 'package:open_authenticator/model/settings/backend_url.dart';
 import 'package:open_authenticator/model/settings/entry.dart';
 import 'package:open_authenticator/utils/platform.dart';
-import 'package:open_authenticator/utils/result.dart';
+import 'package:open_authenticator/utils/result/result.dart';
 import 'package:open_authenticator/utils/shared_preferences_with_prefix.dart';
 import 'package:open_authenticator/utils/uri_builder.dart';
 import 'package:open_authenticator/utils/utils.dart';

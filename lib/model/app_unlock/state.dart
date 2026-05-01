@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/model/app_unlock/methods/method.dart';
 import 'package:open_authenticator/model/app_unlock/reason.dart';
 import 'package:open_authenticator/model/settings/app_unlock_method.dart';
-import 'package:open_authenticator/utils/result.dart';
+import 'package:open_authenticator/utils/result/result.dart';
 
 /// The app unlock state state provider.
 final appLockStateProvider = AsyncNotifierProvider<AppLockStateNotifier, AppLockState>(AppLockStateNotifier.new);

@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/model/password_verification/methods/crypto_store.dart';
 import 'package:open_authenticator/model/password_verification/methods/method.dart';
 import 'package:open_authenticator/model/password_verification/methods/password_signature.dart';
-import 'package:open_authenticator/utils/result.dart';
+import 'package:open_authenticator/utils/result/result.dart';
 
 /// The provider instance.
 final passwordVerificationProvider = AsyncNotifierProvider.autoDispose<PasswordVerification, List<PasswordVerificationMethod>>(PasswordVerification.new);

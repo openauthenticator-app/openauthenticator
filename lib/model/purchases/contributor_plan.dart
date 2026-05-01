@@ -8,7 +8,7 @@ import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/backend/user.dart';
 import 'package:open_authenticator/model/purchases/clients/client.dart';
 import 'package:open_authenticator/model/settings/backend_url.dart';
-import 'package:open_authenticator/utils/result.dart';
+import 'package:open_authenticator/utils/result/result.dart';
 import 'package:purchases_flutter/purchases_flutter.dart' hide Price;
 
 /// The Contributor Plan provider.

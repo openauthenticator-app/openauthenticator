@@ -4,7 +4,8 @@ import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/app_unlock/reason.dart';
 import 'package:open_authenticator/model/backend/user.dart';
 import 'package:open_authenticator/model/settings/app_unlock_method.dart';
-import 'package:open_authenticator/utils/result.dart';
+import 'package:open_authenticator/utils/result/handler.dart';
+import 'package:open_authenticator/utils/result/result.dart';
 import 'package:open_authenticator/widgets/dialog/confirmation_dialog.dart';
 import 'package:open_authenticator/widgets/dialog/sign_in_dialog.dart';
 import 'package:open_authenticator/widgets/dialog/toggle_link_dialog.dart';
@@ -22,7 +23,7 @@ class AccountUtils {
       context,
       waitingDialogMessage: translations.authentication.logIn.waitingLoginMessage,
       action: action,
-      handleResult: (result) => result is! ResultSuccess,
+      resultHandlers: handleErrorOnlyWithDialog,
     );
   }
 
@@ -49,15 +50,12 @@ class AccountUtils {
       context,
       waitingDialogMessage: unlink ? null : translations.authentication.logIn.waitingLoginMessage,
       action: result.action,
-      handleResult: (result) => result is! ResultSuccess,
+      resultHandlers: handleErrorOnlyWithDialog,
     );
   }
 
   /// Prompts the user to choose an authentication provider, use it to re-authenticate and delete its account.
-  static Future<Result> tryDeleteAccount(
-    BuildContext context,
-    WidgetRef ref,
-  ) async {
+  static Future<Result> tryDeleteAccount(BuildContext context, WidgetRef ref) async {
     bool confirm = await ConfirmationDialog.ask(
       context,
       title: translations.authentication.deleteConfirmationDialog.title,
@@ -79,7 +77,6 @@ class AccountUtils {
     return _tryTo(
       context,
       action: () => ref.read(userProvider.notifier).deleteUser(),
-      handleResult: (_) => true,
     );
   }
 
@@ -88,15 +85,19 @@ class AccountUtils {
     BuildContext context, {
     required Future<Result> Function() action,
     String? waitingDialogMessage,
-    bool Function(Result result)? handleResult,
+    List<ResultHandler> resultHandlers = handleSuccessAndErrorWithDialog,
   }) async {
     Result result = await showWaitingOverlay(
       context,
       future: action(),
       message: waitingDialogMessage,
     );
-    if ((handleResult?.call(result) ?? true) && context.mounted) {
-      context.handleResult(result);
+    if (context.mounted) {
+      handleResult(
+        context,
+        result,
+        resultHandlers: resultHandlers,
+      );
     }
     return result;
   }

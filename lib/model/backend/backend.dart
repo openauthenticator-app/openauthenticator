@@ -12,9 +12,8 @@ import 'package:open_authenticator/model/backend/request/request.dart';
 import 'package:open_authenticator/model/backend/request/response.dart';
 import 'package:open_authenticator/model/settings/backend_url.dart';
 import 'package:open_authenticator/utils/platform.dart';
-import 'package:open_authenticator/utils/result.dart';
+import 'package:open_authenticator/utils/result/result.dart';
 import 'package:open_authenticator/utils/uri_builder.dart';
-import 'package:open_authenticator/utils/utils.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:simple_secure_storage/simple_secure_storage.dart';
 
@@ -122,7 +121,6 @@ class BackendClient extends AsyncNotifier<Map<String, String>> {
       return ResultError(
         exception: ex,
         stackTrace: stackTrace,
-        sendToSentry: shouldSendErrorToSentry(ex),
       );
     }
   }

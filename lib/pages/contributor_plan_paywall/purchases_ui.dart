@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/purchases/clients/client.dart';
 import 'package:open_authenticator/model/purchases/contributor_plan.dart';
-import 'package:open_authenticator/utils/result.dart';
-import 'package:open_authenticator/utils/utils.dart';
+import 'package:open_authenticator/utils/result/handler.dart';
+import 'package:open_authenticator/utils/result/result.dart';
 import 'package:open_authenticator/widgets/centered_circular_progress_indicator.dart';
 import 'package:open_authenticator/widgets/dialog/error_dialog.dart';
 import 'package:open_authenticator/widgets/toast.dart';
@@ -55,7 +55,7 @@ class ContributorPlanPaywall extends ConsumerWidget {
               return;
             }
             if (result is! ResultSuccess<ContributorPlanState>) {
-              context.handleResult(result);
+              handleResult(context, result);
               return;
             }
             if (result.value == .active) {
@@ -78,7 +78,7 @@ class ContributorPlanPaywall extends ConsumerWidget {
             onPurchaseCompleted: (customerInfo, transaction) async => await handleSuccess(),
             onRestoreCompleted: (customerInfo) async => await handleSuccess(),
             onPurchaseError: (error) {
-              handleException(error, StackTrace.current);
+              printException(error, StackTrace.current);
               if (context.mounted) {
                 ErrorDialog.openDialog(
                   context,
@@ -87,7 +87,7 @@ class ContributorPlanPaywall extends ConsumerWidget {
               }
             },
             onRestoreError: (error) {
-              handleException(error, StackTrace.current);
+              printException(error, StackTrace.current);
               if (context.mounted) {
                 ErrorDialog.openDialog(
                   context,

@@ -15,7 +15,7 @@ import 'package:open_authenticator/model/settings/storage_type.dart';
 import 'package:open_authenticator/model/totp/repository.dart';
 import 'package:open_authenticator/model/totp/totp.dart';
 import 'package:open_authenticator/utils/platform.dart';
-import 'package:open_authenticator/utils/result.dart';
+import 'package:open_authenticator/utils/result/result.dart';
 
 /// The push operations errors provider.
 final pushOperationsErrorsProvider = StreamProvider<List<PushOperationError>>((ref) => ref.watch(appDatabaseProvider).watchBackendPushOperationErrors());

@@ -12,7 +12,8 @@ import 'package:open_authenticator/model/password_verification/password_verifica
 import 'package:open_authenticator/model/settings/app_unlock_method.dart';
 import 'package:open_authenticator/spacing.dart';
 import 'package:open_authenticator/utils/master_password.dart';
-import 'package:open_authenticator/utils/result.dart';
+import 'package:open_authenticator/utils/result/handler.dart';
+import 'package:open_authenticator/utils/result/result.dart';
 import 'package:open_authenticator/widgets/app_scaffold.dart';
 import 'package:open_authenticator/widgets/blur.dart';
 import 'package:open_authenticator/widgets/button_text.dart';
@@ -116,7 +117,11 @@ class _UnlockChallengeState extends ConsumerState<UnlockChallenge> {
     if (result.exception is CannotUnlockException) {
       setState(() => cannotUnlockException = result.exception as CannotUnlockException);
     } else {
-      context.handleResult(result, showDialogIfError: (_) => false);
+      handleResult(
+        context,
+        result,
+        resultHandlers: handleErrorOnlyWithToast,
+      );
     }
   }
 }

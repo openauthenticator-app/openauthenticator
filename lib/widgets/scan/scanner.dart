@@ -3,7 +3,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:open_authenticator/utils/utils.dart';
+import 'package:open_authenticator/utils/result/handler.dart';
 import 'package:open_authenticator/widgets/centered_circular_progress_indicator.dart';
 import 'package:open_authenticator/widgets/scan/scanner_button_widgets.dart';
 import 'package:open_authenticator/widgets/scan/scanner_error_widget.dart';
@@ -69,7 +69,7 @@ class _QrCodeScannerState extends State<QrCodeScanner> {
                 });
               }
             },
-            onDetectError: widget.onError ?? handleException,
+            onDetectError: widget.onError ?? printException,
             fit: BoxFit.contain,
             controller: controller,
             scanWindow: scanWindow,

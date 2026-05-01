@@ -24,8 +24,9 @@ import 'package:open_authenticator/pages/totp.dart';
 import 'package:open_authenticator/themes.dart';
 import 'package:open_authenticator/utils/platform.dart';
 import 'package:open_authenticator/utils/rate_my_app.dart';
-import 'package:open_authenticator/utils/result.dart';
-import 'package:open_authenticator/utils/utils.dart';
+import 'package:open_authenticator/utils/result/handler.dart';
+import 'package:open_authenticator/utils/result/result.dart';
+import 'package:open_authenticator/utils/sentry.dart';
 import 'package:open_authenticator/widgets/animated_theme.dart';
 import 'package:open_authenticator/widgets/app_scaffold.dart';
 import 'package:open_authenticator/widgets/centered_circular_progress_indicator.dart';
@@ -344,9 +345,10 @@ class _RouteWidgetState extends ConsumerState<_RouteWidget> {
       future: provider.onRedirectReceived(appLink),
     );
     if (mounted) {
-      context.handleResult(
+      handleResult(
+        context,
         result,
-        successMessage: (valueOrNull) => valueOrNull?.localizedMessage,
+        buildSuccessToastMessage: (valueOrNull) => valueOrNull?.localizedMessage,
       );
     }
   }

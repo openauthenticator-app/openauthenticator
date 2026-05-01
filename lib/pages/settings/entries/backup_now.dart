@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/backup.dart';
-import 'package:open_authenticator/utils/result.dart';
+import 'package:open_authenticator/utils/result/handler.dart';
+import 'package:open_authenticator/utils/result/result.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/text_input_dialog.dart';
 import 'package:open_authenticator/widgets/waiting_overlay.dart';
@@ -35,7 +36,7 @@ class BackupNowSettingsEntryWidget extends ConsumerWidget with FTileMixin {
         future: ref.read(backupStoreProvider.notifier).doBackup(password),
       );
       if (context.mounted) {
-        context.handleResult(result);
+        handleResult(context, result);
       }
     },
   );

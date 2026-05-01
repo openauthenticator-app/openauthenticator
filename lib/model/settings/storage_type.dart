@@ -16,7 +16,7 @@ import 'package:open_authenticator/model/password_verification/password_verifica
 import 'package:open_authenticator/model/settings/entry.dart';
 import 'package:open_authenticator/model/totp/decrypted.dart';
 import 'package:open_authenticator/model/totp/totp.dart';
-import 'package:open_authenticator/utils/result.dart';
+import 'package:open_authenticator/utils/result/result.dart';
 
 /// The storage type settings entry provider.
 final storageTypeSettingsEntryProvider = AsyncNotifierProvider.autoDispose<StorageTypeSettingsEntry, StorageType>(StorageTypeSettingsEntry.new);

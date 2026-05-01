@@ -11,7 +11,8 @@ import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/backup.dart';
 import 'package:open_authenticator/pages/settings/entries/widgets.dart';
 import 'package:open_authenticator/utils/platform.dart';
-import 'package:open_authenticator/utils/result.dart';
+import 'package:open_authenticator/utils/result/handler.dart';
+import 'package:open_authenticator/utils/result/result.dart';
 import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/centered_circular_progress_indicator.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
@@ -183,7 +184,7 @@ class _RestoreBackupDialogState extends ConsumerState<_RestoreBackupDialog> {
       result = ResultError(exception: ex, stackTrace: stackTrace);
     } finally {
       if (mounted) {
-        context.handleResult(result);
+        handleResult(context, result);
       }
     }
   }
@@ -204,9 +205,10 @@ class _RestoreBackupDialogState extends ConsumerState<_RestoreBackupDialog> {
       future: backup.restore(password),
     );
     if (mounted) {
-      context.handleResult(
+      handleResult(
+        context,
         result,
-        showDialogIfError: (error) => error is! InvalidPasswordException,
+        resultHandlers: result is ResultError && result.exception is InvalidPasswordException ? handleSuccessAndErrorWithToast : handleSuccessAndErrorWithDialog,
       );
       if (result is ResultSuccess) {
         Navigator.pop(context);
@@ -262,7 +264,7 @@ class _RestoreBackupDialogState extends ConsumerState<_RestoreBackupDialog> {
       result = ResultError(exception: ex, stackTrace: stackTrace);
     } finally {
       if (mounted) {
-        context.handleResult(result);
+        handleResult(context, result);
       }
     }
   }
@@ -280,7 +282,7 @@ class _RestoreBackupDialogState extends ConsumerState<_RestoreBackupDialog> {
     }
     Result deleteResult = await backup.delete();
     if (mounted) {
-      context.handleResult(deleteResult);
+      handleResult(context, deleteResult);
     }
   }
 }

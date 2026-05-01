@@ -8,7 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hashlib/hashlib.dart';
 import 'package:open_authenticator/model/crypto/derived_key.dart';
 import 'package:open_authenticator/model/crypto/salt.dart';
-import 'package:open_authenticator/utils/utils.dart';
+import 'package:open_authenticator/utils/result/handler.dart';
 
 /// The crypto store provider.
 final cryptoStoreProvider = AsyncNotifierProvider<CryptoStoreNotifier, CryptoStore?>(CryptoStoreNotifier.new);
@@ -76,7 +76,7 @@ class CryptoStore with EquatableMixin {
       return utf8.decode(key.aes.gcm(initializationVector).decrypt(encryptedBytes));
     } catch (ex, stackTrace) {
       if (ex is! StateError) {
-        handleException(ex, stackTrace);
+        printException(ex, stackTrace);
       }
     }
     return null;

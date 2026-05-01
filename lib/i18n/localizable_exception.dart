@@ -7,7 +7,4 @@ class LocalizableException implements Exception {
   const LocalizableException({
     required this.localizedErrorMessage,
   });
-
-  @override
-  String toString() => 'An error occurred : $runtimeType. Localized error message : "$localizedErrorMessage".';
 }

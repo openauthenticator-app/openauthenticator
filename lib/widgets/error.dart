@@ -175,9 +175,7 @@ class _ErrorWithStackTraceState extends State<ErrorWithStackTrace> with SingleTi
                   if (context.mounted) {
                     showErrorToast(
                       context,
-                      text: translations.error.generic.withException(
-                        exception: ex,
-                      ),
+                      text: translations.error.generic.withException(exception: ex),
                     );
                   }
                 }

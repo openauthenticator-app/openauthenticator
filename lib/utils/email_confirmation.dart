@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/backend/authentication/providers/provider.dart';
-import 'package:open_authenticator/utils/result.dart';
+import 'package:open_authenticator/utils/result/handler.dart';
+import 'package:open_authenticator/utils/result/result.dart';
 import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
@@ -17,7 +18,7 @@ class EmailConfirmationUtils {
   static Future<Result> askForConfirmation(
     BuildContext context,
     WidgetRef ref, {
-    bool Function(Result result)? handleResult,
+    List<ResultHandler> resultHandlers = handleSuccessAndErrorWithDialog,
   }) async {
     Result result;
     _ConfirmAction? confirmAction = await _ConfirmActionPickerDialog.openDialog(context);
@@ -29,17 +30,19 @@ class EmailConfirmationUtils {
         .cancelConfirmation => _tryCancelConfirmation(context, ref),
       };
     }
-    if ((handleResult?.call(result) ?? true) && context.mounted) {
-      context.handleResult(
+    if (context.mounted) {
+      handleResult(
+        context,
         result,
-        successMessage: (value) => confirmAction == .tryConfirm ? value.localizedMessage : null,
+        resultHandlers: resultHandlers,
+        buildSuccessToastMessage: (value) => confirmAction == .tryConfirm ? (value as RedirectResult).localizedMessage : null,
       );
     }
     return result;
   }
 
   /// Tries to cancel the confirmation.
-  static Future<Result> _tryCancelConfirmation(BuildContext context, WidgetRef ref, {bool handleResult = true}) async {
+  static Future<Result> _tryCancelConfirmation(BuildContext context, WidgetRef ref) async {
     bool confirmation = await ConfirmationDialog.ask(
       context,
       title: translations.emailConfirmation.confirmActionPickerDialog.cancelConfirmation.validationDialog.title,

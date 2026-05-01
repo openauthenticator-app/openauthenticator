@@ -214,7 +214,7 @@ class _TotpsListWidget extends ConsumerWidget {
           future: changeTotpsKey(decryptedTotps.$1, [decryptedTotps.$2.first]),
         );
         if (context.mounted) {
-          context.handleResult(result);
+          handleResult(context, result);
         }
         break;
       case .changeAllTotpsKey:
@@ -223,7 +223,7 @@ class _TotpsListWidget extends ConsumerWidget {
           future: changeTotpsKey(decryptedTotps.$1, decryptedTotps.$2),
         );
         if (context.mounted) {
-          context.handleResult(result);
+          handleResult(context, result);
         }
         break;
       case .changeMasterPassword:

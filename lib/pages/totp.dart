@@ -15,7 +15,8 @@ import 'package:open_authenticator/pages/home/page.dart';
 import 'package:open_authenticator/spacing.dart';
 import 'package:open_authenticator/utils/brightness_listener.dart';
 import 'package:open_authenticator/utils/form_label.dart';
-import 'package:open_authenticator/utils/result.dart';
+import 'package:open_authenticator/utils/result/handler.dart';
+import 'package:open_authenticator/utils/result/result.dart';
 import 'package:open_authenticator/utils/utils.dart';
 import 'package:open_authenticator/widgets/app_scaffold.dart';
 import 'package:open_authenticator/widgets/button_text.dart';
@@ -210,7 +211,7 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
                 if (!context.mounted) {
                   return;
                 }
-                context.handleResult(result);
+                handleResult(context, result);
                 if (result is ResultSuccess) {
                   Navigator.pop(context);
                 }
@@ -255,7 +256,7 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
                   return;
                 }
                 setState(() => enabled = true);
-                context.handleResult(editResult);
+                handleResult(context, editResult);
                 if (editResult is ResultSuccess) {
                   Navigator.pop(context);
                 }

@@ -7,7 +7,8 @@ import 'package:open_authenticator/model/backend/user.dart';
 import 'package:open_authenticator/model/password_verification/password_verification.dart';
 import 'package:open_authenticator/model/settings/storage_type.dart';
 import 'package:open_authenticator/utils/form_label.dart';
-import 'package:open_authenticator/utils/result.dart';
+import 'package:open_authenticator/utils/result/handler.dart';
+import 'package:open_authenticator/utils/result/result.dart';
 import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
@@ -28,7 +29,7 @@ class StorageMigrationUtils {
     bool logout = false,
     String? currentStorageMasterPassword,
     StorageMigrationDeletedTotpPolicy storageMigrationDeletedTotpPolicy = .ask,
-    bool Function(Result result)? handleResult,
+    List<ResultHandler> resultHandlers = handleSuccessAndErrorWithDialog,
   }) async {
     Result result = await (() async {
       StorageType currentType = await ref.read(storageTypeSettingsEntryProvider.future);
@@ -43,7 +44,7 @@ class StorageMigrationUtils {
           }
           backupPassword ??= result.backupPassword;
         }
-        Result<bool> passwordCheckResult = await(await ref.read(passwordVerificationProvider.future)).isPasswordValid(currentStorageMasterPassword ?? '');
+        Result<bool> passwordCheckResult = await (await ref.read(passwordVerificationProvider.future)).isPasswordValid(currentStorageMasterPassword ?? '');
         if (passwordCheckResult is! ResultSuccess<bool> || !passwordCheckResult.value) {
           if (!context.mounted) {
             return const ResultCancelled();
@@ -104,8 +105,12 @@ class StorageMigrationUtils {
       }
       return result;
     })();
-    if ((handleResult?.call(result) ?? true) && context.mounted) {
-      context.handleResult(result);
+    if (context.mounted) {
+      handleResult(
+        context,
+        result,
+        resultHandlers: resultHandlers,
+      );
     }
     return result;
   }

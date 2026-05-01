@@ -5,7 +5,8 @@ import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/app_unlock/methods/method.dart';
 import 'package:open_authenticator/model/settings/app_unlock_method.dart';
 import 'package:open_authenticator/pages/settings/entries/widgets.dart';
-import 'package:open_authenticator/utils/result.dart';
+import 'package:open_authenticator/utils/result/handler.dart';
+import 'package:open_authenticator/utils/result/result.dart';
 
 /// Allows to configure [saveDerivedKeySettingsEntryProvider].
 class SaveDerivedKeySettingsEntryWidget extends CheckboxSettingsEntryWidget<AppUnlockMethodSettingsEntry, String> {
@@ -32,8 +33,12 @@ class SaveDerivedKeySettingsEntryWidget extends CheckboxSettingsEntryWidget<AppU
   Future<void> changeValue(BuildContext context, WidgetRef ref, bool newValue) async {
     String newMethod = newValue ? NoneAppUnlockMethod.kMethodId : MasterPasswordAppUnlockMethod.kMethodId;
     Result result = await ref.read(appUnlockMethodSettingsEntryProvider.notifier).changeValueIfUnlockSucceed(newMethod, context);
-    if (context.mounted && result is! ResultSuccess) {
-      context.handleResult(result);
+    if (context.mounted) {
+      handleResult(
+        context,
+        result,
+        resultHandlers: handleErrorOnlyWithDialog,
+      );
     }
   }
 

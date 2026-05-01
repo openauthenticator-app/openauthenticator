@@ -11,7 +11,7 @@ import 'package:open_authenticator/model/crypto/salt.dart';
 import 'package:open_authenticator/model/settings/app_unlock_method.dart';
 import 'package:open_authenticator/model/totp/repository.dart';
 import 'package:open_authenticator/spacing.dart';
-import 'package:open_authenticator/utils/result.dart';
+import 'package:open_authenticator/utils/result/result.dart';
 import 'package:open_authenticator/widgets/sized_scalable_image.dart';
 
 /// The current intro page slide provider.

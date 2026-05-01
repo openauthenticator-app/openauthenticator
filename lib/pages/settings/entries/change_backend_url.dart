@@ -9,7 +9,8 @@ import 'package:open_authenticator/model/backend/request/request.dart';
 import 'package:open_authenticator/model/backend/request/response.dart';
 import 'package:open_authenticator/model/settings/backend_url.dart';
 import 'package:open_authenticator/pages/settings/entries/widgets.dart';
-import 'package:open_authenticator/utils/result.dart';
+import 'package:open_authenticator/utils/result/handler.dart';
+import 'package:open_authenticator/utils/result/result.dart';
 import 'package:open_authenticator/utils/storage_migration.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/text_input_dialog.dart';
@@ -35,7 +36,7 @@ class ChangeBackendUrlSettingsEntryWidget extends ConsumerWidget with FTileMixin
         ref,
         .localOnly,
         logout: true,
-        handleResult: (result) => result is! ResultSuccess,
+        resultHandlers: handleSuccessAndErrorWithToast,
       );
       if (!context.mounted || result is! ResultSuccess) {
         return;
@@ -71,10 +72,11 @@ class ChangeBackendUrlSettingsEntryWidget extends ConsumerWidget with FTileMixin
         return;
       }
       if (pingBackendResponse is! ResultSuccess<PingBackendResponse>) {
-        context.handleResult(
+        handleResult(
+          context,
           pingBackendResponse,
-          errorMessage: (_) => translations.error.backend.invalidBackendUrl,
-          showDialogIfError: (_) => false,
+          buildErrorToastMessage: (_) => translations.error.backend.invalidBackendUrl,
+          resultHandlers: handleSuccessAndErrorWithToast,
         );
         return;
       }
@@ -89,9 +91,10 @@ class ChangeBackendUrlSettingsEntryWidget extends ConsumerWidget with FTileMixin
         return;
       }
       if (cancelConfirmationResult is! ResultSuccess) {
-        context.handleResult(
+        handleResult(
+          context,
           pingBackendResponse,
-          showDialogIfError: (_) => false,
+          resultHandlers: handleSuccessAndErrorWithToast,
         );
         return;
       }
