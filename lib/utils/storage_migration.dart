@@ -8,6 +8,7 @@ import 'package:open_authenticator/model/password_verification/password_verifica
 import 'package:open_authenticator/model/settings/storage_type.dart';
 import 'package:open_authenticator/utils/form_label.dart';
 import 'package:open_authenticator/utils/result/handler.dart';
+import 'package:open_authenticator/utils/result/presentation.dart';
 import 'package:open_authenticator/utils/result/result.dart';
 import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
@@ -29,7 +30,7 @@ class StorageMigrationUtils {
     bool logout = false,
     String? currentStorageMasterPassword,
     StorageMigrationDeletedTotpPolicy storageMigrationDeletedTotpPolicy = .ask,
-    List<ResultHandler> resultHandlers = handleSuccessAndErrorWithDialog,
+    ResultPresentation presentation = .successAndErrorDialog,
   }) async {
     Result result = await (() async {
       StorageType currentType = await ref.read(storageTypeSettingsEntryProvider.future);
@@ -98,6 +99,7 @@ class StorageMigrationUtils {
               backupPassword: backupPassword,
               currentStorageMasterPassword: currentStorageMasterPassword,
               storageMigrationDeletedTotpPolicy: enteredStorageMigrationDeletedTotpPolicy,
+              presentation: presentation,
             );
           }
         default:
@@ -109,7 +111,7 @@ class StorageMigrationUtils {
       handleResult(
         context,
         result,
-        resultHandlers: resultHandlers,
+        presentation: presentation,
       );
     }
     return result;

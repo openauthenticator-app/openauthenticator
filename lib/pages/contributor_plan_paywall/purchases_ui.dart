@@ -6,7 +6,6 @@ import 'package:open_authenticator/model/purchases/contributor_plan.dart';
 import 'package:open_authenticator/utils/result/handler.dart';
 import 'package:open_authenticator/utils/result/result.dart';
 import 'package:open_authenticator/widgets/centered_circular_progress_indicator.dart';
-import 'package:open_authenticator/widgets/dialog/error_dialog.dart';
 import 'package:open_authenticator/widgets/toast.dart';
 import 'package:purchases_ui_flutter/purchases_ui_flutter.dart';
 
@@ -72,29 +71,20 @@ class ContributorPlanPaywall extends ConsumerWidget {
             }
           }
 
+          void handleError(Object error) {
+            handleResult(
+              context,
+              ResultError(exception: error),
+            );
+          }
+
           return PaywallView(
             offering: snapshot.data?.all[Purchasable.contributorPlan.offeringId],
             onDismiss: onDismiss,
             onPurchaseCompleted: (customerInfo, transaction) async => await handleSuccess(),
             onRestoreCompleted: (customerInfo) async => await handleSuccess(),
-            onPurchaseError: (error) {
-              printException(error, StackTrace.current);
-              if (context.mounted) {
-                ErrorDialog.openDialog(
-                  context,
-                  error: error,
-                );
-              }
-            },
-            onRestoreError: (error) {
-              printException(error, StackTrace.current);
-              if (context.mounted) {
-                ErrorDialog.openDialog(
-                  context,
-                  error: error,
-                );
-              }
-            },
+            onPurchaseError: handleError,
+            onRestoreError: handleError,
           );
         }
         return const CenteredCircularProgressIndicator();

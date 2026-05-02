@@ -37,7 +37,7 @@ class SaveDerivedKeySettingsEntryWidget extends CheckboxSettingsEntryWidget<AppU
       handleResult(
         context,
         result,
-        resultHandlers: handleErrorOnlyWithDialog,
+        presentation: .errorDialog,
       );
     }
   }

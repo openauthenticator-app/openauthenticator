@@ -42,7 +42,6 @@ class ResultError<T> extends Result<T> {
   ResultError({
     required this.exception,
     StackTrace? stackTrace,
-    bool? sendToSentry,
   }) : stackTrace = stackTrace ?? StackTrace.current;
 
   /// Creates a new result error instance from another [result].

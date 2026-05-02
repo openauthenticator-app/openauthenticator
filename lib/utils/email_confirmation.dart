@@ -4,6 +4,7 @@ import 'package:forui/forui.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/backend/authentication/providers/provider.dart';
 import 'package:open_authenticator/utils/result/handler.dart';
+import 'package:open_authenticator/utils/result/presentation.dart';
 import 'package:open_authenticator/utils/result/result.dart';
 import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
@@ -18,7 +19,7 @@ class EmailConfirmationUtils {
   static Future<Result> askForConfirmation(
     BuildContext context,
     WidgetRef ref, {
-    List<ResultHandler> resultHandlers = handleSuccessAndErrorWithDialog,
+    ResultPresentation presentation = .successAndErrorDialog,
   }) async {
     Result result;
     _ConfirmAction? confirmAction = await _ConfirmActionPickerDialog.openDialog(context);
@@ -34,7 +35,7 @@ class EmailConfirmationUtils {
       handleResult(
         context,
         result,
-        resultHandlers: resultHandlers,
+        presentation: presentation,
         buildSuccessToastMessage: (value) => confirmAction == .tryConfirm ? (value as RedirectResult).localizedMessage : null,
       );
     }

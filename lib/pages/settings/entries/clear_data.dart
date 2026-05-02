@@ -15,6 +15,7 @@ import 'package:open_authenticator/model/settings/entry.dart';
 import 'package:open_authenticator/model/totp/image_cache.dart';
 import 'package:open_authenticator/utils/platform.dart';
 import 'package:open_authenticator/utils/result/handler.dart';
+import 'package:open_authenticator/utils/result/reporter.dart';
 import 'package:open_authenticator/utils/result/result.dart';
 import 'package:open_authenticator/utils/shared_preferences_with_prefix.dart';
 import 'package:open_authenticator/widgets/button_text.dart';
@@ -74,7 +75,7 @@ class ClearDataSettingsEntryWidget extends ConsumerWidget with FTileMixin {
             handleResult(
               context,
               logoutResult,
-              resultHandlers: handleErrorOnlyWithDialog,
+              presentation: .errorDialog,
             );
             return;
           }

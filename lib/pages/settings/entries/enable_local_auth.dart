@@ -40,7 +40,7 @@ class EnableLocalAuthSettingsEntryWidget extends CheckboxSettingsEntryWidget<App
       handleResult(
         context,
         result,
-        resultHandlers: handleErrorOnlyWithDialog,
+        presentation: .errorDialog,
       );
     }
   }

@@ -36,7 +36,7 @@ class ChangeBackendUrlSettingsEntryWidget extends ConsumerWidget with FTileMixin
         ref,
         .localOnly,
         logout: true,
-        resultHandlers: handleSuccessAndErrorWithToast,
+        presentation: .successAndErrorToast,
       );
       if (!context.mounted || result is! ResultSuccess) {
         return;
@@ -76,7 +76,7 @@ class ChangeBackendUrlSettingsEntryWidget extends ConsumerWidget with FTileMixin
           context,
           pingBackendResponse,
           buildErrorToastMessage: (_) => translations.error.backend.invalidBackendUrl,
-          resultHandlers: handleSuccessAndErrorWithToast,
+          presentation: .successAndErrorToast,
         );
         return;
       }
@@ -93,8 +93,8 @@ class ChangeBackendUrlSettingsEntryWidget extends ConsumerWidget with FTileMixin
       if (cancelConfirmationResult is! ResultSuccess) {
         handleResult(
           context,
-          pingBackendResponse,
-          resultHandlers: handleSuccessAndErrorWithToast,
+          cancelConfirmationResult,
+          presentation: .successAndErrorToast,
         );
         return;
       }

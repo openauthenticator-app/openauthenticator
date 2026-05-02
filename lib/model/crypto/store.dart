@@ -8,7 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hashlib/hashlib.dart';
 import 'package:open_authenticator/model/crypto/derived_key.dart';
 import 'package:open_authenticator/model/crypto/salt.dart';
-import 'package:open_authenticator/utils/result/handler.dart';
+import 'package:open_authenticator/utils/result/reporter.dart';
 
 /// The crypto store provider.
 final cryptoStoreProvider = AsyncNotifierProvider<CryptoStoreNotifier, CryptoStore?>(CryptoStoreNotifier.new);

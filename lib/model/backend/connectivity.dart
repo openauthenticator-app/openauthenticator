@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/utils/platform.dart';
-import 'package:open_authenticator/utils/result/handler.dart';
+import 'package:open_authenticator/utils/result/reporter.dart';
 import 'package:xdg_desktop_portal/xdg_desktop_portal.dart';
 
 /// The connectivity state provider.

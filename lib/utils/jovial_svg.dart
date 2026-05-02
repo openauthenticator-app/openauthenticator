@@ -11,7 +11,7 @@ import 'package:jovial_svg/src/compact.dart';
 import 'package:jovial_svg/src/compact_noui.dart';
 // ignore: implementation_imports
 import 'package:jovial_svg/src/svg_parser.dart';
-import 'package:open_authenticator/utils/result/handler.dart';
+import 'package:open_authenticator/utils/result/reporter.dart';
 
 /// Contains some useful methods to use with `jovial_svg`.
 class JovialSvgUtils {
@@ -28,7 +28,7 @@ class JovialSvgUtils {
       printException(
         ex,
         stackTrace,
-        sendToSentry: (_) => false,
+        sendToSentry: false,
       );
     } finally {
       await ioSink.close();

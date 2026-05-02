@@ -12,7 +12,6 @@ import 'package:open_authenticator/model/backend/request/request.dart';
 import 'package:open_authenticator/model/backend/request/response.dart';
 import 'package:open_authenticator/utils/result/result.dart';
 import 'package:open_authenticator/utils/sentry.dart';
-import 'package:open_authenticator/utils/utils.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 

@@ -208,7 +208,7 @@ class _RestoreBackupDialogState extends ConsumerState<_RestoreBackupDialog> {
       handleResult(
         context,
         result,
-        resultHandlers: result is ResultError && result.exception is InvalidPasswordException ? handleSuccessAndErrorWithToast : handleSuccessAndErrorWithDialog,
+        presentation: result is ResultError && result.exception is InvalidBackupPasswordException ? .successAndErrorToast : .successAndErrorDialog,
       );
       if (result is ResultSuccess) {
         Navigator.pop(context);

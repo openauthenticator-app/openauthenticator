@@ -5,6 +5,7 @@ import 'package:open_authenticator/model/app_unlock/reason.dart';
 import 'package:open_authenticator/model/backend/user.dart';
 import 'package:open_authenticator/model/settings/app_unlock_method.dart';
 import 'package:open_authenticator/utils/result/handler.dart';
+import 'package:open_authenticator/utils/result/presentation.dart' show ResultPresentation;
 import 'package:open_authenticator/utils/result/result.dart';
 import 'package:open_authenticator/widgets/dialog/confirmation_dialog.dart';
 import 'package:open_authenticator/widgets/dialog/sign_in_dialog.dart';
@@ -23,7 +24,7 @@ class AccountUtils {
       context,
       waitingDialogMessage: translations.authentication.logIn.waitingLoginMessage,
       action: action,
-      resultHandlers: handleErrorOnlyWithDialog,
+      presentation: ResultPresentation.errorDialog,
     );
   }
 
@@ -50,7 +51,7 @@ class AccountUtils {
       context,
       waitingDialogMessage: unlink ? null : translations.authentication.logIn.waitingLoginMessage,
       action: result.action,
-      resultHandlers: handleErrorOnlyWithDialog,
+      presentation: ResultPresentation.errorDialog,
     );
   }
 
@@ -85,7 +86,7 @@ class AccountUtils {
     BuildContext context, {
     required Future<Result> Function() action,
     String? waitingDialogMessage,
-    List<ResultHandler> resultHandlers = handleSuccessAndErrorWithDialog,
+    ResultPresentation presentation = .successAndErrorDialog,
   }) async {
     Result result = await showWaitingOverlay(
       context,
@@ -96,7 +97,7 @@ class AccountUtils {
       handleResult(
         context,
         result,
-        resultHandlers: resultHandlers,
+        presentation: presentation,
       );
     }
     return result;

@@ -120,7 +120,7 @@ class _UnlockChallengeState extends ConsumerState<UnlockChallenge> {
       handleResult(
         context,
         result,
-        resultHandlers: handleErrorOnlyWithToast,
+        presentation: .errorToast,
       );
     }
   }

@@ -173,7 +173,7 @@ class Backup implements Comparable<Backup> {
       Map<String, dynamic> jsonData = jsonDecode(file.readAsStringSync());
       CryptoStore cryptoStore = CryptoStore.fromPassword(password, Salt.base64Decode(string: jsonData[kSaltKey]));
       if (!(cryptoStore.hmacSecretKey.verify(base64.decode(jsonData[kPasswordSignatureKey]), utf8.encode(password)))) {
-        throw InvalidPasswordException();
+        throw InvalidBackupPasswordException();
       }
 
       CryptoStore? currentCryptoStore = await _ref.read(cryptoStoreProvider.future);
@@ -198,14 +198,13 @@ class Backup implements Comparable<Backup> {
         }
       }
       if (totps.isEmpty && jsonTotps.isNotEmpty) {
-        throw InvalidPasswordException();
+        throw InvalidBackupPasswordException();
       }
       return await _ref.read(totpRepositoryProvider.notifier).replaceBy(totps);
     } catch (ex, stackTrace) {
       return ResultError(
         exception: ex,
         stackTrace: stackTrace,
-        sendToSentry: ex is! InvalidPasswordException,
       );
     }
   }
@@ -284,9 +283,9 @@ class _BackupFileDoesNotExistException extends LocalizableException {
 }
 
 /// Thrown when an invalid password has been provided.
-class InvalidPasswordException extends LocalizableException {
+class InvalidBackupPasswordException extends LocalizableException {
   /// Creates a new invalid password exception instance.
-  InvalidPasswordException()
+  InvalidBackupPasswordException()
     : super(
         localizedErrorMessage: translations.error.backup.invalidPassword,
       );
