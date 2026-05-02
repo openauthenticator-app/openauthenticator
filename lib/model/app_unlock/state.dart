@@ -1,9 +1,8 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:open_authenticator/model/app_unlock/interaction.dart';
 import 'package:open_authenticator/model/app_unlock/methods/method.dart';
-import 'package:open_authenticator/model/app_unlock/reason.dart';
 import 'package:open_authenticator/model/settings/app_unlock_method.dart';
 import 'package:open_authenticator/utils/result/result.dart';
 
@@ -20,15 +19,12 @@ class AppLockStateNotifier extends AsyncNotifier<AppLockState> {
   }
 
   /// Tries to unlock the app.
-  Future<Result> unlock(BuildContext context) async {
-    if ((await future) == .unlockChallengedStarted || !context.mounted) {
-      return const ResultCancelled();
-    }
-    if (!ref.mounted) {
+  Future<Result> unlock(AppUnlockInteraction interaction) async {
+    if ((await future) == .unlockChallengedStarted || !interaction.canInteract || !ref.mounted) {
       return const ResultCancelled();
     }
     state = const AsyncData(.unlockChallengedStarted);
-    Result result = await ref.read(appUnlockMethodSettingsEntryProvider.notifier).unlockWithCurrentMethod(context, UnlockReason.openApp);
+    Result result = await ref.read(appUnlockMethodSettingsEntryProvider.notifier).unlockWithCurrentMethod(interaction, .openApp);
     if (!ref.mounted) {
       return const ResultCancelled();
     }

@@ -11,6 +11,7 @@
   "button": {
     "disable": "Disable",
     "changeMasterPassword": "Change master password",
-    "unlock": "Unlock"
+    "unlock": "Unlock",
+    "cancel": "Cancel"
   }
 }

@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
+import 'package:open_authenticator/model/app_unlock/interaction.dart';
 import 'package:open_authenticator/model/app_unlock/methods/method.dart';
 import 'package:open_authenticator/model/settings/app_unlock_method.dart';
 import 'package:open_authenticator/pages/settings/entries/widgets.dart';
+import 'package:open_authenticator/utils/app_unlock_interaction.dart';
 import 'package:open_authenticator/utils/local_authentication/local_authentication.dart';
 import 'package:open_authenticator/utils/result/handler.dart';
 import 'package:open_authenticator/utils/result/result.dart';
@@ -35,7 +37,7 @@ class EnableLocalAuthSettingsEntryWidget extends CheckboxSettingsEntryWidget<App
   @override
   Future<void> changeValue(BuildContext context, WidgetRef ref, bool newValue) async {
     String newMethod = newValue ? LocalAuthenticationAppUnlockMethod.kMethodId : NoneAppUnlockMethod.kMethodId;
-    Result result = await ref.read(appUnlockMethodSettingsEntryProvider.notifier).changeValueIfUnlockSucceed(newMethod, context);
+    Result result = await ref.read(appUnlockMethodSettingsEntryProvider.notifier).changeValueIfUnlockSucceed(context.appUnlockInteraction, newMethod);
     if (context.mounted) {
       handleResult(
         context,

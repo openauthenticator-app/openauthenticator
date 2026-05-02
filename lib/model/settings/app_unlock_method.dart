@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:open_authenticator/model/app_unlock/interaction.dart';
 import 'package:open_authenticator/model/app_unlock/methods/method.dart';
 import 'package:open_authenticator/model/app_unlock/reason.dart';
 import 'package:open_authenticator/model/settings/entry.dart';
@@ -41,9 +41,9 @@ class AppUnlockMethodSettingsEntry extends SettingsEntry<String> {
 
   /// Tries to unlock the app with the current method, handling errors.
   /// Errors may contain a [CannotUnlockException] if unlock has failed for a specific reason.
-  Future<Result> unlockWithCurrentMethod(BuildContext context, UnlockReason unlockReason, {bool? allowNone}) async {
+  Future<Result> unlockWithCurrentMethod(AppUnlockInteraction interaction, UnlockReason unlockReason, {bool? allowNone}) async {
     try {
-      return _tryUnlockWithCurrentMethod(context, unlockReason, allowNone: allowNone);
+      return _tryUnlockWithCurrentMethod(interaction, unlockReason, allowNone: allowNone);
     } catch (ex, stackTrace) {
       return ResultError(
         exception: ex,
@@ -53,45 +53,45 @@ class AppUnlockMethodSettingsEntry extends SettingsEntry<String> {
   }
 
   /// Tries to unlock the app with the current method.
-  Future<Result> _tryUnlockWithCurrentMethod(BuildContext context, UnlockReason unlockReason, {bool? allowNone}) async {
-    allowNone ??= unlockReason != UnlockReason.sensibleAction;
+  Future<Result> _tryUnlockWithCurrentMethod(AppUnlockInteraction interaction, UnlockReason unlockReason, {bool? allowNone}) async {
+    allowNone ??= unlockReason != .sensibleAction;
     String unlockMethodId = await future;
     if (!allowNone && unlockMethodId == NoneAppUnlockMethod.kMethodId) {
       unlockMethodId = MasterPasswordAppUnlockMethod.kMethodId;
     }
-    if (!context.mounted) {
+    if (!interaction.canInteract) {
       return const ResultCancelled();
     }
     AppUnlockMethod? unlockMethod = ref.read(appUnlockMethodProvider(unlockMethodId));
     if (unlockMethod == null) {
       return const ResultCancelled();
     }
-    Result result = await unlockMethod.unlock(context, unlockReason);
+    Result result = await unlockMethod.unlock(interaction, unlockReason);
     return result;
   }
 
   /// Changes the entry value but check for unlock success before.
-  Future<Result> changeValueIfUnlockSucceed(String newMethodId, BuildContext context) async {
+  Future<Result> changeValueIfUnlockSucceed(AppUnlockInteraction interaction, String newMethodId) async {
     String currentMethodId = await future;
-    if (!context.mounted) {
+    if (!interaction.canInteract) {
       return const ResultCancelled();
     }
     AppUnlockMethod? currentMethod = ref.read(appUnlockMethodProvider(currentMethodId));
     if (currentMethod == null) {
       return const ResultCancelled();
     }
-    Result disableResult = await currentMethod.unlock(context, UnlockReason.disable);
+    Result disableResult = await currentMethod.unlock(interaction, .disable);
     if (disableResult is! ResultSuccess) {
       return disableResult;
     }
-    if (!context.mounted) {
+    if (!interaction.canInteract) {
       return const ResultCancelled();
     }
     AppUnlockMethod? newMethod = ref.read(appUnlockMethodProvider(newMethodId));
     if (newMethod == null) {
       return const ResultCancelled();
     }
-    Result enableResult = await newMethod.unlock(context, UnlockReason.enable);
+    Result enableResult = await newMethod.unlock(interaction, .enable);
     if (enableResult is! ResultSuccess) {
       return enableResult;
     }

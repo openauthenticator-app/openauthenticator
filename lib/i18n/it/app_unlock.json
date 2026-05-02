@@ -11,6 +11,7 @@
   "button": {
     "disable": "Disabilitare",
     "changeMasterPassword": "Cambiare la password principale",
-    "unlock": "Sbloccare"
+    "unlock": "Sbloccare",
+    "cancel": "Annulla"
   }
 }

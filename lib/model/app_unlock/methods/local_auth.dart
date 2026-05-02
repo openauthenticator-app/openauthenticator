@@ -13,8 +13,8 @@ class LocalAuthenticationAppUnlockMethod extends AppUnlockMethod {
        );
 
   @override
-  Future<Result> _tryUnlock(BuildContext context, UnlockReason reason) async {
-    bool result = await LocalAuthentication.instance.authenticate(context, reason);
+  Future<Result> _tryUnlock(AppUnlockInteraction interaction, UnlockReason reason) async {
+    bool result = await LocalAuthentication.instance.authenticate(reason);
     return result ? const ResultSuccess() : const ResultCancelled();
   }
 

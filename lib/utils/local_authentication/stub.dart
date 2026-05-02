@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:open_authenticator/model/app_unlock/reason.dart';
 import 'package:open_authenticator/utils/local_authentication/local_authentication.dart';
 
@@ -8,5 +7,5 @@ class LocalAuthenticationStub extends LocalAuthentication {
   Future<bool> isSupported() => Future.value(false);
 
   @override
-  Future<bool> authenticate(BuildContext context, UnlockReason reason) => Future.value(false);
+  Future<bool> authenticate(UnlockReason reason) => Future.value(false);
 }

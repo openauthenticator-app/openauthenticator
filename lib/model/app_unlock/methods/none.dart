@@ -13,7 +13,7 @@ class NoneAppUnlockMethod extends AppUnlockMethod {
        );
 
   @override
-  Future<Result> _tryUnlock(BuildContext context, UnlockReason reason) => Future.value(const ResultSuccess());
+  Future<Result> _tryUnlock(AppUnlockInteraction interaction, UnlockReason reason) => Future.value(const ResultSuccess());
 
   @override
   AppLockState get defaultAppLockState => AppLockState.unlocked;

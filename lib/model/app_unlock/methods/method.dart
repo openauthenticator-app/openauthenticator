@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_auth/local_auth.dart' hide LocalAuthentication;
 import 'package:open_authenticator/i18n/localizable_exception.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
+import 'package:open_authenticator/model/app_unlock/interaction.dart';
 import 'package:open_authenticator/model/app_unlock/reason.dart';
 import 'package:open_authenticator/model/crypto/derived_key.dart';
 import 'package:open_authenticator/model/crypto/salt.dart';
@@ -13,7 +13,6 @@ import 'package:open_authenticator/model/totp/repository.dart';
 import 'package:open_authenticator/model/totp/totp.dart';
 import 'package:open_authenticator/utils/local_authentication/local_authentication.dart';
 import 'package:open_authenticator/utils/result/result.dart';
-import 'package:open_authenticator/widgets/dialog/text_input_dialog.dart';
 
 part 'local_auth.dart';
 part 'master_password.dart';
@@ -44,17 +43,16 @@ sealed class AppUnlockMethod<T> {
   }) : _ref = ref;
 
   /// Unlock the app, handling errors.
-  /// [context] is required so that we can interact with the user.
-  Future<Result<T>> unlock(BuildContext context, UnlockReason reason) async {
+  Future<Result<T>> unlock(AppUnlockInteraction interaction, UnlockReason reason) async {
     try {
       CannotUnlockException? cannotUnlockException = await canUnlock(reason);
       if (cannotUnlockException != null) {
         throw cannotUnlockException;
       }
-      if (!context.mounted) {
+      if (!interaction.canInteract) {
         return const ResultCancelled();
       }
-      return await _tryUnlock(context, reason);
+      return await _tryUnlock(interaction, reason);
     } catch (ex, stackTrace) {
       if (ex is LocalAuthException) {
         if (ex.code == LocalAuthExceptionCode.userCanceled || ex.code == LocalAuthExceptionCode.systemCanceled) {
@@ -69,8 +67,7 @@ sealed class AppUnlockMethod<T> {
   }
 
   /// Tries to unlock the app.
-  /// [context] is required so that we can interact with the user.
-  Future<Result<T>> _tryUnlock(BuildContext context, UnlockReason reason);
+  Future<Result<T>> _tryUnlock(AppUnlockInteraction interaction, UnlockReason reason);
 
   /// The default app lock state.
   AppLockState get defaultAppLockState => AppLockState.locked;

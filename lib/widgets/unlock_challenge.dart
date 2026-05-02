@@ -5,12 +5,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:open_authenticator/app.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
+import 'package:open_authenticator/model/app_unlock/interaction.dart';
 import 'package:open_authenticator/model/app_unlock/methods/method.dart';
 import 'package:open_authenticator/model/app_unlock/state.dart';
 import 'package:open_authenticator/model/password_verification/methods/method.dart';
 import 'package:open_authenticator/model/password_verification/password_verification.dart';
 import 'package:open_authenticator/model/settings/app_unlock_method.dart';
 import 'package:open_authenticator/spacing.dart';
+import 'package:open_authenticator/utils/app_unlock_interaction.dart';
 import 'package:open_authenticator/utils/master_password.dart';
 import 'package:open_authenticator/utils/result/handler.dart';
 import 'package:open_authenticator/utils/result/result.dart';
@@ -110,7 +112,7 @@ class _UnlockChallengeState extends ConsumerState<UnlockChallenge> {
     if (!mounted || lockState != AppLockState.locked) {
       return;
     }
-    Result result = await ref.read(appLockStateProvider.notifier).unlock(context);
+    Result result = await ref.read(appLockStateProvider.notifier).unlock(context.appUnlockInteraction);
     if (!mounted || result is! ResultError) {
       return;
     }

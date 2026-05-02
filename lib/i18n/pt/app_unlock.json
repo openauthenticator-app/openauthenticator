@@ -11,6 +11,7 @@
   "button": {
     "disable": "Desativar",
     "changeMasterPassword": "Alterar a senha mestra",
-    "unlock": "Desbloquear"
+    "unlock": "Desbloquear",
+    "cancel": "Cancelar"
   }
 }

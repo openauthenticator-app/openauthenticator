@@ -13,18 +13,18 @@ class MasterPasswordAppUnlockMethod extends AppUnlockMethod<String> {
        );
 
   @override
-  Future<Result<String>> _tryUnlock(BuildContext context, UnlockReason reason) async {
+  Future<Result<String>> _tryUnlock(AppUnlockInteraction interaction, UnlockReason reason) async {
     if (reason != .openApp && reason != .sensibleAction) {
       List<Totp> totps = await _ref.read(totpRepositoryProvider.future);
       if (totps.isEmpty) {
         return const ResultSuccess();
       }
     }
-    if (!context.mounted) {
+    if (!interaction.canInteract) {
       return const ResultCancelled();
     }
 
-    Result<String> result = await _promptMasterPasswordForUnlock(context, reason == .openApp ? translations.appUnlock.masterPasswordDialogMessage : null);
+    Result<String> result = await _promptMasterPasswordForUnlock(interaction, reason == .openApp ? translations.appUnlock.masterPasswordDialogMessage : null);
     if (result is! ResultSuccess<String>) {
       return result;
     }
@@ -73,9 +73,8 @@ class MasterPasswordAppUnlockMethod extends AppUnlockMethod<String> {
   }
 
   /// Prompts master password for unlock.
-  Future<Result<String>> _promptMasterPasswordForUnlock(BuildContext context, String? message) async {
-    String? password = await MasterPasswordInputDialog.prompt(
-      context,
+  Future<Result<String>> _promptMasterPasswordForUnlock(AppUnlockInteraction interaction, String? message) async {
+    String? password = await interaction.promptMasterPassword(
       message: message,
     );
     if (password == null) {

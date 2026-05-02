@@ -11,6 +11,7 @@
   "button": {
     "disable": "Deaktivieren",
     "changeMasterPassword": "Master-Passwort ändern",
-    "unlock": "Entsperren"
+    "unlock": "Entsperren",
+    "cancel": "Abbrechen"
   }
 }

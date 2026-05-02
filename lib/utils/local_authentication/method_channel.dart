@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:open_authenticator/model/app_unlock/reason.dart';
 import 'package:open_authenticator/utils/local_authentication/local_authentication.dart';
@@ -9,7 +8,7 @@ class LocalAuthenticationMethodChannel extends LocalAuthentication {
   final MethodChannel _methodChannel = const MethodChannel('app.openauthenticator.localauth');
 
   @override
-  Future<bool> authenticate(BuildContext context, UnlockReason reason) async =>
+  Future<bool> authenticate(UnlockReason reason) async =>
       await _methodChannel.invokeMethod<bool>(
         'localAuth.authenticate',
         {

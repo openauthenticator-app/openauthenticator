@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart' as local_auth;
 // ignore: depend_on_referenced_packages
 import 'package:local_auth_android/local_auth_android.dart';
@@ -23,8 +22,7 @@ class LocalAuthenticationDefault extends LocalAuthentication {
   LocalAuthenticationDefault() : _localAuthentication = local_auth.LocalAuthentication();
 
   @override
-  Future<bool> authenticate(BuildContext context, UnlockReason reason) async {
-    String cancelButton = MaterialLocalizations.of(context).cancelButtonLabel;
+  Future<bool> authenticate(UnlockReason reason) async {
     if (currentPlatform.isDesktop) {
       await windowManager.ensureInitialized();
       await windowManager.focus();
@@ -34,15 +32,15 @@ class LocalAuthenticationDefault extends LocalAuthentication {
       localizedReason: translations.appUnlock.localAuthentication[reason.name] ?? 'Authenticate to access the app.',
       authMessages: [
         IOSAuthMessages(
-          cancelButton: cancelButton,
+          cancelButton: translations.appUnlock.button.cancel,
         ),
         MacOSAuthMessages(
-          cancelButton: cancelButton,
+          cancelButton: translations.appUnlock.button.cancel,
         ),
         AndroidAuthMessages(
           signInHint: translations.localAuth.android.signInHint,
           signInTitle: translations.localAuth.android.signInTitle,
-          cancelButton: cancelButton,
+          cancelButton: translations.appUnlock.button.cancel,
         ),
         const WindowsAuthMessages(),
       ],
