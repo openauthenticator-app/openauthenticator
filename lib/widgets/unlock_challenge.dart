@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:open_authenticator/app.dart';
+import 'package:open_authenticator/flows/master_password.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
-import 'package:open_authenticator/model/app_unlock/interaction.dart';
 import 'package:open_authenticator/model/app_unlock/methods/method.dart';
 import 'package:open_authenticator/model/app_unlock/state.dart';
 import 'package:open_authenticator/model/password_verification/methods/method.dart';
@@ -13,7 +13,6 @@ import 'package:open_authenticator/model/password_verification/password_verifica
 import 'package:open_authenticator/model/settings/app_unlock_method.dart';
 import 'package:open_authenticator/spacing.dart';
 import 'package:open_authenticator/utils/app_unlock_interaction.dart';
-import 'package:open_authenticator/utils/master_password.dart';
 import 'package:open_authenticator/utils/result/handler.dart';
 import 'package:open_authenticator/utils/result/result.dart';
 import 'package:open_authenticator/widgets/app_scaffold.dart';
@@ -84,7 +83,7 @@ class _UnlockChallengeState extends ConsumerState<UnlockChallenge> {
                         buttonIcon: FIcons.keyRound,
                         buttonLabel: translations.appUnlock.button.changeMasterPassword,
                         onButtonPress: () async {
-                          Result<String> changeResult = await MasterPasswordUtils.changeMasterPassword(context, ref, askForUnlock: false);
+                          Result<String> changeResult = await ref.read(masterPasswordFlowProvider).changeMasterPassword(context, askForUnlock: false);
                           if (changeResult is ResultSuccess<String>) {
                             await ref.read(appUnlockMethodSettingsEntryProvider.notifier).changeValue(NoneAppUnlockMethod.kMethodId, disableResult: changeResult);
                             await tryUnlockIfNeeded();

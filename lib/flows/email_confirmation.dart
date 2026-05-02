@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:open_authenticator/flows/app_flow.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/backend/authentication/providers/provider.dart';
 import 'package:open_authenticator/utils/result/handler.dart';
@@ -13,22 +14,27 @@ import 'package:open_authenticator/widgets/dialog/confirmation_dialog.dart';
 import 'package:open_authenticator/widgets/dialog/text_input_dialog.dart';
 import 'package:open_authenticator/widgets/waiting_overlay.dart';
 
-/// Allows to handle email confirmation.
-class EmailConfirmationUtils {
+/// The email confirmation flow provider.
+final emailConfirmationFlowProvider = Provider.autoDispose<EmailConfirmationFlow>(EmailConfirmationFlow.new);
+
+/// Coordinates email confirmation user flows.
+class EmailConfirmationFlow extends AppFlow {
+  /// Creates a new email confirmation flow instance.
+  const EmailConfirmationFlow(super.ref);
+
   /// Asks for email confirmation.
-  static Future<Result> askForConfirmation(
-    BuildContext context,
-    WidgetRef ref, {
+  Future<Result> askForConfirmation(
+    BuildContext context, {
     ResultPresentation presentation = .successAndErrorDialog,
-  }) async {
+  }) => keepAliveWhile(() async {
     Result result;
     _ConfirmAction? confirmAction = await _ConfirmActionPickerDialog.openDialog(context);
     if (confirmAction == null || !context.mounted) {
       result = const ResultCancelled();
     } else {
       result = await switch (confirmAction) {
-        .tryConfirm => _tryConfirm(context, ref),
-        .cancelConfirmation => _tryCancelConfirmation(context, ref),
+        .tryConfirm => _tryConfirm(context),
+        .cancelConfirmation => _tryCancelConfirmation(context),
       };
     }
     if (context.mounted) {
@@ -40,10 +46,10 @@ class EmailConfirmationUtils {
       );
     }
     return result;
-  }
+  });
 
   /// Tries to cancel the confirmation.
-  static Future<Result> _tryCancelConfirmation(BuildContext context, WidgetRef ref) async {
+  Future<Result> _tryCancelConfirmation(BuildContext context) async {
     bool confirmation = await ConfirmationDialog.ask(
       context,
       title: translations.emailConfirmation.confirmActionPickerDialog.cancelConfirmation.validationDialog.title,
@@ -60,7 +66,7 @@ class EmailConfirmationUtils {
   }
 
   /// Tries to confirm the user. He has to enter the code manually.
-  static Future<Result<RedirectResult>> _tryConfirm(BuildContext context, WidgetRef ref) async {
+  Future<Result<RedirectResult>> _tryConfirm(BuildContext context) async {
     String? code = (await TextInputDialog.prompt(
       context,
       title: translations.emailConfirmation.codeDialog.title,

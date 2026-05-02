@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:open_authenticator/flows/email_confirmation.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/backend/authentication/providers/provider.dart';
 import 'package:open_authenticator/pages/settings/entries/widgets.dart';
-import 'package:open_authenticator/utils/email_confirmation.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 
 /// Allows the user to confirm its email from the app.
@@ -31,7 +31,7 @@ class ConfirmEmailSettingsEntryWidget extends ConsumerWidget with FTileMixin {
                 ),
               ),
             ),
-            onPress: () => EmailConfirmationUtils.askForConfirmation(context, ref),
+            onPress: () => ref.read(emailConfirmationFlowProvider).askForConfirmation(context),
           );
   }
 }

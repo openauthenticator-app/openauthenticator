@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
-import 'package:open_authenticator/model/app_unlock/interaction.dart';
 import 'package:open_authenticator/model/app_unlock/methods/method.dart';
 import 'package:open_authenticator/model/settings/app_unlock_method.dart';
 import 'package:open_authenticator/pages/settings/entries/widgets.dart';

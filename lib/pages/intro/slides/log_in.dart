@@ -8,8 +8,8 @@ import 'package:open_authenticator/model/backend/user.dart';
 import 'package:open_authenticator/pages/intro/slides/slide.dart';
 import 'package:open_authenticator/pages/settings/entries/synchronize.dart';
 import 'package:open_authenticator/spacing.dart';
-import 'package:open_authenticator/utils/account.dart';
-import 'package:open_authenticator/utils/email_confirmation.dart';
+import 'package:open_authenticator/flows/account.dart';
+import 'package:open_authenticator/flows/email_confirmation.dart';
 import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 
@@ -69,7 +69,7 @@ class _LogInButton extends ConsumerWidget {
     User? user = ref.watch(userProvider).value;
     return user == null
         ? ClickableButton(
-            onPress: () => AccountUtils.tryRequestSignIn(context),
+            onPress: () => ref.read(accountFlowProvider).tryRequestSignIn(context),
             prefix: const Icon(FIcons.logIn),
             child: ButtonText(translations.intro.logIn.button.loggedOut),
           )
@@ -89,7 +89,7 @@ class _ConfirmEmailButton extends ConsumerWidget {
     return emailToConfirm.value == null
         ? const SizedBox.shrink()
         : ClickableButton(
-            onPress: () => EmailConfirmationUtils.askForConfirmation(context, ref),
+            onPress: () => ref.read(emailConfirmationFlowProvider).askForConfirmation(context),
             variant: .ghost,
             prefix: const Icon(FIcons.mail),
             child: ButtonText(translations.intro.logIn.button.confirmEmail),

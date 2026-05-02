@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:open_authenticator/flows/contributor_plan.dart';
+import 'package:open_authenticator/flows/storage_migration.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/backend/user.dart';
 import 'package:open_authenticator/model/purchases/contributor_plan.dart';
 import 'package:open_authenticator/model/settings/storage_type.dart';
 import 'package:open_authenticator/spacing.dart';
-import 'package:open_authenticator/utils/contributor_plan.dart';
 import 'package:open_authenticator/utils/result/handler.dart';
 import 'package:open_authenticator/utils/result/result.dart';
-import 'package:open_authenticator/utils/storage_migration.dart';
 import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/centered_circular_progress_indicator.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
@@ -55,11 +55,11 @@ class TotpLimitDialog extends ConsumerWidget {
       actions: [
         ClickableButton(
           variant: .destructive,
-          onPress: () => _returnIfSucceeded(context, StorageMigrationUtils.changeStorageType(context, ref, StorageType.localOnly).then((result) => result is ResultSuccess)),
+          onPress: () => _returnIfSucceeded(context, ref.read(storageMigrationFlowProvider).changeStorageType(context, StorageType.localOnly).then((result) => result is ResultSuccess)),
           child: ButtonText(translations.totpLimit.actions.stopSynchronization),
         ),
         ClickableButton(
-          onPress: () => _returnIfSucceeded(context, ContributorPlanUtils.purchase(context, ref)),
+          onPress: () => _returnIfSucceeded(context, ref.read(contributorPlanFlowProvider).purchase(context)),
           child: ButtonText(translations.totpLimit.actions.subscribe),
         ),
         if (!autoDialog)

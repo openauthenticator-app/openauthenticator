@@ -4,7 +4,6 @@ publish_to: none
 version: 2.0.2+27
 homepage: https://openauthenticator.app
 repository: https://github.com/openauthenticator-app/openauthenticator
-license: CC-BY-SA-4.0
 issue_tracker: https://github.com/openauthenticator-app/openauthenticator/issues
 funding:
   - https://ko-fi.com/Skyost

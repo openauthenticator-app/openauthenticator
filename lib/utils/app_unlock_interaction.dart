@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
-import 'package:open_authenticator/widgets/dialog/text_input_dialog.dart';
 import 'package:open_authenticator/model/app_unlock/interaction.dart';
+import 'package:open_authenticator/widgets/dialog/text_input_dialog.dart';
 
 /// Allows to interact with the app unlock using a [BuildContext].
 class _BuildContextAppUnlockInteraction implements AppUnlockInteraction {

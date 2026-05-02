@@ -9,7 +9,7 @@ import 'package:open_authenticator/model/migrator/migrator.dart';
 import 'package:open_authenticator/model/settings/storage_type.dart';
 import 'package:open_authenticator/pages/settings/page.dart';
 import 'package:open_authenticator/spacing.dart';
-import 'package:open_authenticator/utils/account.dart';
+import 'package:open_authenticator/flows/account.dart';
 import 'package:open_authenticator/utils/result/handler.dart';
 import 'package:open_authenticator/utils/result/result.dart';
 import 'package:open_authenticator/widgets/app_scaffold.dart';
@@ -115,7 +115,7 @@ class Migrator extends ConsumerWidget {
         handleResult(context, result);
         if (valueOrNull == .shared) {
           Navigator.pushNamed(context, SettingsPage.name);
-          await AccountUtils.tryRequestSignIn(context);
+          await ref.read(accountFlowProvider).tryRequestSignIn(context);
         }
         break;
       case ResultError(:final exception, :final stackTrace):

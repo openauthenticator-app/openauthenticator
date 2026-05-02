@@ -4,7 +4,7 @@ import 'package:forui/forui.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/backend/user.dart';
 import 'package:open_authenticator/model/settings/storage_type.dart';
-import 'package:open_authenticator/utils/account.dart';
+import 'package:open_authenticator/flows/account.dart';
 import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
@@ -53,7 +53,7 @@ class DeleteAccountSettingsEntryWidget extends ConsumerWidget with FTileMixin {
                 );
                 return;
               }
-              await AccountUtils.tryDeleteAccount(context, ref);
+              await ref.read(accountFlowProvider).tryDeleteAccount(context);
             },
           );
   }

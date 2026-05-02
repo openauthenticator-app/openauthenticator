@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:open_authenticator/flows/contributor_plan.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/purchases/clients/client.dart';
 import 'package:open_authenticator/model/purchases/contributor_plan.dart';
-import 'package:open_authenticator/utils/contributor_plan.dart';
 import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
@@ -37,7 +37,7 @@ class ContributorPlanEntryWidget extends ConsumerWidget with FTileMixin {
               prefix: const Icon(FIcons.userLock),
               title: Text(translations.settings.application.contributorPlan.title),
               subtitle: Text(translations.settings.application.contributorPlan.subtitle.inactive),
-              onPress: () => ContributorPlanUtils.purchase(context, ref),
+              onPress: () => ref.read(contributorPlanFlowProvider).purchase(context),
             );
           case .active:
             return ClickableTile(

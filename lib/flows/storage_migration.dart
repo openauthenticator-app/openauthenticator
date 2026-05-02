@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:open_authenticator/flows/app_flow.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/backend/user.dart';
 import 'package:open_authenticator/model/password_verification/password_verification.dart';
@@ -17,13 +18,18 @@ import 'package:open_authenticator/widgets/dialog/text_input_dialog.dart';
 import 'package:open_authenticator/widgets/form/password_form_field.dart';
 import 'package:open_authenticator/widgets/waiting_overlay.dart';
 
-/// Contains some useful methods for migrating storage type.
-class StorageMigrationUtils {
+/// The storage migration flow provider.
+final storageMigrationFlowProvider = Provider.autoDispose<StorageMigrationFlow>(StorageMigrationFlow.new);
+
+/// Coordinates storage migration user flows.
+class StorageMigrationFlow extends AppFlow {
+  /// Creates a new storage migration flow instance.
+  const StorageMigrationFlow(super.ref);
+
   /// Changes the storage type.
   /// Gives some feedback to the user thanks to the [context].
-  static Future<Result> changeStorageType(
+  Future<Result> changeStorageType(
     BuildContext context,
-    WidgetRef ref,
     StorageType newType, {
     bool showConfirmation = true,
     String? backupPassword,
@@ -31,7 +37,7 @@ class StorageMigrationUtils {
     String? currentStorageMasterPassword,
     StorageMigrationDeletedTotpPolicy storageMigrationDeletedTotpPolicy = .ask,
     ResultPresentation presentation = .successAndErrorDialog,
-  }) async {
+  }) => keepAliveWhile(() async {
     Result result = await (() async {
       StorageType currentType = await ref.read(storageTypeSettingsEntryProvider.future);
       if (!context.mounted) {
@@ -92,7 +98,6 @@ class StorageMigrationUtils {
             }
             return await changeStorageType(
               context,
-              ref,
               newType,
               showConfirmation: false,
               logout: logout,
@@ -115,7 +120,7 @@ class StorageMigrationUtils {
       );
     }
     return result;
-  }
+  });
 }
 
 /// The dialog that allows to confirm the operation.

@@ -4,7 +4,7 @@ import 'package:forui/forui.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/settings/storage_type.dart';
 import 'package:open_authenticator/pages/settings/entries/widgets.dart';
-import 'package:open_authenticator/utils/master_password.dart';
+import 'package:open_authenticator/flows/master_password.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 
 /// Allows to change the user master password.
@@ -32,7 +32,7 @@ class ChangeMasterPasswordSettingsEntryWidget extends ConsumerWidget with FTileM
           ],
         ),
       ),
-      onPress: () => MasterPasswordUtils.changeMasterPassword(context, ref),
+      onPress: () => ref.read(masterPasswordFlowProvider).changeMasterPassword(context),
       suffix: const RightChevronSuffix(),
     );
   }

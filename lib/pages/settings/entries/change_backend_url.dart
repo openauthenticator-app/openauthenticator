@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:open_authenticator/app.dart';
+import 'package:open_authenticator/flows/storage_migration.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/backend/authentication/providers/provider.dart';
 import 'package:open_authenticator/model/backend/backend.dart';
@@ -11,7 +12,6 @@ import 'package:open_authenticator/model/settings/backend_url.dart';
 import 'package:open_authenticator/pages/settings/entries/widgets.dart';
 import 'package:open_authenticator/utils/result/handler.dart';
 import 'package:open_authenticator/utils/result/result.dart';
-import 'package:open_authenticator/utils/storage_migration.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/text_input_dialog.dart';
 import 'package:open_authenticator/widgets/toast.dart';
@@ -31,13 +31,14 @@ class ChangeBackendUrlSettingsEntryWidget extends ConsumerWidget with FTileMixin
     title: Text(translations.settings.dangerZone.changeBackendUrl.title),
     subtitle: Text(translations.settings.dangerZone.changeBackendUrl.subtitle),
     onPress: () async {
-      Result result = await StorageMigrationUtils.changeStorageType(
-        context,
-        ref,
-        .localOnly,
-        logout: true,
-        presentation: .successAndErrorToast,
-      );
+      Result result = await ref
+          .read(storageMigrationFlowProvider)
+          .changeStorageType(
+            context,
+            .localOnly,
+            logout: true,
+            presentation: .successAndErrorToast,
+          );
       if (!context.mounted || result is! ResultSuccess) {
         return;
       }

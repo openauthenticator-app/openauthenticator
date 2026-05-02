@@ -6,6 +6,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:open_authenticator/flows/master_password.dart';
 import 'package:open_authenticator/i18n/localizable_exception.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/main.dart';
@@ -28,7 +29,6 @@ import 'package:open_authenticator/pages/settings/page.dart';
 import 'package:open_authenticator/pages/sync_issues.dart';
 import 'package:open_authenticator/pages/totp.dart';
 import 'package:open_authenticator/spacing.dart';
-import 'package:open_authenticator/utils/master_password.dart';
 import 'package:open_authenticator/utils/platform.dart';
 import 'package:open_authenticator/utils/result/handler.dart';
 import 'package:open_authenticator/utils/result/result.dart';
@@ -143,7 +143,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 text: translations.home.noCryptoStore.message,
                 actions: [
                   ClickableButton(
-                    onPress: () => MasterPasswordUtils.changeMasterPassword(context, ref, askForUnlock: false),
+                    onPress: () => ref.read(masterPasswordFlowProvider).changeMasterPassword(context, askForUnlock: false),
                     prefix: const Icon(FIcons.rectangleEllipsis),
                     child: ButtonText(translations.home.noCryptoStore.resetButton),
                   ),

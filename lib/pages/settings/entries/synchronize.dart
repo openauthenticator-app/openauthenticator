@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:open_authenticator/flows/storage_migration.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/backend/user.dart';
 import 'package:open_authenticator/model/purchases/contributor_plan.dart';
@@ -9,7 +10,6 @@ import 'package:open_authenticator/model/totp/limit.dart';
 import 'package:open_authenticator/model/totp/repository.dart';
 import 'package:open_authenticator/model/totp/totp.dart';
 import 'package:open_authenticator/pages/settings/entries/widgets.dart';
-import 'package:open_authenticator/utils/storage_migration.dart';
 
 /// Allows the user to choose its storage type.
 class SynchronizeSettingsEntryWidget extends CheckboxSettingsEntryWidget<StorageTypeSettingsEntry, StorageType> {
@@ -111,7 +111,7 @@ class SynchronizeSettingsEntryWidget extends CheckboxSettingsEntryWidget<Storage
   }
 
   @override
-  void changeValue(BuildContext context, WidgetRef ref, bool newValue) => StorageMigrationUtils.changeStorageType(context, ref, newValue ? StorageType.shared : StorageType.localOnly);
+  void changeValue(BuildContext context, WidgetRef ref, bool newValue) => ref.read(storageMigrationFlowProvider).changeStorageType(context, newValue ? StorageType.shared : StorageType.localOnly);
 
   @override
   bool isEnabled(StorageType? storageType) => storageType == .shared;

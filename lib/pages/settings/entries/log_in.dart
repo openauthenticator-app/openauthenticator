@@ -4,8 +4,8 @@ import 'package:forui/forui.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/backend/authentication/providers/provider.dart';
 import 'package:open_authenticator/model/backend/user.dart';
-import 'package:open_authenticator/utils/account.dart';
-import 'package:open_authenticator/utils/storage_migration.dart';
+import 'package:open_authenticator/flows/account.dart';
+import 'package:open_authenticator/flows/storage_migration.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 
 /// Allows the user to login or logout from the app.
@@ -35,7 +35,7 @@ class _LogInTile extends ConsumerWidget {
             prefix: const Icon(FIcons.logIn),
             title: Text(translations.settings.synchronization.accountLogin.logIn.title),
             subtitle: Text(translations.settings.synchronization.accountLogin.logIn.subtitle),
-            onPress: () => AccountUtils.tryRequestSignIn(context),
+            onPress: () => ref.read(accountFlowProvider).tryRequestSignIn(context),
           )
         : const SizedBox.shrink();
   }
@@ -63,6 +63,6 @@ class _LogOutTile extends ConsumerWidget {
         ),
       ),
     ),
-    onPress: () => StorageMigrationUtils.changeStorageType(context, ref, .localOnly, logout: true),
+    onPress: () => ref.read(storageMigrationFlowProvider).changeStorageType(context, .localOnly, logout: true),
   );
 }

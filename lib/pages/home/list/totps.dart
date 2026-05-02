@@ -227,7 +227,7 @@ class _TotpsListWidget extends ConsumerWidget {
         }
         break;
       case .changeMasterPassword:
-        await MasterPasswordUtils.changeMasterPassword(context, ref, password: password);
+        await ref.read(masterPasswordFlowProvider).changeMasterPassword(context, password: password);
         break;
       default:
         break;

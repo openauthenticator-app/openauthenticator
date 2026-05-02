@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:open_authenticator/flows/account.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/backend/authentication/session.dart';
 import 'package:open_authenticator/model/backend/user.dart';
 import 'package:open_authenticator/pages/settings/entries/widgets.dart';
-import 'package:open_authenticator/utils/account.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 
 /// Allows the user to link its account to another provider.
@@ -64,7 +64,7 @@ class AccountLinkSettingsEntryWidget extends ConsumerWidget with FTileMixin {
           ],
         ),
       ),
-      onPress: () => AccountUtils.tryRequestToggleLink(context),
+      onPress: () => ref.read(accountFlowProvider).tryRequestToggleLink(context),
       enabled: sessionRefreshState is! SessionRefreshStateInProgress,
     );
   }

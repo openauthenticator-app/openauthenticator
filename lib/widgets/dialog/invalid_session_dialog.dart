@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:open_authenticator/flows/account.dart';
+import 'package:open_authenticator/flows/storage_migration.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
-import 'package:open_authenticator/utils/account.dart';
-import 'package:open_authenticator/utils/storage_migration.dart';
 import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
@@ -45,10 +45,10 @@ class InvalidSessionDialog extends ConsumerWidget {
     }
     switch (result) {
       case .logIn:
-        await AccountUtils.tryRequestSignIn(context);
+        await ref.read(accountFlowProvider).tryRequestSignIn(context);
         break;
       case .logOut:
-        await StorageMigrationUtils.changeStorageType(context, ref, .localOnly, logout: true);
+        await ref.read(storageMigrationFlowProvider).changeStorageType(context, .localOnly, logout: true);
         break;
       default:
         break;

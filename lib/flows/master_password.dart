@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:open_authenticator/flows/app_flow.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/app_unlock/reason.dart';
 import 'package:open_authenticator/model/settings/app_unlock_method.dart';
@@ -17,15 +18,20 @@ import 'package:open_authenticator/widgets/form/master_password_form.dart';
 import 'package:open_authenticator/widgets/form/password_form_field.dart';
 import 'package:open_authenticator/widgets/waiting_overlay.dart';
 
-/// Contains various useful methods about the master password.
-class MasterPasswordUtils {
+/// The master password flow provider.
+final masterPasswordFlowProvider = Provider.autoDispose<MasterPasswordFlow>(MasterPasswordFlow.new);
+
+/// Coordinates master password user flows.
+class MasterPasswordFlow extends AppFlow {
+  /// Creates a new master password flow instance.
+  const MasterPasswordFlow(super.ref);
+
   /// Prompts the user to change his master password.
-  static Future<Result<String>> changeMasterPassword(
-    BuildContext context,
-    WidgetRef ref, {
+  Future<Result<String>> changeMasterPassword(
+    BuildContext context, {
     bool askForUnlock = true,
     String? password,
-  }) async {
+  }) => keepAliveWhile(() async {
     if (askForUnlock) {
       AppUnlockMethodSettingsEntry appUnlockerMethodsSettingsEntry = ref.read(appUnlockMethodSettingsEntryProvider.notifier);
       Result unlockResult = await appUnlockerMethodsSettingsEntry.unlockWithCurrentMethod(context.appUnlockInteraction, UnlockReason.sensibleAction);
@@ -53,7 +59,7 @@ class MasterPasswordUtils {
       handleResult(context, changeResult);
     }
     return changeResult;
-  }
+  });
 }
 
 /// The dialog that allows to change the master password.
