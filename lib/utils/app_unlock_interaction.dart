@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:open_authenticator/model/app_unlock/interaction.dart';
 import 'package:open_authenticator/widgets/dialog/text_input_dialog.dart';
 
