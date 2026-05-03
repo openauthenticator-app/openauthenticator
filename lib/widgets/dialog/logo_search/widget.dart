@@ -146,6 +146,10 @@ class _LogoSearchState extends State<LogoSearch> {
 
     setState(searches.clear);
     List<Uri> logos = await Source.sources.search(client, keywords);
+    if (!mounted) {
+      return;
+    }
+
     setState(() => searches.putIfAbsent(keywords, () => []));
     for (Uri logo in logos) {
       if (await Source.check(client, logo) && mounted && searches.containsKey(keywords) && !imageErrors.contains(logo.toString())) {
@@ -155,7 +159,7 @@ class _LogoSearchState extends State<LogoSearch> {
         break;
       }
     }
-    if (searches[keywords]?.isEmpty == true) {
+    if (mounted && searches[keywords]?.isEmpty == true) {
       setState(() => searches.remove(keywords));
     }
   }
