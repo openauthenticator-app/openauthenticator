@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:open_authenticator/model/backend/authentication/providers/provider.dart';
 import 'package:open_authenticator/model/backend/request/error.dart';
 import 'package:open_authenticator/model/backup.dart';
 import 'package:open_authenticator/utils/result/result.dart';
@@ -88,6 +89,7 @@ bool _sendToSentry(Object? ex) =>
       TimeoutException() => false,
       ProviderUserAlreadyExists() => false,
       ExpiredCodeError() => false,
+      EmailAlreadySentException() => false,
       InvalidVerificationCodeError() => false,
       InvalidAuthorizationCodeError() => false,
       InvalidBackupPasswordException() => false,
