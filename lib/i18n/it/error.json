@@ -41,6 +41,7 @@
     "invalidJsonResponse": "Risposta non valida dal $route (HTTP $statusCode) : $body.",
     "noEmailToConfirm": "Nessun email da confermare.",
     "expiredCode": "Il codice di verifica è scaduto. Riprova a effettuare il login.",
+    "invalidUri": "URI non valido ricevuto dal server. Contattaci.",
     "invalidSession": "La tua sessione non è valida. Riprova a effettuare il login.",
     "noSession": "Devi effettuare il login per continuare.",
     "emailAlreadySent": "Un email è già stata inviata a questa indirizzo. Controlla la tua posta elettronica o riprova tra qualche minuto.",

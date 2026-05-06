@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/i18n/localizable_exception.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
+import 'package:open_authenticator/model/app_links/app_auth.dart';
 import 'package:open_authenticator/model/backend/authentication/native_web_auth.dart';
 import 'package:open_authenticator/model/backend/authentication/session.dart';
 import 'package:open_authenticator/model/backend/backend.dart';
@@ -65,14 +66,6 @@ sealed class AuthenticationProvider {
     required Ref ref,
   }) : _ref = ref;
 
-  /// Extracts the provider id from the given uri.
-  static String? extractProviderId(Uri? uri) {
-    if (uri == null || uri.scheme != 'openauthenticator' || uri.host != 'auth' || uri.pathSegments.length < 2 || uri.pathSegments.first != 'provider') {
-      return null;
-    }
-    return uri.pathSegments[1];
-  }
-
   /// Changes the provider id of the user.
   User _changeId(User user, String? providerUserId);
 
@@ -126,15 +119,10 @@ sealed class AuthenticationProvider {
   }
 
   /// Triggered when the redirect is received.
-  Future<Result<RedirectResult>> onRedirectReceived(Uri uri) async {
+  Future<Result<RedirectResult>> onRedirectReceived(AppAuthLink uri) async {
     try {
-      List<String> path = uri.pathSegments;
-      if (path.lastOrNull != 'finish') {
-        return const ResultCancelled();
-      }
-      String? authorizationCode = uri.queryParameters['authorizationCode'];
-      if (authorizationCode == null) {
-        return const ResultCancelled();
+      if (!(uri as FinishAuthAppLink).isValid) {
+        throw _InvalidUriException();
       }
       User? user = await _ref.read(userProvider.future);
       SessionRefreshState sessionRefreshState = _ref.read(sessionRefreshManagerProvider);
@@ -144,8 +132,8 @@ sealed class AuthenticationProvider {
             .sendHttpRequest(
               ProviderLoginRequest(
                 provider: this,
-                authorizationCode: authorizationCode,
-                codeVerifier: uri.queryParameters['codeVerifier'],
+                authorizationCode: uri.authorizationCode,
+                codeVerifier: uri.codeVerifier,
               ),
             );
         if (response is! ResultSuccess<ProviderLoginResponse>) {
@@ -161,8 +149,8 @@ sealed class AuthenticationProvider {
             .sendHttpRequest(
               ProviderLinkRequest(
                 provider: this,
-                authorizationCode: authorizationCode,
-                codeVerifier: uri.queryParameters['codeVerifier'],
+                authorizationCode: uri.authorizationCode,
+                codeVerifier: uri.codeVerifier,
               ),
             );
         if (response is! ResultSuccess<ProviderLinkResponse>) {
@@ -170,9 +158,7 @@ sealed class AuthenticationProvider {
         }
         await _ref.read(userProvider.notifier).changeUser(_changeId(user, response.value.providerUserId));
         return ResultSuccess(
-          value: LinkSuccess(
-            providerId: id,
-          ),
+          value: LinkSuccess(providerId: id),
         );
       }
     } catch (ex, stackTrace) {
@@ -257,4 +243,13 @@ extension FindProvider on List<AuthenticationProvider> {
 
   /// Finds the email provider.
   EmailAuthenticationProvider get email => findProvider(EmailAuthenticationProvider.kProviderId)! as EmailAuthenticationProvider;
+}
+
+/// Triggered when the received uri is invalid.
+class _InvalidUriException extends LocalizableException {
+  /// Creates a new invalid uri exception instance.
+  _InvalidUriException()
+    : super(
+        localizedErrorMessage: translations.error.backend.invalidUri,
+      );
 }

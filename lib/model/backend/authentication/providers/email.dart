@@ -13,15 +13,14 @@ class EmailAuthenticationProvider extends AuthenticationProvider {
        );
 
   @override
-  Future<Result<RedirectResult>> onRedirectReceived(Uri uri) async {
-    if (uri.host == 'auth' && uri.path == '/provider/email/sent') {
-      String? cancelCode = uri.queryParameters['cancelCode'];
-      if (cancelCode == null) {
+  Future<Result<RedirectResult>> onRedirectReceived(AppAuthLink uri) async {
+    if ((uri as EmailSentAppLink).isValid) {
+      if (uri.cancelCode == null) {
         return ResultError(
-          exception: uri.queryParameters['previously']?.toLowerCase() == 'true' ? EmailAlreadySentException() : _NoCancelCodeException(),
+          exception: uri.previously ? EmailAlreadySentException() : _NoCancelCodeException(),
         );
       }
-      _ref.read(emailConfirmationStateProvider.notifier)._markNeedsConfirmation(uri.queryParameters['email']!, uri.queryParameters['cancelCode']!);
+      _ref.read(emailConfirmationStateProvider.notifier)._markNeedsConfirmation(uri.email, uri.cancelCode!);
       return ResultSuccess(value: ConfirmationEmailSent(providerId: id));
     }
     Result<RedirectResult> result = await super.onRedirectReceived(uri);
@@ -80,7 +79,10 @@ class EmailAuthenticationProvider extends AuthenticationProvider {
         }
         return response.to((_) => null);
       }
-      Uri uri = response.value.url;
+      AppAuthLink uri = response.value.url as AppAuthLink;
+      if (!uri.isValid) {
+        throw _InvalidUriException();
+      }
       return await onRedirectReceived(uri);
     } catch (ex, stackTrace) {
       return ResultError(

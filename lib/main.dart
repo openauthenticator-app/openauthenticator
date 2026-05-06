@@ -7,7 +7,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:open_authenticator/app.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
-import 'package:open_authenticator/model/app_links.dart';
+import 'package:open_authenticator/model/app_links/app_auth.dart';
+import 'package:open_authenticator/model/app_links/app_purchases.dart';
+import 'package:open_authenticator/model/app_links/listener.dart';
+import 'package:open_authenticator/model/app_links/openauthenticator.dart';
+import 'package:open_authenticator/model/app_links/otpauth_totp.dart';
 import 'package:open_authenticator/model/backend/authentication/providers/provider.dart';
 import 'package:open_authenticator/model/backend/authentication/session.dart';
 import 'package:open_authenticator/model/crypto/store.dart';
@@ -34,6 +38,7 @@ import 'package:open_authenticator/widgets/dialog/invalid_session_dialog.dart';
 import 'package:open_authenticator/widgets/dialog/totp_limit_dialog.dart';
 import 'package:open_authenticator/widgets/error.dart';
 import 'package:open_authenticator/widgets/migrator.dart';
+import 'package:open_authenticator/widgets/toast.dart';
 import 'package:open_authenticator/widgets/unlock_challenge.dart';
 import 'package:open_authenticator/widgets/waiting_overlay.dart';
 import 'package:open_authenticator/widgets/window_frame.dart';
@@ -264,18 +269,18 @@ class _RouteWidgetState extends ConsumerState<_RouteWidget> {
             return;
           }
           Uri uri = next.value!;
-          if (uri.scheme == 'openauthenticator') {
+          if ((uri as OpenAuthenticatorAppLink).isValid) {
             if (!ref.read(appLinksListenerProvider.notifier).consumeLink(uri)) {
               return;
             }
-            WidgetsBinding.instance.addPostFrameCallback((_) => handleAppLink(uri));
+            WidgetsBinding.instance.addPostFrameCallback((_) => handleOpenAuthenticatorLink(uri));
             return;
           }
-          if (uri.scheme == 'otpauth') {
+          if ((uri as OtpAuthTotpLink).isValid) {
             if (!ref.read(appLinksListenerProvider.notifier).consumeLink(uri)) {
               return;
             }
-            WidgetsBinding.instance.addPostFrameCallback((_) => handleTotpLink(uri));
+            WidgetsBinding.instance.addPostFrameCallback((_) => handleTotpLink(uri as OtpAuthTotpLink));
             return;
           }
         },
@@ -331,30 +336,37 @@ class _RouteWidgetState extends ConsumerState<_RouteWidget> {
   );
 
   /// Handles an in-app link.
-  Future<void> handleAppLink(Uri appLink) async {
-    String? providerId = AuthenticationProvider.extractProviderId(appLink);
-    if (providerId == null) {
-      return;
-    }
-    AuthenticationProvider? provider = ref.read(authenticationProviders).findProvider(providerId);
-    if (provider == null) {
-      return;
-    }
-    Result<RedirectResult> result = await showWaitingOverlay(
-      context,
-      future: provider.onRedirectReceived(appLink),
-    );
-    if (mounted) {
-      handleResult(
+  Future<void> handleOpenAuthenticatorLink(OpenAuthenticatorAppLink appLink) async {
+    if ((appLink as AppAuthLink).isValid) {
+      AuthenticationProvider? provider = ref.read(authenticationProviders).findProvider(appLink.providerId);
+      if (provider == null) {
+        return;
+      }
+      Result<RedirectResult> result = await showWaitingOverlay(
         context,
-        result,
-        buildSuccessToastMessage: (valueOrNull) => valueOrNull?.localizedMessage,
+        future: provider.onRedirectReceived(appLink),
       );
+      if (mounted) {
+        handleResult(
+          context,
+          result,
+          buildSuccessToastMessage: (valueOrNull) => valueOrNull?.localizedMessage,
+        );
+      }
+      return;
+    }
+    if ((appLink as AppPurchasesLink).isValid) {
+      if ((appLink as AppPurchasesSuccessLink).isValid && mounted) {
+        showSuccessToast(
+          context,
+          text: translations.contributorPlan.subscribeSuccess.delayed,
+        );
+      }
     }
   }
 
   /// Handles a TOTP link.
-  Future<void> handleTotpLink(Uri totpLink) async {
+  Future<void> handleTotpLink(OtpAuthTotpLink totpLink) async {
     if (mounted) {
       await showWaitingOverlay(
         context,

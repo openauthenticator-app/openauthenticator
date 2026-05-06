@@ -1,17 +1,13 @@
 import 'package:hashlib/hashlib.dart' as hashlib;
 import 'package:hashlib_codecs/hashlib_codecs.dart';
+import 'package:open_authenticator/model/app_links/otpauth_totp.dart';
 import 'package:open_authenticator/model/crypto/store.dart';
 import 'package:open_authenticator/model/totp/algorithm.dart';
 import 'package:open_authenticator/model/totp/totp.dart';
-import 'package:open_authenticator/utils/uri_builder.dart';
 import 'package:uuid/uuid.dart';
 
 /// Represents a TOTP, in its decrypted state.
 class DecryptedTotp extends Totp {
-  /// The period key.
-  /// Used in `otpauth` URIs.
-  static const String _kPeriodKey = 'period';
-
   /// Creates a new decrypted TOTP instance.
   const DecryptedTotp({
     required super.uuid,
@@ -69,9 +65,17 @@ class DecryptedTotp extends Totp {
   @override
   int compareTo(Totp other) {
     if (other.isDecrypted) {
-      return (issuer ?? label ?? uuid).compareTo((other as DecryptedTotp).issuer ?? other.label ?? other.uuid);
+      int issuersComparison = (issuer ?? '').compareTo((other as DecryptedTotp).issuer ?? '');
+      if (issuersComparison != 0) {
+        return issuersComparison;
+      }
+      int labelsComparison = (label ?? '').compareTo(other.label ?? '');
+      if (labelsComparison != 0) {
+        return labelsComparison;
+      }
+      return uuid.compareTo(other.uuid);
     }
-    return -1;
+    return super.compareTo(other);
   }
 
   @override
@@ -141,28 +145,20 @@ class DecryptedTotp extends Totp {
   }
 
   /// Creates a new TOTP instance from the scanned QR code properties.
-  static Future<DecryptedTotp?> fromUri(Uri uri, CryptoStore? cryptoStore) async {
-    if (!uri.isScheme('otpauth') || uri.host != 'totp' || !uri.queryParameters.containsKey('secret')) {
-      return null;
-    }
-    String label = Uri.decodeFull(uri.path);
-    if (label.startsWith('/')) {
-      label = label.substring(1);
-    }
-    int? validity = uri.queryParameters.containsKey(_kPeriodKey) ? int.tryParse(uri.queryParameters[_kPeriodKey]!) : null;
-    return create(
-      cryptoStore: cryptoStore,
-      secret: uri.queryParameters[Totp.kSecretKey]!,
-      label: label,
-      issuer: uri.queryParameters[Totp.kIssuerKey],
-      algorithm: uri.queryParameters.containsKey(Totp.kAlgorithmKey) ? Algorithm.fromString(uri.queryParameters[Totp.kAlgorithmKey]!) : null,
-      digits: uri.queryParameters.containsKey(Totp.kDigitsKey) ? int.tryParse(uri.queryParameters[Totp.kDigitsKey]!) : null,
-      validity: validity == null ? null : Duration(seconds: validity),
-    );
-  }
+  static DecryptedTotp? fromUri(OtpAuthTotpLink uri, CryptoStore? cryptoStore) => uri.isValid
+      ? create(
+          cryptoStore: cryptoStore,
+          secret: uri.encodedSecret,
+          label: uri.label,
+          issuer: uri.issuer,
+          algorithm: uri.algorithm,
+          digits: uri.digits,
+          validity: uri.validity,
+        )
+      : null;
 
   /// Returns the URI associated to this TOTP instance.
-  Uri get uri => toUri(
+  OtpAuthTotpLink get uri => OtpAuthTotpLink.build(
     secret: secret,
     label: label ?? uuid,
     issuer: issuer,
@@ -170,36 +166,6 @@ class DecryptedTotp extends Totp {
     digits: digits,
     validity: validity,
   );
-
-  /// Converts the given TOTP parameters to an URI.
-  static Uri toUri({
-    required String secret,
-    required String label,
-    String? issuer,
-    Algorithm? algorithm,
-    int? digits,
-    Duration? validity,
-  }) {
-    UriBuilder builder = UriBuilder(
-      scheme: 'otpauth',
-      host: 'totp',
-      path: label,
-    );
-    builder.appendQueryParameter(Totp.kSecretKey, secret);
-    if (issuer != null) {
-      builder.appendQueryParameter(Totp.kIssuerKey, issuer);
-    }
-    if (algorithm != null) {
-      builder.appendQueryParameter(Totp.kAlgorithmKey, algorithm.name.toLowerCase());
-    }
-    if (digits != null) {
-      builder.appendQueryParameter(Totp.kDigitsKey, digits.toString());
-    }
-    if (validity != null) {
-      builder.appendQueryParameter(_kPeriodKey, validity.inSeconds.toString());
-    }
-    return builder.build();
-  }
 }
 
 /// Allows to check if the TOTP instance is decrypted.

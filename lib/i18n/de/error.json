@@ -41,6 +41,7 @@
     "invalidJsonResponse": "Ungültige Antwort vom $route (HTTP $statusCode) : $body.",
     "expiredCode": "Der Bestätigungscode ist abgelaufen. Bitte versuchen Sie sich erneut einzuloggen.",
     "noEmailToConfirm": "Keine E-Mail zum Bestätigen.",
+    "invalidUri": "Ungültige URI empfangen vom Server. Bitte kontaktieren Sie uns.",
     "invalidSession": "Ihre Sitzung ist ungültig. Bitte versuchen Sie sich erneut einzuloggen.",
     "noSession": "Sie müssen sich einloggen, um fortzufahren.",
     "emailAlreadySent": "Eine E-Mail wurde bereits an diese Adresse gesendet. Bitte überprüfen Sie Ihre Postfach oder versuchen Sie es in wenigen Minuten erneut.",

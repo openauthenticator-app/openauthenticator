@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
-import 'package:open_authenticator/model/app_links.dart';
+import 'package:open_authenticator/model/app_links/listener.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 
 /// Allows to input a link from the clipboard.

@@ -380,27 +380,7 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
 /// Allows to easily decrypt a TOTP list.
 extension _DecryptList on List<Totp> {
   /// Sorts the TOTP list.
-  List<Totp> sortCanonically() => List.of(this)
-    ..sort((a, b) {
-      if (a.isDecrypted) {
-        if (b.isDecrypted) {
-          int issuersComparison = ((a as DecryptedTotp).issuer ?? '').compareTo((b as DecryptedTotp).issuer ?? '');
-          if (issuersComparison != 0) {
-            return issuersComparison;
-          }
-          int labelsComparison = (a.label ?? '').compareTo(b.label ?? '');
-          if (labelsComparison != 0) {
-            return labelsComparison;
-          }
-          return a.uuid.compareTo(b.uuid);
-        }
-        return -1;
-      }
-      if (b.isDecrypted) {
-        return 1;
-      }
-      return a.uuid.compareTo(b.uuid);
-    });
+  List<Totp> sortCanonically() => List.of(this)..sort();
 
   /// Merges the [totp] to the current TOTP list.
   List<Totp> createMergedList({

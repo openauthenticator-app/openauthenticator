@@ -5,6 +5,7 @@ import 'package:forui/forui.dart';
 import 'package:open_authenticator/i18n/localizable_exception.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/main.dart';
+import 'package:open_authenticator/model/app_links/otpauth_totp.dart';
 import 'package:open_authenticator/model/crypto/store.dart';
 import 'package:open_authenticator/model/totp/algorithm.dart';
 import 'package:open_authenticator/model/totp/decrypted.dart';
@@ -60,9 +61,9 @@ class TotpPage extends ConsumerStatefulWidget {
   ConsumerState<ConsumerStatefulWidget> createState() => _TotpPageState();
 
   /// Opens this page from a scanned [uri].
-  static Future<void> openFromUri(BuildContext context, WidgetRef ref, Uri uri) async {
+  static Future<void> openFromUri(BuildContext context, WidgetRef ref, OtpAuthTotpLink uri) async {
     CryptoStore? cryptoStore = await ref.read(cryptoStoreProvider.future);
-    DecryptedTotp? totp = await DecryptedTotp.fromUri(uri, cryptoStore);
+    DecryptedTotp? totp = DecryptedTotp.fromUri(uri, cryptoStore);
     if (!context.mounted) {
       return;
     }
@@ -429,7 +430,7 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
       padding: const EdgeInsets.symmetric(vertical: kSpace),
       child: Center(
         child: QrImageView(
-          data: DecryptedTotp.toUri(
+          data: OtpAuthTotpLink.build(
             secret: secret.toUpperCase(),
             label: label,
             issuer: issuer,
