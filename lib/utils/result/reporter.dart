@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:open_authenticator/model/backend/authentication/providers/provider.dart';
 import 'package:open_authenticator/model/backend/request/error.dart';
-import 'package:open_authenticator/model/backup.dart';
+import 'package:open_authenticator/model/backup/backup.dart';
 import 'package:open_authenticator/utils/result/result.dart';
 import 'package:open_authenticator/utils/sentry.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';

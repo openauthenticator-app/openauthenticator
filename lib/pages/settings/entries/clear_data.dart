@@ -8,7 +8,7 @@ import 'package:forui/forui.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/app_unlock/reason.dart';
 import 'package:open_authenticator/model/backend/user.dart';
-import 'package:open_authenticator/model/backup.dart';
+import 'package:open_authenticator/model/backup/backup.dart';
 import 'package:open_authenticator/model/database/database.dart';
 import 'package:open_authenticator/model/settings/app_unlock_method.dart';
 import 'package:open_authenticator/model/settings/entry.dart';
@@ -89,9 +89,9 @@ class ClearDataSettingsEntryWidget extends ConsumerWidget with FTileMixin {
           await database.clear();
           if (deleteBackups) {
             List<ResultError> errors = [];
-            List<Backup> backups = await ref.read(backupStoreProvider.future);
-            for (Backup backup in backups) {
-              Result deleteResult = await backup.delete();
+            List<BackupPath> backups = await ref.read(backupStoreProvider.future);
+            for (BackupPath backup in backups) {
+              Result deleteResult = await ref.read(backupStoreProvider.notifier).deleteBackup(backup);
               if (deleteResult is ResultError) {
                 errors.add(deleteResult);
               }
