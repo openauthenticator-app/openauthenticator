@@ -1,5 +1,6 @@
 import 'package:open_authenticator/i18n/localizable_exception.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
+import 'package:open_authenticator/utils/result/reporter.dart';
 
 /// Represents a backend request error.
 class BackendRequestError extends LocalizableException {
@@ -65,14 +66,14 @@ class BackendRequestError extends LocalizableException {
           statusCode: statusCode,
           message: message,
         );
-      case InvalidVerificationCodeError.kErrorCode:
-        return InvalidVerificationCodeError._(
+      case _InvalidVerificationCodeError.kErrorCode:
+        return _InvalidVerificationCodeError._(
           route: route,
           statusCode: statusCode,
           message: message,
         );
-      case InvalidAuthorizationCodeError.kErrorCode:
-        return InvalidAuthorizationCodeError._(
+      case _InvalidAuthorizationCodeError.kErrorCode:
+        return _InvalidAuthorizationCodeError._(
           route: route,
           statusCode: statusCode,
           message: message,
@@ -83,8 +84,8 @@ class BackendRequestError extends LocalizableException {
           statusCode: statusCode,
           message: message,
         );
-      case ProviderUserAlreadyExists.kErrorCode:
-        return ProviderUserAlreadyExists._(
+      case _ProviderUserAlreadyExistsError.kErrorCode:
+        return _ProviderUserAlreadyExistsError._(
           route: route,
           statusCode: statusCode,
           message: message,
@@ -171,7 +172,7 @@ class InvalidSessionError extends BackendRequestError {
 }
 
 /// Thrown when the verification code is expired.
-class ExpiredCodeError extends BackendRequestError {
+class ExpiredCodeError extends BackendRequestError with UserError {
   /// The expired code error code.
   static const String kErrorCode = 'expiredCode';
 
@@ -187,12 +188,12 @@ class ExpiredCodeError extends BackendRequestError {
 }
 
 /// Thrown when the verification code is invalid.
-class InvalidVerificationCodeError extends BackendRequestError {
+class _InvalidVerificationCodeError extends BackendRequestError with UserError {
   /// The invalid verification code error code.
   static const String kErrorCode = 'invalidVerificationCode';
 
   /// Creates a new invalid verification code error instance.
-  InvalidVerificationCodeError._({
+  _InvalidVerificationCodeError._({
     required super.route,
     required super.statusCode,
     super.message,
@@ -203,12 +204,12 @@ class InvalidVerificationCodeError extends BackendRequestError {
 }
 
 /// Thrown when the provider authorization code is invalid.
-class InvalidAuthorizationCodeError extends BackendRequestError {
+class _InvalidAuthorizationCodeError extends BackendRequestError with UserError {
   /// The invalid authorization code error code.
   static const String kErrorCode = 'invalidAuthorizationCode';
 
   /// Creates a new invalid authorization code error instance.
-  InvalidAuthorizationCodeError._({
+  _InvalidAuthorizationCodeError._({
     required super.route,
     required super.statusCode,
     super.message,
@@ -235,12 +236,12 @@ class InvalidAppVersionError extends BackendRequestError {
 }
 
 /// Thrown when the provider user already exists.
-class ProviderUserAlreadyExists extends BackendRequestError {
+class _ProviderUserAlreadyExistsError extends BackendRequestError with UserError {
   /// The provider user already exists error code.
   static const String kErrorCode = 'providerUserAlreadyExists';
 
   /// Creates a new expired session error instance.
-  ProviderUserAlreadyExists._({
+  _ProviderUserAlreadyExistsError._({
     required super.route,
     required super.statusCode,
     super.message,

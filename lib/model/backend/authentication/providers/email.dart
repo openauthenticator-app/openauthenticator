@@ -17,7 +17,7 @@ class EmailAuthenticationProvider extends AuthenticationProvider {
     if ((uri as EmailSentAppLink).isValid) {
       if (uri.cancelCode == null) {
         return ResultError(
-          exception: uri.previously ? EmailAlreadySentException() : _NoCancelCodeException(),
+          exception: uri.previously ? _EmailAlreadySentException() : _NoCancelCodeException(),
         );
       }
       _ref.read(emailConfirmationStateProvider.notifier)._markNeedsConfirmation(uri.email, uri.cancelCode!);
@@ -219,9 +219,9 @@ class _NoEmailToConfirmException extends LocalizableException {
 }
 
 /// Triggered when the email has already been sent.
-class EmailAlreadySentException extends LocalizableException {
+class _EmailAlreadySentException extends LocalizableException with UserError {
   /// Creates a new email already sent exception instance.
-  EmailAlreadySentException()
+  _EmailAlreadySentException()
     : super(
         localizedErrorMessage: translations.error.backend.emailAlreadySent,
       );

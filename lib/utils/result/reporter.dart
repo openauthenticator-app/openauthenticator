@@ -2,9 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:open_authenticator/model/backend/authentication/providers/provider.dart';
-import 'package:open_authenticator/model/backend/request/error.dart';
-import 'package:open_authenticator/model/backup/backup.dart';
 import 'package:open_authenticator/utils/result/result.dart';
 import 'package:open_authenticator/utils/sentry.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
@@ -87,12 +84,7 @@ bool _sendToSentry(Object? ex) =>
     switch (ex) {
       SocketException(:final osError) => !{7, 8}.contains(osError?.errorCode),
       TimeoutException() => false,
-      ProviderUserAlreadyExists() => false,
-      ExpiredCodeError() => false,
-      EmailAlreadySentException() => false,
-      InvalidVerificationCodeError() => false,
-      InvalidAuthorizationCodeError() => false,
-      InvalidBackupPasswordException() => false,
+      UserError(:final reportToSentry) => reportToSentry,
       _ => true,
     };
 
@@ -143,4 +135,10 @@ class SentryResultReporter implements ResultReporter {
       stackTrace: result.stackTrace,
     );
   }
+}
+
+/// An user error, that may not be reported to Sentry.
+mixin UserError {
+  /// Whether the error should be reported to Sentry.
+  bool get reportToSentry => false;
 }
