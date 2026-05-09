@@ -64,18 +64,18 @@ class AppScaffold extends StatelessWidget {
     VoidCallback? onRetryPressed,
   }) => (scrollable ? AppScaffold.scrollable : AppScaffold.new)(
     header: switch (asyncValue) {
-      AsyncValue(:final value, hasValue: true) => headerBuilder?.call(value!) ?? header,
+      AsyncValue(:final value, hasValue: true) => headerBuilder?.call(value as T) ?? header,
       AsyncError() => header,
       _ => header,
     },
     footer: switch (asyncValue) {
-      AsyncValue(:final value, hasValue: true) => footerBuilder?.call(value!) ?? footer,
+      AsyncValue(:final value, hasValue: true) => footerBuilder?.call(value as T) ?? footer,
       AsyncError() => footer,
       _ => footer,
     },
     scaffoldStyle: scaffoldStyle,
     padding: switch (asyncValue) {
-      AsyncValue(:final value, hasValue: true) => paddingBuilder?.call(value!) ?? padding,
+      AsyncValue(:final value, hasValue: true) => paddingBuilder?.call(value as T) ?? padding,
       AsyncError() => padding,
       _ => padding,
     },
@@ -95,7 +95,7 @@ class AppScaffold extends StatelessWidget {
       return false;
     })(),
     children: switch (asyncValue) {
-      AsyncValue(:final value, hasValue: true) => builder(value!),
+      AsyncValue(:final value, hasValue: true) => builder(value as T),
       AsyncError(:final error, :final stackTrace) => [
         ErrorAlert(
           error: error,

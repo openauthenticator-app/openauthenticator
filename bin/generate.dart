@@ -1,5 +1,6 @@
 import 'dart:io';
 
+// ignore: depend_on_referenced_packages
 import 'package:args/args.dart';
 
 /// Generates "lib/app.dart".
