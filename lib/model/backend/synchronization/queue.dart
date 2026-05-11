@@ -101,7 +101,10 @@ class SynchronizationController extends Notifier<SynchronizationStatus> with Wid
   static const Duration _kPullTimeout = Duration(seconds: 20);
 
   /// The synchronization periodic interval.
-  static const Duration _kPeriodicInterval = Duration(minutes: 10);
+  static const Duration _kPeriodicInterval = Duration(minutes: 30);
+
+  /// The minimum delay between two automatic foreground synchronizations.
+  static const Duration _kForegroundSyncThrottle = Duration(minutes: 10);
 
   /// The synchronization coalesce delay.
   static const Duration _kCoalesceDelay = Duration(milliseconds: 300);
@@ -114,6 +117,9 @@ class SynchronizationController extends Notifier<SynchronizationStatus> with Wid
 
   /// The current retry timer.
   Timer? _retryTimer;
+
+  /// The last time a synchronization completed successfully.
+  DateTime? _lastSuccessfulSync;
 
   @override
   SynchronizationStatus build() {
@@ -142,7 +148,7 @@ class SynchronizationController extends Notifier<SynchronizationStatus> with Wid
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     if (state == .resumed) {
-      forceSync();
+      forceSync(skipIfRecentlySynced: true);
     }
   }
 
@@ -183,12 +189,29 @@ class SynchronizationController extends Notifier<SynchronizationStatus> with Wid
   }
 
   /// Forces a synchronization.
-  Future<void> forceSync({bool checkSettings = true}) async {
+  Future<void> forceSync({
+    bool checkSettings = true,
+    bool skipIfRecentlySynced = false,
+  }) async {
+    if (skipIfRecentlySynced && await _shouldSkipRecentAutomaticSync()) {
+      return;
+    }
+
     _retryTimer?.cancel();
     _retryTimer = null;
     _coalesceTimer?.cancel();
     _coalesceTimer = null;
     await _run(checkSettings: checkSettings);
+  }
+
+  /// Returns whether an automatic foreground synchronization can be skipped.
+  Future<bool> _shouldSkipRecentAutomaticSync() async {
+    if (_lastSuccessfulSync == null || DateTime.now().difference(_lastSuccessfulSync!) >= _kForegroundSyncThrottle) {
+      return false;
+    }
+
+    List<PushOperation> operations = await ref.read(pushOperationsQueueProvider.future);
+    return operations.isEmpty;
   }
 
   /// Runs the synchronization.
@@ -215,6 +238,9 @@ class SynchronizationController extends Notifier<SynchronizationStatus> with Wid
       bool canSendRequests = (await ref.read(connectivityStateProvider.future)).canSendRequests;
       if (canSendRequests) {
         void onFinish({bool errorOccurred = false}) {
+          if (!errorOccurred) {
+            _lastSuccessfulSync = DateTime.now();
+          }
           if (ref.mounted) {
             state = state.update(
               phase: const SynchronizationPhaseUpToDate(),
