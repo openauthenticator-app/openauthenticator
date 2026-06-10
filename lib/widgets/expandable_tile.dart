@@ -83,7 +83,7 @@ class _ExpandableTileState extends ConsumerState<ExpandableTile> with SingleTick
                 turns: expand ? 0.25 : 0,
                 duration: const Duration(milliseconds: 100),
                 child: Icon(
-                  FIcons.chevronRight,
+                  FLucideIcons.chevronRight,
                   color: widget.iconColor,
                 ),
               ),
@@ -91,7 +91,7 @@ class _ExpandableTileState extends ConsumerState<ExpandableTile> with SingleTick
           ],
         ),
         SizeTransition(
-          axisAlignment: 1.0,
+          alignment: AlignmentGeometry.bottomCenter,
           sizeFactor: expandAnimation,
           child: Padding(
             padding: widget.childrenPadding,
@@ -113,6 +113,7 @@ class _ExpandableTileState extends ConsumerState<ExpandableTile> with SingleTick
     super.dispose();
   }
 
+  /// Toggles the expand state.
   void _toggle() {
     bool willExpand = !expand;
     setState(() => expand = willExpand);

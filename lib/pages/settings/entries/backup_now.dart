@@ -18,7 +18,7 @@ class BackupNowSettingsEntryWidget extends ConsumerWidget with FTileMixin {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => ClickableTile(
-    prefix: const Icon(FIcons.save),
+    prefix: const Icon(FLucideIcons.save),
     title: Text(translations.settings.backups.backupNow.title),
     subtitle: Text(translations.settings.backups.backupNow.subtitle),
     onPress: () async {

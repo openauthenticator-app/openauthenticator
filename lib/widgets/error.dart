@@ -51,7 +51,7 @@ class ErrorAlert extends StatelessWidget {
           builder: (context, asyncSnapshot) => ClickableButton(
             onPress: asyncSnapshot.data == true ? () => launchUrl(reportIssueUrl) : null,
             variant: .outline,
-            prefix: const Icon(FIcons.bug),
+            prefix: const Icon(FLucideIcons.bug),
             child: ButtonText(translations.error.widget.button.report),
           ),
         ),
@@ -59,7 +59,7 @@ class ErrorAlert extends StatelessWidget {
       if (onRetryPressed != null)
         ClickableButton(
           onPress: onRetryPressed,
-          prefix: const Icon(FIcons.refreshCcw),
+          prefix: const Icon(FLucideIcons.refreshCcw),
           child: ButtonText(translations.error.widget.button.retry),
         ),
     ],
@@ -181,7 +181,7 @@ class _ErrorWithStackTraceState extends State<ErrorWithStackTrace> with SingleTi
                 }
               },
               variant: .ghost,
-              child: const Icon(FIcons.copy),
+              child: const Icon(FLucideIcons.copy),
             ),
         ],
       ),

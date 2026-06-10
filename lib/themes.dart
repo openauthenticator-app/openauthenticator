@@ -24,57 +24,59 @@ import 'package:open_authenticator/utils/utils.dart';
     card: const Color(0xFFFFFFFF),
     border: const Color(0xFFE3E3E6),
   );
-  FColors darkColors = const FColors(
+  FColors darkColors = FColors(
     brightness: .dark,
     systemOverlayStyle: .light,
-    barrier: Color(0x7A000000),
-    background: Color(0xFF0C0A09),
-    foreground: Color(0xFFF2F2F2),
+    barrier: const Color(0x7A000000),
+    background: const Color(0xFF0C0A09),
+    foreground: const Color(0xFFF2F2F2),
     primary: Colors.green,
-    primaryForeground: Color(0xFF052E16),
-    secondary: Color(0xFF27272A),
-    secondaryForeground: Color(0xFFFAFAFA),
-    muted: Color(0xFF262626),
-    mutedForeground: Color(0xFFA1A1AA),
-    destructive: Color(0xFF7F1D1D),
-    destructiveForeground: Color(0xFFFEF2F2),
-    error: Color(0xFF7F1D1D),
-    errorForeground: Color(0xFFFEF2F2),
-    card: Color(0xFF18181B),
-    border: Color(0xFF27272A),
+    primaryForeground: const Color(0xFF052E16),
+    secondary: const Color(0xFF27272A),
+    secondaryForeground: const Color(0xFFFAFAFA),
+    muted: const Color(0xFF262626),
+    mutedForeground: const Color(0xFFA1A1AA),
+    destructive: const Color(0xFF7F1D1D),
+    destructiveForeground: const Color(0xFFFEF2F2),
+    error: const Color(0xFF7F1D1D),
+    errorForeground: const Color(0xFFFEF2F2),
+    card: const Color(0xFF18181B),
+    border: const Color(0xFF27272A),
   );
   return (
     light: FPlatformThemeData(
       desktop: () => _adaptLightTheme(
-        FThemeData(
+        _greenThemeData(
           touch: false,
           debugLabel: 'Green Light Desktop',
           colors: lightColors,
+          generalStyle: _adaptGeneralStyle(shadow: [_lightTileShadow]),
         ),
         touch: false,
       ),
       touch: () => _adaptLightTheme(
-        FThemeData(
-          touch: false,
-          debugLabel: 'Green Light Desktop',
+        _greenThemeData(
+          touch: true,
+          debugLabel: 'Green Light Touch',
           colors: lightColors,
+          generalStyle: _adaptGeneralStyle(shadow: [_lightTileShadow]),
         ),
         touch: true,
       ),
     ),
     dark: FPlatformThemeData(
       desktop: () => _adaptDarkTheme(
-        FThemeData(
+        _greenThemeData(
           touch: false,
-          debugLabel: 'Green Light Desktop',
+          debugLabel: 'Green Dark Desktop',
           colors: darkColors,
         ),
         touch: false,
       ),
       touch: () => _adaptDarkTheme(
-        FThemeData(
-          touch: false,
-          debugLabel: 'Green Light Desktop',
+        _greenThemeData(
+          touch: true,
+          debugLabel: 'Green Dark Touch',
           colors: darkColors,
         ),
         touch: true,
@@ -83,14 +85,35 @@ import 'package:open_authenticator/utils/utils.dart';
   );
 }
 
+/// The light theme's tile shadow.
+BoxShadow get _lightTileShadow => BoxShadow(
+  color: Colors.grey.withValues(alpha: 0.3),
+  spreadRadius: 1,
+  blurRadius: 4,
+  offset: const Offset(0, 2),
+);
+
+/// Creates a green theme using the newer ForUI constructor-level general style.
+FThemeData _greenThemeData({
+  required bool touch,
+  required String debugLabel,
+  required FColors colors,
+  FStyleDelta? generalStyle,
+}) {
+  FTypography typography = FTypography.inherit(colors: colors, touch: touch);
+  FStyle style = FStyle.inherit(colors: colors, typography: typography, touch: touch);
+  return FThemeData(
+    touch: touch,
+    debugLabel: debugLabel,
+    colors: colors,
+    typography: typography,
+    style: (generalStyle ?? _adaptGeneralStyle()).call(style),
+  );
+}
+
 /// Adapts the light theme.
 FThemeData _adaptLightTheme(FThemeData light, {required bool touch}) {
-  BoxShadow tileShadow = BoxShadow(
-    color: Colors.grey.withValues(alpha: 0.3),
-    spreadRadius: 1,
-    blurRadius: 4,
-    offset: const Offset(0, 2),
-  );
+  BoxShadow tileShadow = _lightTileShadow;
   return light.copyWith(
     headerStyles: _adaptHeaderStyles(
       originalPadding: light.headerStyles.base.padding,
@@ -132,9 +155,6 @@ FThemeData _adaptLightTheme(FThemeData light, {required bool touch}) {
     alertStyles: _adaptAlertStyles(
       boxShadow: [tileShadow],
     ),
-    style: _adaptGeneralStyle(
-      shadow: [tileShadow],
-    ),
   );
 }
 
@@ -161,7 +181,6 @@ FThemeData _adaptDarkTheme(FThemeData dark, {required bool touch}) => dark.copyW
     hoveredBackgroundColor: Colors.white12,
   ),
   toasterStyle: _adaptToasterStyle(),
-  style: _adaptGeneralStyle(),
 );
 
 /// Adapts the header styles.
@@ -212,7 +231,7 @@ FVariantsDelta<FItemVariantConstraint, FItemVariant, FTileStyle, FTileStyleDelta
             .base(null),
           ],
         ),
-        decoration: .delta(
+        contentDecoration: .delta(
           [
             .base(
               .boxDelta(
@@ -347,7 +366,7 @@ FPopoverMenuStyleDelta _adaptPopoverMenuStyle({
       [
         .all(
           .delta(
-            decoration: .delta(
+            contentDecoration: .delta(
               [
                 .match(
                   {.hovered},

@@ -12,6 +12,6 @@ class DisplaySearchButtonSettingsEntryWidget extends BoolSettingsEntryWidget<Dis
          provider: displaySearchButtonSettingsEntryProvider,
          title: translations.settings.application.displaySearchIconButton.title,
          subtitle: translations.settings.application.displaySearchIconButton.subtitle,
-         icon: FIcons.search,
+         icon: FLucideIcons.search,
        );
 }

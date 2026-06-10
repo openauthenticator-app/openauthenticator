@@ -17,8 +17,8 @@ class ResultSuccess<T> extends Result<T> {
 
   /// Creates a new result success instance.
   const ResultSuccess({
-    T? value,
-  }) : _value = value;
+    this._value,
+  });
 
   /// Returns the [_value], ensuring it's not null.
   T get value => _value!;

@@ -143,7 +143,7 @@ class TotpTile extends StatelessWidget {
           : (context) => ClickableButton.icon(
               variant: .secondary,
               onPress: onCopyPress,
-              child: const Icon(FIcons.copy),
+              child: const Icon(FLucideIcons.copy),
             );
     } else {
       return onDecryptPress == null
@@ -151,7 +151,7 @@ class TotpTile extends StatelessWidget {
           : (context) => ClickableButton.icon(
               variant: .secondary,
               onPress: onDecryptPress,
-              child: const Icon(FIcons.lock),
+              child: const Icon(FLucideIcons.lock),
             );
     }
   }
@@ -234,13 +234,13 @@ class _MobileActionsDialog extends StatelessWidget {
     children: [
       if (canEdit)
         ClickableTile(
-          prefix: const Icon(FIcons.pencil),
+          prefix: const Icon(FLucideIcons.pencil),
           onPress: editButtonEnabled ? (() => Navigator.pop(context, _MobileActionsDialogResult.edit)) : null,
           title: Text(translations.totp.actions.mobileDialog.edit.title),
           subtitle: Text(translations.totp.actions.mobileDialog.edit.subtitle),
         ),
       ClickableTile(
-        prefix: const Icon(FIcons.trash),
+        prefix: const Icon(FLucideIcons.trash),
         variant: .destructive,
         onPress: deleteButtonEnabled ? (() => Navigator.pop(context, _MobileActionsDialogResult.delete)) : null,
         title: Text(translations.totp.actions.mobileDialog.delete.title),
@@ -291,7 +291,7 @@ class _DesktopActions extends StatelessWidget {
             Clickable(
               child: FItem(
                 onPress: onEditPress,
-                prefix: const Icon(FIcons.pencil),
+                prefix: const Icon(FLucideIcons.pencil),
                 title: Text(translations.totp.actions.desktopButtons.edit),
               ),
             ),
@@ -309,7 +309,7 @@ class _DesktopActions extends StatelessWidget {
                   ),
                 ),
                 onPress: onDeletePress,
-                prefix: const Icon(FIcons.trash),
+                prefix: const Icon(FLucideIcons.trash),
                 title: Text(translations.totp.actions.desktopButtons.delete),
               ),
             ),
@@ -317,14 +317,14 @@ class _DesktopActions extends StatelessWidget {
             Clickable(
               child: FItem(
                 onPress: onDecryptPress,
-                prefix: const Icon(FIcons.lock),
+                prefix: const Icon(FLucideIcons.lock),
                 title: Text(translations.totp.actions.decrypt),
               ),
             ),
         ],
       ),
     ],
-    child: const Icon(FIcons.ellipsis),
+    child: const Icon(FLucideIcons.ellipsis),
     builder: (_, controller, child) => ClickableButton.icon(
       variant: .ghost,
       onPress: controller.toggle,

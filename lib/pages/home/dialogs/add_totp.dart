@@ -22,13 +22,13 @@ class _AddTotpDialog extends StatelessWidget {
     ],
     children: [
       ClickableTile(
-        prefix: const Icon(FIcons.qrCode),
+        prefix: const Icon(FLucideIcons.qrCode),
         onPress: () => Navigator.pop(context, AddTotpDialogResult.qrCode),
         title: Text(translations.home.addDialog.qrCode.title),
         subtitle: Text(translations.home.addDialog.qrCode.subtitle),
       ),
       ClickableTile(
-        prefix: const Icon(FIcons.textAlignStart),
+        prefix: const Icon(FLucideIcons.textAlignStart),
         onPress: () => Navigator.pop(context, AddTotpDialogResult.manually),
         title: Text(translations.home.addDialog.manually.title),
         subtitle: Text(translations.home.addDialog.manually.subtitle),

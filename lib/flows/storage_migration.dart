@@ -199,7 +199,7 @@ class _ConfirmationDialogState extends State<_ConfirmationDialog> {
             control: .managed(controller: backupPasswordController),
             validator: isBackupPasswordValid,
             label: FormLabelWithIcon(
-              icon: FIcons.save,
+              icon: FLucideIcons.save,
               text: translations.miscellaneous.backupCheckbox.input.text,
             ),
             hint: translations.miscellaneous.backupCheckbox.input.hint,
@@ -254,13 +254,13 @@ class _StorageMigrationDeletedTotpPolicyPickerDialog extends StatelessWidget {
     children: [
       Text(translations.storageMigration.deletedTotpPolicyPickerDialog.message),
       ClickableTile(
-        prefix: const Icon(FIcons.trash),
+        prefix: const Icon(FLucideIcons.trash),
         title: Text(translations.storageMigration.deletedTotpPolicyPickerDialog.delete.title),
         subtitle: Text(translations.storageMigration.deletedTotpPolicyPickerDialog.delete.subtitle),
         onPress: () => Navigator.pop(context, StorageMigrationDeletedTotpPolicy.delete),
       ),
       ClickableTile(
-        prefix: const Icon(FIcons.upload),
+        prefix: const Icon(FLucideIcons.upload),
         title: Text(translations.storageMigration.deletedTotpPolicyPickerDialog.restore.title),
         subtitle: Text(translations.storageMigration.deletedTotpPolicyPickerDialog.restore.subtitle),
         onPress: () => Navigator.pop(context, StorageMigrationDeletedTotpPolicy.keep),

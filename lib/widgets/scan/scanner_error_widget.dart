@@ -23,7 +23,7 @@ class ScannerErrorWidget extends StatelessWidget {
       children: [
         const Padding(
           padding: .only(bottom: kBigSpace),
-          child: Icon(FIcons.circleAlert),
+          child: Icon(FLucideIcons.circleAlert),
         ),
         Text(
           switch (error.errorCode) {

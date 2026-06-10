@@ -20,7 +20,7 @@ class ConfirmEmailSettingsEntryWidget extends ConsumerWidget with FTileMixin {
     return emailToConfirm.value == null
         ? const SizedBox.shrink()
         : ClickableTile(
-            prefix: const Icon(FIcons.mail),
+            prefix: const Icon(FLucideIcons.mail),
             suffix: const RightChevronSuffix(),
             title: Text(translations.settings.synchronization.confirmEmail.title),
             subtitle: Text.rich(

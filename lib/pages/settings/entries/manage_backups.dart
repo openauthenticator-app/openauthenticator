@@ -36,7 +36,7 @@ class ManageBackupSettingsEntryWidget extends ConsumerWidget with FTileMixin {
     int backupCount = backups.value?.length ?? 0;
     return ClickableTile(
       suffix: const RightChevronSuffix(),
-      prefix: const Icon(FIcons.clock),
+      prefix: const Icon(FLucideIcons.clock),
       title: Text(translations.settings.backups.manageBackups.title),
       subtitle: Text.rich(
         backupCount == 0
@@ -131,26 +131,26 @@ class _RestoreBackupDialogState extends ConsumerState<_RestoreBackupDialog> {
     ClickableButton(
       variant: .secondary,
       onPress: () => restoreBackup(backup),
-      prefix: const Icon(FIcons.upload),
+      prefix: const Icon(FLucideIcons.upload),
       child: ButtonText(translations.settings.backups.manageBackups.button.restore),
     ),
     if (currentPlatform != .linux)
       ClickableButton(
         variant: .secondary,
         onPress: () => shareBackup(backup),
-        prefix: const Icon(FIcons.share),
+        prefix: const Icon(FLucideIcons.share),
         child: ButtonText(translations.settings.backups.manageBackups.button.share),
       ),
     ClickableButton(
       variant: .secondary,
       onPress: () => exportBackup(backup),
-      prefix: const Icon(FIcons.arrowUpDown),
+      prefix: const Icon(FLucideIcons.arrowUpDown),
       child: ButtonText(translations.settings.backups.manageBackups.button.export),
     ),
     ClickableButton(
       variant: .destructive,
       onPress: () => deleteBackup(backup),
-      prefix: const Icon(FIcons.trash),
+      prefix: const Icon(FLucideIcons.trash),
       child: ButtonText(translations.settings.backups.manageBackups.button.delete),
     ),
   ];

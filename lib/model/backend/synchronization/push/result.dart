@@ -122,8 +122,7 @@ enum PushOperationErrorKind {
   tooManyTotps,
 
   /// Any other error occurred.
-  genericError
-  ;
+  genericError;
 
   /// Whether the error is permanent.
   final bool isPermanent;

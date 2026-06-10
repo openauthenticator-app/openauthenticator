@@ -64,8 +64,8 @@ sealed class AuthenticationProvider {
   /// Creates a new authentication provider instance.
   const AuthenticationProvider({
     required this.id,
-    required Ref ref,
-  }) : _ref = ref;
+    required this._ref,
+  });
 
   /// Changes the provider id of the user.
   User _changeId(User user, String? providerUserId);

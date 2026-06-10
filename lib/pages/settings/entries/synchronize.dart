@@ -16,7 +16,7 @@ class SynchronizeSettingsEntryWidget extends CheckboxSettingsEntryWidget<Storage
   /// Creates a new synchronize settings entry widget instance.
   SynchronizeSettingsEntryWidget({
     super.key,
-    super.icon = FIcons.refreshCcw,
+    super.icon = FLucideIcons.refreshCcw,
   }) : super(
          provider: storageTypeSettingsEntryProvider,
          title: translations.settings.synchronization.synchronizeTotps.title,

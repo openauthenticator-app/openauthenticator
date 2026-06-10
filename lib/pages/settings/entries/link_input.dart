@@ -14,7 +14,7 @@ class LinkInputSettingsEntryWidget extends ConsumerWidget with FTileMixin {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => ClickableTile(
-    prefix: const Icon(FIcons.link),
+    prefix: const Icon(FLucideIcons.link),
     title: const Text('Input link'),
     subtitle: const Text('Inputs an openauthenticator:// link from the clipboard.'),
     onPress: () async {

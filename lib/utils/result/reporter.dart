@@ -35,16 +35,15 @@ enum ResultReporting {
       ConsoleResultReporter(),
       SentryResultReporter(),
     ],
-  )
-  ;
+  );
 
   /// The reporters to use.
   final List<ResultReporter> _reporters;
 
   /// Creates a new result reporting instance.
   const ResultReporting({
-    required List<ResultReporter> reporters,
-  }) : _reporters = reporters;
+    required this._reporters,
+  });
 }
 
 /// Prints the [ex] and [stackTrace] to the console.

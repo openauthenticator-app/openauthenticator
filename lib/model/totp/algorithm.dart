@@ -10,8 +10,7 @@ enum Algorithm {
   sha256(hashlib.sha256),
 
   /// The SHA512 algorithm.
-  sha512(hashlib.sha512)
-  ;
+  sha512(hashlib.sha512);
 
   /// The corresponding [totp_lib.Algorithm] enum entry.
   final hashlib.BlockHashBase mapsTo;

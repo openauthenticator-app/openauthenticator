@@ -25,7 +25,7 @@ class MigrationStateSettingsEntryWidget extends ConsumerWidget with FTileMixin {
               initial: migrationState,
               onChange: (choices) => ref.read(migratorProvider.notifier).changeValue(choices.first),
             ),
-            prefix: const Icon(FIcons.send),
+            prefix: const Icon(FLucideIcons.send),
             title: const Text('Migration state'),
             subtitle: const Text('Change the migration state.'),
             detailsBuilder: (_, values, _) => Text(values.first.name),

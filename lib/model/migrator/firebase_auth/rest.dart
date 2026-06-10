@@ -198,16 +198,13 @@ class RestUser extends User with ChangeNotifier {
 
   /// Creates a new REST user instance.
   RestUser._({
-    required String uid,
-    String? email,
-    required List<String> providers,
-    required String idToken,
+    required this._uid,
+    this._email,
+    required this._providers,
+    required this._idToken,
     required this.refreshToken,
     required this.expirationDate,
-  }) : _uid = uid,
-       _email = email,
-       _providers = providers,
-       _idToken = idToken;
+  });
 
   /// Creates a new REST user instance from a sign-in result.
   static Future<RestUser?> _fromSignInResult(SignInResult signInResult) async {

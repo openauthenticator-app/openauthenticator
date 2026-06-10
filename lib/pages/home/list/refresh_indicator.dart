@@ -35,7 +35,7 @@ class _TotpsRefreshIndicatorWidget extends StatelessWidget {
                       ),
                     )
                   : Icon(
-                      FIcons.loaderCircle,
+                      FLucideIcons.loaderCircle,
                       size: iconSize,
                     ),
             ),

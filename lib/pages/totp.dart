@@ -218,7 +218,7 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
                 }
               },
               icon: Icon(
-                FIcons.trash,
+                FLucideIcons.trash,
                 color: context.theme.colors.destructive,
               ),
             ),
@@ -263,7 +263,7 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
                 }
               }
             : null,
-        prefix: const Icon(FIcons.check),
+        prefix: const Icon(FLucideIcons.check),
         child: ButtonText(translations.totp.page.save),
       ),
       children: [
@@ -295,7 +295,7 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
                 createImageWidget(),
               FTextFormField(
                 label: FormLabelWithIcon(
-                  icon: FIcons.tag,
+                  icon: FLucideIcons.tag,
                   text: translations.totp.page.label.text,
                 ),
                 hint: translations.totp.page.label.hint,
@@ -306,7 +306,7 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
               ),
               PasswordFormField(
                 label: FormLabelWithIcon(
-                  icon: FIcons.rectangleEllipsis,
+                  icon: FLucideIcons.rectangleEllipsis,
                   text: translations.totp.page.secret.text,
                 ),
                 hint: translations.totp.page.secret.hint,
@@ -317,7 +317,7 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
               ),
               FTextFormField(
                 label: FormLabelWithIcon(
-                  icon: FIcons.rectangleEllipsis,
+                  icon: FLucideIcons.rectangleEllipsis,
                   text: translations.totp.page.issuer.text,
                 ),
                 hint: translations.totp.page.issuer.hint,
@@ -353,7 +353,7 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
     FSelect<Algorithm>(
       control: .managed(controller: algorithmController),
       label: FormLabelWithIcon(
-        icon: FIcons.tag,
+        icon: FLucideIcons.tag,
         text: translations.totp.page.algorithm,
       ),
       items: {
@@ -366,7 +366,7 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
       control: .managed(controller: digitsController),
       keyboardType: const TextInputType.numberWithOptions(),
       label: FormLabelWithIcon(
-        icon: FIcons.binary,
+        icon: FLucideIcons.binary,
         text: translations.totp.page.digits,
       ),
       hint: Totp.kDefaultDigits.toString(),
@@ -377,7 +377,7 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
       control: .managed(controller: validityController),
       keyboardType: const TextInputType.numberWithOptions(),
       label: FormLabelWithIcon(
-        icon: FIcons.clock,
+        icon: FLucideIcons.clock,
         text: translations.totp.page.validity,
       ),
       hint: Totp.kDefaultValidity.inSeconds.toString(),
@@ -391,7 +391,7 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
           onChange: (_) {},
         ),
         label: const FormLabelWithIcon(
-          icon: FIcons.idCard,
+          icon: FLucideIcons.idCard,
           text: 'UUID',
         ),
         enabled: false,

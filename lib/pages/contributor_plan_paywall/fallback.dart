@@ -120,7 +120,7 @@ class _ContributorPlanFallbackPaywallState extends ConsumerState<ContributorPlan
                     Padding(
                       padding: const EdgeInsets.only(right: kSpace / 2),
                       child: Icon(
-                        FIcons.check,
+                        FLucideIcons.check,
                         color: context.theme.colors.primary,
                       ),
                     ),
@@ -350,11 +350,11 @@ class _ContributorPlanBillingPlanPickerState extends ConsumerState<_ContributorP
         ? const SizedBox.shrink()
         : ClickableTile(
             style: .delta(
-              decoration: .delta(
+              contentDecoration: .delta(
                 this.packageType == packageType
                     ? [
                         .base(
-                          .boxDelta(color: context.theme.tileStyles.base.decoration.base.color?.highlight()),
+                          .boxDelta(color: context.theme.tileStyles.base.contentDecoration.base.color?.highlight()),
                         ),
                       ]
                     : [],
@@ -405,7 +405,7 @@ class _ContributorPlanBillingPlanPickerState extends ConsumerState<_ContributorP
                 ),
               ),
             ),
-            prefix: Icon(this.packageType == packageType ? FIcons.circleCheckBig : FIcons.circle),
+            prefix: Icon(this.packageType == packageType ? FLucideIcons.circleCheckBig : FLucideIcons.circle),
             onPress: () {
               setState(() => this.packageType = this.packageType == packageType ? null : packageType);
             },

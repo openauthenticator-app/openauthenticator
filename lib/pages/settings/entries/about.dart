@@ -17,7 +17,7 @@ class AboutSettingsEntryWidget extends StatelessWidget with FTileMixin {
   @override
   Widget build(BuildContext context) => ClickableTile(
     suffix: const RightChevronSuffix(),
-    prefix: const Icon(FIcons.heart),
+    prefix: const Icon(FLucideIcons.heart),
     title: Text(translations.settings.about.aboutApp.title(appName: App.appName)),
     subtitle: FutureBuilder(
       future: PackageInfo.fromPlatform().then((value) => value.version),

@@ -34,7 +34,7 @@ class AccountLinkSettingsEntryWidget extends ConsumerWidget with FTileMixin {
     ];
     return ClickableTile(
       suffix: const RightChevronSuffix(),
-      prefix: const Icon(FIcons.link),
+      prefix: const Icon(FLucideIcons.link),
       title: Text(translations.settings.synchronization.accountLink.title),
       subtitle: Text.rich(
         TextSpan(

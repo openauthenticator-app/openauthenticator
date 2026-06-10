@@ -10,7 +10,7 @@ FToasterEntry showSuccessToast(BuildContext context, {required String text}) => 
   foreground: context.theme.colors.primaryForeground,
   title: translations.miscellaneous.toast.success,
   text: text,
-  icon: FIcons.check,
+  icon: FLucideIcons.check,
 );
 
 /// Creates the SnackBar and shows it.
@@ -20,7 +20,7 @@ FToasterEntry showErrorToast(BuildContext context, {required String text}) => _s
   foreground: context.theme.colors.destructiveForeground,
   title: translations.miscellaneous.toast.error,
   text: text,
-  icon: FIcons.circleAlert,
+  icon: FLucideIcons.circleAlert,
 );
 
 /// Creates the SnackBar and shows it.
@@ -62,7 +62,7 @@ FToasterEntry _showToast(
       ),
     ),
     onPress: entry.dismiss,
-    child: Icon(FIcons.x, color: foreground),
+    child: Icon(FLucideIcons.x, color: foreground),
   ),
   duration: const Duration(seconds: 1),
 );

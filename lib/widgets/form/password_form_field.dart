@@ -67,7 +67,7 @@ class PasswordFormField extends StatefulWidget {
   /// The default reveal button builder.
   static Widget _defaultRevealButtonBuilder(BuildContext context, VoidCallback reveal, bool state) => IconButton(
     onPressed: reveal,
-    icon: Icon(state ? FIcons.eyeClosed : FIcons.eye),
+    icon: Icon(state ? FLucideIcons.eyeClosed : FLucideIcons.eye),
   );
 }
 

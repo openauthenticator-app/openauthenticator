@@ -141,7 +141,7 @@ class _ChangeMasterPasswordDialogState extends ConsumerState<_ChangeMasterPasswo
             control: .managed(controller: backupPasswordController),
             validator: isBackupPasswordValid,
             label: FormLabelWithIcon(
-              icon: FIcons.save,
+              icon: FLucideIcons.save,
               text: translations.miscellaneous.backupCheckbox.input.text,
             ),
             hint: translations.miscellaneous.backupCheckbox.input.hint,

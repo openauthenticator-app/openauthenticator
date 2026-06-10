@@ -13,7 +13,6 @@ list(APPEND FLUTTER_PLUGIN_LIST
   sentry_flutter
   share_plus
   simple_secure_storage_windows
-  sqlite3_flutter_libs
   url_launcher_windows
   window_manager
 )

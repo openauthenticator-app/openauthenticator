@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:open_authenticator/flows/account.dart';
+import 'package:open_authenticator/flows/storage_migration.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/backend/authentication/providers/provider.dart';
 import 'package:open_authenticator/model/backend/user.dart';
-import 'package:open_authenticator/flows/account.dart';
-import 'package:open_authenticator/flows/storage_migration.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 
 /// Allows the user to login or logout from the app.
@@ -32,7 +32,7 @@ class _LogInTile extends ConsumerWidget {
     EmailConfirmationData? confirmationData = ref.watch(emailConfirmationStateProvider).value;
     return confirmationData == null
         ? ClickableTile(
-            prefix: const Icon(FIcons.logIn),
+            prefix: const Icon(FLucideIcons.logIn),
             title: Text(translations.settings.synchronization.accountLogin.logIn.title),
             subtitle: Text(translations.settings.synchronization.accountLogin.logIn.subtitle),
             onPress: () => ref.read(accountFlowProvider).tryRequestSignIn(context),
@@ -53,7 +53,7 @@ class _LogOutTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => ClickableTile(
-    prefix: const Icon(FIcons.logOut),
+    prefix: const Icon(FLucideIcons.logOut),
     title: Text(translations.settings.synchronization.accountLogin.logOut.title),
     subtitle: Text.rich(
       translations.settings.synchronization.accountLogin.logOut.subtitle(

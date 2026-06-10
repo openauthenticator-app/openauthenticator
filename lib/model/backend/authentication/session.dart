@@ -210,8 +210,8 @@ class SessionRefreshStateInProgress extends SessionRefreshState {
 
   /// Creates a new in progress session refresh state instance.
   SessionRefreshStateInProgress({
-    required Completer<Result<Session>> pendingRefresh,
-  }) : _pendingRefresh = pendingRefresh;
+    required this._pendingRefresh,
+  });
 }
 
 /// The session refresh state is success.

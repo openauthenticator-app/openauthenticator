@@ -78,12 +78,12 @@ class _LogoSearchState extends State<LogoSearch> {
         style: .delta(
           color: .delta(
             [
-              .base(context.theme.tileStyles.base.decoration.base.color),
+              .base(context.theme.tileStyles.base.contentDecoration.base.color),
             ],
           ),
         ),
         label: FormLabelWithIcon(
-          icon: FIcons.search,
+          icon: FLucideIcons.search,
           text: translations.logoSearch.keywords.text,
         ),
         hint: translations.logoSearch.keywords.hint,

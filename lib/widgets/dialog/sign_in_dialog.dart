@@ -123,7 +123,7 @@ class _EmailFormState extends ConsumerState<_EmailForm> {
             control: .managed(controller: emailController),
             enabled: canAuthenticateByEmail,
             label: FormLabelWithIcon(
-              icon: FIcons.mail,
+              icon: FLucideIcons.mail,
               text: translations.authentication.signInDialog.email.title,
             ),
             hint: emailToConfirm ?? (hasEmailProvider ? user.email : null) ?? translations.authentication.signInDialog.email.hint,
@@ -141,7 +141,7 @@ class _EmailFormState extends ConsumerState<_EmailForm> {
           ),
         ),
         ClickableButton(
-          prefix: const Icon(FIcons.send),
+          prefix: const Icon(FLucideIcons.send),
           onPress: email.trim().isNotEmpty && TextInputDialog.validateEmail(email) == null ? (() => onEmailChosen(provider)) : null,
           child: child,
         ),
@@ -373,7 +373,7 @@ class _AuthenticatedBadge extends StatelessWidget {
     offset: offset,
     alignment: alignment,
     label: const Icon(
-      FIcons.check,
+      FLucideIcons.check,
       color: Colors.white,
     ),
     backgroundColor: Colors.green.shade700,

@@ -35,7 +35,7 @@ class ClearDataSettingsEntryWidget extends ConsumerWidget with FTileMixin {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => ClickableTile(
-    prefix: const Icon(FIcons.trash),
+    prefix: const Icon(FLucideIcons.trash),
     title: Text(translations.settings.dangerZone.clearData.title),
     subtitle: Text(translations.settings.dangerZone.clearData.subtitle),
     onPress: () async {

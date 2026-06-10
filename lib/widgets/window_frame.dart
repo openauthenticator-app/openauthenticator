@@ -75,7 +75,7 @@ class _DragAreaState extends State<_DragArea> with WindowListener {
             child: Transform.translate(
               offset: const Offset(0, 5),
               child: Icon(
-                FIcons.minus,
+                FLucideIcons.minus,
                 size: context.theme.typography.sm.fontSize,
               ),
             ),
@@ -87,7 +87,7 @@ class _DragAreaState extends State<_DragArea> with WindowListener {
               child: Transform.flip(
                 flipX: true,
                 child: Icon(
-                  FIcons.copy,
+                  FLucideIcons.copy,
                   size: context.theme.typography.sm.fontSize,
                 ),
               ),
@@ -97,7 +97,7 @@ class _DragAreaState extends State<_DragArea> with WindowListener {
               variant: .secondary,
               onPress: isLoading || isMaximized == null ? null : () => doFuture(windowManager.maximize),
               child: Icon(
-                FIcons.square,
+                FLucideIcons.square,
                 size: context.theme.typography.sm.fontSize,
               ),
             ),
@@ -105,7 +105,7 @@ class _DragAreaState extends State<_DragArea> with WindowListener {
             variant: .destructive,
             onPress: isLoading ? null : () => doFuture(windowManager.close),
             child: Icon(
-              FIcons.x,
+              FLucideIcons.x,
               size: context.theme.typography.sm.fontSize,
             ),
           ),

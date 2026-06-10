@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:open_authenticator/app.dart';
+import 'package:open_authenticator/flows/account.dart';
+import 'package:open_authenticator/flows/email_confirmation.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/backend/authentication/providers/provider.dart';
 import 'package:open_authenticator/model/backend/user.dart';
 import 'package:open_authenticator/pages/intro/slides/slide.dart';
 import 'package:open_authenticator/pages/settings/entries/synchronize.dart';
 import 'package:open_authenticator/spacing.dart';
-import 'package:open_authenticator/flows/account.dart';
-import 'package:open_authenticator/flows/email_confirmation.dart';
 import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 
@@ -70,12 +70,12 @@ class _LogInButton extends ConsumerWidget {
     return user == null
         ? ClickableButton(
             onPress: () => ref.read(accountFlowProvider).tryRequestSignIn(context),
-            prefix: const Icon(FIcons.logIn),
+            prefix: const Icon(FLucideIcons.logIn),
             child: ButtonText(translations.intro.logIn.button.loggedOut),
           )
         : ClickableButton(
             onPress: null,
-            prefix: const Icon(FIcons.check),
+            prefix: const Icon(FLucideIcons.check),
             child: ButtonText(translations.intro.logIn.button.loggedIn),
           );
   }
@@ -91,7 +91,7 @@ class _ConfirmEmailButton extends ConsumerWidget {
         : ClickableButton(
             onPress: () => ref.read(emailConfirmationFlowProvider).askForConfirmation(context),
             variant: .ghost,
-            prefix: const Icon(FIcons.mail),
+            prefix: const Icon(FLucideIcons.mail),
             child: ButtonText(translations.intro.logIn.button.confirmEmail),
           );
   }

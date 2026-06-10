@@ -84,9 +84,9 @@ class CurrentIntroSlideState with EquatableMixin {
 
   /// Creates a new current intro slide state.
   const CurrentIntroSlideState._({
-    required List<IntroPageSlide> slides,
+    required this._slides,
     required this.slideIndex,
-  }) : _slides = slides;
+  });
 
   /// Returns the next slide state.
   CurrentIntroSlideState? _createNextSlideState() {

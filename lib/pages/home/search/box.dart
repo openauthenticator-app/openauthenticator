@@ -44,12 +44,12 @@ class _SearchBoxWidgetState extends ConsumerState<_SearchBox> {
           suffixBuilder: (_, _, _) => ClickableButton.icon(
             variant: .ghost,
             onPress: null,
-            child: const Icon(FIcons.search),
+            child: const Icon(FLucideIcons.search),
           ),
           style: .delta(
             color: .delta(
               [
-                .base(context.theme.tileStyles.base.decoration.base.color),
+                .base(context.theme.tileStyles.base.contentDecoration.base.color),
               ],
             ),
           ),

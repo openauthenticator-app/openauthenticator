@@ -31,7 +31,7 @@ class _HomePageHeader extends ConsumerWidget {
         _RequireProviderValueWidget.cryptoStoreAndTotpList(
           child: ClickableHeaderAction(
             onPress: () => Navigator.pushNamed(context, SettingsPage.name),
-            icon: const Icon(FIcons.settings),
+            icon: const Icon(FLucideIcons.settings),
           ),
         ),
       ],
@@ -48,7 +48,7 @@ class _HomePageHeader extends ConsumerWidget {
           _RequireProviderValueWidget.cryptoStoreAndTotpList(
             child: ClickableHeaderAction(
               onPress: onAddButtonPress,
-              icon: const Icon(FIcons.plus),
+              icon: const Icon(FLucideIcons.plus),
             ),
           ),
         _RequireProviderValueWidget.cryptoStoreAndTotpList(
@@ -112,7 +112,7 @@ class _SyncHeaderAction extends ConsumerWidget {
         return const ClickableHeaderAction(
           onPress: null,
           icon: Icon(
-            FIcons.refreshCcwDot,
+            FLucideIcons.refreshCcwDot,
           ),
         );
       case SynchronizationPhaseSyncing():
@@ -120,7 +120,7 @@ class _SyncHeaderAction extends ConsumerWidget {
             ? const ClickableHeaderAction(
                 onPress: null,
                 icon: RotationAnimation(
-                  child: Icon(FIcons.refreshCcw),
+                  child: Icon(FLucideIcons.refreshCcw),
                 ),
               )
             : const SizedBox.shrink();
@@ -142,7 +142,7 @@ class _SyncHeaderAction extends ConsumerWidget {
             }
           },
           icon: Icon(
-            FIcons.refreshCcw,
+            FLucideIcons.refreshCcw,
             color: context.theme.colors.destructive,
           ),
         );
@@ -152,7 +152,7 @@ class _SyncHeaderAction extends ConsumerWidget {
           return ClickableHeaderAction(
             onPress: () => Navigator.pushNamed(context, SyncIssuesPage.name),
             icon: Icon(
-              FIcons.refreshCcwDot,
+              FLucideIcons.refreshCcwDot,
               color: context.theme.colors.destructive,
             ),
           );
@@ -160,7 +160,7 @@ class _SyncHeaderAction extends ConsumerWidget {
         if (currentPlatform.isDesktop) {
           return ClickableHeaderAction(
             onPress: () => ref.read(synchronizationControllerProvider.notifier).forceSync(),
-            icon: const Icon(FIcons.refreshCcw),
+            icon: const Icon(FLucideIcons.refreshCcw),
           );
         }
         return const SizedBox.shrink();

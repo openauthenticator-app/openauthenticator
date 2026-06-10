@@ -109,7 +109,7 @@ abstract class BackendPostRequest<T extends BackendResponse> extends BackendRequ
   Future<http.Response> execute(http.Client client, Uri url, {Map<String, String>? headers}) => client.post(
     url,
     headers: {
-      if (headers != null) ...headers,
+      ...?headers,
       'Content-Type': 'application/json',
     },
     body: jsonEncode(jsonBody),
@@ -129,7 +129,7 @@ abstract class BackendDeleteRequest<T extends BackendResponse> extends BackendRe
   Future<http.Response> execute(http.Client client, Uri url, {Map<String, String>? headers}) => client.delete(
     url,
     headers: {
-      if (headers != null) ...headers,
+      ...?headers,
       'Content-Type': 'application/json',
     },
     body: jsonEncode(jsonBody),

@@ -30,25 +30,25 @@ class _TotpDecryptDialog extends StatelessWidget {
       ),
       if (decryptedTotps.length > 1)
         ClickableTile(
-          prefix: const Icon(FIcons.checkCheck),
+          prefix: const Icon(FLucideIcons.checkCheck),
           onPress: () => Navigator.pop(context, TotpDecryptDialogResult.changeAllTotpsKey),
           title: Text(translations.totp.totpKeyDialog.choices.changeAllDecryptedTotpsKey.title),
           subtitle: Text(translations.totp.totpKeyDialog.choices.changeAllDecryptedTotpsKey.subtitle),
         ),
       ClickableTile(
-        prefix: const Icon(FIcons.keyRound),
+        prefix: const Icon(FLucideIcons.keyRound),
         onPress: () => Navigator.pop(context, TotpDecryptDialogResult.changeTotpKey),
         title: Text(translations.totp.totpKeyDialog.choices.changeTotpKey.title(n: decryptedTotps.length)),
         subtitle: Text(translations.totp.totpKeyDialog.choices.changeTotpKey.subtitle),
       ),
       ClickableTile(
-        prefix: const Icon(FIcons.rectangleEllipsis),
+        prefix: const Icon(FLucideIcons.rectangleEllipsis),
         onPress: () => Navigator.pop(context, TotpDecryptDialogResult.changeMasterPassword),
         title: Text(translations.totp.totpKeyDialog.choices.changeMasterPassword.title),
         subtitle: Text(translations.totp.totpKeyDialog.choices.changeMasterPassword.subtitle),
       ),
       ClickableTile(
-        prefix: const Icon(FIcons.x),
+        prefix: const Icon(FLucideIcons.x),
         onPress: () => Navigator.pop(context),
         title: Text(translations.totp.totpKeyDialog.choices.doNothing.title),
         subtitle: Text(translations.totp.totpKeyDialog.choices.doNothing.subtitle),

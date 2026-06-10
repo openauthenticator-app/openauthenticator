@@ -5,8 +5,8 @@ class UriBuilder {
 
   /// Creates a new [UriBuilder] from a [Uri].
   UriBuilder._({
-    required Uri uri,
-  }) : _uri = uri;
+    required this._uri,
+  });
 
   /// Creates a new [UriBuilder].
   UriBuilder({

@@ -54,7 +54,7 @@ class _ThemePickerDialog extends ConsumerWidget {
             prefix: Icon(mode.icon),
             title: Text(translations.settings.application.theme.themePickerDialog.theme.name[mode.name]!),
             subtitle: Text(translations.settings.application.theme.themePickerDialog.theme.description[mode.name]!),
-            suffix: theme.value == mode ? const Icon(FIcons.check) : null,
+            suffix: theme.value == mode ? const Icon(FLucideIcons.check) : null,
             onPress: () => Navigator.pop(context, mode),
           ),
       ],
@@ -75,11 +75,11 @@ extension _Icon on ThemeMode? {
     switch (this) {
       case null:
       case ThemeMode.system:
-        return FIcons.sunMoon;
+        return FLucideIcons.sunMoon;
       case ThemeMode.dark:
-        return FIcons.moon;
+        return FLucideIcons.moon;
       case ThemeMode.light:
-        return FIcons.sun;
+        return FLucideIcons.sun;
     }
   }
 }

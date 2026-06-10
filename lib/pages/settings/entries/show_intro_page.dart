@@ -13,7 +13,7 @@ class ShowIntroPageSettingsEntryWidget extends ConsumerWidget with FTileMixin {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => ClickableTile(
-    prefix: const Icon(FIcons.chevronFirst),
+    prefix: const Icon(FLucideIcons.chevronFirst),
     title: const Text('Show intro page'),
     subtitle: const Text('Displays the intro page.'),
     onPress: () async {

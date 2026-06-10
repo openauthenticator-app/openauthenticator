@@ -9,7 +9,7 @@ class TranslateSettingsEntryWidget extends UriSettingsEntry with FTileMixin {
   TranslateSettingsEntryWidget({
     super.key,
   }) : super(
-         icon: FIcons.languages,
+         icon: FLucideIcons.languages,
          title: translations.settings.about.translate.title,
          subtitle: translations.settings.about.translate.subtitle(appName: App.appName),
          uri: Uri.parse(App.appTranslationUrl),

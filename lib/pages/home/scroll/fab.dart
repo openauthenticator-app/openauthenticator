@@ -87,7 +87,7 @@ class _FloatingAddButton extends StatelessWidget {
             ),
             mainAxisSize: .min,
             child: const Icon(
-              FIcons.plus,
+              FLucideIcons.plus,
               size: 40,
               color: Colors.white,
             ),

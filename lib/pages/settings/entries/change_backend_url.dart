@@ -26,7 +26,7 @@ class ChangeBackendUrlSettingsEntryWidget extends ConsumerWidget with FTileMixin
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => ClickableTile(
-    prefix: const Icon(FIcons.globe),
+    prefix: const Icon(FLucideIcons.globe),
     suffix: const RightChevronSuffix(),
     title: Text(translations.settings.dangerZone.changeBackendUrl.title),
     subtitle: Text(translations.settings.dangerZone.changeBackendUrl.subtitle),

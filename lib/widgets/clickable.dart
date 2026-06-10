@@ -195,7 +195,7 @@ class ClickableHeaderAction extends FHeaderAction {
   const ClickableHeaderAction.back({
     Key? key,
     required VoidCallback? onPress,
-    FHeaderActionStyle? style,
+    FHeaderActionStyleDelta style = const .context(),
     bool autofocus = false,
     FocusNode? focusNode,
     ValueChanged<bool>? onFocusChange,
@@ -208,7 +208,7 @@ class ClickableHeaderAction extends FHeaderAction {
     Map<Type, Action<Intent>>? actions,
   }) : this(
          key: key,
-         icon: const Icon(FIcons.arrowLeft),
+         icon: const Icon(FLucideIcons.arrowLeft),
          onPress: onPress,
          style: style,
          autofocus: autofocus,
@@ -227,7 +227,7 @@ class ClickableHeaderAction extends FHeaderAction {
   const ClickableHeaderAction.x({
     Key? key,
     required VoidCallback? onPress,
-    FHeaderActionStyle? style,
+    FHeaderActionStyleDelta style = const .context(),
     bool autofocus = false,
     FocusNode? focusNode,
     ValueChanged<bool>? onFocusChange,
@@ -240,7 +240,7 @@ class ClickableHeaderAction extends FHeaderAction {
     Map<Type, Action<Intent>>? actions,
   }) : this(
          key: key,
-         icon: const Icon(FIcons.x),
+         icon: const Icon(FLucideIcons.x),
          onPress: onPress,
          style: style,
          autofocus: autofocus,

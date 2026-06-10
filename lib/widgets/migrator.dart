@@ -3,13 +3,13 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:open_authenticator/flows/account.dart';
 import 'package:open_authenticator/i18n/localizable_exception.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/migrator/migrator.dart';
 import 'package:open_authenticator/model/settings/storage_type.dart';
 import 'package:open_authenticator/pages/settings/page.dart';
 import 'package:open_authenticator/spacing.dart';
-import 'package:open_authenticator/flows/account.dart';
 import 'package:open_authenticator/utils/result/handler.dart';
 import 'package:open_authenticator/utils/result/result.dart';
 import 'package:open_authenticator/widgets/app_scaffold.dart';
@@ -68,7 +68,7 @@ class Migrator extends ConsumerWidget {
                           width: math.min(MediaQuery.sizeOf(context).width - kBigSpace, 300),
                           child: ClickableButton(
                             onPress: () => _migrate(context, ref),
-                            prefix: const Icon(FIcons.cloudSync),
+                            prefix: const Icon(FLucideIcons.cloudSync),
                             child: ButtonText(translations.migrator.button.migrate),
                           ),
                         ),
@@ -83,7 +83,7 @@ class Migrator extends ConsumerWidget {
                               future: ref.read(migratorProvider.notifier).markMigrated(),
                             );
                           },
-                          prefix: const Icon(FIcons.cloudAlert),
+                          prefix: const Icon(FLucideIcons.cloudAlert),
                           child: ButtonText(translations.migrator.button.dontMigrate),
                         ),
                       ),

@@ -98,14 +98,14 @@ class _ConfirmActionPickerDialog extends StatelessWidget {
     ],
     children: [
       ClickableTile(
-        prefix: const Icon(FIcons.check),
+        prefix: const Icon(FLucideIcons.check),
         title: Text(translations.emailConfirmation.confirmActionPickerDialog.confirm.title),
         subtitle: Text(translations.emailConfirmation.confirmActionPickerDialog.confirm.subtitle),
         onPress: () => Navigator.pop(context, _ConfirmAction.tryConfirm),
       ),
       ClickableTile(
         variant: .destructive,
-        prefix: const Icon(FIcons.x),
+        prefix: const Icon(FLucideIcons.x),
         title: Text(translations.emailConfirmation.confirmActionPickerDialog.cancelConfirmation.title),
         subtitle: Text(translations.emailConfirmation.confirmActionPickerDialog.cancelConfirmation.subtitle),
         onPress: () => Navigator.pop(context, _ConfirmAction.cancelConfirmation),

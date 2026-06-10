@@ -87,8 +87,7 @@ enum ConnectivityState {
   unavailable,
 
   /// We couldn't determine the connectivity state.
-  unknown
-  ;
+  unknown;
 
   /// Returns whether we can send HTTP requests.
   bool get canSendRequests => this == .available || this == .unknown;

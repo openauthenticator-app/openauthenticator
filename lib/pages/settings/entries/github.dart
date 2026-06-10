@@ -10,7 +10,7 @@ class GithubSettingsEntryWidget extends UriSettingsEntry {
   GithubSettingsEntryWidget({
     super.key,
   }) : super(
-         icon: FIcons.bug,
+         icon: FLucideIcons.bug,
          title: translations.settings.about.github.title,
          subtitle: translations.settings.about.github.subtitle,
          uri: UriBuilder.prefix(

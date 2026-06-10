@@ -7,8 +7,7 @@ enum ImageType {
   si,
 
   /// Any other image.
-  other
-  ;
+  other;
 
   /// Infers an image type from the given [source].
   static ImageType inferFromSource(String source) {

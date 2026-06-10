@@ -31,7 +31,7 @@ class ToggleLinkDialog extends ConsumerWidget {
       bool unlink = currentProviders.contains(provider);
       return _ProviderTile(
         providerId: provider.id,
-        trailingIcon: unlink ? FIcons.unlink : null,
+        trailingIcon: unlink ? FLucideIcons.unlink : null,
         onTap: () => Navigator.pop(
           context,
           (

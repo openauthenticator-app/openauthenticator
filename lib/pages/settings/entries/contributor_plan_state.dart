@@ -22,7 +22,7 @@ class ContributorPlanStateSettingsEntryWidget extends ConsumerWidget with FTileM
         onChange: (choices) => ref.read(contributorPlanStateProvider.notifier).debugChangeState(choices.first),
       ),
       enabled: state.hasValue,
-      prefix: const Icon(FIcons.bug),
+      prefix: const Icon(FLucideIcons.bug),
       title: const Text('Contributor Plan state'),
       subtitle: const Text('Change the Contributor Plan state for debugging purposes.'),
       detailsBuilder: (_, values, _) => Text(values.first.name),

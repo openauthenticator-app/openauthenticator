@@ -241,7 +241,7 @@ class _PackageRow extends StatelessWidget {
   Widget build(BuildContext context) => ClickableTile(
     title: Text(title),
     onPress: onPress,
-    suffix: const Icon(FIcons.chevronRight),
+    suffix: const Icon(FLucideIcons.chevronRight),
   );
 }
 

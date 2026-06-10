@@ -92,7 +92,7 @@ class _IntroPageState extends ConsumerState<IntroPage> with BrightnessListener {
                           }
                         }
                       : null,
-                  prefix: Icon(hasFinished ? FIcons.check : FIcons.chevronRight),
+                  prefix: Icon(hasFinished ? FLucideIcons.check : FLucideIcons.chevronRight),
                   child: ButtonText(hasFinished ? translations.intro.button.finish : translations.intro.button.next),
                 ),
               ],

@@ -77,7 +77,7 @@ class _MasterPasswordFormState extends State<MasterPasswordForm> {
         PasswordFormField(
           control: .managed(controller: passwordController),
           label: FormLabelWithIcon(
-            icon: FIcons.rectangleEllipsis,
+            icon: FLucideIcons.rectangleEllipsis,
             text: widget.inputText,
           ),
           hint: widget.hintText,
@@ -97,7 +97,7 @@ class _MasterPasswordFormState extends State<MasterPasswordForm> {
         PasswordFormField(
           control: .managed(controller: confirmationController),
           label: FormLabelWithIcon(
-            icon: FIcons.check,
+            icon: FLucideIcons.check,
             text: translations.masterPassword.form.confirmation.input,
           ),
           hint: translations.masterPassword.form.confirmation.hint,

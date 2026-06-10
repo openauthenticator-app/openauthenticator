@@ -31,7 +31,7 @@ class SwitchCameraButton extends StatelessWidget {
       return ClickableButton.icon(
         variant: .secondary,
         onPress: controller.switchCamera,
-        child: const Icon(FIcons.switchCamera),
+        child: const Icon(FLucideIcons.switchCamera),
       );
     },
   );
@@ -56,17 +56,17 @@ class ToggleFlashlightButton extends StatelessWidget {
             TorchState.auto => ClickableButton.icon(
               variant: .secondary,
               onPress: controller.toggleTorch,
-              child: const Icon(FIcons.sparkles),
+              child: const Icon(FLucideIcons.sparkles),
             ),
             TorchState.off => ClickableButton.icon(
               variant: .secondary,
               onPress: controller.toggleTorch,
-              child: const Icon(FIcons.zapOff),
+              child: const Icon(FLucideIcons.zapOff),
             ),
             TorchState.on => ClickableButton.icon(
               variant: .secondary,
               onPress: controller.toggleTorch,
-              child: const Icon(FIcons.zap),
+              child: const Icon(FLucideIcons.zap),
             ),
             TorchState.unavailable => ClickableButton.icon(
               variant: .secondary,

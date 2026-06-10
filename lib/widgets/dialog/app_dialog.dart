@@ -295,7 +295,7 @@ class _AppDialogTitle extends StatelessWidget {
                 message: MaterialLocalizations.of(context).closeButtonLabel,
                 child: ClickableButton.icon(
                   variant: .destructive,
-                  child: const Icon(FIcons.x),
+                  child: const Icon(FLucideIcons.x),
                   onPress: () => Navigator.pop(context),
                 ),
               ),

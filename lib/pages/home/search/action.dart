@@ -25,7 +25,7 @@ class _SearchAction extends ConsumerWidget {
                     onTotpFound?.call(result);
                   }
                 },
-                icon: const Icon(FIcons.search),
+                icon: const Icon(FLucideIcons.search),
               ),
       _ => const SizedBox.shrink(),
     };

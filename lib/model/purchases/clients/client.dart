@@ -169,8 +169,7 @@ enum Purchasable {
   /// Allows to subscribe to the Contributor Plan.
   contributorPlan(
     offeringId: AppContributorPlan.offeringId,
-  )
-  ;
+  );
 
   /// The offering ID.
   final String offeringId;

@@ -16,9 +16,9 @@ class SharedPreferencesWithPrefix {
 
   /// Creates a new shared preferences with prefix instance.
   const SharedPreferencesWithPrefix._({
-    required SharedPreferencesWithCache sharedPreferences,
+    required this._sharedPreferences,
     this.prefix = '',
-  }) : _sharedPreferences = sharedPreferences;
+  });
 
   /// Creates a new instance with the given options and reloads the cache from the platform data.
   static Future<SharedPreferencesWithPrefix> create({

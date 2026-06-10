@@ -64,7 +64,7 @@ class _UnlockChallengeState extends ConsumerState<UnlockChallenge> {
                     above: switch (cannotUnlockException) {
                       LocalAuthenticationDeviceNotSupported(:final localizedErrorMessage) => _UnlockChallengeContent(
                         text: localizedErrorMessage,
-                        buttonIcon: FIcons.x,
+                        buttonIcon: FLucideIcons.x,
                         buttonLabel: translations.appUnlock.button.disable,
                         onButtonPress: () async {
                           List<PasswordVerificationMethod> passwordVerificationMethod = await ref.read(passwordVerificationProvider.future);
@@ -80,7 +80,7 @@ class _UnlockChallengeState extends ConsumerState<UnlockChallenge> {
                       ),
                       MasterPasswordNoPasswordVerificationMethodAvailable(:final localizedErrorMessage) || MasterPasswordNoSalt(:final localizedErrorMessage) => _UnlockChallengeContent(
                         text: localizedErrorMessage,
-                        buttonIcon: FIcons.keyRound,
+                        buttonIcon: FLucideIcons.keyRound,
                         buttonLabel: translations.appUnlock.button.changeMasterPassword,
                         onButtonPress: () async {
                           Result<String> changeResult = await ref.read(masterPasswordFlowProvider).changeMasterPassword(context, askForUnlock: false);
@@ -92,7 +92,7 @@ class _UnlockChallengeState extends ConsumerState<UnlockChallenge> {
                       ),
                       _ => _UnlockChallengeContent(
                         text: translations.appUnlock.widget(app: App.appName),
-                        buttonIcon: FIcons.keyRound,
+                        buttonIcon: FLucideIcons.keyRound,
                         buttonLabel: translations.appUnlock.button.unlock,
                         onButtonPress: value == AppLockState.unlockChallengedStarted ? null : tryUnlockIfNeeded,
                       ),

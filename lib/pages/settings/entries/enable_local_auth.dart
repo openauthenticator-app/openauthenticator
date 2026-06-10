@@ -19,7 +19,7 @@ class EnableLocalAuthSettingsEntryWidget extends CheckboxSettingsEntryWidget<App
          provider: appUnlockMethodSettingsEntryProvider,
          title: translations.settings.security.enableLocalAuth.title,
          subtitle: translations.settings.security.enableLocalAuth.subtitle,
-         icon: FIcons.lock,
+         icon: FLucideIcons.lock,
        );
 
   @override

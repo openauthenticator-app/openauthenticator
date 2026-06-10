@@ -19,8 +19,8 @@ class CryptoStoreVerificationMethod with PasswordVerificationMethod {
 
   /// Creates a new crypto store verification method instance.
   const CryptoStoreVerificationMethod({
-    required CryptoStore? cryptoStore,
-  }) : _cryptoStore = cryptoStore;
+    required this._cryptoStore,
+  });
 
   @override
   bool get enabled => _cryptoStore != null;

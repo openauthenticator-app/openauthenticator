@@ -37,7 +37,7 @@ class SyncIssuesPage extends ConsumerWidget {
         suffixes: [
           ClickableHeaderAction(
             icon: Icon(
-              FIcons.trash,
+              FLucideIcons.trash,
               color: context.theme.colors.destructive,
             ),
             onPress: () async {
@@ -54,7 +54,7 @@ class SyncIssuesPage extends ConsumerWidget {
       builder: (value) => [
         if (value.isEmpty)
           ImageTextActions.icon(
-            icon: FIcons.checkCheck,
+            icon: FLucideIcons.checkCheck,
             text: translations.syncIssues.operations.empty,
           )
         else

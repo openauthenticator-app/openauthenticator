@@ -39,8 +39,8 @@ sealed class AppUnlockMethod<T> {
   /// Creates a new app unlock method instance.
   const AppUnlockMethod({
     required this.id,
-    required Ref ref,
-  }) : _ref = ref;
+    required this._ref,
+  });
 
   /// Unlock the app, handling errors.
   Future<Result<T>> unlock(AppUnlockInteraction interaction, UnlockReason reason) async {

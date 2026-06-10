@@ -12,6 +12,6 @@ class CacheTotpPicturesSettingsEntryWidget extends BoolSettingsEntryWidget<Cache
          provider: cacheTotpPicturesSettingsEntryProvider,
          title: translations.settings.application.cacheTotpPictures.title,
          subtitle: translations.settings.application.cacheTotpPictures.subtitle,
-         icon: FIcons.server,
+         icon: FLucideIcons.server,
        );
 }

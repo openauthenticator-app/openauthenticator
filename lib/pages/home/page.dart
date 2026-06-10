@@ -139,12 +139,12 @@ class _HomePageState extends ConsumerState<HomePage> {
             child: SingleChildScrollView(
               padding: context.theme.scaffoldStyle.childPadding,
               child: ImageTextActions.icon(
-                icon: FIcons.lock,
+                icon: FLucideIcons.lock,
                 text: translations.home.noCryptoStore.message,
                 actions: [
                   ClickableButton(
                     onPress: () => ref.read(masterPasswordFlowProvider).changeMasterPassword(context, askForUnlock: false),
-                    prefix: const Icon(FIcons.rectangleEllipsis),
+                    prefix: const Icon(FLucideIcons.rectangleEllipsis),
                     child: ButtonText(translations.home.noCryptoStore.resetButton),
                   ),
                 ],
