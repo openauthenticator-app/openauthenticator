@@ -64,7 +64,7 @@
       "title": "Master-Kennwort ändern",
       "subtitle": {
         "text": "Sie können Ihr Master-Passwort jederzeit ändern.",
-        "sync": "Beachten Sie, dass Sie ihn in all Ihren Open Authenticator-Instanzen, die miteinander synchronisiert sind, erneut eingeben müssen."
+        "sync": "Beachten Sie, dass Sie es in all Ihren Open Authenticator-Instanzen, die miteinander synchronisiert sind, erneut eingeben müssen."
       }
     }
   },
