@@ -73,7 +73,7 @@ class AboutAppDialog extends StatelessWidget {
             ],
           ),
           textAlign: .center,
-          style: context.theme.typography.lg,
+          style: context.theme.typography.display.lg,
         ),
       ),
       if (applicationLegalese != null)

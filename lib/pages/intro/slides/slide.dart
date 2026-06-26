@@ -240,7 +240,7 @@ class IntroPageSlideWidgetState extends State<IntroPageSlideWidget> with TickerP
             opacity: _textAnimation,
             child: widget.titleWidget,
           ),
-          style: context.theme.typography.xl3,
+          style: context.theme.typography.display.xl3,
         ),
       ),
       Padding(

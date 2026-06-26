@@ -99,7 +99,7 @@ class _LogoSearchState extends State<LogoSearch> {
                   if (source is! DirectSource) source.name,
               ].join(' / '),
             ),
-            style: context.theme.typography.xs.copyWith(
+            style: context.theme.typography.body.xs.copyWith(
               color: context.theme.colors.foreground.withValues(alpha: 0.75),
             ),
             textAlign: .right,

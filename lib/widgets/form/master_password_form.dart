@@ -87,7 +87,7 @@ class _MasterPasswordFormState extends State<MasterPasswordForm> {
           width: MediaQuery.sizeOf(context).width,
           child: Text(
             translations.masterPassword.form.securityScore(score: '$securityScore/40'),
-            style: context.theme.typography.sm.copyWith(
+            style: context.theme.typography.body.sm.copyWith(
               fontWeight: .bold,
               color: securityScoreColor,
             ),

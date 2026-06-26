@@ -194,7 +194,7 @@ class _ErrorWithStackTraceState extends State<ErrorWithStackTrace> with SingleTi
         child: FCard(
           child: SelectableText(
             details,
-            style: TextStyle(fontSize: context.theme.typography.xs.fontSize),
+            style: TextStyle(fontSize: context.theme.typography.body.xs.fontSize),
             textAlign: TextAlign.left,
           ),
         ),

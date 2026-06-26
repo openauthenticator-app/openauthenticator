@@ -276,7 +276,7 @@ class _AppDialogTitle extends StatelessWidget {
           ),
           style: .delta(
             titleTextStyle: .delta(
-              fontSize: context.theme.typography.xl.fontSize,
+              fontSize: context.theme.typography.display.xl.fontSize,
               fontWeight: FontWeight.normal,
               height: 1,
             ),

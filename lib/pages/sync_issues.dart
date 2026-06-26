@@ -101,7 +101,7 @@ class _PushOperationErrorWidget extends ConsumerWidget {
         Text(
           translations.syncIssues.operations.expandable.permanent,
           style: TextStyle(
-            fontSize: context.theme.typography.xs.fontSize,
+            fontSize: context.theme.typography.body.xs.fontSize,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -118,7 +118,7 @@ class _PushOperationErrorWidget extends ConsumerWidget {
               text: ' ${DateFormat.yMd(translations.$meta.locale.underscoreTag).format(error.createdAt)} ${DateFormat.Hms(translations.$meta.locale.underscoreTag).format(error.createdAt)}',
             ),
           ],
-          style: context.theme.typography.xs,
+          style: context.theme.typography.body.xs,
         ),
       ),
       Text.rich(
@@ -134,13 +134,13 @@ class _PushOperationErrorWidget extends ConsumerWidget {
               text: ' ${error.errorCode}',
             ),
           ],
-          style: context.theme.typography.xs,
+          style: context.theme.typography.body.xs,
         ),
       ),
       Text(
         translations.syncIssues.operations.expandable.details,
         style: TextStyle(
-          fontSize: context.theme.typography.xs.fontSize,
+          fontSize: context.theme.typography.body.xs.fontSize,
           fontWeight: FontWeight.bold,
         ),
       ),
@@ -148,7 +148,7 @@ class _PushOperationErrorWidget extends ConsumerWidget {
         error.errorKind.localizedMessage,
         maxLines: null,
         overflow: TextOverflow.visible,
-        style: TextStyle(fontSize: context.theme.typography.xs.fontSize),
+        style: TextStyle(fontSize: context.theme.typography.body.xs.fontSize),
       ),
       Align(
         alignment: Alignment.centerRight,

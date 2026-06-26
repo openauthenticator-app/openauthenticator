@@ -23,7 +23,7 @@ dependencies:
   jovial_svg: ^1.1.30
   mobile_scanner: ^7.2.0
   html: ^0.15.6
-  path_provider: ^2.1.5
+  path_provider: ^2.1.6
   shared_preferences: ^2.5.5
   uuid: ^4.5.3
   equatable: ^2.0.8
@@ -31,44 +31,44 @@ dependencies:
   drift_flutter: ^0.3.0
   path: ^1.9.1
   local_auth: ^3.0.1
-  package_info_plus: ^10.1.0
+  package_info_plus: ^10.2.0
   http: ^1.6.0
   qr_flutter: ^4.1.0
   intl: any
   url_launcher: ^6.3.2
-  purchases_flutter: ^10.2.2
-  purchases_ui_flutter: ^10.2.2
+  purchases_flutter: ^10.3.0
+  purchases_ui_flutter: ^10.3.0
   purchases_dart:
     git:
       url: https://github.com/openauthenticator-app/purchases-dart.git
   window_manager: ^0.5.1
-  slang: ^4.15.0
-  slang_flutter: ^4.15.0
+  slang: ^4.16.0
+  slang_flutter: ^4.16.0
   rate_my_app: ^2.4.0
-  app_links: ^7.1.1
+  app_links: ^7.2.0
   hashlib: ^2.3.4
   hashlib_codecs: ^3.1.2
   cipherlib: ^0.4.0
   scrollable_positioned_list: ^0.3.8
-  share_plus: ^13.1.0
+  share_plus: ^13.2.0
   wakelock_plus: ^1.6.1
-  file_picker: ^12.0.0-beta.5
-  connectivity_plus: ^7.1.1
-  sentry_flutter: ^9.21.0
-  forui: ^0.22.3
-  forui_assets: ^0.22.1
+  file_picker: ^12.0.0-beta.7
+  connectivity_plus: ^7.2.0
+  sentry_flutter: ^9.22.0
+  forui: ^0.23.0
+  forui_assets: ^0.23.0
   custom_refresh_indicator: ^4.0.1
   xdg_desktop_portal: ^0.1.14
   # TODO: Remove Firebase dependencies once migration is finished.
-  firebase_core: ^4.10.0
-  firebase_auth: ^6.5.2
-  cloud_firestore: ^6.5.0
+  firebase_core: ^4.11.0
+  firebase_auth: ^6.5.4
+  cloud_firestore: ^6.6.0
 
 dev_dependencies:
   flutter_lints: ^6.0.0
   build_runner: ^2.15.0
   drift_dev: ^2.33.0
-  msix: ^3.16.13
+  msix: ^3.17.0
   riverpod_lint: ^3.1.4
   release: ^0.1.8
   args: ^2.7.0

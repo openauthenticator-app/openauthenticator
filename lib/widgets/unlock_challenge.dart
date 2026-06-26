@@ -161,7 +161,7 @@ class _UnlockChallengeContent extends StatelessWidget {
             fit: BoxFit.scaleDown,
             child: TitleText(
               textAlign: TextAlign.center,
-              textStyle: context.theme.typography.xl2,
+              textStyle: context.theme.typography.display.xl2,
             ),
           ),
         ),

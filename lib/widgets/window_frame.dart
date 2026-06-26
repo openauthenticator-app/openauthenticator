@@ -76,7 +76,7 @@ class _DragAreaState extends State<_DragArea> with WindowListener {
               offset: const Offset(0, 5),
               child: Icon(
                 FLucideIcons.minus,
-                size: context.theme.typography.sm.fontSize,
+                size: context.theme.typography.body.sm.fontSize,
               ),
             ),
           ),
@@ -88,7 +88,7 @@ class _DragAreaState extends State<_DragArea> with WindowListener {
                 flipX: true,
                 child: Icon(
                   FLucideIcons.copy,
-                  size: context.theme.typography.sm.fontSize,
+                  size: context.theme.typography.body.sm.fontSize,
                 ),
               ),
             )
@@ -98,7 +98,7 @@ class _DragAreaState extends State<_DragArea> with WindowListener {
               onPress: isLoading || isMaximized == null ? null : () => doFuture(windowManager.maximize),
               child: Icon(
                 FLucideIcons.square,
-                size: context.theme.typography.sm.fontSize,
+                size: context.theme.typography.body.sm.fontSize,
               ),
             ),
           ClickableButton.icon(
@@ -106,7 +106,7 @@ class _DragAreaState extends State<_DragArea> with WindowListener {
             onPress: isLoading ? null : () => doFuture(windowManager.close),
             child: Icon(
               FLucideIcons.x,
-              size: context.theme.typography.sm.fontSize,
+              size: context.theme.typography.body.sm.fontSize,
             ),
           ),
         ],

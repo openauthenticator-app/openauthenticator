@@ -96,13 +96,13 @@ class TotpTile extends StatelessWidget {
         if (totp.isDecrypted && (totp as DecryptedTotp).issuer != null && (totp as DecryptedTotp).issuer!.isNotEmpty)
           Text(
             ((totp as DecryptedTotp)).issuer!,
-            style: context.theme.typography.lg.copyWith(
+            style: context.theme.typography.body.lg.copyWith(
               overflow: TextOverflow.ellipsis,
             ),
           ),
         Text(
           (totp.isDecrypted ? (totp as DecryptedTotp).label : null) ?? totp.uuid,
-          style: context.theme.typography.md.copyWith(
+          style: context.theme.typography.body.md.copyWith(
             color: context.theme.colors.mutedForeground,
             overflow: TextOverflow.ellipsis,
           ),
@@ -114,7 +114,7 @@ class TotpTile extends StatelessWidget {
             padding: const EdgeInsets.only(top: 6),
             child: TotpCode(
               totp: totp as DecryptedTotp,
-              textStyle: context.theme.typography.xl2,
+              textStyle: context.theme.typography.body.xl2,
             ),
           )
         : null,

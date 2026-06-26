@@ -26,7 +26,7 @@ class _TotpCodeState extends TimeBasedTotpWidgetState<TotpCode> {
 
   @override
   Widget build(BuildContext context) {
-    TextStyle textStyle = widget.textStyle ?? context.theme.typography.md;
+    TextStyle textStyle = widget.textStyle ?? context.theme.typography.display.md;
     return Container(
       decoration: BoxDecoration(
         color: context.theme.colors.primary.withValues(alpha: 0.15),

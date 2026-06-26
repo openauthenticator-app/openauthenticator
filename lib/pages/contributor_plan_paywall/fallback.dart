@@ -48,12 +48,12 @@ class ContributorPlanFallbackPaywallHeader extends StatelessWidget {
             title: (text) => WidgetSpan(
               child: TitleText(
                 text: text,
-                textStyle: context.theme.typography.xl3,
+                textStyle: context.theme.typography.display.xl3,
               ),
               alignment: PlaceholderAlignment.middle,
             ),
           ),
-          style: context.theme.typography.xl3,
+          style: context.theme.typography.display.xl3,
           textAlign: TextAlign.center,
         ),
       ),
@@ -89,7 +89,7 @@ class _ContributorPlanFallbackPaywallState extends ConsumerState<ContributorPlan
           [
             .all(
               .delta(
-                fontSize: context.theme.typography.xs.fontSize,
+                fontSize: context.theme.typography.body.xs.fontSize,
               ),
             ),
           ],
@@ -373,7 +373,7 @@ class _ContributorPlanBillingPlanPickerState extends ConsumerState<_ContributorP
                         child: FBadge(
                           style: .delta(
                             contentStyle: .delta(
-                              labelTextStyle: .delta(fontSize: context.theme.typography.xs.fontSize),
+                              labelTextStyle: .delta(fontSize: context.theme.typography.body.xs.fontSize),
                               padding: const .value(
                                 .symmetric(horizontal: kSpace / 2, vertical: kSpace / 4),
                               ),

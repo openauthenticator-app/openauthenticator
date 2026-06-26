@@ -137,7 +137,7 @@ class _EmailFormState extends ConsumerState<_EmailForm> {
           padding: const EdgeInsets.only(bottom: kBigSpace),
           child: Text(
             description,
-            style: context.theme.typography.xs,
+            style: context.theme.typography.body.xs,
           ),
         ),
         ClickableButton(

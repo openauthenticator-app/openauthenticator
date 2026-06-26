@@ -52,7 +52,7 @@ class Migrator extends ConsumerWidget {
                         child: Text(
                           translations.migrator.title,
                           textAlign: TextAlign.center,
-                          style: context.theme.typography.xl2,
+                          style: context.theme.typography.display.xl2,
                         ),
                       ),
                       Padding(
