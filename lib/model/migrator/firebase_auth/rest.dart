@@ -5,9 +5,11 @@ import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:open_authenticator/model/migrator/firebase_auth/firebase_auth.dart';
 import 'package:open_authenticator/model/migrator/firebase_options.dart';
+import 'package:open_authenticator/model/secure_storage.dart';
 import 'package:simple_secure_storage/simple_secure_storage.dart';
 
 /// The error message thrown when an invalid response is returned.
@@ -37,11 +39,15 @@ class FirebaseAuthRest extends FirebaseAuth {
   /// This allow us to link our auth implementation to the Firebase C++ SDK.
   final MethodChannel _methodChannel = const MethodChannel('app.openauthenticator.auth');
 
+  /// The simple secure storage instance.
+  CachedSimpleSecureStorage? simpleSecureStorage;
+
   @override
-  Future<void> initialize() async {
-    await super.initialize();
+  Future<void> initialize(Ref ref) async {
+    await super.initialize(ref);
     _methodChannel.setMethodCallHandler(_handlePlatformCall);
-    String? userData = await SimpleSecureStorage.read(_kUserData);
+    simpleSecureStorage = await ref.read(secureStorageProvider.future);
+    String? userData = simpleSecureStorage?.read(_kUserData);
     if (userData == null) {
       _onUserChanged(methodChannelCall: _kCallInstall);
       return;
@@ -128,9 +134,17 @@ class FirebaseAuthRest extends FirebaseAuth {
   void _onUserChanged({String methodChannelCall = _kCallUserChanged}) {
     _controller.add(_currentUser);
     if (_currentUser == null) {
-      SimpleSecureStorage.delete(_kUserData);
+      if (simpleSecureStorage == null) {
+        SimpleSecureStorage.delete(_kUserData);
+      } else {
+        simpleSecureStorage!.delete(_kUserData);
+      }
     } else {
-      SimpleSecureStorage.write(_kUserData, jsonEncode(_currentUser!.toJson()));
+      if (simpleSecureStorage == null) {
+        SimpleSecureStorage.write(_kUserData, jsonEncode(_currentUser!.toJson()));
+      } else {
+        simpleSecureStorage!.write(_kUserData, jsonEncode(_currentUser!.toJson()));
+      }
     }
     _methodChannel.invokeMethod(
       methodChannelCall,

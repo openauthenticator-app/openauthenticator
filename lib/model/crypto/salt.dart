@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/model/crypto/key.dart';
 import 'package:open_authenticator/model/database/database.dart';
+import 'package:open_authenticator/model/secure_storage.dart';
 import 'package:open_authenticator/model/totp/totp.dart';
 import 'package:simple_secure_storage/simple_secure_storage.dart';
 
@@ -17,7 +18,8 @@ class SaltNotifier extends AsyncNotifier<Salt?> {
 
   @override
   Future<Salt?> build() async {
-    String? value = await SimpleSecureStorage.read(_kPasswordDerivedKeySaltKey);
+    CachedSimpleSecureStorage simpleSecureStorage = await ref.watch(secureStorageProvider.future);
+    String? value = simpleSecureStorage.read(_kPasswordDerivedKeySaltKey);
     if (value != null) {
       return Salt.base64Decode(
         string: value,
@@ -66,10 +68,11 @@ class SaltNotifier extends AsyncNotifier<Salt?> {
 
   /// Saves the given [salt] to the local storage.
   Future<void> _saveToLocalStorage(Salt? salt) async {
+    CachedSimpleSecureStorage simpleSecureStorage = await ref.read(secureStorageProvider.future);
     if (salt == null) {
-      await SimpleSecureStorage.delete(_kPasswordDerivedKeySaltKey);
+      await simpleSecureStorage.delete(_kPasswordDerivedKeySaltKey);
     } else {
-      await SimpleSecureStorage.write(_kPasswordDerivedKeySaltKey, base64.encode(salt.value));
+      await simpleSecureStorage.write(_kPasswordDerivedKeySaltKey, base64.encode(salt.value));
     }
   }
 }

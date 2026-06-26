@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/migrator/firebase_auth/default.dart';
 import 'package:open_authenticator/model/migrator/firebase_auth/rest.dart';
@@ -33,7 +34,7 @@ abstract class FirebaseAuth {
 
   /// Initializes the current instance.
   @mustCallSuper
-  FutureOr<void> initialize() => _localeStreamSubscription = LocaleSettings.getLocaleStream().listen((locale) => onLocaleChange(locale.languageCode));
+  FutureOr<void> initialize(Ref ref) => _localeStreamSubscription = LocaleSettings.getLocaleStream().listen((locale) => onLocaleChange(locale.languageCode));
 
   /// Triggered when the locale has changed.
   @mustCallSuper

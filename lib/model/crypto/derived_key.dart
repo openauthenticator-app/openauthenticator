@@ -8,6 +8,7 @@ import 'package:open_authenticator/model/app_unlock/methods/method.dart';
 import 'package:open_authenticator/model/crypto/key.dart';
 import 'package:open_authenticator/model/crypto/salt.dart';
 import 'package:open_authenticator/model/password_verification/methods/password_signature.dart';
+import 'package:open_authenticator/model/secure_storage.dart';
 import 'package:open_authenticator/model/settings/app_unlock_method.dart';
 import 'package:simple_secure_storage/simple_secure_storage.dart';
 
@@ -21,7 +22,8 @@ class DerivedKeyNotifier extends AsyncNotifier<DerivedKey?> {
 
   @override
   FutureOr<DerivedKey?> build() async {
-    String? derivedKey = await SimpleSecureStorage.read(_kPasswordDerivedKeyKey);
+    CachedSimpleSecureStorage simpleSecureStorage = await ref.watch(secureStorageProvider.future);
+    String? derivedKey = simpleSecureStorage.read(_kPasswordDerivedKeyKey);
     return derivedKey == null ? null : DerivedKey._base64Decode(string: derivedKey);
   }
 
@@ -41,13 +43,17 @@ class DerivedKeyNotifier extends AsyncNotifier<DerivedKey?> {
     }
     andWrite ??= unlockMethod != MasterPasswordAppUnlockMethod.kMethodId;
     if (andWrite) {
-      await SimpleSecureStorage.write(_kPasswordDerivedKeyKey, base64.encode(newKey.value));
+      CachedSimpleSecureStorage simpleSecureStorage = await ref.read(secureStorageProvider.future);
+      await simpleSecureStorage.write(_kPasswordDerivedKeyKey, base64.encode(newKey.value));
     }
     return newKey;
   }
 
   /// Deletes the current derived key from the local storage.
-  Future<void> deleteFromLocalStorage() async => await SimpleSecureStorage.delete(_kPasswordDerivedKeyKey);
+  Future<void> deleteFromLocalStorage() async {
+    CachedSimpleSecureStorage simpleSecureStorage = await ref.read(secureStorageProvider.future);
+    await simpleSecureStorage.delete(_kPasswordDerivedKeyKey);
+  }
 }
 
 /// Represents a derived key.

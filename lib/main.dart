@@ -44,18 +44,11 @@ import 'package:open_authenticator/widgets/waiting_overlay.dart';
 import 'package:open_authenticator/widgets/window_frame.dart';
 import 'package:rate_my_app/rate_my_app.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
-import 'package:simple_secure_storage/simple_secure_storage.dart';
 import 'package:window_manager/window_manager.dart';
 
 /// Hello world !
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await SimpleSecureStorage.initialize(
-    switch (currentPlatform) {
-      .iOS || .macOS => _OpenAuthenticatorSSSDarwinInitializationOptions(),
-      _ => _OpenAuthenticatorSSSInitializationOptions(),
-    },
-  );
   if (currentPlatform.isDesktop) {
     await windowManager.ensureInitialized();
     windowManager.waitUntilReadyToShow(
@@ -87,27 +80,6 @@ Future<void> main() async {
           appRunner: appRunner,
         )
       : appRunner();
-}
-
-/// Allows to initialize [SimpleSecureStorage] with parameters that depend on the current mode.
-class _OpenAuthenticatorSSSInitializationOptions extends InitializationOptions {
-  /// Creates a new Open Authenticator SimpleSecureStorage initialization options.
-  _OpenAuthenticatorSSSInitializationOptions()
-    : super(
-        appName: App.appName + (kDebugMode ? ' Debug' : ''),
-        namespace: App.appPackageName + (kDebugMode ? '.debug' : ''),
-      );
-}
-
-/// Allows to initialize [SimpleSecureStorage] on Darwin platforms with parameters that depend on the current mode.
-class _OpenAuthenticatorSSSDarwinInitializationOptions extends DarwinInitializationOptions {
-  /// Creates a new Open Authenticator SimpleSecureStorage initialization options.
-  _OpenAuthenticatorSSSDarwinInitializationOptions()
-    : super(
-        appName: App.appName + (kDebugMode ? ' Debug' : ''),
-        namespace: App.appPackageName + (kDebugMode ? '.debug' : ''),
-        accessibility: .afterFirstUnlock,
-      );
 }
 
 /// The main widget class.

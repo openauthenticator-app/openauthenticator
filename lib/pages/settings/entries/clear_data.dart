@@ -10,6 +10,7 @@ import 'package:open_authenticator/model/app_unlock/reason.dart';
 import 'package:open_authenticator/model/backend/user.dart';
 import 'package:open_authenticator/model/backup/backup.dart';
 import 'package:open_authenticator/model/database/database.dart';
+import 'package:open_authenticator/model/secure_storage.dart';
 import 'package:open_authenticator/model/settings/app_unlock_method.dart';
 import 'package:open_authenticator/model/settings/entry.dart';
 import 'package:open_authenticator/model/totp/image_cache.dart';
@@ -80,7 +81,8 @@ class ClearDataSettingsEntryWidget extends ConsumerWidget with FTileMixin {
             );
             return;
           }
-          await SimpleSecureStorage.clear();
+          CachedSimpleSecureStorage simpleSecureStorage = await ref.read(secureStorageProvider.future);
+          await simpleSecureStorage.clear();
           TotpImageCacheManager totpImageCacheManager = ref.read(totpImageCacheManagerProvider.notifier);
           await totpImageCacheManager.clearCache();
           SharedPreferencesWithPrefix preferences = await ref.read(sharedPreferencesProvider.future);

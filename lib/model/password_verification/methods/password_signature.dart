@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/model/crypto/salt.dart';
 import 'package:open_authenticator/model/crypto/store.dart';
 import 'package:open_authenticator/model/password_verification/methods/method.dart';
+import 'package:open_authenticator/model/secure_storage.dart';
 import 'package:simple_secure_storage/simple_secure_storage.dart';
 
 /// The provider instance.
@@ -18,10 +19,13 @@ class PasswordSignatureVerificationMethodNotifier extends AsyncNotifier<Password
   static const String _kPasswordSignatureKey = 'passwordSignature';
 
   @override
-  FutureOr<PasswordSignatureVerificationMethod> build() async => PasswordSignatureVerificationMethod(
-    passwordSignature: await SimpleSecureStorage.read(_kPasswordSignatureKey),
-    salt: await ref.watch(saltProvider.future),
-  );
+  FutureOr<PasswordSignatureVerificationMethod> build() async {
+    CachedSimpleSecureStorage simpleSecureStorage = await ref.watch(secureStorageProvider.future);
+    return PasswordSignatureVerificationMethod(
+      passwordSignature: simpleSecureStorage.read(_kPasswordSignatureKey),
+      salt: await ref.watch(saltProvider.future),
+    );
+  }
 
   /// Enables the password signature verification method.
   Future<bool> enable(String? password) async {
@@ -34,7 +38,8 @@ class PasswordSignatureVerificationMethodNotifier extends AsyncNotifier<Password
     }
     CryptoStore cryptoStore = CryptoStore.fromPassword(password, salt);
     String passwordSignature = cryptoStore.hmacSecretKey.string(password, utf8).base64();
-    await SimpleSecureStorage.write(_kPasswordSignatureKey, passwordSignature);
+    CachedSimpleSecureStorage simpleSecureStorage = await ref.read(secureStorageProvider.future);
+    await simpleSecureStorage.write(_kPasswordSignatureKey, passwordSignature);
     if (ref.mounted) {
       state = AsyncData(
         PasswordSignatureVerificationMethod(
@@ -51,7 +56,8 @@ class PasswordSignatureVerificationMethodNotifier extends AsyncNotifier<Password
 
   /// Disables the password signature verification method.
   Future<void> disable() async {
-    await SimpleSecureStorage.delete(_kPasswordSignatureKey);
+    CachedSimpleSecureStorage simpleSecureStorage = await ref.read(secureStorageProvider.future);
+    await simpleSecureStorage.delete(_kPasswordSignatureKey);
     if (ref.mounted) {
       state = const AsyncData(PasswordSignatureVerificationMethod());
     }

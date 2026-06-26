@@ -1,7 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/model/app_unlock/interaction.dart';
 import 'package:open_authenticator/model/app_unlock/methods/method.dart';
 import 'package:open_authenticator/model/app_unlock/reason.dart';
+import 'package:open_authenticator/model/secure_storage.dart';
 import 'package:open_authenticator/model/settings/entry.dart';
 import 'package:open_authenticator/utils/result/result.dart';
 import 'package:open_authenticator/utils/shared_preferences_with_prefix.dart';
@@ -12,14 +14,18 @@ final appUnlockMethodSettingsEntryProvider = AsyncNotifierProvider.autoDispose<A
 
 /// A settings entry that allows to get and set the app unlock method.
 class AppUnlockMethodSettingsEntry extends SettingsEntry<String> {
+  /// The app unlock method key.
+  static const String kKey = 'appUnlockMethod';
+
   /// Creates a new app unlock settings entry instance.
   AppUnlockMethodSettingsEntry()
     : super(
-        key: 'appUnlockMethod',
+        key: kKey,
         defaultValue: NoneAppUnlockMethod.kMethodId,
       );
 
   @override
+  @protected
   Future<String> loadFromPreferences(SharedPreferencesWithPrefix preferences) async {
     if (!preferences.containsKey(key)) {
       return defaultValue;
@@ -28,7 +34,8 @@ class AppUnlockMethodSettingsEntry extends SettingsEntry<String> {
     if (value != NoneAppUnlockMethod.kMethodId) {
       return value;
     }
-    String? secureValue = await SimpleSecureStorage.read(key);
+    CachedSimpleSecureStorage simpleSecureStorage = await ref.watch(secureStorageProvider.future);
+    String? secureValue = simpleSecureStorage.read(key);
     if (secureValue == null) {
       return value;
     }
@@ -101,13 +108,14 @@ class AppUnlockMethodSettingsEntry extends SettingsEntry<String> {
 
   @override
   Future<void> changeValue(String value, {ResultSuccess? enableResult, ResultSuccess? disableResult}) async {
+    CachedSimpleSecureStorage simpleSecureStorage = await ref.read(secureStorageProvider.future);
     switch (value) {
       case NoneAppUnlockMethod.kMethodId:
-        await SimpleSecureStorage.delete(key);
+        await simpleSecureStorage.delete(key);
         break;
       case LocalAuthenticationAppUnlockMethod.kMethodId:
       case MasterPasswordAppUnlockMethod.kMethodId:
-        await SimpleSecureStorage.write(key, value);
+        await simpleSecureStorage.write(key, value);
         break;
       default:
         return;

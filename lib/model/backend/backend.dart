@@ -10,6 +10,7 @@ import 'package:open_authenticator/model/backend/connectivity.dart';
 import 'package:open_authenticator/model/backend/request/error.dart';
 import 'package:open_authenticator/model/backend/request/request.dart';
 import 'package:open_authenticator/model/backend/request/response.dart';
+import 'package:open_authenticator/model/secure_storage.dart';
 import 'package:open_authenticator/model/settings/backend_url.dart';
 import 'package:open_authenticator/utils/platform.dart';
 import 'package:open_authenticator/utils/result/result.dart';
@@ -34,7 +35,8 @@ class BackendClient extends AsyncNotifier<Map<String, String>> {
   @override
   FutureOr<Map<String, String>> build() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    String? appClientId = await SimpleSecureStorage.read(_kAppClientIdKey);
+    CachedSimpleSecureStorage simpleSecureStorage = await ref.watch(secureStorageProvider.future);
+    String? appClientId = simpleSecureStorage.read(_kAppClientIdKey);
     ref.onDispose(_client.close);
     return {
       'App-Version': packageInfo.version,
@@ -49,7 +51,8 @@ class BackendClient extends AsyncNotifier<Map<String, String>> {
     if (!headers.containsKey('App-Client-Id')) {
       String appClientId = currentPlatform.generateAppClientId();
       headers['App-Client-Id'] = appClientId;
-      await SimpleSecureStorage.write(_kAppClientIdKey, appClientId);
+      CachedSimpleSecureStorage simpleSecureStorage = await ref.read(secureStorageProvider.future);
+      await simpleSecureStorage.write(_kAppClientIdKey, appClientId);
       if (ref.mounted) {
         state = AsyncData(headers);
       }

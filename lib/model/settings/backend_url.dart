@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/app.dart';
 import 'package:open_authenticator/model/settings/entry.dart';
@@ -16,9 +17,11 @@ class BackendUrlSettingsEntry extends SettingsEntry<BackendUrl> {
       );
 
   @override
+  @protected
   Future<BackendUrl> loadFromPreferences(SharedPreferencesWithPrefix preferences) async => BackendUrl(preferences.getString(key)!);
 
   @override
+  @protected
   Future<void> saveToPreferences(SharedPreferencesWithPrefix preferences, BackendUrl value) => preferences.setString(key, value);
 }
 

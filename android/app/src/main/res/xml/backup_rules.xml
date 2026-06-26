@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <exclude
+        domain="sharedpref"
+        path="app.openauthenticator" />
+    <exclude
+        domain="sharedpref"
+        path="app.openauthenticator.xml" />
+    <exclude
+        domain="sharedpref"
+        path="app.openauthenticator.debug" />
+    <exclude
+        domain="sharedpref"
+        path="app.openauthenticator.debug.xml" />
+</full-backup-content>

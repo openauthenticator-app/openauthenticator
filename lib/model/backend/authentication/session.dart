@@ -8,6 +8,7 @@ import 'package:open_authenticator/model/backend/backend.dart';
 import 'package:open_authenticator/model/backend/request/error.dart';
 import 'package:open_authenticator/model/backend/request/request.dart';
 import 'package:open_authenticator/model/backend/request/response.dart';
+import 'package:open_authenticator/model/secure_storage.dart';
 import 'package:open_authenticator/utils/result/result.dart';
 import 'package:simple_secure_storage/simple_secure_storage.dart';
 
@@ -55,8 +56,9 @@ class StoredSessionNotifier extends AsyncNotifier<Session?> {
 
   @override
   Future<Session?> build() async {
-    String? accessToken = await SimpleSecureStorage.read(_kAccessToken);
-    String? refreshToken = await SimpleSecureStorage.read(_kRefreshToken);
+    CachedSimpleSecureStorage simpleSecureStorage = await ref.watch(secureStorageProvider.future);
+    String? accessToken = simpleSecureStorage.read(_kAccessToken);
+    String? refreshToken = simpleSecureStorage.read(_kRefreshToken);
     return accessToken == null || refreshToken == null
         ? null
         : Session(
@@ -67,8 +69,9 @@ class StoredSessionNotifier extends AsyncNotifier<Session?> {
 
   /// Stores the session and uses it.
   Future<void> storeAndUse(Session session) async {
-    await SimpleSecureStorage.write(_kAccessToken, session.accessToken);
-    await SimpleSecureStorage.write(_kRefreshToken, session.refreshToken);
+    CachedSimpleSecureStorage simpleSecureStorage = await ref.read(secureStorageProvider.future);
+    await simpleSecureStorage.write(_kAccessToken, session.accessToken);
+    await simpleSecureStorage.write(_kRefreshToken, session.refreshToken);
     if (ref.mounted) {
       state = AsyncData(
         Session(

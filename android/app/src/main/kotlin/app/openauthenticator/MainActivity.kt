@@ -32,6 +32,12 @@ class MainActivity : FlutterFragmentActivity() {
                 else -> result.notImplemented()
             }
         }
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "app.openauthenticator.storage_recovery").setMethodCallHandler { call, result ->
+            when (call.method) {
+                "clearRestoredEncryptedSharedPreferences" -> clearRestoredEncryptedSharedPreferences(result)
+                else -> result.notImplemented()
+            }
+        }
     }
 
     private fun authenticate(call: MethodCall, result: MethodChannel.Result) {
@@ -70,5 +76,15 @@ class MainActivity : FlutterFragmentActivity() {
         intent.addCategory(Intent.CATEGORY_BROWSABLE)
         intent.addCategory(Intent.CATEGORY_DEFAULT)
         super.onNewIntent(intent)
+    }
+
+    private fun clearRestoredEncryptedSharedPreferences(result: MethodChannel.Result) {
+        try {
+            deleteSharedPreferences("app.openauthenticator")
+            deleteSharedPreferences("app.openauthenticator.debug")
+            result.success(null)
+        } catch (ex: Exception) {
+            result.error("clear_failed", ex.localizedMessage, null)
+        }
     }
 }

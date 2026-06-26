@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/model/migrator/firebase_auth/firebase_auth.dart';
 
 /// Uses FlutterFire's Firebase implementation.
@@ -16,8 +17,8 @@ class FirebaseAuthDefault extends FirebaseAuth {
   final StreamController<FirebaseAuthUser?> _userChangesStreamController = StreamController<FirebaseAuthUser?>.broadcast();
 
   @override
-  Future<void> initialize() async {
-    await super.initialize();
+  Future<void> initialize(Ref ref) async {
+    await super.initialize(ref);
     await firebase_auth.FirebaseAuth.instance.setLanguageCode(locale);
     firebase_auth.User? user = firebase_auth.FirebaseAuth.instance.currentUser;
     _currentUser = _createUserFromFirebaseUser(user);

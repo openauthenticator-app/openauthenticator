@@ -43,12 +43,14 @@ class SettingsEntry<T> extends AsyncNotifier<T> {
   }
 
   /// Loads the value from preferences.
+  @protected
   Future<T> loadFromPreferences(SharedPreferencesWithPrefix preferences) async {
     assert(T == String || T == bool || T == int || T == double || T == List<String>);
     return preferences.get(key) as T;
   }
 
   /// Saves the value to preferences.
+  @protected
   Future<void> saveToPreferences(SharedPreferencesWithPrefix preferences, T value) async {
     assert(T == String || T == bool || T == int || T == double || T == List<String>);
     if (T == String) {
@@ -74,12 +76,14 @@ abstract class EnumSettingsEntry<T extends Enum> extends SettingsEntry<T> {
   });
 
   @override
+  @protected
   Future<T> loadFromPreferences(SharedPreferencesWithPrefix preferences) async {
     String? value = preferences.getString(key);
     return values.firstWhereOrNull((theme) => theme.name == value) ?? defaultValue;
   }
 
   @override
+  @protected
   Future<void> saveToPreferences(SharedPreferencesWithPrefix preferences, T value) async {
     await preferences.setString(key, value.name);
   }

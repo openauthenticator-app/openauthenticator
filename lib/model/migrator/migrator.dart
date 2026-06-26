@@ -52,7 +52,7 @@ class Migrator extends AsyncNotifier<MigrationState> {
       StorageType newStorageType = storageType == 'online' ? .shared : .localOnly;
       if (newStorageType == .shared) {
         await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-        await FirebaseAuth.instance.initialize();
+        await FirebaseAuth.instance.initialize(ref);
         await Future.delayed(const Duration(seconds: 2));
         Result totpsMigrationResult = await _migrateFirebaseTotps();
         Result userMigrationResult = await _migrateFirebaseUser();
