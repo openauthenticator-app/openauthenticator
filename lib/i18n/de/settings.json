@@ -32,7 +32,7 @@
     },
     "theme": {
       "title": "Thema",
-      "subtitle": "Ändern Sie den Anwendungsthemen und Helligkeit.",
+      "subtitle": "Ändern Sie das Anwendungsthema und die Helligkeit.",
       "themePickerDialog": {
         "title": "Thema",
         "theme": {
@@ -42,9 +42,9 @@
             "dark": "Dunkel"
           },
           "description(map)": {
-            "system": "Verwenden Sie das Systemthema.",
-            "light": "Verwenden Sie das Hellenthema.",
-            "dark": "Verwenden Sie das Dunkelthema."
+            "system": "Verwenden Sie das System-Thema.",
+            "light": "Verwenden Sie das Hell-Thema.",
+            "dark": "Verwenden Sie das Dunkel-Thema."
           }
         }
       }
@@ -64,7 +64,7 @@
       "title": "Master-Kennwort ändern",
       "subtitle": {
         "text": "Sie können Ihr Master-Passwort jederzeit ändern.",
-        "sync": "Beachten Sie, dass Sie ihn in all Ihren Open Authenticator-Instanzen, die miteinander synchronisiert sind, erneut eingeben müssen."
+        "sync": "Beachten Sie, dass Sie es in all Ihren Open Authenticator-Instanzen, die miteinander synchronisiert sind, erneut eingeben müssen."
       }
     }
   },
