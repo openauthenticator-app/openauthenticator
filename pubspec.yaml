@@ -1,7 +1,7 @@
 name: open_authenticator
 description: A cross-platform OTP app, free and open-source.
 publish_to: none
-version: 2.0.2+27
+version: 2.1.0+28
 homepage: https://openauthenticator.app
 repository: https://github.com/openauthenticator-app/openauthenticator
 issue_tracker: https://github.com/openauthenticator-app/openauthenticator/issues

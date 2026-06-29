@@ -1,5 +1,26 @@
 # 📰 Open Authenticator changelog
 
+## v2.1.0
+Released on June 29, 2026.
+
+* **FIX**: Don't use `setState` if context is not mounted in the logo search dialog. ([#d8f3cc9](https://github.com/openauthenticator-app/openauthenticator/commit/d8f3cc9))
+* **FIX**: Fixed a freeze occurring when the user tries to restore the app data from an OS backup. ([#8d16358](https://github.com/openauthenticator-app/openauthenticator/commit/8d16358))
+* **FIX**: Fixed various static analysis errors. ([#9a4398f](https://github.com/openauthenticator-app/openauthenticator/commit/9a4398f))
+* **CHORE**: Improved in-app links handling. ([#29fd553](https://github.com/openauthenticator-app/openauthenticator/commit/29fd553))
+* **CHORE**: Moved build and publish scripts to the scripts directory. ([#8e41991](https://github.com/openauthenticator-app/openauthenticator/commit/8e41991))
+* **CHORE**: Now throttling foreground synchronization and updated the periodic interval. ([#b24121a](https://github.com/openauthenticator-app/openauthenticator/commit/b24121a))
+* **CHORE**: Updated `de/intro.json`. ([#0dbe6e6](https://github.com/openauthenticator-app/openauthenticator/commit/0dbe6e6))
+* **CHORE**: Updated `de/settings.json`. ([#84e7e85](https://github.com/openauthenticator-app/openauthenticator/commit/84e7e85))
+* **CHORE**: Updated dependencies and SDK constraints. ([#2532ff6](https://github.com/openauthenticator-app/openauthenticator/commit/2532ff6))
+* **CHORE**: `EmailAlreadySentException` will not be sent to Sentry anymore. ([#7f629ad](https://github.com/openauthenticator-app/openauthenticator/commit/7f629ad))
+* **REFACTOR**: Added a global result handler. ([#ef12f86](https://github.com/openauthenticator-app/openauthenticator/commit/ef12f86))
+* **REFACTOR**: Added an `AppUnlockInteraction` mixin to avoid using `BuildContext` in lib/model. ([#b11cfa9](https://github.com/openauthenticator-app/openauthenticator/commit/b11cfa9))
+* **REFACTOR**: Added an `UserError` mixin for easier handling on Sentry. ([#a790792](https://github.com/openauthenticator-app/openauthenticator/commit/a790792))
+* **REFACTOR**: Avoid depending on `flutter/material` if not needed. ([#554096f](https://github.com/openauthenticator-app/openauthenticator/commit/554096f))
+* **REFACTOR**: Changed how backups are handled. ([#c6ad1d7](https://github.com/openauthenticator-app/openauthenticator/commit/c6ad1d7))
+* **REFACTOR**: Moved static utility methods into app flows. ([#2c2d6ec](https://github.com/openauthenticator-app/openauthenticator/commit/2c2d6ec))
+* **REFACTOR**: Separated `Result`s presentation and reporting. ([#696f0e2](https://github.com/openauthenticator-app/openauthenticator/commit/696f0e2))
+
 ## v2.0.2
 Released on May 1, 2026.
 

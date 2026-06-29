@@ -77,6 +77,30 @@
   </branding>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="2.1.0" date="2026-06-29">
+      <url type="details">https://github.com/openauthenticator-app/openauthenticator/releases/tag/2.1.0</url>
+      <description type="changelog">
+        <ul>
+          <li>Don't use `setState` if context is not mounted in the logo search dialog.</li>
+          <li>Fixed a freeze occurring when the user tries to restore the app data from an OS backup.</li>
+          <li>Fixed various static analysis errors.</li>
+          <li>Improved in-app links handling.</li>
+          <li>Moved build and publish scripts to the scripts directory.</li>
+          <li>Now throttling foreground synchronization and updated the periodic interval.</li>
+          <li>Updated `de/intro.json`.</li>
+          <li>Updated `de/settings.json`.</li>
+          <li>Updated dependencies and SDK constraints.</li>
+          <li>`EmailAlreadySentException` will not be sent to Sentry anymore.</li>
+          <li>Added a global result handler.</li>
+          <li>Added an `AppUnlockInteraction` mixin to avoid using `BuildContext` in lib/model.</li>
+          <li>Added an `UserError` mixin for easier handling on Sentry.</li>
+          <li>Avoid depending on `flutter/material` if not needed.</li>
+          <li>Changed how backups are handled.</li>
+          <li>Moved static utility methods into app flows.</li>
+          <li>Separated `Result`s presentation and reporting.</li>
+        </ul>
+      </description>
+    </release>
     <release version="2.0.2" date="2026-05-01">
       <url type="details">https://github.com/openauthenticator-app/openauthenticator/releases/tag/2.0.2</url>
       <description type="changelog">
