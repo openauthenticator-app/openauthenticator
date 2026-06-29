@@ -27,7 +27,7 @@ dependencies:
   shared_preferences: ^2.5.5
   uuid: ^4.5.3
   equatable: ^2.0.8
-  drift: ^2.33.0
+  drift: ^2.34.0
   drift_flutter: ^0.3.0
   path: ^1.9.1
   local_auth: ^3.0.1
@@ -67,8 +67,8 @@ dependencies:
 dev_dependencies:
   flutter_lints: ^6.0.0
   build_runner: ^2.15.0
-  drift_dev: ^2.33.0
-  msix: ^3.17.0
+  drift_dev: ^2.34.0
+  msix: ^3.18.0
   riverpod_lint: ^3.1.4
   release: ^0.1.8
   args: ^2.7.0
