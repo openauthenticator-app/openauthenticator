@@ -3,12 +3,13 @@ set -euo pipefail
 set -x
 
 script_dir=$(cd "$(dirname "$0")" && pwd)
-snap_dir="$script_dir/snap"
+project_dir=$(cd "$script_dir/.." && pwd)
+snap_dir="$project_dir/snap"
 env_file="${SNAP_ENV_FILE:-}"
 
 docker_image="${SNAPCRAFT_DOCKER_IMAGE:-ghcr.io/canonical/snapcraft:8_core24}"
 container_workspace="${SNAPCRAFT_CONTAINER_WORKSPACE:-/project}"
-output_dir="${SNAP_OUTPUT_DIR:-$script_dir}"
+output_dir="${SNAP_OUTPUT_DIR:-$project_dir}"
 platform="${SNAPCRAFT_DOCKER_PLATFORM:-}"
 apt_update="${SNAPCRAFT_APT_UPDATE:-1}"
 
@@ -32,7 +33,7 @@ strip_trailing_cr() {
 if [[ -n "$env_file" ]]; then
   load_env_file "$env_file"
 else
-  load_env_file "$script_dir/.env"
+  load_env_file "$project_dir/.env"
   load_env_file "$snap_dir/.env"
 fi
 
@@ -43,7 +44,7 @@ platform=$(strip_trailing_cr "${SNAPCRAFT_DOCKER_PLATFORM:-$platform}")
 apt_update=$(strip_trailing_cr "${SNAPCRAFT_APT_UPDATE:-$apt_update}")
 
 if [[ "$output_dir" != /* ]]; then
-  output_dir="$script_dir/$output_dir"
+  output_dir="$project_dir/$output_dir"
 fi
 
 if ! command -v docker >/dev/null 2>&1; then
@@ -83,7 +84,7 @@ rsync -a --no-owner --no-group --delete \
   --exclude 'prime' \
   --exclude 'stage' \
   --exclude '*.snap' \
-  "$script_dir/" \
+  "$project_dir/" \
   "$build_context/"
 
 docker_args=(

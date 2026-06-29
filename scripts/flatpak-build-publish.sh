@@ -3,7 +3,8 @@ set -euo pipefail
 set -x
 
 script_dir=$(cd "$(dirname "$0")" && pwd)
-flatpak_dir="$script_dir/flatpak"
+project_dir=$(cd "$script_dir/.." && pwd)
+flatpak_dir="$project_dir/flatpak"
 env_file="${FLATPAK_ENV_FILE:-}"
 
 app_id="app.openauthenticator.OpenAuthenticator"
@@ -64,7 +65,7 @@ EOF
 if [[ -n "$env_file" ]]; then
   load_env_file "$env_file"
 else
-  load_env_file "$script_dir/.env"
+  load_env_file "$project_dir/.env"
   load_env_file "$flatpak_dir/.env"
 fi
 
