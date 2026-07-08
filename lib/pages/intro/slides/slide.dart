@@ -75,7 +75,7 @@ class CurrentIntroPageSlideNotifier extends AsyncNotifier<CurrentIntroSlideState
 }
 
 /// The current intro page slide state.
-class CurrentIntroSlideState with EquatableMixin {
+class CurrentIntroSlideState with Equatable {
   /// The slides to display.
   final List<IntroPageSlide> _slides;
 

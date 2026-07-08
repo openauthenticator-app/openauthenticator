@@ -5,7 +5,7 @@ import 'package:open_authenticator/model/totp/totp.dart';
 import 'package:uuid/uuid.dart';
 
 /// Represents a push operation.
-sealed class PushOperation<T> with EquatableMixin {
+sealed class PushOperation<T> with Equatable {
   /// The operation UUID.
   final String uuid;
 

@@ -1,5 +1,5 @@
+import 'package:convertlib/convertlib.dart';
 import 'package:hashlib/hashlib.dart' as hashlib;
-import 'package:hashlib_codecs/hashlib_codecs.dart';
 import 'package:open_authenticator/model/app_links/otpauth_totp.dart';
 import 'package:open_authenticator/model/crypto/store.dart';
 import 'package:open_authenticator/model/totp/algorithm.dart';

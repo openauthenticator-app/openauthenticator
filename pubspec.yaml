@@ -19,15 +19,15 @@ dependencies:
     sdk: flutter
   animations: ^2.2.0
   flutter_riverpod: ^3.3.2
-  simple_secure_storage: ^0.4.1
+  simple_secure_storage: ^0.4.2
   jovial_svg: ^1.1.30
   mobile_scanner: ^7.2.0
   html: ^0.15.6
   path_provider: ^2.1.6
   shared_preferences: ^2.5.5
   uuid: ^4.5.3
-  equatable: ^2.0.8
-  drift: ^2.34.0
+  equatable: ^2.1.0
+  drift: ^2.34.1
   drift_flutter: ^0.3.0
   path: ^1.9.1
   local_auth: ^3.0.1
@@ -36,25 +36,25 @@ dependencies:
   qr_flutter: ^4.1.0
   intl: any
   url_launcher: ^6.3.2
-  purchases_flutter: ^10.3.0
-  purchases_ui_flutter: ^10.3.0
+  purchases_flutter: ^10.4.0
+  purchases_ui_flutter: ^10.4.0
   purchases_dart:
     git:
       url: https://github.com/openauthenticator-app/purchases-dart.git
-  window_manager: ^0.5.1
-  slang: ^4.16.0
-  slang_flutter: ^4.16.0
+  window_manager: ^0.5.2
+  slang: ^4.18.0
+  slang_flutter: ^4.18.0
   rate_my_app: ^2.4.0
   app_links: ^7.2.0
-  hashlib: ^2.3.4
-  hashlib_codecs: ^3.1.2
-  cipherlib: ^0.4.0
+  hashlib: ^2.4.0
+  convertlib: ^3.4.0
+  cipherlib: ^0.6.0
   scrollable_positioned_list: ^0.3.8
   share_plus: ^13.2.0
   wakelock_plus: ^1.6.1
   file_picker: ^12.0.0-beta.7
   connectivity_plus: ^7.2.0
-  sentry_flutter: ^9.22.0
+  sentry_flutter: ^9.24.0
   forui: ^0.23.0
   forui_assets: ^0.23.0
   custom_refresh_indicator: ^4.0.1
@@ -66,7 +66,7 @@ dependencies:
 
 dev_dependencies:
   flutter_lints: ^6.0.0
-  build_runner: ^2.15.0
+  build_runner: ^2.15.1
   drift_dev: ^2.34.0
   msix: ^3.18.0
   riverpod_lint: ^3.1.4

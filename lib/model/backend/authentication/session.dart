@@ -13,7 +13,7 @@ import 'package:open_authenticator/utils/result/result.dart';
 import 'package:simple_secure_storage/simple_secure_storage.dart';
 
 /// Represents a session.
-class Session with EquatableMixin {
+class Session with Equatable {
   /// The access token.
   final String accessToken;
 

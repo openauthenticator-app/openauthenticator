@@ -16,7 +16,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 /// Represents a user, got from the backend.
-class User with EquatableMixin {
+class User with Equatable {
   /// The user ID.
   final String id;
 

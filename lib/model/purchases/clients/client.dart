@@ -147,7 +147,7 @@ mixin CanRestorePurchases on RevenueCatClient {
 }
 
 /// Represents a price.
-class Price with EquatableMixin {
+class Price with Equatable {
   /// The raw amount.
   final double amount;
 

@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 
 /// Represents a push operation result.
-class PushOperationResult with EquatableMixin {
+class PushOperationResult with Equatable {
   /// The operation UUID.
   final String operationUuid;
 

@@ -18,7 +18,7 @@ final totpLimitProvider = FutureProvider<TotpLimit>((ref) async {
 });
 
 /// The class that allows to check whether TOTP limit has been reached.
-class TotpLimit with EquatableMixin {
+class TotpLimit with Equatable {
   /// The user TOTPs limit.
   final int? userTotpsLimit;
 

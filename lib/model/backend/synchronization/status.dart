@@ -3,7 +3,7 @@ import 'dart:math' as math;
 import 'package:equatable/equatable.dart';
 
 /// Represents the synchronization status.
-class SynchronizationStatus with EquatableMixin {
+class SynchronizationStatus with Equatable {
   /// The maximum backoff duration.
   static const Duration _kMaxBackoff = Duration(minutes: 10);
 

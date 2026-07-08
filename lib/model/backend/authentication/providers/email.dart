@@ -189,7 +189,7 @@ class EmailConfirmationStateNotifier extends AsyncNotifier<EmailConfirmationData
 }
 
 /// The email confirmation data.
-class EmailConfirmationData with EquatableMixin {
+class EmailConfirmationData with Equatable {
   /// The email.
   final String email;
 

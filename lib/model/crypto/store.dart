@@ -35,7 +35,7 @@ class CryptoStoreNotifier extends AsyncNotifier<CryptoStore?> {
 }
 
 /// Allows to encrypt some data according to a key.
-class CryptoStore with EquatableMixin {
+class CryptoStore with Equatable {
   /// The initialization vector length.
   static const int _initializationVectorLength = 96 ~/ 8;
 
