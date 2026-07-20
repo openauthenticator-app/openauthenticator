@@ -58,10 +58,10 @@ class AppDialog extends StatelessWidget {
           child: this.children[i],
         ),
     ];
-    return FDialog.raw(
+    return FDialog(
       builder: (context, style) => _AppDialogContent(
-        style: style.contentStyle.resolve({context.platformVariant}),
-        slideableActions: style.slideableActions.resolve({context.platformVariant}),
+        style: style,
+        slideableActions: context.platformVariant.touch,
         title: title == null
             ? null
             : _AppDialogTitle(
@@ -90,21 +90,8 @@ class AppDialog extends StatelessWidget {
             ),
         ],
       ),
-      style: .delta(
-        contentStyle: .delta(
-          [
-            .all(
-              const .delta(
-                padding: .value(EdgeInsets.zero),
-                titlePadding: .value(EdgeInsets.zero),
-                bodyPadding: .value(EdgeInsets.zero),
-                titleSpacing: 0,
-                contentSpacing: 0,
-                actionSpacing: 0,
-              ),
-            ),
-          ],
-        ),
+      style: const .delta(
+        insetPadding: .value(.zero),
       ),
       animation: animation,
     );
@@ -114,7 +101,7 @@ class AppDialog extends StatelessWidget {
 /// Mimics ForUI's dialog content, but allows the text to be aligned at the start by default.
 class _AppDialogContent extends StatelessWidget {
   /// The dialog content's style.
-  final FDialogContentStyle style;
+  final FDialogStyle style;
 
   /// Whether the dialog's actions support pressing an action and sliding to another.
   final bool slideableActions;
@@ -151,46 +138,33 @@ class _AppDialogContent extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: style.padding,
-    child: Column(
-      mainAxisSize: .min,
-      crossAxisAlignment: alignment,
-      children: [
-        if (title case final title?)
-          Padding(
-            padding: style.titlePadding,
-            child: Semantics(
-              container: true,
-              child: DefaultTextStyle.merge(textAlign: titleTextAlign, style: style.titleTextStyle, child: title),
-            ),
+  Widget build(BuildContext context) => Column(
+    mainAxisSize: .min,
+    crossAxisAlignment: alignment,
+    children: [
+      if (title case final title?)
+        Semantics(
+          container: true,
+          child: DefaultTextStyle.merge(textAlign: titleTextAlign, style: style.titleTextStyle, child: title),
+        ),
+      if (body case final body?)
+        Flexible(
+          child: Semantics(
+            container: true,
+            child: DefaultTextStyle.merge(textAlign: bodyTextAlign, style: style.bodyTextStyle, child: body),
           ),
-        if (title != null && body != null) SizedBox(height: style.titleSpacing),
-        if (body case final body?)
-          Flexible(
-            child: Padding(
-              padding: style.bodyPadding,
-              child: Semantics(
-                container: true,
-                child: DefaultTextStyle.merge(textAlign: bodyTextAlign, style: style.bodyTextStyle, child: body),
-              ),
-            ),
-          ),
-        if (title != null && body != null) SizedBox(height: style.contentSpacing),
-        if (slideableActions) FTappableGroup(child: _createActions(context, style)) else _createActions(context, style),
-      ],
-    ),
+        ),
+      if (slideableActions) FTappableGroup(child: _createActions(context, style)) else _createActions(context, style),
+    ],
   );
 
   /// Creates the dialog actions.
-  Widget _createActions(BuildContext context, FDialogContentStyle style) => MediaQuery.sizeOf(context).width < context.theme.breakpoints.sm
+  Widget _createActions(BuildContext context, FDialogStyle style) => MediaQuery.sizeOf(context).width < context.theme.breakpoints.sm
       ? Column(
-          spacing: style.actionSpacing,
           mainAxisSize: .min,
           children: actions,
         )
       : Row(
-          spacing: style.actionSpacing,
           mainAxisAlignment: .end,
           children: actions.reversed.toList(),
         );

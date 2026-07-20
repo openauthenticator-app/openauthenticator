@@ -2,9 +2,7 @@ import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:open_authenticator/utils/platform.dart';
 import 'package:open_authenticator/utils/result/reporter.dart';
-import 'package:xdg_desktop_portal/xdg_desktop_portal.dart';
 
 /// The connectivity state provider.
 final connectivityStateProvider = AsyncNotifierProvider<ConnectivityStateNotifier, ConnectivityState>(ConnectivityStateNotifier.new);
@@ -14,63 +12,29 @@ class ConnectivityStateNotifier extends AsyncNotifier<ConnectivityState> {
   @override
   Future<ConnectivityState> build() async {
     try {
-      if (currentPlatform == .linux) {
-        XdgDesktopPortalClient xdgDesktopPortalClient = XdgDesktopPortalClient();
-        ref.onDispose(xdgDesktopPortalClient.close);
-        Completer<ConnectivityState> initialState = Completer();
+      Connectivity connectivity = Connectivity();
 
-        void onConnectivityChanged(XdgNetworkStatus status) {
-          ConnectivityState connectivityState = status.available ? .available : .unavailable;
-          if (!initialState.isCompleted) {
-            initialState.complete(connectivityState);
-          }
-          if (ref.mounted) {
-            state = AsyncData(connectivityState);
-          }
+      void onConnectivityChanged(List<ConnectivityResult> result) {
+        if (ref.mounted) {
+          state = AsyncData(result.associatedConnectivityState);
         }
-
-        void onConnectivityError(Object error, StackTrace stackTrace) {
-          printException(error, stackTrace);
-          if (!initialState.isCompleted) {
-            initialState.completeError(error, stackTrace);
-          }
-          if (ref.mounted) {
-            state = const AsyncData(.unknown);
-          }
-        }
-
-        StreamSubscription<XdgNetworkStatus> subscription = xdgDesktopPortalClient.networkMonitor.status.listen(
-          onConnectivityChanged,
-          onError: onConnectivityError,
-        );
-        ref.onDispose(subscription.cancel);
-
-        return await initialState.future;
-      } else {
-        Connectivity connectivity = Connectivity();
-
-        void onConnectivityChanged(List<ConnectivityResult> result) {
-          if (ref.mounted) {
-            state = AsyncData(result.associatedConnectivityState);
-          }
-        }
-
-        void onConnectivityError(Object error, StackTrace stackTrace) {
-          printException(error, stackTrace);
-          if (ref.mounted) {
-            state = const AsyncData(.unknown);
-          }
-        }
-
-        StreamSubscription<List<ConnectivityResult>>? subscription = connectivity.onConnectivityChanged.listen(
-          onConnectivityChanged,
-          onError: onConnectivityError,
-        );
-        ref.onDispose(subscription.cancel);
-
-        List<ConnectivityResult> result = await connectivity.checkConnectivity();
-        return result.associatedConnectivityState;
       }
+
+      void onConnectivityError(Object error, StackTrace stackTrace) {
+        printException(error, stackTrace);
+        if (ref.mounted) {
+          state = const AsyncData(.unknown);
+        }
+      }
+
+      StreamSubscription<List<ConnectivityResult>>? subscription = connectivity.onConnectivityChanged.listen(
+        onConnectivityChanged,
+        onError: onConnectivityError,
+      );
+      ref.onDispose(subscription.cancel);
+
+      List<ConnectivityResult> result = await connectivity.checkConnectivity();
+      return result.associatedConnectivityState;
     } catch (ex, stackTrace) {
       printException(ex, stackTrace);
       return .unknown;

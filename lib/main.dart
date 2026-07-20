@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:io' as io;
 
+import 'package:connectivity_plus_linux_portal/connectivity_plus_linux_portal.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -65,6 +67,13 @@ Future<void> main() async {
         await windowManager.focus();
       },
     );
+    if (currentPlatform == .linux) {
+      bool isFlatpak = io.Platform.environment.containsKey('FLATPAK_ID') || io.Platform.environment['container'] == 'flatpak';
+      String? backend = io.Platform.environment['CONNECTIVITY_BACKEND'];
+      if (isFlatpak || backend == 'portal') {
+        ConnectivityPlusLinuxPortalPlugin.registerWith();
+      }
+    }
   }
   await LocaleSettings.useDeviceLocale();
   void appRunner() => runApp(

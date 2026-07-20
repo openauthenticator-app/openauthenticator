@@ -138,12 +138,12 @@ FThemeData _adaptLightTheme(FThemeData light, {required bool touch}) {
       secondaryColor: light.buttonStyles.resolve({FButtonVariant.secondary}).base.decoration.base.color,
     ),
     textFieldStyles: _adaptTextFieldStyles(
-      labelTextStyle: (touch ? FThemes.zinc.light.touch : FThemes.zinc.light.desktop).textFieldStyles.base.labelTextStyle,
-      contentTextStyle: (touch ? FThemes.zinc.light.touch : FThemes.zinc.light.desktop).textFieldStyles.base.contentTextStyle,
+      labelTextStyle: (touch ? FTheme.neutral.light.touch : FTheme.neutral.light.desktop).textFieldStyles.base.labelTextStyle,
+      contentTextStyle: (touch ? FTheme.neutral.light.touch : FTheme.neutral.light.desktop).textFieldStyles.base.contentTextStyle,
       fillColor: Colors.white,
     ),
     selectStyle: _adaptSelectStyle(
-      labelTextStyle: (touch ? FThemes.zinc.light.touch : FThemes.zinc.light.desktop).textFieldStyles.base.labelTextStyle,
+      labelTextStyle: (touch ? FTheme.neutral.light.touch : FTheme.neutral.light.desktop).textFieldStyles.base.labelTextStyle,
     ),
     popoverMenuStyle: _adaptPopoverMenuStyle(
       hoveredBackgroundColor: Colors.black12,
@@ -173,8 +173,8 @@ FThemeData _adaptDarkTheme(FThemeData dark, {required bool touch}) => dark.copyW
     highlightAmount: 0.025,
   ),
   textFieldStyles: _adaptTextFieldStyles(
-    labelTextStyle: (touch ? FThemes.zinc.dark.touch : FThemes.zinc.dark.desktop).textFieldStyles.base.labelTextStyle,
-    contentTextStyle: (touch ? FThemes.zinc.dark.touch : FThemes.zinc.dark.desktop).textFieldStyles.base.contentTextStyle,
+    labelTextStyle: (touch ? FTheme.neutral.dark.touch : FTheme.neutral.dark.desktop).textFieldStyles.base.labelTextStyle,
+    contentTextStyle: (touch ? FTheme.neutral.dark.touch : FTheme.neutral.dark.desktop).textFieldStyles.base.contentTextStyle,
     fillColor: Colors.black,
   ),
   popoverMenuStyle: _adaptPopoverMenuStyle(

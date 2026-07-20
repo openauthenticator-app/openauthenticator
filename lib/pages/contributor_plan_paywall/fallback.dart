@@ -372,11 +372,9 @@ class _ContributorPlanBillingPlanPickerState extends ConsumerState<_ContributorP
                         padding: const EdgeInsets.only(right: kSpace),
                         child: FBadge(
                           style: .delta(
-                            contentStyle: .delta(
-                              labelTextStyle: .delta(fontSize: context.theme.typography.body.xs.fontSize),
-                              padding: const .value(
-                                .symmetric(horizontal: kSpace / 2, vertical: kSpace / 4),
-                              ),
+                            labelTextStyle: .delta(fontSize: context.theme.typography.body.xs.fontSize),
+                            padding: const .value(
+                              .symmetric(horizontal: kSpace / 2, vertical: kSpace / 4),
                             ),
                           ),
                           child: Text(
