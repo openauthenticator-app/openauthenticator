@@ -50,7 +50,7 @@ class AppUnlockMethodSettingsEntry extends SettingsEntry<String> {
   /// Errors may contain a [CannotUnlockException] if unlock has failed for a specific reason.
   Future<Result> unlockWithCurrentMethod(AppUnlockInteraction interaction, UnlockReason unlockReason, {bool? allowNone}) async {
     try {
-      return _tryUnlockWithCurrentMethod(interaction, unlockReason, allowNone: allowNone);
+      return await _tryUnlockWithCurrentMethod(interaction, unlockReason, allowNone: allowNone);
     } catch (ex, stackTrace) {
       return ResultError(
         exception: ex,

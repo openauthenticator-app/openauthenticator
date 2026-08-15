@@ -44,7 +44,7 @@ class Blur extends StatelessWidget {
           ?below,
           Positioned.fill(
             child: BackdropFilter(
-              filter: context.theme.dialogRouteStyle.barrierFilter?.call(1) ?? ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+              filter: context.theme.dialogRouteStyle.barrierFilter?.call(context, 1) ?? ImageFilter.blur(sigmaX: 5, sigmaY: 5),
               child: Container(
                 decoration: BoxDecoration(
                   color: context.theme.colors.background.withValues(alpha: colorOpacity),

@@ -18,7 +18,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   animations: ^2.2.0
-  flutter_riverpod: ^3.3.2
+  flutter_riverpod: ^3.4.2
   simple_secure_storage: ^0.4.2
   jovial_svg: ^1.1.30
   mobile_scanner: ^7.4.0
@@ -27,7 +27,7 @@ dependencies:
   shared_preferences: ^2.5.5
   uuid: ^4.6.0
   equatable: ^2.1.0
-  drift: ^2.34.2
+  drift: ^2.34.3
   drift_flutter: ^0.3.1
   path: ^1.9.1
   local_auth: ^3.0.2
@@ -36,42 +36,45 @@ dependencies:
   qr_flutter: ^4.1.0
   intl: any
   url_launcher: ^6.3.2
-  purchases_flutter: ^10.4.2
-  purchases_ui_flutter: ^10.4.2
+  purchases_flutter: ^10.9.0
+  purchases_ui_flutter: ^10.9.0
   purchases_dart:
     git:
       url: https://github.com/openauthenticator-app/purchases-dart.git
   window_manager: ^0.5.2
-  slang: ^4.18.0
-  slang_flutter: ^4.18.0
-  rate_my_app: ^2.4.0
+  slang: ^4.19.0
+  slang_flutter: ^4.19.0
+  rate_my_app: ^2.4.1
   app_links: ^7.2.1
   hashlib: ^2.4.2
-  convertlib: ^3.5.1
-  cipherlib: ^0.7.1
+  convertlib: ^3.6.1
+  cipherlib: ^0.7.2
   scrollable_positioned_list: ^0.3.8
-  share_plus: ^13.2.1
-  wakelock_plus: ^1.6.1
-  file_picker: ^12.0.0-beta.7
-  connectivity_plus: ^7.3.0
+  share_plus: ^13.3.0
+  wakelock_plus: ^1.7.0
+  file_picker: ^12.0.0
+  connectivity_plus: ^7.3.1
   connectivity_plus_linux_portal: ^0.0.4
-  sentry_flutter: ^9.24.0
-  forui: ^0.24.1
-  forui_assets: ^0.24.0
+  sentry_flutter: ^9.27.0
+  forui: ^0.25.0
+  forui_assets: ^0.25.0
   custom_refresh_indicator: ^4.0.1
   # TODO: Remove Firebase dependencies once migration is finished.
-  firebase_core: ^4.12.1
-  firebase_auth: ^6.5.6
-  cloud_firestore: ^6.7.1
+  firebase_core: ^4.13.0
+  firebase_auth: ^6.5.7
+  cloud_firestore: ^6.8.0
 
 dev_dependencies:
   flutter_lints: ^6.0.0
-  build_runner: ^2.15.1
-  drift_dev: ^2.34.0
+  build_runner: ^2.16.0
+  drift_dev: ^2.34.5
   msix: ^3.18.0
-  riverpod_lint: ^3.1.4
-  release: ^0.1.8
+  riverpod_lint: ^3.1.8
+  release: ^0.1.10
   args: ^2.7.0
+
+dependency_overrides:
+  xml: ^7.0.1
 
 flutter:
   assets:

@@ -159,7 +159,7 @@ class _RestoreBackupDialogState extends ConsumerState<_RestoreBackupDialog> {
   Future<void> importBackup() async {
     Result result = const ResultCancelled();
     try {
-      FilePickerResult? filePickerResult = await showWaitingOverlay(
+      List<PlatformFile>? files = await showWaitingOverlay(
         context,
         future: (() async {
           Directory directory = await BackupPath.getBackupsDirectory(create: true);
@@ -168,11 +168,12 @@ class _RestoreBackupDialogState extends ConsumerState<_RestoreBackupDialog> {
             initialDirectory: directory.path,
             type: FileType.custom,
             allowedExtensions: ['bak'],
-            lockParentWindow: true,
+            windowsOptions: const WindowsOptions(lockParentWindow: true),
+            linuxOptions: const LinuxOptions(lockParentWindow: true),
           );
         })(),
       );
-      String? backupFilePath = filePickerResult?.files.firstOrNull?.path;
+      String? backupFilePath = files?.firstOrNull?.path;
       if (backupFilePath == null || !mounted) {
         return;
       }
@@ -238,7 +239,7 @@ class _RestoreBackupDialogState extends ConsumerState<_RestoreBackupDialog> {
   Future<void> exportBackup(BackupPath backup) async {
     Result result = const ResultCancelled();
     try {
-      String? outputFilePath = await showWaitingOverlay(
+      Uri? outputFilePath = await showWaitingOverlay(
         context,
         future: (() async {
           Directory directory = await BackupPath.getBackupsDirectory(create: true);
@@ -249,14 +250,15 @@ class _RestoreBackupDialogState extends ConsumerState<_RestoreBackupDialog> {
             bytes: Uint8List(0),
             type: FileType.custom,
             allowedExtensions: ['bak'],
-            lockParentWindow: true,
+            windowsOptions: const WindowsOptions(lockParentWindow: true),
+            linuxOptions: const LinuxOptions(lockParentWindow: true),
           );
         })(),
       );
       if (outputFilePath == null) {
         return;
       }
-      backup.file.copySync(outputFilePath);
+      backup.file.copySync(outputFilePath.toString());
       result = const ResultSuccess();
     } catch (ex, stackTrace) {
       result = ResultError(exception: ex, stackTrace: stackTrace);
