@@ -52,7 +52,7 @@ import 'package:window_manager/window_manager.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (currentPlatform.isDesktop) {
-    currentWindow
+    (await initializePrimaryWindow())
       ?..titleBarStyle = TitleBarStyle.hidden
       ..isWindowControlButtonsVisible = false
       ..title = App.appName

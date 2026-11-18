@@ -59,6 +59,7 @@ class _DragAreaState extends State<_DragArea> {
 
   @override
   Widget build(BuildContext context) => DragToMoveArea(
+    window: window,
     child: SizedBox(
       width: MediaQuery.sizeOf(context).width,
       child: Wrap(

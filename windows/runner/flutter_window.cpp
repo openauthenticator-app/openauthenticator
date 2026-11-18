@@ -6,6 +6,7 @@
 #include <flutter/standard_method_codec.h>
 #include <windows.h>
 
+#include <cstdint>
 #include <optional>
 
 #include "flutter/generated_plugin_registrant.h"
@@ -47,6 +48,17 @@ bool FlutterWindow::OnCreate() {
     return false;
   }
   RegisterPlugins(flutter_controller_->engine());
+
+  window_channel_ = std::make_unique<flutter::MethodChannel<>>(
+      flutter_controller_->engine()->messenger(), "app.openauthenticator.window",
+      &flutter::StandardMethodCodec::GetInstance());
+  window_channel_->SetMethodCallHandler([this](const flutter::MethodCall<>& call, std::unique_ptr<flutter::MethodResult<>> result) {
+    if (call.method_name() == "getHandle") {
+      result->Success(flutter::EncodableValue(reinterpret_cast<std::int64_t>(GetHandle())));
+    } else {
+      result->NotImplemented();
+    }
+  });
 
   method_channel_auth = std::make_unique<flutter::MethodChannel<>>(flutter_controller_->engine()->messenger(), "app.openauthenticator.auth", &flutter::StandardMethodCodec::GetInstance());
   method_channel_auth->SetMethodCallHandler([this](const flutter::MethodCall<>& call, std::unique_ptr<flutter::MethodResult<>> result) {
@@ -93,6 +105,10 @@ bool FlutterWindow::OnCreate() {
 }
 
 void FlutterWindow::OnDestroy() {
+  if (window_channel_) {
+    window_channel_->SetMethodCallHandler(nullptr);
+    window_channel_.reset();
+  }
   if (method_channel_auth) {
     method_channel_auth->SetMethodCallHandler(nullptr);
     method_channel_auth = nullptr;

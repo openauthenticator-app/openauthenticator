@@ -22,6 +22,7 @@ class FlutterWindow : public Win32Window {
  public:
   static inline FlutterWindow* FlutterWindow::instance = nullptr;
   std::unique_ptr<flutter::MethodChannel<>> method_channel_auth;
+  std::unique_ptr<flutter::MethodChannel<>> window_channel_;
 
   virtual ~FlutterWindow();
   static FlutterWindow* GetInstance(const flutter::DartProject& project);

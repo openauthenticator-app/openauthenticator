@@ -25,36 +25,39 @@ class LocalAuthenticationDefault extends LocalAuthentication {
   @override
   Future<bool> authenticate(UnlockReason reason) async {
     final Window? window = currentWindow;
+    final bool wasAlwaysOnTop = window?.isAlwaysOnTop ?? false;
     window
       ?..focus()
       ..isAlwaysOnTop = true;
-    final bool result = await _localAuthentication.authenticate(
-      localizedReason: translations.appUnlock.localAuthentication[reason.name] ?? 'Authenticate to access the app.',
-      authMessages: [
-        IOSAuthMessages(
-          cancelButton: translations.appUnlock.button.cancel,
-        ),
-        MacOSAuthMessages(
-          cancelButton: translations.appUnlock.button.cancel,
-        ),
-        AndroidAuthMessages(
-          signInHint: translations.localAuth.android.signInHint,
-          signInTitle: translations.localAuth.android.signInTitle,
-          cancelButton: translations.appUnlock.button.cancel,
-        ),
-        const WindowsAuthMessages(),
-      ],
-    );
-    if (window != null) {
-      if (currentPlatform == Platform.macOS || currentPlatform == Platform.windows) {
-        // See https://github.com/flutter/flutter/issues/122322.
-        window
-          ..blur()
-          ..focus();
+    try {
+      return await _localAuthentication.authenticate(
+        localizedReason: translations.appUnlock.localAuthentication[reason.name] ?? 'Authenticate to access the app.',
+        authMessages: [
+          IOSAuthMessages(
+            cancelButton: translations.appUnlock.button.cancel,
+          ),
+          MacOSAuthMessages(
+            cancelButton: translations.appUnlock.button.cancel,
+          ),
+          AndroidAuthMessages(
+            signInHint: translations.localAuth.android.signInHint,
+            signInTitle: translations.localAuth.android.signInTitle,
+            cancelButton: translations.appUnlock.button.cancel,
+          ),
+          const WindowsAuthMessages(),
+        ],
+      );
+    } finally {
+      if (window != null) {
+        window.isAlwaysOnTop = wasAlwaysOnTop;
+        if (currentPlatform == Platform.macOS || currentPlatform == Platform.windows) {
+          // See https://github.com/flutter/flutter/issues/122322.
+          window
+            ..blur()
+            ..focus();
+        }
       }
-      window.isAlwaysOnTop = false;
     }
-    return result;
   }
 
   @override
