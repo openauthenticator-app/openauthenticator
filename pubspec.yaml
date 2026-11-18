@@ -36,8 +36,8 @@ dependencies:
   qr_flutter: ^4.1.0
   intl: ^0.20.3
   url_launcher: ^6.3.3
-  purchases_flutter: ^10.19.1
-  purchases_ui_flutter: ^10.19.1
+  purchases_flutter: ^11.0.3
+  purchases_ui_flutter: ^11.0.3
   purchases_dart:
     git:
       url: https://github.com/openauthenticator-app/purchases-dart.git
