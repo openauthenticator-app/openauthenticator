@@ -3,6 +3,7 @@ import 'package:open_authenticator/core/backend/backend.dart';
 import 'package:open_authenticator/core/backend/request/request.dart';
 import 'package:open_authenticator/core/backend/request/response.dart';
 import 'package:open_authenticator/core/backend/synchronization/push/operation.dart';
+import 'package:open_authenticator/core/backend/synchronization/queue.dart';
 import 'package:open_authenticator/core/backup/backup.dart';
 import 'package:open_authenticator/core/crypto/derived_key.dart';
 import 'package:open_authenticator/core/crypto/salt.dart';
@@ -165,6 +166,8 @@ class StorageMigrator {
       });
 
       await ref.read(storageTypeSettingsEntryProvider.notifier).changeValue(value);
+      // The synchronization controller may not have been created yet (eg. if nothing has been synchronized so far).
+      ref.read(synchronizationControllerProvider.notifier).notifyLocalChange();
 
       return const ResultSuccess();
     } catch (ex, stackTrace) {
