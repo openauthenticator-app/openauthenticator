@@ -15,7 +15,6 @@ import 'package:open_authenticator/model/totp/json.dart';
 import 'package:open_authenticator/model/totp/totp.dart';
 import 'package:open_authenticator/utils/drift.dart';
 import 'package:open_authenticator/utils/json.dart';
-import 'package:open_authenticator/utils/riverpod.dart';
 import 'package:open_authenticator/utils/sqlite.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -27,10 +26,9 @@ part 'tables.dart';
 typedef DeletedTotpMap = Map<String, DateTime>;
 
 /// The app database provider.
-final Provider<AppDatabase> appDatabaseProvider = Provider.autoDispose<AppDatabase>((ref) {
+final Provider<AppDatabase> appDatabaseProvider = Provider<AppDatabase>((ref) {
   final AppDatabase storage = AppDatabase();
   ref.onDispose(storage.close);
-  ref.cacheFor(const Duration(seconds: 1));
   return storage;
 });
 
@@ -45,6 +43,10 @@ class AppDatabase extends _$AppDatabase {
 
   /// Creates a new Drift storage instance.
   AppDatabase() : super(_openConnection());
+
+  /// Creates a new Drift storage instance using the given [executor].
+  @visibleForTesting
+  AppDatabase.forTesting(super.executor);
 
   @override
   int get schemaVersion => 2;
@@ -71,15 +73,11 @@ class AppDatabase extends _$AppDatabase {
     });
   }
 
-  /// Deletes the TOTP associated to the given [uuid].
-  Future<void> deleteTotp(String uuid) async {
-    await (delete(totps)..where((totp) => totp.uuid.isValue(uuid))).go();
-  }
-
-  /// Deletes the TOTP associated to the given [uuids].
-  Future<void> deleteTotps(Iterable<String> uuids) async {
-    await (delete(totps)..where((totp) => totp.uuid.isIn(uuids))).go();
-  }
+  /// Deletes the TOTPs associated to the [tombstones] keys and marks them as deleted.
+  Future<void> deleteTotps(DeletedTotpMap tombstones) => transaction(() async {
+    await (delete(totps)..where((totp) => totp.uuid.isIn(tombstones.keys))).go();
+    await markAsDeleted(tombstones);
+  });
 
   /// Updates the [totp].
   Future<void> updateTotp(Totp totp) async {
@@ -98,39 +96,18 @@ class AppDatabase extends _$AppDatabase {
     });
   }
 
-  /// Returns the TOTP associated to the given [uuid].
-  Future<Totp?> getTotp(String uuid) async {
-    final _DriftTotp? totp =
-        await (select(totps)
-              ..where((totp) => totp.uuid.isValue(uuid))
-              ..limit(1))
-            .getSingleOrNull();
-    return totp?.asTotp;
-  }
-
-  // @override
-  // Stream<List<Totp>> watchTotps() => select(totps).watch().map((list) => [
-  //       for (_DriftTotp driftTotp in list) driftTotp.asTotp,
-  //     ]);
-
   /// Lists all TOTPs.
-  Future<List<Totp>> listTotps() => _selectAllTotps().map((totp) => totp.asTotp).get();
+  Future<List<Totp>> listTotps() => select(totps).map((totp) => totp.asTotp).get();
 
-  /// Lists all TOTPs UUID.
-  Future<List<String>> listUuids() => _selectAllTotps().map((totp) => totp.uuid).get();
-
-  /// Selects all TOTPs.
-  SimpleSelectStatement<$TotpsTable, _DriftTotp> _selectAllTotps() => select(totps)..orderBy([(table) => OrderingTerm(expression: table.issuer)]);
-
-  /// Replace all current TOTPs by [newTotps].
-  Future<void> replaceTotps(List<Totp> totpsToInsert, DeletedTotpMap tombstonesToInsert) async {
+  /// Replace all current TOTPs by [totpsToInsert].
+  Future<void> replaceTotps(List<Totp> totpsToInsert, DeletedTotpMap tombstonesToInsert) => transaction(() async {
     await totps.deleteAll();
     await removeDeletionMarks([
       for (final Totp totp in totpsToInsert) totp.uuid,
     ]);
     await markAsDeleted(tombstonesToInsert);
     await addTotps(totpsToInsert);
-  }
+  });
 
   /// Returns all deleted TOTPs.
   Future<DeletedTotpMap> getDeletedTotps() async {
@@ -138,45 +115,35 @@ class AppDatabase extends _$AppDatabase {
     return Map.fromEntries(tombstones);
   }
 
-  /// Adds the given [tombstones] to the deleted TOTPs table.
+  /// Adds the given [tombstones] to the deleted TOTPs table. Existing tombstones are only replaced by newer ones.
   Future<void> markAsDeleted(DeletedTotpMap tombstones) async {
-    final DeletedTotpMap merged = await getDeletedTotps();
-
-    for (final MapEntry<String, DateTime> entry in tombstones.entries) {
-      final DateTime? current = merged[entry.key];
-      if (current == null || current.isBefore(entry.value)) {
-        merged[entry.key] = entry.value;
-      }
+    if (tombstones.isEmpty) {
+      return;
     }
-
-    await batch((batch) {
-      batch.deleteAll(deletedTotps);
-      batch.insertAll(
-        deletedTotps,
-        [
-          for (final MapEntry<String, DateTime> entry in merged.entries)
-            _DriftDeletedTotp(
-              uuid: entry.key,
-              deletedAt: entry.value,
-            ),
-        ],
-      );
+    await transaction(() async {
+      final List<_DriftDeletedTotp> existing = await (select(deletedTotps)..where((deletedTotp) => deletedTotp.uuid.isIn(tombstones.keys))).get();
+      final DeletedTotpMap current = {
+        for (final _DriftDeletedTotp deletedTotp in existing) deletedTotp.uuid: deletedTotp.deletedAt,
+      };
+      await batch((batch) {
+        batch.insertAllOnConflictUpdate(
+          deletedTotps,
+          [
+            for (final MapEntry<String, DateTime> entry in tombstones.entries)
+              if (current[entry.key]?.isBefore(entry.value) ?? true)
+                _DriftDeletedTotp(
+                  uuid: entry.key,
+                  deletedAt: entry.value,
+                ),
+          ],
+        );
+      });
     });
   }
 
   /// Marks the given [totp] as not deleted.
   Future<void> removeDeletionMarks(List<String> uuids) async {
     await (delete(deletedTotps)..where((deletedTotp) => deletedTotp.uuid.isIn(uuids))).go();
-  }
-
-  /// Returns the push operation associated to the given [uuid].
-  Future<PushOperation?> getPendingBackendPushOperation(String uuid) async {
-    final _DriftBackendPushOperation? operation =
-        await (select(pendingBackendPushOperations)
-              ..where((operation) => operation.uuid.isValue(uuid))
-              ..limit(1))
-            .getSingleOrNull();
-    return operation?.asBackendPushOperation;
   }
 
   /// Selects the pending backend push operations.
@@ -212,11 +179,6 @@ class AppDatabase extends _$AppDatabase {
         ],
       );
     });
-  }
-
-  /// Deletes the pending backend push operation associated to the given [operation].
-  Future<void> deletePendingBackendPushOperation(PushOperation operation) async {
-    await (delete(pendingBackendPushOperations)..where((pendingOperation) => pendingOperation.uuid.isValue(operation.uuid))).go();
   }
 
   /// Applies the given push response.
@@ -282,12 +244,10 @@ class AppDatabase extends _$AppDatabase {
 
   /// Selects the backend push operation errors.
   Selectable<PushOperationError> _selectBackendPushOperationErrors() {
-    final SimpleSelectStatement<$BackendPushOperationErrorsTable, _DriftBackendPushOperationError> operations = select(backendPushOperationErrors)..orderBy([(table) => OrderingTerm.desc(table.createdAt)]);
+    final SimpleSelectStatement<$BackendPushOperationErrorsTable, _DriftBackendPushOperationError> operations = select(backendPushOperationErrors)
+      ..orderBy([(table) => OrderingTerm.desc(table.createdAt)]);
     return operations.map((operation) => operation.asBackendPushOperationResult as PushOperationError);
   }
-
-  /// Returns the backend push operation errors.
-  Future<List<PushOperationError>> listBackendPushOperationErrors() => _selectBackendPushOperationErrors().get();
 
   /// Returns the stream of backend push operation errors.
   Stream<List<PushOperationError>> watchBackendPushOperationErrors() => _selectBackendPushOperationErrors().watch();
@@ -322,9 +282,9 @@ class AppDatabase extends _$AppDatabase {
 
   /// Opens the connection to the [_kDbFileName] and imports the legacy database if needed.
   static QueryExecutor _openConnection() => LazyDatabase(() async {
-      await _importLegacyDatabaseIfNeeded();
-      return SqliteUtils.openConnection(_kDbFileName);
-    });
+    await _importLegacyDatabaseIfNeeded();
+    return SqliteUtils.openConnection(_kDbFileName);
+  });
 
   /// Imports the legacy database if needed.
   static Future<void> _importLegacyDatabaseIfNeeded() async {
@@ -344,12 +304,9 @@ class AppDatabase extends _$AppDatabase {
   }
 
   /// Gets the path to the database file.
-  static Future<File> _getDatabaseFile(String dbFileName, {bool addDebugModeSuffix = true}) async {
-    if (addDebugModeSuffix && kDebugMode) {
-      dbFileName += '_debug';
-    }
+  static Future<File> _getDatabaseFile(String dbFileName) async {
     final Directory directory = await getApplicationSupportDirectory();
-    return File('${directory.path}/$dbFileName.sqlite');
+    return File('${directory.path}/${SqliteUtils.getDbFileName(dbFileName)}.sqlite');
   }
 
   /// Replaces the database files.
@@ -384,11 +341,11 @@ class AppDatabase extends _$AppDatabase {
     await _copyIfExists(sourceJournal, targetJournal);
   }
 
-  /// Deletes the legacy database files.
+  /// Renames the legacy database files, so that they're not imported again.
   static Future<void> _renameLegacyDatabaseFiles(File legacyMainFile) async {
-    Future<void> renameIfExists(File file, {String suffix = '-migrated'}) async {
+    Future<void> renameIfExists(File file) async {
       if (await file.exists()) {
-        await file.rename('${file.path}-$suffix');
+        await file.rename('${file.path}-migrated');
       }
     }
 

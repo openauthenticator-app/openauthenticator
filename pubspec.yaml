@@ -82,6 +82,8 @@ dev_dependencies:
   msix: ^3.18.0
   riverpod_lint: ^3.2.0
   release: ^0.2.0
+  flutter_test:
+    sdk: flutter
 
 dependency_overrides:
   xml: ^7.0.1

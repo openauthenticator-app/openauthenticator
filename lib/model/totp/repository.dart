@@ -289,8 +289,7 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
         }
         deletes[entry.key] = entry.value;
       }
-      await database.deleteTotps(deletes.keys);
-      await database.markAsDeleted(deletes);
+      await database.deleteTotps(deletes);
       final StorageType storageType = await ref.read(storageTypeSettingsEntryProvider.future);
       if (storageType == .shared && !fromNetwork) {
         _enqueue(
