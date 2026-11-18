@@ -140,6 +140,9 @@ class SessionRefreshManager extends Notifier<SessionRefreshState> {
         stackTrace: stackTrace,
       );
     }
+    if (ref.mounted && state is SessionRefreshStateInProgress && identical((state as SessionRefreshStateInProgress)._pendingRefresh, pendingRefresh)) {
+      state = const SessionRefreshStateIdle();
+    }
     pendingRefresh.complete(result);
     return result;
   }

@@ -103,7 +103,7 @@ class BackendClient extends AsyncNotifier<Map<String, String>> {
     } catch (ex, stackTrace) {
       switch (ex) {
         case ExpiredSessionError():
-          if (autoRefreshAccessToken) {
+          if (autoRefreshAccessToken && request.needsAuthorization) {
             final Result result = await ref.read(sessionRefreshManagerProvider.notifier).refresh();
             if (result is! ResultSuccess) {
               return result.to((value) => null);
@@ -112,6 +112,7 @@ class BackendClient extends AsyncNotifier<Map<String, String>> {
               request,
               backendUrl: backendUrl,
               autoRefreshAccessToken: false,
+              timeout: timeout,
             );
           }
           break;
