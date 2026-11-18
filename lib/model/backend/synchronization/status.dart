@@ -32,7 +32,6 @@ class SynchronizationStatus with Equatable {
 
   /// Updates the synchronization status.
   SynchronizationStatus update({
-    DateTime? timestamp,
     SynchronizationPhase? phase,
     int? retryAttempt,
   }) => copyWith(

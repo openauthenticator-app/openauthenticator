@@ -56,7 +56,6 @@ sealed class PushOperation<T> with Equatable {
 
 /// Represents a `set` push operation.
 class SetTotpsPushOperation extends PushOperation<JsonMap> {
-
   /// Creates a new `set` push operation instance from a TOTPs list.
   SetTotpsPushOperation({
     String? uuid,
@@ -69,6 +68,7 @@ class SetTotpsPushOperation extends PushOperation<JsonMap> {
          },
          createdAt: createdAt,
        );
+
   /// Creates a new `set` push operation instance from a raw payload.
   SetTotpsPushOperation.raw({
     super.uuid,
@@ -92,7 +92,6 @@ class SetTotpsPushOperation extends PushOperation<JsonMap> {
 
 /// Represents a `delete` push operation.
 class DeleteTotpsPushOperation extends PushOperation<Map<String, int>> {
-
   /// Creates a new `delete` push operation instance from a UUIDs list.
   DeleteTotpsPushOperation({
     String? uuid,
@@ -105,6 +104,7 @@ class DeleteTotpsPushOperation extends PushOperation<Map<String, int>> {
          },
          createdAt: createdAt,
        );
+
   /// Creates a new `delete` push operation instance from a raw payload.
   DeleteTotpsPushOperation.raw({
     super.uuid,

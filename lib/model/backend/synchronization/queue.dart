@@ -154,10 +154,15 @@ class SynchronizationController extends Notifier<SynchronizationStatus> with Wid
 
   /// Triggered when the connectivity state has changed.
   void _onConnectivityChanged(AsyncValue<ConnectivityState>? previous, AsyncValue<ConnectivityState> next) {
-    if (ref.mounted) {
+    final bool canSendRequests = next.value?.canSendRequests == true;
+    if (ref.mounted && state.phase is! SynchronizationPhaseSyncing) {
       state = state.update(
-        phase: next.value?.canSendRequests == true ? const SynchronizationPhaseIdle() : const SynchronizationPhaseOffline(),
+        phase: canSendRequests ? const SynchronizationPhaseIdle() : const SynchronizationPhaseOffline(),
       );
+    }
+    if (canSendRequests && previous?.value?.canSendRequests != true) {
+      // We're back online, so let's push the pending operations.
+      notifyLocalChange();
     }
   }
 
@@ -174,10 +179,8 @@ class SynchronizationController extends Notifier<SynchronizationStatus> with Wid
 
   /// Notifies the local change.
   void notifyLocalChange({bool checkSettings = true}) {
-    if (_retryTimer != null) {
-      return;
-    }
-
+    _retryTimer?.cancel();
+    _retryTimer = null;
     _coalesceTimer?.cancel();
     _coalesceTimer = Timer(
       _kCoalesceDelay,
@@ -216,69 +219,45 @@ class SynchronizationController extends Notifier<SynchronizationStatus> with Wid
 
   /// Runs the synchronization.
   Future<void> _run({bool checkSettings = true}) async {
-    if (!ref.mounted) {
+    if (!ref.mounted || state.phase is SynchronizationPhaseSyncing) {
       return;
     }
-    bool hasError = false;
+    state = state.copyWith(
+      phase: const SynchronizationPhaseSyncing(),
+    );
     try {
-      if (state.phase is SynchronizationPhaseSyncing) {
+      await state.waitBeforeNextOperation();
+      if (!ref.mounted) {
         return;
       }
-
-      state = state.copyWith(
-        phase: const SynchronizationPhaseSyncing(),
+      state = state.update(
+        retryAttempt: state.retryAttempt + 1,
       );
-      await state.waitBeforeNextOperation();
-      if (ref.mounted) {
-        state = state.update(
-          retryAttempt: state.retryAttempt + 1,
-        );
-      }
 
       final bool canSendRequests = (await ref.read(connectivityStateProvider.future)).canSendRequests;
-      if (canSendRequests) {
-        void onFinish({bool errorOccurred = false}) {
-          if (!errorOccurred) {
-            _lastSuccessfulSync = DateTime.now();
-          }
-          if (ref.mounted) {
-            state = state.update(
-              phase: const SynchronizationPhaseUpToDate(),
-              retryAttempt: errorOccurred ? state.retryAttempt : 0,
-            );
-          }
-        }
-
-        final Result pushResult = await ref.read(pushOperationsQueueProvider.notifier)._push(checkSettings: checkSettings);
-        if (pushResult is! ResultSuccess) {
-          if (pushResult is ResultCancelled) {
-            onFinish(errorOccurred: false);
-          } else {
-            hasError = true;
-            (Object, StackTrace) error = pushResult is ResultError ? (pushResult.exception, pushResult.stackTrace) : (Exception('An error occurred while pushing.'), StackTrace.current);
-            Error.throwWithStackTrace(error.$1, error.$2);
-          }
-        } else {
-          final Result pullResult = await _pull(checkSettings: checkSettings);
-          if (pullResult is! ResultSuccess) {
-            if (pullResult is ResultCancelled) {
-              onFinish(errorOccurred: false);
-            } else {
-              hasError = true;
-              (Object, StackTrace) error = pullResult is ResultError ? (pullResult.exception, pullResult.stackTrace) : (Exception('An error occurred while pulling.'), StackTrace.current);
-              Error.throwWithStackTrace(error.$1, error.$2);
-            }
-          }
-
-          onFinish(errorOccurred: false);
-        }
-      } else {
+      if (!canSendRequests) {
         if (ref.mounted) {
           state = state.update(phase: const SynchronizationPhaseOffline());
         }
+        return;
+      }
+
+      final Result pushResult = await ref.read(pushOperationsQueueProvider.notifier)._push(checkSettings: checkSettings);
+      _throwIfError(pushResult);
+      if (pushResult is ResultSuccess) {
+        _throwIfError(await _pull(checkSettings: checkSettings));
+      }
+
+      _lastSuccessfulSync = DateTime.now();
+      _retryTimer?.cancel();
+      _retryTimer = null;
+      if (ref.mounted) {
+        state = state.update(
+          phase: const SynchronizationPhaseUpToDate(),
+          retryAttempt: 0,
+        );
       }
     } catch (ex, stackTrace) {
-      hasError = true;
       if (ref.mounted) {
         state = state.update(
           phase: SynchronizationPhaseError(
@@ -287,13 +266,14 @@ class SynchronizationController extends Notifier<SynchronizationStatus> with Wid
           ),
         );
       }
-    }
-
-    if (hasError) {
       _scheduleRetry();
-    } else {
-      _retryTimer?.cancel();
-      _retryTimer = null;
+    }
+  }
+
+  /// Throws the exception of the [result] if it's an error.
+  void _throwIfError(Result result) {
+    if (result is ResultError) {
+      Error.throwWithStackTrace(result.exception, result.stackTrace);
     }
   }
 
