@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart';
 import 'package:open_authenticator/core/app_links/app_auth.dart';
 import 'package:open_authenticator/core/backend/authentication/native_web_auth.dart';
 import 'package:open_authenticator/core/backend/authentication/session.dart';

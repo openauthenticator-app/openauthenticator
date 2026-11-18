@@ -20,7 +20,7 @@ class EmailAuthenticationProvider extends AuthenticationProvider {
           exception: uri.previously ? _EmailAlreadySentException() : _NoCancelCodeException(),
         );
       }
-      _ref.read(emailConfirmationStateProvider.notifier)._markNeedsConfirmation(uri.email, uri.cancelCode!);
+      await _ref.read(emailConfirmationStateProvider.notifier)._markNeedsConfirmation(uri.email, uri.cancelCode!);
       return ResultSuccess(value: ConfirmationEmailSent(providerId: id));
     }
     final Result<RedirectResult> result = await super.onRedirectReceived(uri);
@@ -161,29 +161,36 @@ class EmailConfirmationStateNotifier extends AsyncNotifier<EmailConfirmationData
 
   /// Marks the [email] for confirmation with the given cancel code.
   Future<void> _markNeedsConfirmation(String email, String cancelCode) async {
-    if ((await future) != null) {
-      return;
-    }
-    final SharedPreferencesWithPrefix preferences = await ref.read(sharedPreferencesProvider.future);
-    await preferences.setString(_kAuthenticationEmailKey, email);
-    await preferences.setString(_kAuthenticationEmailCancelCodeKey, cancelCode);
-    if (ref.mounted) {
+    // The provider may have no listener (eg. if the settings page is not displayed), so it must be kept alive while saving.
+    final KeepAliveLink keepAliveLink = ref.keepAlive();
+    try {
+      if ((await future) != null) {
+        return;
+      }
+      final SharedPreferencesWithPrefix preferences = await ref.read(sharedPreferencesProvider.future);
+      await preferences.setString(_kAuthenticationEmailKey, email);
+      await preferences.setString(_kAuthenticationEmailCancelCodeKey, cancelCode);
       state = AsyncData(
         EmailConfirmationData(
           email: email,
           cancelCode: cancelCode,
         ),
       );
+    } finally {
+      keepAliveLink.close();
     }
   }
 
   /// Cancels the confirmation.
   Future<void> _cancelConfirmation() async {
-    final SharedPreferencesWithPrefix preferences = await ref.read(sharedPreferencesProvider.future);
-    await preferences.remove(_kAuthenticationEmailKey);
-    await preferences.remove(_kAuthenticationEmailCancelCodeKey);
-    if (ref.mounted) {
+    final KeepAliveLink keepAliveLink = ref.keepAlive();
+    try {
+      final SharedPreferencesWithPrefix preferences = await ref.read(sharedPreferencesProvider.future);
+      await preferences.remove(_kAuthenticationEmailKey);
+      await preferences.remove(_kAuthenticationEmailCancelCodeKey);
       state = const AsyncData(null);
+    } finally {
+      keepAliveLink.close();
     }
   }
 }
