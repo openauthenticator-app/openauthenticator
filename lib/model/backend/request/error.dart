@@ -34,72 +34,36 @@ class BackendRequestError extends LocalizableException {
     required int statusCode,
     required JsonMap json,
   }) {
-    final String? code = json['data']?['errorCode'];
-    final String? message = json['data']?['message'];
-    switch (code) {
-      case ExpiredSessionError.kErrorCode:
-        return ExpiredSessionError._(
-          route: route,
-          statusCode: statusCode,
-          message: message,
-        );
-      case InvalidPayloadError.kErrorCode:
-        return InvalidPayloadError._(
-          route: route,
-          statusCode: statusCode,
-          message: message,
-        );
-      case InvalidTokenError.kErrorCode:
-        return InvalidTokenError._(
-          route: route,
-          statusCode: statusCode,
-          message: message,
-        );
-      case InvalidSessionError.kErrorCode:
-        return InvalidSessionError._(
-          route: route,
-          statusCode: statusCode,
-          message: message,
-        );
-      case ExpiredCodeError.kErrorCode:
-        return ExpiredCodeError._(
-          route: route,
-          statusCode: statusCode,
-          message: message,
-        );
-      case _InvalidVerificationCodeError.kErrorCode:
-        return _InvalidVerificationCodeError._(
-          route: route,
-          statusCode: statusCode,
-          message: message,
-        );
-      case _InvalidAuthorizationCodeError.kErrorCode:
-        return _InvalidAuthorizationCodeError._(
-          route: route,
-          statusCode: statusCode,
-          message: message,
-        );
-      case InvalidAppVersionError.kErrorCode:
-        return InvalidAppVersionError._(
-          route: route,
-          statusCode: statusCode,
-          message: message,
-        );
-      case _ProviderUserAlreadyExistsError.kErrorCode:
-        return _ProviderUserAlreadyExistsError._(
-          route: route,
-          statusCode: statusCode,
-          message: message,
-        );
-      default:
-        return BackendRequestError._(
-          route: route,
-          statusCode: statusCode,
-          code: code,
-          message: json['data']['message'],
-        );
-    }
+    final Object? data = json['data'];
+    final String? code = data is Map ? data['errorCode']?.toString() : null;
+    final String? message = data is Map ? data['message']?.toString() : null;
+    final _BackendRequestErrorConstructor? constructor = _kErrors[code];
+    return constructor == null
+        ? BackendRequestError._(
+            route: route,
+            statusCode: statusCode,
+            code: code,
+            message: message,
+          )
+        : constructor(
+            route: route,
+            statusCode: statusCode,
+            message: message,
+          );
   }
+
+  /// Maps error codes to their corresponding error class.
+  static const Map<String, _BackendRequestErrorConstructor> _kErrors = {
+    ExpiredSessionError.kErrorCode: ExpiredSessionError._,
+    InvalidPayloadError.kErrorCode: InvalidPayloadError._,
+    InvalidTokenError.kErrorCode: InvalidTokenError._,
+    InvalidSessionError.kErrorCode: InvalidSessionError._,
+    ExpiredCodeError.kErrorCode: ExpiredCodeError._,
+    _InvalidVerificationCodeError.kErrorCode: _InvalidVerificationCodeError._,
+    _InvalidAuthorizationCodeError.kErrorCode: _InvalidAuthorizationCodeError._,
+    InvalidAppVersionError.kErrorCode: InvalidAppVersionError._,
+    _ProviderUserAlreadyExistsError.kErrorCode: _ProviderUserAlreadyExistsError._,
+  };
 
   @override
   String toString() => [
@@ -107,6 +71,9 @@ class BackendRequestError extends LocalizableException {
     if (message != null) 'The error message is "$message".',
   ].join('\n');
 }
+
+/// A constructor of a [BackendRequestError] subclass.
+typedef _BackendRequestErrorConstructor = BackendRequestError Function({required String route, required int statusCode, String? message});
 
 /// Thrown when the session has expired.
 class ExpiredSessionError extends BackendRequestError {

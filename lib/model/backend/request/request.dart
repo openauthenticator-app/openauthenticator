@@ -78,9 +78,6 @@ class InvalidJsonResponse extends LocalizableException {
 mixin BackendWithBodyRequest<T extends BackendResponse> on BackendRequest<T> {
   /// The body.
   Object? get jsonBody => null;
-
-  /// The encoding.
-  Encoding? get encoding => null;
 }
 
 /// Represents a backend GET request.
@@ -114,7 +111,6 @@ abstract class BackendPostRequest<T extends BackendResponse> extends BackendRequ
       'Content-Type': 'application/json',
     },
     body: jsonEncode(jsonBody),
-    encoding: encoding,
   );
 }
 
@@ -134,7 +130,6 @@ abstract class BackendDeleteRequest<T extends BackendResponse> extends BackendRe
       'Content-Type': 'application/json',
     },
     body: jsonEncode(jsonBody),
-    encoding: encoding,
   );
 }
 
