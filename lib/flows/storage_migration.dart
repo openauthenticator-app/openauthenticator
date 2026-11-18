@@ -4,6 +4,7 @@ import 'package:forui/forui.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:open_authenticator/flows/app_flow.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
+import 'package:open_authenticator/model/backend/synchronization/storage_migration.dart';
 import 'package:open_authenticator/model/backend/user.dart';
 import 'package:open_authenticator/model/password_verification/password_verification.dart';
 import 'package:open_authenticator/model/settings/storage_type.dart';
@@ -70,8 +71,8 @@ class StorageMigrationFlow extends AppFlow {
       Result result = await showWaitingOverlay(
         context,
         future: ref
-            .read(storageTypeSettingsEntryProvider.notifier)
-            .changeValue(
+            .read(storageMigratorProvider)
+            .migrate(
               newType,
               masterPassword: masterPassword,
               backupPassword: backupPassword,
