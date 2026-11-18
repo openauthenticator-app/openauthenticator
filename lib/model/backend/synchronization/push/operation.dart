@@ -6,7 +6,7 @@ import 'package:open_authenticator/utils/json.dart';
 import 'package:uuid/uuid.dart';
 
 /// Represents a push operation.
-sealed class PushOperation<T> with Equatable {
+sealed class PushOperation<T extends JsonMap> with Equatable {
   /// The operation UUID.
   final String uuid;
 
@@ -137,29 +137,16 @@ enum PushOperationKind {
 
 /// Allows to compact a list of push operations.
 extension Compact on List<PushOperation> {
-  /// Compacts the current push operations. Only the latest operation for each TOTP UUID is kept.
+  /// Compacts operations supplied in newest insertion order first. Only the latest operation for each TOTP UUID is kept.
   List<PushOperation> get compacted {
     if (isEmpty) {
       return [];
     }
 
-    final List<PushOperation> sorted = List.of(this)
-      ..sort((a, b) {
-        final int createdAtComparison = b.createdAt.compareTo(a.createdAt);
-        if (createdAtComparison != 0) {
-          return createdAtComparison;
-        }
-        final int kindComparison = a._kind.index.compareTo(b._kind.index);
-        if (kindComparison != 0) {
-          return kindComparison;
-        }
-        return a.uuid.compareTo(b.uuid);
-      });
-
     final Set<String> processedTotpUuids = {};
     final List<PushOperation> result = [];
 
-    for (final PushOperation operation in sorted) {
+    for (final PushOperation operation in this) {
       switch (operation) {
         case SetTotpsPushOperation(:final payload):
           final JsonMap newPayload = {

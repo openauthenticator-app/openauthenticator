@@ -68,7 +68,7 @@ extension _ToDriftTotp on Totp {
 /// Contains some useful methods to use [PushOperation] with Drift.
 extension _ToDriftBackendPushOperation on PushOperation {
   /// Converts this instance to a Drift generated [_DriftBackendPushOperation].
-  _DriftBackendPushOperation get asDriftBackendPushOperation => _DriftBackendPushOperation(
+  PendingBackendPushOperationsCompanion get asDriftBackendPushOperation => PendingBackendPushOperationsCompanion.insert(
     uuid: uuid,
     kind: switch (this) {
       SetTotpsPushOperation() => PushOperationKind.set,

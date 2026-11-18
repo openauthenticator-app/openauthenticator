@@ -37,35 +37,18 @@ class PushOperationsQueue extends AsyncNotifier<List<PushOperation>> {
     return await database.listPendingBackendPushOperations();
   }
 
-  /// Enqueues a push operation.
-  Future<void> enqueue(
-    PushOperation operation, {
-    bool andRun = true,
-  }) async {
-    final AppDatabase database = ref.read(appDatabaseProvider);
-    await database.addPendingBackendPushOperation(operation);
-    if (andRun) {
-      ref.read(synchronizationControllerProvider.notifier).notifyLocalChange();
-    }
-  }
-
   /// Pushes the pending operations.
-  Future<Result> _push({bool checkSettings = true}) async {
+  Future<Result<List<PushOperationResult>>> _push({bool checkSettings = true}) async {
     if (checkSettings) {
       final StorageType storageType = await ref.read(storageTypeSettingsEntryProvider.future);
       if (storageType == .localOnly) {
         return const ResultCancelled();
       }
     }
-    final List<PushOperation> operations = await future;
-    final List<PushOperation> compactedOperations = operations.compacted;
     final AppDatabase database = ref.read(appDatabaseProvider);
-    if (compactedOperations.length != operations.length) {
-      await database.replacePendingBackendPushOperations(compactedOperations);
-    }
-
+    final List<PushOperation> compactedOperations = await database.compactPendingOperations();
     if (compactedOperations.isEmpty) {
-      return const ResultSuccess();
+      return const ResultSuccess(value: []);
     }
 
     final Result<SynchronizationPushResponse> result = await ref
@@ -77,11 +60,11 @@ class PushOperationsQueue extends AsyncNotifier<List<PushOperation>> {
           timeout: _kPushOperationTimeout,
         );
     if (result is! ResultSuccess<SynchronizationPushResponse>) {
-      return result;
+      return result.to((_) => null);
     }
 
     await database.applyPushResponse(result.value);
-    return const ResultSuccess();
+    return ResultSuccess(value: result.value.result);
   }
 
   /// Triggered when the database updates.
@@ -114,6 +97,8 @@ class SynchronizationController extends Notifier<SynchronizationStatus> with Wid
 
   /// The current coalesce timer.
   Timer? _coalesceTimer;
+
+  bool _syncRequestedWhileRunning = false;
 
   /// The current retry timer.
   Timer? _retryTimer;
@@ -219,7 +204,11 @@ class SynchronizationController extends Notifier<SynchronizationStatus> with Wid
 
   /// Runs the synchronization.
   Future<void> _run({bool checkSettings = true}) async {
-    if (!ref.mounted || state.phase is SynchronizationPhaseSyncing) {
+    if (!ref.mounted) {
+      return;
+    }
+    if (state.phase is SynchronizationPhaseSyncing) {
+      _syncRequestedWhileRunning = true;
       return;
     }
     state = state.copyWith(
@@ -242,10 +231,29 @@ class SynchronizationController extends Notifier<SynchronizationStatus> with Wid
         return;
       }
 
-      final Result pushResult = await ref.read(pushOperationsQueueProvider.notifier)._push(checkSettings: checkSettings);
+      final Result<List<PushOperationResult>> pushResult = await ref.read(pushOperationsQueueProvider.notifier)._push(checkSettings: checkSettings);
       _throwIfError(pushResult);
-      if (pushResult is ResultSuccess) {
-        _throwIfError(await _pull(checkSettings: checkSettings));
+      if (pushResult is! ResultSuccess<List<PushOperationResult>>) {
+        if (ref.mounted) {
+          state = state.update(phase: const SynchronizationPhaseIdle());
+        }
+        return;
+      }
+      final Result pull = await _pull(checkSettings: checkSettings);
+      _throwIfError(pull);
+      if (pull is! ResultSuccess) {
+        if (ref.mounted) {
+          state = state.update(phase: const SynchronizationPhaseIdle());
+        }
+        return;
+      }
+      for (final PushOperationResult result in pushResult.value) {
+        final PushOperationErrorKind? error = result.errorKind;
+        if (error == PushOperationErrorKind.maxOperationsCountExceeded) {
+          _syncRequestedWhileRunning = true;
+        } else if (error != null && !error.isPermanent) {
+          throw StateError(error.localizedMessage);
+        }
       }
 
       _lastSuccessfulSync = DateTime.now();
@@ -266,7 +274,14 @@ class SynchronizationController extends Notifier<SynchronizationStatus> with Wid
           ),
         );
       }
-      _scheduleRetry();
+      if (ref.mounted) {
+        _scheduleRetry();
+      }
+    } finally {
+      if (_syncRequestedWhileRunning && ref.mounted) {
+        _syncRequestedWhileRunning = false;
+        notifyLocalChange(checkSettings: checkSettings);
+      }
     }
   }
 

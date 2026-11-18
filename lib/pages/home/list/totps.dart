@@ -148,7 +148,7 @@ class _TotpsListWidget extends ConsumerWidget {
     final (CryptoStore, List<DecryptedTotp>) decryptedTotps = await showWaitingOverlay(
       context,
       future: () async {
-        final CryptoStore previousCryptoStore = CryptoStore.fromPassword(password, totp.encryptedData.encryptionSalt);
+        final CryptoStore previousCryptoStore = await CryptoStore.fromPasswordInIsolate(password, totp.encryptedData.encryptionSalt);
         final Totp targetTotp = totp.decrypt(previousCryptoStore);
         if (!targetTotp.isDecrypted) {
           return (previousCryptoStore, <DecryptedTotp>[]);

@@ -72,7 +72,7 @@ class SaltNotifier extends AsyncNotifier<Salt?> {
     if (salt == null) {
       await simpleSecureStorage.delete(_kPasswordDerivedKeySaltKey);
     } else {
-      await simpleSecureStorage.write(_kPasswordDerivedKeySaltKey, base64.encode(salt.value));
+      await simpleSecureStorage.writeCredential(_kPasswordDerivedKeySaltKey, base64.encode(salt.value));
     }
   }
 }

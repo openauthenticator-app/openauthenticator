@@ -6,7 +6,6 @@ import 'package:open_authenticator/model/backend/backend.dart';
 import 'package:open_authenticator/model/backend/request/request.dart';
 import 'package:open_authenticator/model/backend/request/response.dart';
 import 'package:open_authenticator/model/backend/synchronization/push/operation.dart';
-import 'package:open_authenticator/model/backend/synchronization/queue.dart';
 import 'package:open_authenticator/model/backup/backup.dart';
 import 'package:open_authenticator/model/crypto/derived_key.dart';
 import 'package:open_authenticator/model/crypto/salt.dart';
@@ -101,6 +100,12 @@ class StorageTypeSettingsEntry extends EnumSettingsEntry<StorageType> {
       final List<Totp> toAdd = [];
       CryptoStore? newCryptoStore;
       if (masterPassword == null || response.totps.isEmpty) {
+        if (masterPassword == null && response.totps.isNotEmpty && currentStorageTotps.isNotEmpty) {
+          final CryptoStore? current = await ref.read(cryptoStoreProvider.future);
+          if (current == null || !response.totps.any((totp) => totp.encryptedData.canDecryptData(current))) {
+            throw _RemoteStoragePasswordMismatchException();
+          }
+        }
         toAdd.addAll(currentStorageTotps);
       } else {
         // Key derivation is expensive, so we only do it once per salt.
@@ -124,36 +129,37 @@ class StorageTypeSettingsEntry extends EnumSettingsEntry<StorageType> {
           final CryptoStore oldCryptoStore = currentCryptoStore != null && totp.encryptedData.canDecryptData(currentCryptoStore)
               ? currentCryptoStore
               : await cryptoStoreFor(totp.encryptedData.encryptionSalt);
-          toAdd.add(totp.changeEncryptionKey(oldCryptoStore, newCryptoStore) ?? totp);
+          toAdd.add(totp.changeEncryptionKey(oldCryptoStore, newCryptoStore) ?? (throw _CurrentStoragePasswordMismatchException()));
         }
       }
 
-      await database.addTotps(toAdd);
-      if (tombstonesToRemove.isNotEmpty) {
-        await database.removeDeletionMarks(tombstonesToRemove);
-      }
-      if (newCryptoStore != null) {
-        await ref.read(saltProvider.notifier).changeSalt(newCryptoStore.salt);
-        await ref.read(derivedKeyProvider.notifier).updateFromPassword(masterPassword!);
-      }
-
-      final PushOperationsQueue pushOperationsQueue = ref.read(pushOperationsQueueProvider.notifier);
-      if (toAdd.isNotEmpty) {
-        await pushOperationsQueue.enqueue(
-          SetTotpsPushOperation(
-            totps: toAdd,
-          ),
-          andRun: false,
-        );
-      }
-      if (toDelete.isNotEmpty) {
-        await pushOperationsQueue.enqueue(
-          DeleteTotpsPushOperation(
-            tombstones: toDelete,
-          ),
-          andRun: false,
-        );
-      }
+      final Salt? previousSalt = await ref.read(saltProvider.future);
+      await database.transaction(() async {
+        await database.addTotps(toAdd);
+        if (tombstonesToRemove.isNotEmpty) {
+          await database.removeDeletionMarks(tombstonesToRemove);
+        }
+        if (toAdd.isNotEmpty) {
+          await database.addPendingBackendPushOperation(SetTotpsPushOperation(totps: toAdd));
+        }
+        if (toDelete.isNotEmpty) {
+          await database.addPendingBackendPushOperation(DeleteTotpsPushOperation(tombstones: toDelete));
+        }
+        if (newCryptoStore case final store?) {
+          final SaltNotifier salts = ref.read(saltProvider.notifier);
+          if (previousSalt != store.salt) {
+            await salts.changeSalt(store.salt);
+          }
+          try {
+            await ref.read(derivedKeyProvider.notifier).updateFromPassword(masterPassword!, derivedStore: store);
+          } catch (_) {
+            if (previousSalt != store.salt) {
+              await salts.changeSalt(previousSalt);
+            }
+            rethrow;
+          }
+        }
+      });
 
       await super.changeValue(value);
 

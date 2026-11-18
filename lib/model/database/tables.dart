@@ -31,7 +31,7 @@ class Totps extends Table {
   TextColumn get encryptionSalt => text().map(const Uint8ListConverter())();
 
   /// Maps to [Totp.updatedAt].
-  DateTimeColumn get updatedAt => dateTime().withDefault(Constant(DateTime.fromMillisecondsSinceEpoch(0)))();
+  IntColumn get updatedAt => integer().withDefault(const Constant(0)).map(const EpochMillisecondsConverter())();
 
   @override
   Set<Column> get primaryKey => {uuid};
@@ -44,7 +44,7 @@ class DeletedTotps extends Table {
   TextColumn get uuid => text()();
 
   /// The date and time when the TOTP was deleted.
-  DateTimeColumn get deletedAt => dateTime().withDefault(currentDateAndTime)();
+  IntColumn get deletedAt => integer().map(const EpochMillisecondsConverter())();
 
   @override
   Set<Column> get primaryKey => {uuid};
@@ -53,8 +53,11 @@ class DeletedTotps extends Table {
 /// Represents a pending [PushOperation].
 @DataClassName('_DriftBackendPushOperation')
 class PendingBackendPushOperations extends Table {
+  /// Durable insertion order, including concurrent writes within a millisecond.
+  IntColumn get sequence => integer().autoIncrement()();
+
   /// Maps to [PushOperation.uuid].
-  TextColumn get uuid => text()();
+  TextColumn get uuid => text().unique()();
 
   /// The push operation kind.
   TextColumn get kind => textEnum<PushOperationKind>()();
@@ -63,10 +66,7 @@ class PendingBackendPushOperations extends Table {
   TextColumn get jsonPayload => text()();
 
   /// Maps to [PushOperation.createdAt].
-  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
-
-  @override
-  Set<Column> get primaryKey => {uuid};
+  IntColumn get createdAt => integer().map(const EpochMillisecondsConverter())();
 }
 
 /// Represents a backend push operation error.

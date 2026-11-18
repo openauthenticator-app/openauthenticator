@@ -38,6 +38,24 @@ class SecureStorageNotifier extends AsyncNotifier<CachedSimpleSecureStorage> {
   }
 }
 
+/// Keeps the in-memory credential consistent when the platform rejects a write.
+extension CredentialStorage on CachedSimpleSecureStorage {
+  /// Persists a credential, restoring its previous cached value on failure.
+  Future<void> writeCredential(String key, String value) async {
+    final String? previous = read(key);
+    try {
+      await write(key, value);
+    } catch (_) {
+      if (previous == null) {
+        await delete(key, flush: false);
+      } else {
+        await write(key, previous, flush: false);
+      }
+      rethrow;
+    }
+  }
+}
+
 /// Allows to clear the restored encrypted storage.
 class _StorageRecovery {
   /// The channel used to communicate with the native platform.

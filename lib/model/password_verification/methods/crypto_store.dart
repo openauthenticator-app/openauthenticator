@@ -30,6 +30,6 @@ class CryptoStoreVerificationMethod with PasswordVerificationMethod {
     if (!(await super.verify(password))) {
       return false;
     }
-    return _cryptoStore?.checkPasswordValidity(password) == true;
+    return await _cryptoStore?.checkPasswordValidity(password) == true;
   }
 }

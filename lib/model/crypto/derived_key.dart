@@ -7,6 +7,7 @@ import 'package:open_authenticator/app.dart';
 import 'package:open_authenticator/model/app_unlock/methods/method.dart';
 import 'package:open_authenticator/model/crypto/key.dart';
 import 'package:open_authenticator/model/crypto/salt.dart';
+import 'package:open_authenticator/model/crypto/store.dart';
 import 'package:open_authenticator/model/password_verification/methods/password_signature.dart';
 import 'package:open_authenticator/model/secure_storage.dart';
 import 'package:open_authenticator/model/settings/app_unlock_method.dart';
@@ -28,23 +29,24 @@ class DerivedKeyNotifier extends AsyncNotifier<DerivedKey?> {
   }
 
   /// Creates a new derived key instance using the [password] and uses it as [state].
-  Future<DerivedKey?> updateFromPassword(String password, {bool? andWrite}) async {
+  Future<DerivedKey?> updateFromPassword(String password, {bool? andWrite, CryptoStore? derivedStore}) async {
     final Salt? salt = await ref.read(saltProvider.future);
     if (salt == null) {
       return null;
     }
-    final DerivedKey newKey = DerivedKey.fromPassword(password, salt);
+    final CryptoStore store = derivedStore != null && derivedStore.salt == salt ? derivedStore : await CryptoStore.fromPasswordInIsolate(password, salt);
+    final DerivedKey newKey = store.key;
     final String unlockMethod = await ref.read(appUnlockMethodSettingsEntryProvider.future);
     if (unlockMethod == MasterPasswordAppUnlockMethod.kMethodId) {
-      await ref.read(passwordSignatureVerificationMethodProvider.notifier).updatePasswordSignature(password);
-    }
-    if (ref.mounted) {
-      state = AsyncData(newKey);
+      await ref.read(passwordSignatureVerificationMethodProvider.notifier).enable(password, derivedStore: store);
     }
     andWrite ??= unlockMethod != MasterPasswordAppUnlockMethod.kMethodId;
     if (andWrite) {
       final CachedSimpleSecureStorage simpleSecureStorage = await ref.read(secureStorageProvider.future);
-      await simpleSecureStorage.write(_kPasswordDerivedKeyKey, base64.encode(newKey.value));
+      await simpleSecureStorage.writeCredential(_kPasswordDerivedKeyKey, base64.encode(newKey.value));
+    }
+    if (ref.mounted) {
+      state = AsyncData(newKey);
     }
     return newKey;
   }

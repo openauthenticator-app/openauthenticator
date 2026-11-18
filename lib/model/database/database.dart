@@ -11,7 +11,6 @@ import 'package:open_authenticator/model/backend/synchronization/push/result.dar
 import 'package:open_authenticator/model/crypto/salt.dart';
 import 'package:open_authenticator/model/database/database.steps.dart';
 import 'package:open_authenticator/model/totp/algorithm.dart';
-import 'package:open_authenticator/model/totp/json.dart';
 import 'package:open_authenticator/model/totp/totp.dart';
 import 'package:open_authenticator/utils/drift.dart';
 import 'package:open_authenticator/utils/json.dart';
@@ -49,10 +48,10 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
-  MigrationStrategy get migration => MigrationStrategy(onUpgrade: schemaUpgrade);
+  MigrationStrategy get migration => MigrationStrategy(onUpgrade: (migrator, from, to) => transaction(() => schemaUpgrade(migrator, from, to)));
 
   /// Stores the given [totps].
   Future<void> addTotps(List<Totp> totps) async {
@@ -65,23 +64,63 @@ class AppDatabase extends _$AppDatabase {
     });
   }
 
-  /// Deletes the TOTPs associated to the [tombstones] keys and marks them as deleted.
-  Future<void> deleteTotps(DeletedTotpMap tombstones) => transaction(() async {
-    await (delete(totps)..where((totp) => totp.uuid.isIn(tombstones.keys))).go();
-    await markAsDeleted(tombstones);
+  /// Applies data, tombstones and their outgoing operations in one transaction.
+  Future<(List<Totp>, DeletedTotpMap)> saveTotps(List<Totp> input, {bool replace = false, bool updateOnly = false, bool fromNetwork = false, bool enqueue = false}) => transaction(() async {
+    final Set<String> ids = input.map((totp) => totp.uuid).toSet();
+    final Map<String, DateTime> existing = await _activeTimestamps(replace ? null : ids);
+    final DeletedTotpMap deleted = await getDeletedTotps(ids);
+    final saved = <Totp>[];
+    for (final totp in input) {
+      final DateTime? active = existing[totp.uuid];
+      final DateTime? tombstone = deleted[totp.uuid];
+      if (!replace && ((updateOnly && active == null) || (fromNetwork && active != null && active.isAfter(totp.updatedAt)) || (tombstone != null && !tombstone.isBefore(totp.updatedAt)))) {
+        continue;
+      }
+      saved.add(totp);
+    }
+    final removed = <String, DateTime>{};
+    if (replace) {
+      final Set<String> retained = saved.map((totp) => totp.uuid).toSet();
+      final now = DateTime.now();
+      for (final String uuid in existing.keys.where((uuid) => !retained.contains(uuid))) {
+        removed[uuid] = now;
+      }
+      await replaceTotps(saved, removed);
+    } else if (saved.isNotEmpty) {
+      await removeDeletionMarks([
+        for (final totp in saved)
+          if (deleted.containsKey(totp.uuid)) totp.uuid,
+      ]);
+      await addTotps(saved);
+    }
+    if (enqueue) {
+      if (removed.isNotEmpty) {
+        await addPendingBackendPushOperation(DeleteTotpsPushOperation(tombstones: removed));
+      }
+      if (saved.isNotEmpty) {
+        await addPendingBackendPushOperation(SetTotpsPushOperation(totps: saved));
+      }
+    }
+    return (saved, removed);
   });
 
-  /// Updates all [totps].
-  Future<void> updateTotps(List<Totp> totps) async {
-    await batch((batch) {
-      batch.replaceAll(
-        this.totps,
-        [
-          for (final Totp totp in totps) totp.asDriftTotp,
-        ],
-      );
-    });
-  }
+  /// Deletes entries that have not been edited since the requested timestamp.
+  Future<DeletedTotpMap> deleteTotps(DeletedTotpMap requested, {bool enqueue = false}) => transaction(() async {
+    final Map<String, DateTime> active = await _activeTimestamps(requested.keys);
+    final DeletedTotpMap deleted = await getDeletedTotps(requested.keys);
+    final Map<String, DateTime> accepted = {
+      for (final entry in requested.entries)
+        if (!(active[entry.key]?.isAfter(entry.value) ?? false) && (deleted[entry.key]?.isBefore(entry.value) ?? true)) entry.key: entry.value,
+    };
+    if (accepted.isNotEmpty) {
+      await (delete(totps)..where((totp) => totp.uuid.isIn(accepted.keys))).go();
+      await markAsDeleted(accepted);
+      if (enqueue) {
+        await addPendingBackendPushOperation(DeleteTotpsPushOperation(tombstones: accepted));
+      }
+    }
+    return accepted;
+  });
 
   /// Lists all TOTPs.
   Future<List<Totp>> listTotps() => select(totps).map((totp) => totp.asTotp).get();
@@ -96,10 +135,23 @@ class AppDatabase extends _$AppDatabase {
     await addTotps(totpsToInsert);
   });
 
-  /// Returns all deleted TOTPs.
-  Future<DeletedTotpMap> getDeletedTotps() async {
-    final List<MapEntry<String, DateTime>> tombstones = await (select(deletedTotps)).map((deletedTotp) => MapEntry(deletedTotp.uuid, deletedTotp.deletedAt)).get();
-    return Map.fromEntries(tombstones);
+  Future<Map<String, DateTime>> _activeTimestamps(Iterable<String>? ids) async {
+    final JoinedSelectStatement<$TotpsTable, _DriftTotp> query = selectOnly(totps)..addColumns([totps.uuid, totps.updatedAt]);
+    if (ids != null) {
+      query.where(totps.uuid.isIn(ids));
+    }
+    return {
+      for (final TypedResult row in await query.get()) row.read(totps.uuid)!: DateTime.fromMillisecondsSinceEpoch(row.read(totps.updatedAt)!),
+    };
+  }
+
+  /// Returns deletion timestamps for the requested UUIDs, or the entire table.
+  Future<DeletedTotpMap> getDeletedTotps([Iterable<String>? ids]) async {
+    final SimpleSelectStatement<$DeletedTotpsTable, _DriftDeletedTotp> query = select(deletedTotps);
+    if (ids != null) {
+      query.where((row) => row.uuid.isIn(ids));
+    }
+    return {for (final _DriftDeletedTotp row in await query.get()) row.uuid: row.deletedAt};
   }
 
   /// Adds the given [tombstones] to the deleted TOTPs table. Existing tombstones are only replaced by newer ones.
@@ -137,9 +189,7 @@ class AppDatabase extends _$AppDatabase {
   Selectable<PushOperation> _selectPendingBackendPushOperations() {
     final SimpleSelectStatement<$PendingBackendPushOperationsTable, _DriftBackendPushOperation> operations = select(pendingBackendPushOperations)
       ..orderBy([
-        (table) => OrderingTerm.desc(table.createdAt),
-        (table) => OrderingTerm.asc(table.kind),
-        (table) => OrderingTerm.asc(table.uuid),
+        (table) => OrderingTerm.desc(table.sequence),
       ]);
     return operations.map((operation) => operation.asBackendPushOperation);
   }
@@ -155,79 +205,55 @@ class AppDatabase extends _$AppDatabase {
     await into(pendingBackendPushOperations).insert(operation.asDriftBackendPushOperation);
   }
 
-  /// Replaces all pending backend push operations by [operations].
-  Future<void> replacePendingBackendPushOperations(List<PushOperation> operations) async {
-    await batch((batch) {
-      batch.deleteAll(pendingBackendPushOperations);
-      batch.insertAll(
-        pendingBackendPushOperations,
-        [
-          for (final PushOperation operation in operations) operation.asDriftBackendPushOperation,
-        ],
-      );
-    });
-  }
-
-  /// Applies the given push response.
-  Future<void> applyPushResponse(SynchronizationPushResponse value) async {
-    final Set<String> operationUuidsToDelete = {};
-    final Map<String, List<PushOperationResult>> resultsWithErrors = {};
-    for (final PushOperationResult result in value.result) {
-      operationUuidsToDelete.add(result.operationUuid);
-      if (!result.success) {
-        resultsWithErrors.putIfAbsent(result.totpUuid, () => []).add(result);
+  /// Reads and compacts a single database snapshot, preserving insertion order.
+  Future<List<PushOperation>> compactPendingOperations() => transaction(() async {
+    final List<PushOperation> operations = await listPendingBackendPushOperations();
+    final List<PushOperation> compacted = operations.compacted;
+    final Map<String, PushOperation> retained = {for (final operation in compacted) operation.uuid: operation};
+    for (final operation in operations) {
+      final PushOperation? remaining = retained[operation.uuid];
+      if (remaining == null) {
+        await _writePendingPayload(operation.uuid, {});
+      } else if (remaining.payload.length != operation.payload.length) {
+        await _writePendingPayload(operation.uuid, remaining.payload);
       }
     }
+    return compacted;
+  });
 
-    final Map<String, PushOperation> pendingOperationsByUuid = {
-      for (final PushOperation operation in await listPendingBackendPushOperations())
-        if (operationUuidsToDelete.contains(operation.uuid)) operation.uuid: operation,
-    };
+  Future<void> _writePendingPayload(String uuid, JsonMap payload) async {
+    if (payload.isEmpty) {
+      await (delete(pendingBackendPushOperations)..where((row) => row.uuid.equals(uuid))).go();
+    } else {
+      await (update(pendingBackendPushOperations)..where((row) => row.uuid.equals(uuid))).write(
+        PendingBackendPushOperationsCompanion(jsonPayload: Value(jsonEncode(payload))),
+      );
+    }
+  }
 
-    final Map<String, Totp> retrySets = {};
-    final DeletedTotpMap retryDeletes = {};
-    final List<_DriftBackendPushOperationError> errors = [];
-    for (final MapEntry<String, List<PushOperationResult>> entry in resultsWithErrors.entries) {
+  /// Keeps transient failures in their original queue position, behind newer edits.
+  Future<void> applyPushResponse(SynchronizationPushResponse response) => transaction(() async {
+    final results = <String, List<PushOperationResult>>{};
+    for (final PushOperationResult result in response.result) {
+      (results[result.operationUuid] ??= []).add(result);
+    }
+    for (final MapEntry<String, List<PushOperationResult>> entry in results.entries) {
+      final _DriftBackendPushOperation? row = await (select(pendingBackendPushOperations)..where((row) => row.uuid.equals(entry.key))).getSingleOrNull();
+      if (row == null) {
+        continue;
+      }
+      final JsonMap payload = decodeJsonMap(row.jsonPayload);
       for (final PushOperationResult result in entry.value) {
-        if (!result.errorKind!.isPermanent) {
-          final PushOperation? operation = pendingOperationsByUuid[result.operationUuid];
-          if (operation != null) {
-            switch (operation) {
-              case SetTotpsPushOperation(:final JsonMap payload):
-                final JsonMap? totpData = payload[result.totpUuid];
-                if (totpData != null) {
-                  retrySets[result.totpUuid] = JsonTotp.fromJson(totpData, uuid: result.totpUuid);
-                }
-                break;
-              case DeleteTotpsPushOperation(:final Map<String, int> payload):
-                final int? deletedAt = payload[result.totpUuid];
-                if (deletedAt != null) {
-                  retryDeletes[result.totpUuid] = DateTime.fromMillisecondsSinceEpoch(deletedAt);
-                }
-                break;
-            }
-          }
+        if (result.success || result.errorKind!.isPermanent) {
+          payload.remove(result.totpUuid);
         }
-        errors.add(result.asDriftBackendPushOperationError);
+        if (!result.success) {
+          await into(backendPushOperationErrors).insert(result.asDriftBackendPushOperationError);
+        }
       }
+      await _writePendingPayload(entry.key, payload);
     }
-
-    final List<PushOperation> retries = <PushOperation>[
-      if (retrySets.isNotEmpty) SetTotpsPushOperation(totps: retrySets.values.toList()),
-      if (retryDeletes.isNotEmpty) DeleteTotpsPushOperation(tombstones: retryDeletes),
-    ].compacted;
-
-    await batch((batch) {
-      batch.deleteWhere(pendingBackendPushOperations, (operation) => operation.uuid.isIn(operationUuidsToDelete));
-      batch.insertAll(
-        pendingBackendPushOperations,
-        [
-          for (final PushOperation operation in retries) operation.asDriftBackendPushOperation,
-        ],
-      );
-      batch.insertAll(backendPushOperationErrors, errors);
-    });
-  }
+  });
 
   /// Selects the backend push operation errors.
   Selectable<PushOperationError> _selectBackendPushOperationErrors() {
@@ -360,6 +386,22 @@ extension _Migrations on GeneratedDatabase {
       await migrator.createTable(schema.deletedTotps);
       await migrator.createTable(schema.pendingBackendPushOperations);
       await migrator.createTable(schema.backendPushOperationErrors);
+    },
+    from2To3: (migrator, schema) async {
+      await customStatement('UPDATE totps SET updated_at = updated_at * 1000');
+      await customStatement('UPDATE totps SET validity = NULL WHERE validity <= 0 OR validity > 2147483647');
+      await customStatement('UPDATE totps SET digits = NULL WHERE digits < 4 OR digits > 15');
+      await customStatement('ALTER TABLE deleted_totps RENAME TO deleted_totps_v2');
+      await migrator.createTable(schema.deletedTotps);
+      await customStatement('INSERT INTO deleted_totps (uuid, deleted_at) SELECT uuid, deleted_at * 1000 FROM deleted_totps_v2');
+      await customStatement('DROP TABLE deleted_totps_v2');
+      await customStatement('ALTER TABLE pending_backend_push_operations RENAME TO pending_v2');
+      await migrator.createTable(schema.pendingBackendPushOperations);
+      await customStatement(
+        'INSERT INTO pending_backend_push_operations (uuid, kind, json_payload, created_at) '
+        'SELECT uuid, kind, json_payload, created_at * 1000 FROM pending_v2 ORDER BY rowid',
+      );
+      await customStatement('DROP TABLE pending_v2');
     },
   );
 }

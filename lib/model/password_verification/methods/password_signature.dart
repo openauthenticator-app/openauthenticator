@@ -28,7 +28,7 @@ class PasswordSignatureVerificationMethodNotifier extends AsyncNotifier<Password
   }
 
   /// Enables the password signature verification method.
-  Future<bool> enable(String? password) async {
+  Future<bool> enable(String? password, {CryptoStore? derivedStore}) async {
     if (password == null) {
       return false;
     }
@@ -36,10 +36,10 @@ class PasswordSignatureVerificationMethodNotifier extends AsyncNotifier<Password
     if (salt == null) {
       return false;
     }
-    final CryptoStore cryptoStore = CryptoStore.fromPassword(password, salt);
+    final CryptoStore cryptoStore = derivedStore != null && derivedStore.salt == salt ? derivedStore : await CryptoStore.fromPasswordInIsolate(password, salt);
     final String passwordSignature = cryptoStore.hmacSecretKey.string(password, utf8).base64();
     final CachedSimpleSecureStorage simpleSecureStorage = await ref.read(secureStorageProvider.future);
-    await simpleSecureStorage.write(_kPasswordSignatureKey, passwordSignature);
+    await simpleSecureStorage.writeCredential(_kPasswordSignatureKey, passwordSignature);
     if (ref.mounted) {
       state = AsyncData(
         PasswordSignatureVerificationMethod(
@@ -50,9 +50,6 @@ class PasswordSignatureVerificationMethodNotifier extends AsyncNotifier<Password
     }
     return true;
   }
-
-  /// Updates the current password.
-  Future<void> updatePasswordSignature(String password) async => await enable(password);
 
   /// Disables the password signature verification method.
   Future<void> disable() async {
@@ -86,7 +83,7 @@ class PasswordSignatureVerificationMethod with PasswordVerificationMethod {
     if (!(await super.verify(password))) {
       return false;
     }
-    final CryptoStore cryptoStore = CryptoStore.fromPassword(password, salt!);
+    final CryptoStore cryptoStore = await CryptoStore.fromPasswordInIsolate(password, salt!);
     return cryptoStore.hmacSecretKey.verify(base64.decode(passwordSignature!), utf8.encode(password));
   }
 }

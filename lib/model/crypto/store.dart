@@ -52,13 +52,6 @@ class CryptoStore with Equatable {
     required this.salt,
   });
 
-  /// Creates a [CryptoStore] from the given [password].
-  CryptoStore.fromPassword(String password, Salt salt)
-    : this._(
-        key: DerivedKey.fromPassword(password, salt),
-        salt: salt,
-      );
-
   /// Creates a [CryptoStore] from the given [password], deriving the key in a separate isolate to avoid blocking the UI.
   static Future<CryptoStore> fromPasswordInIsolate(String password, Salt salt) async => CryptoStore._(
     key: await Isolate.run(() => DerivedKey.fromPassword(password, salt)),
@@ -90,7 +83,7 @@ class CryptoStore with Equatable {
   }
 
   /// Checks if the given password is valid.
-  bool checkPasswordValidity(String password) => DerivedKey.fromPassword(password, salt) == key;
+  Future<bool> checkPasswordValidity(String password) async => (await fromPasswordInIsolate(password, salt)).key == key;
 
   /// Checks if the given [encryptedData] could be decrypted using [decrypt].
   /// There seems to be no better way of doing this.

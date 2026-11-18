@@ -25,3 +25,15 @@ class DurationConverter extends TypeConverter<Duration, int> {
   @override
   int toSql(Duration value) => value.inSeconds;
 }
+
+/// Preserves the precision of timestamps exchanged with the backend.
+class EpochMillisecondsConverter extends TypeConverter<DateTime, int> {
+  /// Creates a converter for Unix timestamps in milliseconds.
+  const EpochMillisecondsConverter();
+
+  @override
+  DateTime fromSql(int value) => DateTime.fromMillisecondsSinceEpoch(value);
+
+  @override
+  int toSql(DateTime value) => value.millisecondsSinceEpoch;
+}

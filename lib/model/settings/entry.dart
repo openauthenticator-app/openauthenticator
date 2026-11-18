@@ -36,9 +36,11 @@ class SettingsEntry<T> extends AsyncNotifier<T> {
   /// Changes the entry value.
   Future<void> changeValue(T value) async {
     if (value != state.value && ref.mounted) {
-      state = AsyncData(value);
       final SharedPreferencesWithPrefix preferences = await ref.read(sharedPreferencesProvider.future);
       await saveToPreferences(preferences, value);
+      if (ref.mounted) {
+        state = AsyncData(value);
+      }
     }
   }
 
