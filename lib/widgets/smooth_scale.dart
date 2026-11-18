@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Huge thanks to `smooth_highlight` library for this.
 class SmoothScale extends StatefulWidget {

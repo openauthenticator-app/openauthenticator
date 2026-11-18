@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:animations/animations.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:open_authenticator/model/app_unlock/methods/method.dart';
 import 'package:open_authenticator/model/crypto/derived_key.dart';
 import 'package:open_authenticator/model/crypto/salt.dart';

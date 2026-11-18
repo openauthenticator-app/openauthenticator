@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart' hide ErrorWidget;
 import 'package:forui/forui.dart';
+import 'package:material_ui/material_ui.dart' hide ErrorWidget;
 import 'package:open_authenticator/spacing.dart';
 import 'package:open_authenticator/utils/platform.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
-import 'package:window_manager/window_manager.dart';
+import 'package:window_manager/legacy.dart';
 
 /// Allows to display a window frame.
 class DesktopWindowFrame extends StatelessWidget {

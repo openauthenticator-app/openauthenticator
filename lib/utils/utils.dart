@@ -1,6 +1,6 @@
 import 'package:convertlib/convertlib.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Contains some useful iterable methods.
 extension IterableUtils<T> on Iterable<T> {

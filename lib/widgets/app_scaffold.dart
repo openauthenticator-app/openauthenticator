@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart' hide ErrorWidget;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:material_ui/material_ui.dart' hide ErrorWidget;
 import 'package:open_authenticator/widgets/error.dart';
 
 /// Scaffold for the app.

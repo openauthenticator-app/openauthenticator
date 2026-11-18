@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:jovial_svg/jovial_svg.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// A sized scalable image widget.
 class SizedScalableImage extends StatelessWidget {

@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:open_authenticator/app.dart';
 import 'package:open_authenticator/model/settings/entry.dart';
 import 'package:open_authenticator/utils/shared_preferences_with_prefix.dart';

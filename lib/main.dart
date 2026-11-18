@@ -2,11 +2,12 @@ import 'dart:async';
 import 'dart:io' as io;
 
 import 'package:connectivity_plus_linux_portal/connectivity_plus_linux_portal.dart';
+import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_localizations/flutter_localizations.dart' show GlobalWidgetsLocalizations;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:open_authenticator/app.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/app_links/app_auth.dart';
@@ -46,7 +47,7 @@ import 'package:open_authenticator/widgets/waiting_overlay.dart';
 import 'package:open_authenticator/widgets/window_frame.dart';
 import 'package:rate_my_app/rate_my_app.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
-import 'package:window_manager/window_manager.dart';
+import 'package:window_manager/legacy.dart';
 
 /// Hello world !
 Future<void> main() async {

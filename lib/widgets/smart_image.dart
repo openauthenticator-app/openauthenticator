@@ -1,8 +1,8 @@
 import 'dart:io';
 
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:jovial_svg/jovial_svg.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:open_authenticator/utils/image_type.dart';
 import 'package:open_authenticator/utils/jovial_svg.dart';
 import 'package:open_authenticator/utils/utils.dart';

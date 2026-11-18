@@ -11,7 +11,7 @@ import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/app_unlock/reason.dart';
 import 'package:open_authenticator/utils/local_authentication/local_authentication.dart';
 import 'package:open_authenticator/utils/platform.dart';
-import 'package:window_manager/window_manager.dart';
+import 'package:window_manager/legacy.dart';
 
 /// Uses Flutter's LocalAuthentication implementation.
 class LocalAuthenticationDefault extends LocalAuthentication {

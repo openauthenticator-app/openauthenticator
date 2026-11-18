@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:open_authenticator/model/app_unlock/interaction.dart';
 import 'package:open_authenticator/widgets/dialog/text_input_dialog.dart';
 

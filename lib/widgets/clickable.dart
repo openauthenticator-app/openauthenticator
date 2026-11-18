@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// A widget that is clickable, and therefore displays a [SystemMouseCursors.click] cursor.
 class Clickable extends StatelessWidget with FTileMixin, FItemMixin {

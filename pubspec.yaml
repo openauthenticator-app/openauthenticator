@@ -10,68 +10,78 @@ funding:
   - https://paypal.me/Skyost
 
 environment:
-  sdk: '>=3.12.0 <4.0.0'
+  sdk: ^3.14.0
 
 dependencies:
   flutter:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  animations: ^2.2.0
-  flutter_riverpod: ^3.4.2
-  simple_secure_storage: ^0.4.2
-  jovial_svg: ^1.1.30
-  mobile_scanner: ^7.4.0
-  html: ^0.15.6
+  animations: ^3.0.0
+  flutter_riverpod: ^3.5.0
+  simple_secure_storage: ^0.4.3
+  jovial_svg: ^1.1.31
+  mobile_scanner: ^7.5.0
+  html: ^0.15.7
   path_provider: ^2.1.6
-  shared_preferences: ^2.5.5
+  shared_preferences: ^2.5.6
   uuid: ^4.6.0
-  equatable: ^2.1.0
-  drift: ^2.34.3
+  equatable: ^3.0.0
+  drift: ^2.35.4
   drift_flutter: ^0.3.1
   path: ^1.9.1
   local_auth: ^3.0.2
-  package_info_plus: ^10.2.1
+  package_info_plus: ^10.2.2
   http: ^1.6.0
   qr_flutter: ^4.1.0
-  intl: any
-  url_launcher: ^6.3.2
-  purchases_flutter: ^10.9.0
-  purchases_ui_flutter: ^10.9.0
+  intl: ^0.20.3
+  url_launcher: ^6.3.3
+  purchases_flutter: ^10.19.1
+  purchases_ui_flutter: ^10.19.1
   purchases_dart:
     git:
       url: https://github.com/openauthenticator-app/purchases-dart.git
-  window_manager: ^0.5.2
-  slang: ^4.19.0
+  window_manager: ^0.7.0
+  slang: ^4.19.2
   slang_flutter: ^4.19.0
-  rate_my_app: ^2.4.1
-  app_links: ^7.2.1
-  hashlib: ^2.4.2
+  rate_my_app: ^2.4.2
+  app_links: ^7.2.2
+  hashlib: ^2.4.3
   convertlib: ^3.6.1
   cipherlib: ^0.7.2
   scrollable_positioned_list: ^0.3.8
-  share_plus: ^13.3.0
-  wakelock_plus: ^1.7.0
-  file_picker: ^12.0.0
-  connectivity_plus: ^7.3.1
+  share_plus: ^13.3.1
+  wakelock_plus: ^1.8.2
+  file_picker: ^13.4.0
+  connectivity_plus: ^7.3.2
   connectivity_plus_linux_portal: ^0.0.4
-  sentry_flutter: ^9.27.0
-  forui: ^0.25.0
+  sentry_flutter: ^10.5.0
+  forui: ^0.28.0
   forui_assets: ^0.25.0
-  custom_refresh_indicator: ^4.0.1
+  custom_refresh_indicator: ^4.0.2
   # TODO: Remove Firebase dependencies once migration is finished.
-  firebase_core: ^4.13.0
-  firebase_auth: ^6.5.7
-  cloud_firestore: ^6.8.0
+  firebase_core: ^5.2.0
+  firebase_auth: ^7.1.0
+  cloud_firestore: ^7.2.0
+  material_ui: ^1.11.1
+  cupertino_ui: ^1.1.7
+  args: ^2.7.0
+  riverpod: ^3.5.0
+  meta: ^1.19.0
+  local_auth_android: ^2.3.0
+  local_auth_darwin: ^2.0.5
+  local_auth_windows: ^2.0.2
+  jovial_misc: ^0.10.0
+  shared_preferences_linux: ^2.4.1
+  shared_preferences_windows: ^2.4.1
 
 dev_dependencies:
   flutter_lints: ^6.0.0
-  build_runner: ^2.16.0
-  drift_dev: ^2.34.5
+  build_runner: ^2.17.1
+  drift_dev: ^2.35.3
   msix: ^3.18.0
-  riverpod_lint: ^3.1.8
-  release: ^0.1.10
-  args: ^2.7.0
+  riverpod_lint: ^3.2.0
+  release: ^0.2.0
 
 dependency_overrides:
   xml: ^7.0.1

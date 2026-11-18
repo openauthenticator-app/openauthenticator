@@ -1,7 +1,7 @@
 import 'dart:ui';
 
-import 'package:flutter/material.dart';
 import 'package:forui/forui.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Allows to blur a widget. Kudos to "jagritjkh/blur" for the initial implementation.
 class Blur extends StatelessWidget {

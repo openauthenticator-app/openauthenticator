@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:open_authenticator/spacing.dart';
 import 'package:open_authenticator/widgets/sized_scalable_image.dart';
 import 'package:open_authenticator/widgets/title_text.dart';
