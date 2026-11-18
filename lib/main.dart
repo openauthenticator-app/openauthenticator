@@ -2,9 +2,7 @@ import 'dart:async';
 import 'dart:io' as io;
 
 import 'package:connectivity_plus_linux_portal/connectivity_plus_linux_portal.dart';
-import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_localizations/flutter_localizations.dart' show GlobalWidgetsLocalizations;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:material_ui/material_ui.dart';
@@ -155,11 +153,7 @@ class OpenAuthenticatorApp extends ConsumerWidget {
       key: ValueKey('materialApp.$showIntroState'),
       title: App.appName,
       locale: locale,
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
+      localizationsDelegates: GlobalMaterialLocalizations.delegates,
       navigatorObservers: [
         SentryNavigatorObserver(),
       ],
