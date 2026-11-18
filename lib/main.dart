@@ -32,6 +32,7 @@ import 'package:open_authenticator/utils/rate_my_app.dart';
 import 'package:open_authenticator/utils/result/handler.dart';
 import 'package:open_authenticator/utils/result/result.dart';
 import 'package:open_authenticator/utils/sentry.dart';
+import 'package:open_authenticator/utils/window.dart';
 import 'package:open_authenticator/widgets/animated_theme.dart';
 import 'package:open_authenticator/widgets/app_scaffold.dart';
 import 'package:open_authenticator/widgets/centered_circular_progress_indicator.dart';
@@ -45,27 +46,21 @@ import 'package:open_authenticator/widgets/waiting_overlay.dart';
 import 'package:open_authenticator/widgets/window_frame.dart';
 import 'package:rate_my_app/rate_my_app.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
-import 'package:window_manager/legacy.dart';
+import 'package:window_manager/window_manager.dart';
 
 /// Hello world !
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (currentPlatform.isDesktop) {
-    await windowManager.ensureInitialized();
-    windowManager.waitUntilReadyToShow(
-      const WindowOptions(
-        title: App.appName,
-        size: Size(800, 600),
-        minimumSize: Size(400, 400),
-        center: true,
-        titleBarStyle: TitleBarStyle.hidden,
-        windowButtonVisibility: false,
-      ),
-      () async {
-        await windowManager.show();
-        await windowManager.focus();
-      },
-    );
+    currentWindow
+      ?..titleBarStyle = TitleBarStyle.hidden
+      ..isWindowControlButtonsVisible = false
+      ..title = App.appName
+      ..setSize(const Size(800, 600).toNative(), false)
+      ..minimumSize = const Size(400, 400).toNative()
+      ..center()
+      ..show()
+      ..focus();
     if (currentPlatform == .linux) {
       final bool isFlatpak = io.Platform.environment.containsKey('FLATPAK_ID') || io.Platform.environment['container'] == 'flatpak';
       final String? backend = io.Platform.environment['CONNECTIVITY_BACKEND'];

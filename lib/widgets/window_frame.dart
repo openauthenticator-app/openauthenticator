@@ -1,11 +1,10 @@
-import 'dart:async';
-
 import 'package:forui/forui.dart';
 import 'package:material_ui/material_ui.dart' hide ErrorWidget;
 import 'package:open_authenticator/spacing.dart';
 import 'package:open_authenticator/utils/platform.dart';
+import 'package:open_authenticator/utils/window.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
-import 'package:window_manager/legacy.dart';
+import 'package:window_manager/window_manager.dart';
 
 /// Allows to display a window frame.
 class DesktopWindowFrame extends StatelessWidget {
@@ -41,9 +40,12 @@ class _DragArea extends StatefulWidget {
 }
 
 /// The drag area widget state.
-class _DragAreaState extends State<_DragArea> with WindowListener {
-  /// Whether the drag area is loading.
-  bool isLoading = false;
+class _DragAreaState extends State<_DragArea> {
+  /// The current window.
+  final Window? window = currentWindow;
+
+  /// The window listener ID.
+  ListenerId? listenerId;
 
   /// Whether the window is maximized.
   bool? isMaximized;
@@ -51,13 +53,8 @@ class _DragAreaState extends State<_DragArea> with WindowListener {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final bool isMaximized = await windowManager.isMaximized();
-      if (mounted) {
-        setState(() => this.isMaximized = isMaximized);
-      }
-    });
-    windowManager.addListener(this);
+    isMaximized = window?.isMaximized;
+    listenerId = window?.addListener(onWindowEvent);
   }
 
   @override
@@ -71,7 +68,7 @@ class _DragAreaState extends State<_DragArea> with WindowListener {
         children: [
           ClickableButton.icon(
             variant: .secondary,
-            onPress: isLoading ? null : windowManager.minimize,
+            onPress: window?.minimize,
             child: Transform.translate(
               offset: const Offset(0, 5),
               child: Icon(
@@ -83,7 +80,7 @@ class _DragAreaState extends State<_DragArea> with WindowListener {
           if (isMaximized == true)
             ClickableButton.icon(
               variant: .secondary,
-              onPress: isLoading ? null : () => doFuture(windowManager.unmaximize),
+              onPress: window?.unmaximize,
               child: Transform.flip(
                 flipX: true,
                 child: Icon(
@@ -95,7 +92,7 @@ class _DragAreaState extends State<_DragArea> with WindowListener {
           else
             ClickableButton.icon(
               variant: .secondary,
-              onPress: isLoading || isMaximized == null ? null : () => doFuture(windowManager.maximize),
+              onPress: isMaximized == null ? null : window?.maximize,
               child: Icon(
                 FLucideIcons.square,
                 size: context.theme.typography.body.sm.fontSize,
@@ -103,7 +100,7 @@ class _DragAreaState extends State<_DragArea> with WindowListener {
             ),
           ClickableButton.icon(
             variant: .destructive,
-            onPress: isLoading ? null : () => doFuture(windowManager.close),
+            onPress: window?.close,
             child: Icon(
               FLucideIcons.x,
               size: context.theme.typography.body.sm.fontSize,
@@ -114,34 +111,19 @@ class _DragAreaState extends State<_DragArea> with WindowListener {
     ),
   );
 
-  /// Executes the given future and sets the loading state accordingly.
-  Future<void> doFuture<T>(Future<T> Function() future) async {
-    setState(() => isLoading = true);
-    await future();
-    if (mounted) {
-      setState(() => isLoading = false);
-    }
-  }
-
-  @override
-  void onWindowMaximize() {
-    super.onWindowMaximize();
-    if (mounted) {
-      setState(() => isMaximized = true);
-    }
-  }
-
-  @override
-  void onWindowUnmaximize() {
-    super.onWindowUnmaximize();
-    if (mounted) {
-      setState(() => isMaximized = false);
+  /// Triggered when a window event occurs.
+  void onWindowEvent(WindowEvent event) {
+    if (mounted && (event is WindowMaximizedEvent || event is WindowRestoredEvent || event is WindowResizedEvent)) {
+      setState(() => isMaximized = window?.isMaximized);
     }
   }
 
   @override
   void dispose() {
-    windowManager.removeListener(this);
+    final ListenerId? listenerId = this.listenerId;
+    if (listenerId != null) {
+      window?.removeListener(listenerId);
+    }
     super.dispose();
   }
 }
