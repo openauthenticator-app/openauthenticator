@@ -287,33 +287,15 @@ class _DesktopActions extends StatelessWidget {
     menu: [
       FItemGroup(
         children: [
-          if (totp.isDecrypted) ...[
+          if (totp.isDecrypted)
             Clickable(
               child: FItem(
                 onPress: onEditPress,
                 prefix: const Icon(FLucideIcons.pencil),
                 title: Text(translations.totp.actions.desktopButtons.edit),
               ),
-            ),
-            Clickable(
-              child: FItem(
-                style: .delta(
-                  contentStyle: .delta(
-                    prefixIconStyle: .delta(
-                      [
-                        .all(
-                          .delta(color: context.theme.colors.destructive),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                onPress: onDeletePress,
-                prefix: const Icon(FLucideIcons.trash),
-                title: Text(translations.totp.actions.desktopButtons.delete),
-              ),
-            ),
-          ] else
+            )
+          else
             Clickable(
               child: FItem(
                 onPress: onDecryptPress,
@@ -321,6 +303,25 @@ class _DesktopActions extends StatelessWidget {
                 title: Text(translations.totp.actions.decrypt),
               ),
             ),
+          // Undecryptable TOTPs can be deleted too, otherwise they would prevent backups and master password changes forever.
+          Clickable(
+            child: FItem(
+              style: .delta(
+                contentStyle: .delta(
+                  prefixIconStyle: .delta(
+                    [
+                      .all(
+                        .delta(color: context.theme.colors.destructive),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              onPress: onDeletePress,
+              prefix: const Icon(FLucideIcons.trash),
+              title: Text(translations.totp.actions.desktopButtons.delete),
+            ),
+          ),
         ],
       ),
     ],
