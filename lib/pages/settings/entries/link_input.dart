@@ -18,11 +18,11 @@ class LinkInputSettingsEntryWidget extends ConsumerWidget with FTileMixin {
     title: const Text('Input link'),
     subtitle: const Text('Inputs an openauthenticator:// link from the clipboard.'),
     onPress: () async {
-      ClipboardData? clipboardData = await Clipboard.getData('text/plain');
+      final ClipboardData? clipboardData = await Clipboard.getData('text/plain');
       if (clipboardData == null || clipboardData.text == null) {
         return;
       }
-      Uri? uri = Uri.tryParse(clipboardData.text!);
+      final Uri? uri = Uri.tryParse(clipboardData.text!);
       if (uri == null || uri.scheme != 'openauthenticator') {
         return;
       }

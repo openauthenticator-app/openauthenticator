@@ -114,7 +114,7 @@ class _TextInputDialogState extends State<TextInputDialog> {
   @override
   Widget build(BuildContext context) {
     void onSubmit(String value) {
-      bool valid = onChanged(value);
+      final bool valid = onChanged(value);
       if (valid) {
         Navigator.pop(context, value);
       }
@@ -171,7 +171,7 @@ class _TextInputDialogState extends State<TextInputDialog> {
   bool onChanged(String newValue) {
     value = newValue;
     if (widget.validator != null) {
-      bool result = widget.validator!(newValue) == null;
+      final bool result = widget.validator!(newValue) == null;
       setState(() => valid = result);
       return result;
     }

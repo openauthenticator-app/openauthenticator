@@ -1,3 +1,4 @@
+import 'package:meta/meta.dart';
 import 'package:open_authenticator/model/app_links/openauthenticator.dart';
 
 /// Handles `openauthenticator://auth/` links.
@@ -12,6 +13,7 @@ extension type AppAuthLink(OpenAuthenticatorAppLink uri) implements OpenAuthenti
   static const String _kFirstPathSegment = 'provider';
 
   /// Returns whether the given [uri] is a valid app auth link.
+  @redeclare
   bool get isValid => uri.isScheme(_kScheme) && uri.host == _kHost && uri.pathSegments.length >= 2 && uri.pathSegments.firstOrNull == _kFirstPathSegment;
 
   /// Returns the provider id.
@@ -30,6 +32,7 @@ extension type FinishAuthAppLink(AppAuthLink uri) implements AppAuthLink {
   static const String _kLastPathSegment = 'finish';
 
   /// Returns whether the given [uri] is a valid finish auth app link.
+  @redeclare
   bool get isValid => (this as AppAuthLink).isValid && uri.pathSegments.lastOrNull == _kLastPathSegment && uri.queryParameters[_kAuthorizationCodeQueryParameter] != null;
 
   /// Returns the authorization code.
@@ -54,6 +57,7 @@ extension type EmailSentAppLink(AppAuthLink uri) implements AppAuthLink {
   static const String _kPreviouslyQueryParameter = 'previously';
 
   /// Returns whether the given [uri] is a email sent app link.
+  @redeclare
   bool get isValid => (this as AppAuthLink).isValid && uri.path == _kPath && uri.queryParameters[_kEmailQueryParameter] != null;
 
   /// Returns the email.

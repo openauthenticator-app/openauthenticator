@@ -32,7 +32,7 @@ class Migrator extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    AsyncValue<MigrationState> migrationState = ref.watch(migratorProvider);
+    final AsyncValue<MigrationState> migrationState = ref.watch(migratorProvider);
     return switch (migrationState) {
       AsyncData(:final value) => switch (value) {
         .needed => AppScaffold(
@@ -103,7 +103,7 @@ class Migrator extends ConsumerWidget {
 
   /// Migrates the data.
   Future<void> _migrate(BuildContext context, WidgetRef ref) async {
-    Result<StorageType> result = await showWaitingOverlay(
+    final Result<StorageType> result = await showWaitingOverlay(
       context,
       future: ref.read(migratorProvider.notifier).migrate(),
     );
@@ -119,7 +119,7 @@ class Migrator extends ConsumerWidget {
         }
         break;
       case ResultError(:final exception, :final stackTrace):
-        ErrorDialogResult? errorResult = await ErrorDialog.openDialog(
+        final ErrorDialogResult? errorResult = await ErrorDialog.openDialog(
           context,
           message: exception is LocalizableException ? exception.localizedErrorMessage : translations.error.migrator.message,
           error: exception,

@@ -7,9 +7,9 @@ import 'package:open_authenticator/model/totp/totp.dart';
 
 /// The TOTP limit provider.
 final totpLimitProvider = FutureProvider<TotpLimit>((ref) async {
-  User? user = await ref.watch(userProvider.future);
-  StorageType storageType = await ref.watch(storageTypeSettingsEntryProvider.future);
-  List<Totp> totps = await ref.watch(totpRepositoryProvider.future);
+  final User? user = await ref.watch(userProvider.future);
+  final StorageType storageType = await ref.watch(storageTypeSettingsEntryProvider.future);
+  final List<Totp> totps = await ref.watch(totpRepositoryProvider.future);
   return TotpLimit._(
     userTotpsLimit: user?.totpsLimit,
     storageType: storageType,

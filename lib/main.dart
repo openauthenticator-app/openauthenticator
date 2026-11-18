@@ -68,8 +68,8 @@ Future<void> main() async {
       },
     );
     if (currentPlatform == .linux) {
-      bool isFlatpak = io.Platform.environment.containsKey('FLATPAK_ID') || io.Platform.environment['container'] == 'flatpak';
-      String? backend = io.Platform.environment['CONNECTIVITY_BACKEND'];
+      final bool isFlatpak = io.Platform.environment.containsKey('FLATPAK_ID') || io.Platform.environment['container'] == 'flatpak';
+      final String? backend = io.Platform.environment['CONNECTIVITY_BACKEND'];
       if (isFlatpak || backend == 'portal') {
         ConnectivityPlusLinuxPortalPlugin.registerWith();
       }
@@ -106,11 +106,11 @@ class OpenAuthenticatorApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    AsyncValue<bool> showIntro = ref.watch(showIntroSettingsEntryProvider);
-    AsyncValue<ThemeMode> theme = ref.watch(themeSettingsEntryProvider);
-    Locale locale = TranslationProvider.of(context).flutterLocale;
+    final AsyncValue<bool> showIntro = ref.watch(showIntroSettingsEntryProvider);
+    final AsyncValue<ThemeMode> theme = ref.watch(themeSettingsEntryProvider);
+    final Locale locale = TranslationProvider.of(context).flutterLocale;
     return switch (showIntro) {
-      AsyncData(:bool value) => _createMaterialApp(
+      AsyncData(:final bool value) => _createMaterialApp(
         showIntroState: 'data',
         theme: theme,
         locale: locale,
@@ -148,8 +148,8 @@ class OpenAuthenticatorApp extends ConsumerWidget {
     String? initialRoute,
     Widget? home,
   }) {
-    FThemeData light = currentPlatform.isDesktop ? greenTheme.light.desktop : greenTheme.light.touch;
-    FThemeData dark = currentPlatform.isDesktop ? greenTheme.dark.desktop : greenTheme.dark.touch;
+    final FThemeData light = currentPlatform.isDesktop ? greenTheme.light.desktop : greenTheme.light.touch;
+    final FThemeData dark = currentPlatform.isDesktop ? greenTheme.dark.desktop : greenTheme.dark.touch;
     return MaterialApp(
       key: ValueKey('materialApp.$showIntroState'),
       title: App.appName,
@@ -193,7 +193,7 @@ class OpenAuthenticatorApp extends ConsumerWidget {
                 child: SettingsPage(),
               ),
               TotpPage.name: (context) {
-                Map<String, dynamic>? arguments = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
+                final Map<String, dynamic>? arguments = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
                 return _RouteWidget(
                   child: TotpPage(
                     totp: arguments?[kRouteParameterTotp],
@@ -245,11 +245,11 @@ class _RouteWidgetState extends ConsumerState<_RouteWidget> {
     if (widget.listen) {
       ref.listenManual(
         appLinksListenerProvider,
-        (previous, next) async {
+        (previous, next) {
           if (previous?.value == next.value || next is! AsyncData<Uri?> || next.value == null) {
             return;
           }
-          Uri uri = next.value!;
+          final Uri uri = next.value!;
           if ((uri as OpenAuthenticatorAppLink).isValid) {
             if (!ref.read(appLinksListenerProvider.notifier).consumeLink(uri)) {
               return;
@@ -269,7 +269,7 @@ class _RouteWidgetState extends ConsumerState<_RouteWidget> {
       );
       ref.listenManual(
         totpLimitProvider,
-        (previous, next) async {
+        (previous, next) {
           if (previous?.value == next.value || next is! AsyncData<TotpLimit> || !next.value.isExceeded) {
             return;
           }
@@ -292,7 +292,7 @@ class _RouteWidgetState extends ConsumerState<_RouteWidget> {
     }
     if (widget.rateMyApp) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
-        RateMyApp rateMyApp = RateMyApp.customConditions(
+        final RateMyApp rateMyApp = RateMyApp.customConditions(
           preferencesPrefix: kDebugMode ? 'flutterDebug.rateMyApp.' : 'flutter.rateMyApp.',
           appStoreIdentifier: Stores.appStoreIdentifier,
           googlePlayIdentifier: Stores.googlePlayIdentifier,
@@ -319,11 +319,11 @@ class _RouteWidgetState extends ConsumerState<_RouteWidget> {
   /// Handles an in-app link.
   Future<void> handleOpenAuthenticatorLink(OpenAuthenticatorAppLink appLink) async {
     if ((appLink as AppAuthLink).isValid) {
-      AuthenticationProvider? provider = ref.read(authenticationProviders).findProvider(appLink.providerId);
+      final AuthenticationProvider? provider = ref.read(authenticationProviders).findProvider(appLink.providerId);
       if (provider == null) {
         return;
       }
-      Result<RedirectResult> result = await showWaitingOverlay(
+      final Result<RedirectResult> result = await showWaitingOverlay(
         context,
         future: provider.onRedirectReceived(appLink),
       );

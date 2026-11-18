@@ -19,7 +19,7 @@ class DeleteAccountSettingsEntryWidget extends ConsumerWidget with FTileMixin {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    User? user = ref.watch(userProvider).value;
+    final User? user = ref.watch(userProvider).value;
     return user == null
         ? const SizedBox.shrink()
         : ClickableTile(
@@ -27,7 +27,7 @@ class DeleteAccountSettingsEntryWidget extends ConsumerWidget with FTileMixin {
             title: Text(translations.settings.dangerZone.deleteAccount.title),
             subtitle: Text(translations.settings.dangerZone.deleteAccount.subtitle),
             onPress: () async {
-              StorageType storageType = await showWaitingOverlay(
+              final StorageType storageType = await showWaitingOverlay(
                 context,
                 future: ref.read(storageTypeSettingsEntryProvider.future),
               );

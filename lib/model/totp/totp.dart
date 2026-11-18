@@ -87,7 +87,7 @@ class Totp extends Equatable implements Comparable<Totp> {
   /// Tries to decrypt the current TOTP [secret].
   /// Returns the current instance if failed.
   Totp decrypt(CryptoStore? cryptoStore) {
-    DecryptedData? decryptedData = DecryptedData.decrypt(
+    final DecryptedData? decryptedData = DecryptedData.decrypt(
       cryptoStore: cryptoStore,
       encryptedData: encryptedData,
     );
@@ -117,7 +117,7 @@ class Totp extends Equatable implements Comparable<Totp> {
         return null;
       }
     }
-    DecryptedData? decryptedData = (result as DecryptedTotp).decryptedData.changeEncryptionKey(newCryptoStore);
+    final DecryptedData? decryptedData = (result as DecryptedTotp).decryptedData.changeEncryptionKey(newCryptoStore);
     if (decryptedData == null) {
       return null;
     }
@@ -185,7 +185,7 @@ class EncryptedData extends Equatable {
     String? issuer,
     String? imageUrl,
   }) {
-    Uint8List? encryptedSecret = cryptoStore?.encrypt(secret);
+    final Uint8List? encryptedSecret = cryptoStore?.encrypt(secret);
     if (encryptedSecret == null) {
       return null;
     }

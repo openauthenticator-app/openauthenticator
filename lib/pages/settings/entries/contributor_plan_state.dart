@@ -12,10 +12,10 @@ class ContributorPlanStateSettingsEntryWidget extends ConsumerWidget with FTileM
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    AsyncValue<ContributorPlanState> state = ref.watch(contributorPlanStateProvider);
+    final AsyncValue<ContributorPlanState> state = ref.watch(contributorPlanStateProvider);
     return FSelectMenuTile<ContributorPlanState>.fromMap(
       {
-        for (ContributorPlanState state in ContributorPlanState.values) state.name: state,
+        for (final ContributorPlanState state in ContributorPlanState.values) state.name: state,
       },
       selectControl: FMultiValueControl.managedRadio(
         initial: state.value ?? ContributorPlanState.impossible,

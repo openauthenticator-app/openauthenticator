@@ -30,8 +30,8 @@ class PushOperationsQueue extends AsyncNotifier<List<PushOperation>> {
 
   @override
   Future<List<PushOperation>> build() async {
-    AppDatabase database = ref.watch(appDatabaseProvider);
-    StreamSubscription<List<PushOperation>> subscription = database.watchPendingBackendPushOperations().listen(_onDatabaseUpdate);
+    final AppDatabase database = ref.watch(appDatabaseProvider);
+    final StreamSubscription<List<PushOperation>> subscription = database.watchPendingBackendPushOperations().listen(_onDatabaseUpdate);
     ref.onDispose(subscription.cancel);
 
     return await database.listPendingBackendPushOperations();
@@ -42,7 +42,7 @@ class PushOperationsQueue extends AsyncNotifier<List<PushOperation>> {
     PushOperation operation, {
     bool andRun = true,
   }) async {
-    AppDatabase database = ref.read(appDatabaseProvider);
+    final AppDatabase database = ref.read(appDatabaseProvider);
     await database.addPendingBackendPushOperation(operation);
     if (andRun) {
       ref.read(synchronizationControllerProvider.notifier).notifyLocalChange();
@@ -52,14 +52,14 @@ class PushOperationsQueue extends AsyncNotifier<List<PushOperation>> {
   /// Pushes the pending operations.
   Future<Result> _push({bool checkSettings = true}) async {
     if (checkSettings) {
-      StorageType storageType = await ref.read(storageTypeSettingsEntryProvider.future);
+      final StorageType storageType = await ref.read(storageTypeSettingsEntryProvider.future);
       if (storageType == .localOnly) {
         return const ResultCancelled();
       }
     }
-    List<PushOperation> operations = await future;
-    List<PushOperation> compactedOperations = operations.compacted;
-    AppDatabase database = ref.read(appDatabaseProvider);
+    final List<PushOperation> operations = await future;
+    final List<PushOperation> compactedOperations = operations.compacted;
+    final AppDatabase database = ref.read(appDatabaseProvider);
     if (compactedOperations.length != operations.length) {
       await database.replacePendingBackendPushOperations(compactedOperations);
     }
@@ -68,7 +68,7 @@ class PushOperationsQueue extends AsyncNotifier<List<PushOperation>> {
       return const ResultSuccess();
     }
 
-    Result<SynchronizationPushResponse> result = await ref
+    final Result<SynchronizationPushResponse> result = await ref
         .read(backendClientProvider.notifier)
         .sendHttpRequest(
           SynchronizationPushRequest(
@@ -123,12 +123,12 @@ class SynchronizationController extends Notifier<SynchronizationStatus> with Wid
 
   @override
   SynchronizationStatus build() {
-    StorageType? storageType = ref.watch(storageTypeSettingsEntryProvider).value;
+    final StorageType? storageType = ref.watch(storageTypeSettingsEntryProvider).value;
     if (storageType == .localOnly) {
       return SynchronizationStatus();
     }
 
-    Timer periodicTimer = Timer.periodic(_kPeriodicInterval, (_) => notifyLocalChange());
+    final Timer periodicTimer = Timer.periodic(_kPeriodicInterval, (_) => notifyLocalChange());
     ref.onDispose(periodicTimer.cancel);
 
     if (currentPlatform.isMobile) {
@@ -210,7 +210,7 @@ class SynchronizationController extends Notifier<SynchronizationStatus> with Wid
       return false;
     }
 
-    List<PushOperation> operations = await ref.read(pushOperationsQueueProvider.future);
+    final List<PushOperation> operations = await ref.read(pushOperationsQueueProvider.future);
     return operations.isEmpty;
   }
 
@@ -235,7 +235,7 @@ class SynchronizationController extends Notifier<SynchronizationStatus> with Wid
         );
       }
 
-      bool canSendRequests = (await ref.read(connectivityStateProvider.future)).canSendRequests;
+      final bool canSendRequests = (await ref.read(connectivityStateProvider.future)).canSendRequests;
       if (canSendRequests) {
         void onFinish({bool errorOccurred = false}) {
           if (!errorOccurred) {
@@ -249,7 +249,7 @@ class SynchronizationController extends Notifier<SynchronizationStatus> with Wid
           }
         }
 
-        Result pushResult = await ref.read(pushOperationsQueueProvider.notifier)._push(checkSettings: checkSettings);
+        final Result pushResult = await ref.read(pushOperationsQueueProvider.notifier)._push(checkSettings: checkSettings);
         if (pushResult is! ResultSuccess) {
           if (pushResult is ResultCancelled) {
             onFinish(errorOccurred: false);
@@ -259,7 +259,7 @@ class SynchronizationController extends Notifier<SynchronizationStatus> with Wid
             Error.throwWithStackTrace(error.$1, error.$2);
           }
         } else {
-          Result pullResult = await _pull(checkSettings: checkSettings);
+          final Result pullResult = await _pull(checkSettings: checkSettings);
           if (pullResult is! ResultSuccess) {
             if (pullResult is ResultCancelled) {
               onFinish(errorOccurred: false);
@@ -299,7 +299,7 @@ class SynchronizationController extends Notifier<SynchronizationStatus> with Wid
 
   /// Schedules a retry.
   void _scheduleRetry() {
-    int jitterMs = _random.nextInt(250);
+    final int jitterMs = _random.nextInt(250);
 
     _retryTimer?.cancel();
     _retryTimer = Timer(
@@ -317,20 +317,20 @@ class SynchronizationController extends Notifier<SynchronizationStatus> with Wid
   /// Pulls changes from the backend.
   Future<Result> _pull({bool checkSettings = true}) async {
     if (checkSettings) {
-      StorageType storageType = await ref.read(storageTypeSettingsEntryProvider.future);
+      final StorageType storageType = await ref.read(storageTypeSettingsEntryProvider.future);
       if (storageType == StorageType.localOnly) {
         return const ResultCancelled();
       }
     }
 
-    List<Totp> totps = await ref.read(totpRepositoryProvider.future);
-    DeletedTotpMap deletedTotps = await ref.read(appDatabaseProvider).getDeletedTotps();
-    Result<SynchronizationPullResponse> result = await ref
+    final List<Totp> totps = await ref.read(totpRepositoryProvider.future);
+    final DeletedTotpMap deletedTotps = await ref.read(appDatabaseProvider).getDeletedTotps();
+    final Result<SynchronizationPullResponse> result = await ref
         .read(backendClientProvider.notifier)
         .sendHttpRequest(
           SynchronizationPullRequest(
             active: {
-              for (Totp totp in totps) totp.uuid: totp.updatedAt,
+              for (final Totp totp in totps) totp.uuid: totp.updatedAt,
             },
             deleted: deletedTotps,
           ),
@@ -341,22 +341,22 @@ class SynchronizationController extends Notifier<SynchronizationStatus> with Wid
       return result;
     }
 
-    TotpRepository repository = ref.read(totpRepositoryProvider.notifier);
-    Result addResult = await repository.addTotps(
+    final TotpRepository repository = ref.read(totpRepositoryProvider.notifier);
+    final Result addResult = await repository.addTotps(
       result.value.inserts,
       fromNetwork: true,
     );
     if (addResult is! ResultSuccess) {
       return addResult;
     }
-    Result updateResult = await repository.updateTotps(
+    final Result updateResult = await repository.updateTotps(
       result.value.updates,
       fromNetwork: true,
     );
     if (updateResult is! ResultSuccess) {
       return updateResult;
     }
-    Result deleteResult = await repository.deleteTotps(
+    final Result deleteResult = await repository.deleteTotps(
       result.value.deletes,
       fromNetwork: true,
     );

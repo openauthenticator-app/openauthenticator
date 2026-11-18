@@ -54,12 +54,12 @@ class _RequireProviderValueWidget<T, U extends AsyncNotifier<T>> extends Consume
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (showChildIfLocked) {
-      bool isUnlocked = ref.watch(appLockStateProvider).value == AppLockState.unlocked;
+      final bool isUnlocked = ref.watch(appLockStateProvider).value == AppLockState.unlocked;
       if (!isUnlocked) {
         return child;
       }
     }
-    AsyncValue<T> value = ref.watch(provider);
+    final AsyncValue<T> value = ref.watch(provider);
     return value.value == null ? childIfAbsent : child;
   }
 }

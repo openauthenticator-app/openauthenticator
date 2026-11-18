@@ -11,7 +11,7 @@ enum ImageType {
 
   /// Infers an image type from the given [source].
   static ImageType inferFromSource(String source) {
-    String normalized = normalizeSource(source);
+    final String normalized = normalizeSource(source);
     if (normalized.endsWith('.svg')) {
       return svg;
     }
@@ -26,7 +26,7 @@ enum ImageType {
     if (mimeType == null) {
       return other;
     }
-    String normalized = mimeType.toLowerCase();
+    final String normalized = mimeType.toLowerCase();
     if (normalized.contains('image/svg+xml')) {
       return svg;
     }
@@ -35,11 +35,11 @@ enum ImageType {
 
   /// Normalizes a source to infer its type more reliably.
   static String normalizeSource(String source) {
-    Uri? uri = Uri.tryParse(source);
+    final Uri? uri = Uri.tryParse(source);
     if (uri == null) {
       return source.toLowerCase();
     }
-    String path = uri.path.isEmpty ? source : uri.path;
+    final String path = uri.path.isEmpty ? source : uri.path;
     return path.toLowerCase();
   }
 }

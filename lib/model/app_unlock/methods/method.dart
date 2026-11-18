@@ -13,13 +13,14 @@ import 'package:open_authenticator/model/totp/repository.dart';
 import 'package:open_authenticator/model/totp/totp.dart';
 import 'package:open_authenticator/utils/local_authentication/local_authentication.dart';
 import 'package:open_authenticator/utils/result/result.dart';
+import 'package:riverpod/src/providers/provider.dart';
 
 part 'local_auth.dart';
 part 'master_password.dart';
 part 'none.dart';
 
 /// The app unlock method provider.
-final appUnlockMethodProvider = Provider.family<AppUnlockMethod?, String>(
+final ProviderFamily<AppUnlockMethod<dynamic>?, String> appUnlockMethodProvider = Provider.family<AppUnlockMethod?, String>(
   (ref, id) => switch (id) {
     LocalAuthenticationAppUnlockMethod.kMethodId => LocalAuthenticationAppUnlockMethod._(ref: ref),
     MasterPasswordAppUnlockMethod.kMethodId => MasterPasswordAppUnlockMethod._(ref: ref),
@@ -45,7 +46,7 @@ sealed class AppUnlockMethod<T> {
   /// Unlock the app, handling errors.
   Future<Result<T>> unlock(AppUnlockInteraction interaction, UnlockReason reason) async {
     try {
-      CannotUnlockException? cannotUnlockException = await canUnlock(reason);
+      final CannotUnlockException? cannotUnlockException = await canUnlock(reason);
       if (cannotUnlockException != null) {
         throw cannotUnlockException;
       }

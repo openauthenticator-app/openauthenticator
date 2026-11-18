@@ -216,7 +216,7 @@ class _ErrorWithStackTraceState extends State<ErrorWithStackTrace> with SingleTi
       if (widget.error is LocalizableException) {
         exception = widget.error.runtimeType.toString();
       } else {
-        String error = widget.error.toString();
+        final String error = widget.error.toString();
         exception = error.length > 20 ? '${error.substring(0, 20)}...' : error;
       }
       description = translations.error.generic.withException(exception: exception);

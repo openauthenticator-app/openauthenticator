@@ -10,6 +10,7 @@ import 'package:http/http.dart' as http;
 import 'package:open_authenticator/model/migrator/firebase_auth/firebase_auth.dart';
 import 'package:open_authenticator/model/migrator/firebase_options.dart';
 import 'package:open_authenticator/model/secure_storage.dart';
+import 'package:open_authenticator/utils/json.dart';
 import 'package:simple_secure_storage/simple_secure_storage.dart';
 
 /// The error message thrown when an invalid response is returned.
@@ -47,12 +48,12 @@ class FirebaseAuthRest extends FirebaseAuth {
     await super.initialize(ref);
     _methodChannel.setMethodCallHandler(_handlePlatformCall);
     simpleSecureStorage = await ref.read(secureStorageProvider.future);
-    String? userData = simpleSecureStorage?.read(_kUserData);
+    final String? userData = simpleSecureStorage?.read(_kUserData);
     if (userData == null) {
       _onUserChanged(methodChannelCall: _kCallInstall);
       return;
     }
-    RestUser currentUser = RestUser.fromJson(jsonDecode(userData));
+    final RestUser currentUser = RestUser.fromJson(jsonDecode(userData));
     _currentUser = currentUser;
     currentUser.addListener(_onUserChanged);
     _onUserChanged(methodChannelCall: _kCallInstall);
@@ -66,7 +67,7 @@ class FirebaseAuthRest extends FirebaseAuth {
 
   @override
   Future<SignInResult> signInWith(FirebaseAuthMethod method) async {
-    SignInResult result = await super.signInWith(method);
+    final SignInResult result = await super.signInWith(method);
     if (result.localId == null || result.idToken == null || result.email == null || result.refreshToken == null || result.expiresIn == null) {
       throw Exception('Invalid sign-in result.');
     }
@@ -82,7 +83,7 @@ class FirebaseAuthRest extends FirebaseAuth {
     if (!isLoggedIn) {
       throw Exception('You must be logged-in to unlink a provider.');
     }
-    http.Response response = await http.post(
+    final http.Response response = await http.post(
       Uri.https(
         'identitytoolkit.googleapis.com',
         '/v1/accounts:update',
@@ -104,11 +105,11 @@ class FirebaseAuthRest extends FirebaseAuth {
     if (response.statusCode != 200) {
       throw Exception(_invalidResponseErrorMessage(response));
     }
-    Map<String, dynamic> data = jsonDecode(response.body);
+    final JsonMap data = decodeJsonMap(response.body);
     _currentUser!._refreshFromResponse(data);
     return SignInResult(
       email: data['email'],
-      localId: data['localId']!,
+      localId: data['localId'],
     );
   }
 
@@ -160,8 +161,8 @@ class FirebaseAuthRest extends FirebaseAuth {
   Future _handlePlatformCall(MethodCall call) async {
     switch (call.method) {
       case 'user.getIdToken':
-        Object? arguments = call.arguments;
-        bool forceRefresh = arguments is Map && arguments['forceRefresh']?.toString() == 'true';
+        final Object? arguments = call.arguments;
+        final bool forceRefresh = arguments is Map && arguments['forceRefresh']?.toString() == 'true';
         return await _currentUser?.getIdToken(forceRefresh: forceRefresh);
       default:
         throw UnimplementedError();
@@ -222,7 +223,7 @@ class RestUser extends User with ChangeNotifier {
 
   /// Creates a new REST user instance from a sign-in result.
   static Future<RestUser?> _fromSignInResult(SignInResult signInResult) async {
-    RestUser user = RestUser._(
+    final RestUser user = RestUser._(
       uid: signInResult.localId!,
       email: signInResult.email,
       providers: [],
@@ -237,7 +238,7 @@ class RestUser extends User with ChangeNotifier {
   }
 
   /// Creates a new REST user instance from a JSON map.
-  RestUser.fromJson(Map<String, dynamic> json)
+  RestUser.fromJson(JsonMap json)
     : this._(
         uid: json[RestUser._kUid],
         email: json[RestUser._kEmail],
@@ -257,7 +258,7 @@ class RestUser extends User with ChangeNotifier {
   List<String> get providers => _providers;
 
   /// Converts this user to a JSON map.
-  Map<String, dynamic> toJson() => {
+  JsonMap toJson() => {
     _kUid: _uid,
     _kEmail: _email,
     _kProviders: _providers,
@@ -276,7 +277,7 @@ class RestUser extends User with ChangeNotifier {
 
   /// Refreshes the access token.
   Future<bool> refreshAccessToken() async {
-    http.Response response = await http.post(
+    final http.Response response = await http.post(
       Uri.https(
         'securetoken.googleapis.com',
         '/v1/token',
@@ -292,10 +293,10 @@ class RestUser extends User with ChangeNotifier {
     if (response.statusCode != 200) {
       return false;
     }
-    Map<String, dynamic> data = jsonDecode(response.body);
+    final JsonMap data = jsonDecode(response.body);
     _idToken = data['id_token'];
     refreshToken = data['refresh_token'];
-    int expirationSeconds = int.parse(data['expires_in']);
+    final int expirationSeconds = int.parse(data['expires_in']);
     expirationDate = DateTime.now().add(Duration(seconds: expirationSeconds));
     notifyListeners();
     return true;
@@ -303,8 +304,8 @@ class RestUser extends User with ChangeNotifier {
 
   @override
   Future<bool> reload() async {
-    String idToken = await getIdToken();
-    http.Response response = await http.post(
+    final String idToken = await getIdToken();
+    final http.Response response = await http.post(
       Uri.https(
         'identitytoolkit.googleapis.com',
         '/v1/accounts:lookup',
@@ -322,8 +323,8 @@ class RestUser extends User with ChangeNotifier {
     if (response.statusCode != 200) {
       return false;
     }
-    Map<String, dynamic> data = jsonDecode(response.body);
-    List? users = data['users'];
+    final JsonMap data = jsonDecode(response.body);
+    final List? users = data['users'];
     if (users != null && users.isNotEmpty) {
       _refreshFromResponse(users.first);
     }
@@ -332,8 +333,8 @@ class RestUser extends User with ChangeNotifier {
 
   /// Sends a delete request for the user.
   Future<bool> _sendDeleteRequest() async {
-    String idToken = await getIdToken();
-    http.Response response = await http.post(
+    final String idToken = await getIdToken();
+    final http.Response response = await http.post(
       Uri.https(
         'identitytoolkit.googleapis.com',
         '/v1/accounts:delete',
@@ -353,7 +354,7 @@ class RestUser extends User with ChangeNotifier {
 
   @override
   Future<SignInResult> reAuthenticateWith(FirebaseAuthMethod method) async {
-    SignInResult signInResult = await super.reAuthenticateWith(method);
+    final SignInResult signInResult = await super.reAuthenticateWith(method);
     if (_uid != signInResult.localId) {
       return signInResult;
     }
@@ -366,18 +367,18 @@ class RestUser extends User with ChangeNotifier {
 
   @override
   Future<SignInResult> linkTo(CanLinkTo method) async {
-    SignInResult signInResult = await super.linkTo(method);
+    final SignInResult signInResult = await super.linkTo(method);
     await reload();
     return signInResult;
   }
 
   /// Refreshes the user data from the [data].
-  void _refreshFromResponse(Map<String, dynamic> data) {
+  void _refreshFromResponse(JsonMap data) {
     _email = data['email'];
-    List providerUserInfo = data['providerUserInfo'];
+    final List providerUserInfo = data['providerUserInfo'];
     if (providerUserInfo.isNotEmpty) {
-      List<String> providers = [];
-      for (Map<String, dynamic> provider in providerUserInfo) {
+      final List<String> providers = [];
+      for (final JsonMap provider in providerUserInfo) {
         providers.add(provider['providerId']);
       }
       _providers = providers;
@@ -396,7 +397,7 @@ mixin _RestIdpAuthMethod on FirebaseAuthMethod, CanLinkTo {
 
   @override
   Future<SignInResult> linkTo(User user) async {
-    String? idToken = await user.getIdToken();
+    final String? idToken = await user.getIdToken();
     if (idToken == null) {
       throw Exception('Failed to get current user id token.');
     }
@@ -409,7 +410,7 @@ mixin _RestIdpAuthMethod on FirebaseAuthMethod, CanLinkTo {
 
   /// Sign-in with the specified [additionalParameters].
   Future<SignInResult> _doAction({Map<String, String> additionalParameters = const {}}) async {
-    http.Response response = await http.post(
+    final http.Response response = await http.post(
       Uri.https(
         'identitytoolkit.googleapis.com',
         '/v1/accounts:signInWithIdp',
@@ -431,7 +432,7 @@ mixin _RestIdpAuthMethod on FirebaseAuthMethod, CanLinkTo {
     if (response.statusCode != 200) {
       throw Exception(_invalidResponseErrorMessage(response));
     }
-    Map<String, dynamic> data = jsonDecode(response.body);
+    final JsonMap data = jsonDecode(response.body);
     return SignInResult(
       email: data['email'],
       localId: data['localId'],
@@ -504,7 +505,7 @@ class EmailLinkAuthMethodRest extends EmailLinkAuthMethod {
 
   @override
   Future<SignInResult> signIn() async {
-    http.Response response = await http.post(
+    final http.Response response = await http.post(
       Uri.https(
         'identitytoolkit.googleapis.com',
         '/v1/accounts:signInWithEmailLink',
@@ -523,7 +524,7 @@ class EmailLinkAuthMethodRest extends EmailLinkAuthMethod {
     if (response.statusCode != 200) {
       throw Exception(_invalidResponseErrorMessage(response));
     }
-    Map<String, dynamic> data = jsonDecode(response.body);
+    final JsonMap data = jsonDecode(response.body);
     return SignInResult(
       email: data['email'],
       localId: data['localId'],

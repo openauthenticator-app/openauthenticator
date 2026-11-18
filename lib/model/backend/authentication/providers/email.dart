@@ -23,7 +23,7 @@ class EmailAuthenticationProvider extends AuthenticationProvider {
       _ref.read(emailConfirmationStateProvider.notifier)._markNeedsConfirmation(uri.email, uri.cancelCode!);
       return ResultSuccess(value: ConfirmationEmailSent(providerId: id));
     }
-    Result<RedirectResult> result = await super.onRedirectReceived(uri);
+    final Result<RedirectResult> result = await super.onRedirectReceived(uri);
     if (result is ResultSuccess) {
       await _ref.read(emailConfirmationStateProvider.notifier)._cancelConfirmation();
     }
@@ -38,8 +38,8 @@ class EmailAuthenticationProvider extends AuthenticationProvider {
 
   /// Requests a login for either signing in or linking.
   Future<Result> _requestLogin(String email, {bool link = false}) async {
-    String backendUrl = await _ref.read(backendUrlSettingsEntryProvider.future);
-    UriBuilder uriBuilder = UriBuilder.prefix(
+    final String backendUrl = await _ref.read(backendUrlSettingsEntryProvider.future);
+    final UriBuilder uriBuilder = UriBuilder.prefix(
       prefix: backendUrl,
       path: '/auth/provider/$id/redirect',
       queryParameters: {
@@ -48,7 +48,7 @@ class EmailAuthenticationProvider extends AuthenticationProvider {
       },
     );
     if (link) {
-      User? user = await _ref.read(userProvider.future);
+      final User? user = await _ref.read(userProvider.future);
       uriBuilder.appendQueryParameter('userId', user!.id);
       uriBuilder.appendQueryParameter('mode', 'link');
     } else {
@@ -61,11 +61,11 @@ class EmailAuthenticationProvider extends AuthenticationProvider {
   /// Confirms the email.
   Future<Result<RedirectResult>> confirm(String verificationCode) async {
     try {
-      EmailConfirmationData? data = await _ref.read(emailConfirmationStateProvider.future);
+      final EmailConfirmationData? data = await _ref.read(emailConfirmationStateProvider.future);
       if (data == null) {
         throw _NoEmailToConfirmException();
       }
-      Result<EmailConfirmResponse> response = await _ref
+      final Result<EmailConfirmResponse> response = await _ref
           .read(backendClientProvider.notifier)
           .sendHttpRequest(
             EmailConfirmRequest(
@@ -79,7 +79,7 @@ class EmailAuthenticationProvider extends AuthenticationProvider {
         }
         return response.to((_) => null);
       }
-      AppAuthLink uri = response.value.url as AppAuthLink;
+      final AppAuthLink uri = response.value.url as AppAuthLink;
       if (!uri.isValid) {
         throw _InvalidUriException();
       }
@@ -95,11 +95,11 @@ class EmailAuthenticationProvider extends AuthenticationProvider {
   /// Cancels the confirmation.
   Future<Result> cancelConfirmation() async {
     try {
-      EmailConfirmationData? data = await _ref.read(emailConfirmationStateProvider.future);
+      final EmailConfirmationData? data = await _ref.read(emailConfirmationStateProvider.future);
       if (data == null) {
         return const ResultSuccess();
       }
-      Result<EmailConfirmationCancelResponse> response = await _ref
+      final Result<EmailConfirmationCancelResponse> response = await _ref
           .read(backendClientProvider.notifier)
           .sendHttpRequest(
             EmailConfirmationCancelRequest(
@@ -136,7 +136,7 @@ class ConfirmationEmailSent extends RedirectResult {
 }
 
 /// The email confirmation state provider.
-final emailConfirmationStateProvider = AsyncNotifierProvider.autoDispose<EmailConfirmationStateNotifier, EmailConfirmationData?>(EmailConfirmationStateNotifier.new);
+final AsyncNotifierProvider<EmailConfirmationStateNotifier, EmailConfirmationData?> emailConfirmationStateProvider = AsyncNotifierProvider.autoDispose<EmailConfirmationStateNotifier, EmailConfirmationData?>(EmailConfirmationStateNotifier.new);
 
 /// The email confirmation state notifier.
 class EmailConfirmationStateNotifier extends AsyncNotifier<EmailConfirmationData?> {
@@ -148,9 +148,9 @@ class EmailConfirmationStateNotifier extends AsyncNotifier<EmailConfirmationData
 
   @override
   FutureOr<EmailConfirmationData?> build() async {
-    SharedPreferencesWithPrefix preferences = await ref.read(sharedPreferencesProvider.future);
-    String? email = preferences.getString(_kAuthenticationEmailKey);
-    String? cancelCode = preferences.getString(_kAuthenticationEmailCancelCodeKey);
+    final SharedPreferencesWithPrefix preferences = await ref.read(sharedPreferencesProvider.future);
+    final String? email = preferences.getString(_kAuthenticationEmailKey);
+    final String? cancelCode = preferences.getString(_kAuthenticationEmailCancelCodeKey);
     return email == null || cancelCode == null
         ? null
         : EmailConfirmationData(
@@ -164,7 +164,7 @@ class EmailConfirmationStateNotifier extends AsyncNotifier<EmailConfirmationData
     if ((await future) != null) {
       return;
     }
-    SharedPreferencesWithPrefix preferences = await ref.read(sharedPreferencesProvider.future);
+    final SharedPreferencesWithPrefix preferences = await ref.read(sharedPreferencesProvider.future);
     await preferences.setString(_kAuthenticationEmailKey, email);
     await preferences.setString(_kAuthenticationEmailCancelCodeKey, cancelCode);
     if (ref.mounted) {
@@ -179,7 +179,7 @@ class EmailConfirmationStateNotifier extends AsyncNotifier<EmailConfirmationData
 
   /// Cancels the confirmation.
   Future<void> _cancelConfirmation() async {
-    SharedPreferencesWithPrefix preferences = await ref.read(sharedPreferencesProvider.future);
+    final SharedPreferencesWithPrefix preferences = await ref.read(sharedPreferencesProvider.future);
     await preferences.remove(_kAuthenticationEmailKey);
     await preferences.remove(_kAuthenticationEmailCancelCodeKey);
     if (ref.mounted) {

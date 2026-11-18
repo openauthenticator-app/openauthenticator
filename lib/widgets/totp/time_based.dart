@@ -80,10 +80,10 @@ abstract class TimeBasedTotpWidgetState<T extends TimeBasedTotpWidget> extends S
 
   /// Calculates the expiration date.
   DateTime _calculateExpirationDate(DateTime date) {
-    int seconds = validity.inSeconds;
-    int currentUnixTime = date.toUtc().millisecondsSinceEpoch ~/ 1000;
-    int timeStepRemainder = currentUnixTime % seconds;
-    int expirationTime = currentUnixTime + (seconds - timeStepRemainder);
+    final int seconds = validity.inSeconds;
+    final int currentUnixTime = date.toUtc().millisecondsSinceEpoch ~/ 1000;
+    final int timeStepRemainder = currentUnixTime % seconds;
+    final int expirationTime = currentUnixTime + (seconds - timeStepRemainder);
     return DateTime.fromMillisecondsSinceEpoch(expirationTime * 1000);
   }
 }

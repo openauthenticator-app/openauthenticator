@@ -20,7 +20,7 @@ enum Algorithm {
 
   /// Tries to convert the given [string] to an [Algorithm].
   static Algorithm? fromString(String string) {
-    String normalized = string.toLowerCase();
+    final String normalized = string.toLowerCase();
     return Algorithm.values.firstWhereOrNull((algorithm) => algorithm.name.toLowerCase() == normalized);
   }
 }

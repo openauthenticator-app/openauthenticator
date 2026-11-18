@@ -35,8 +35,8 @@ class EnableLocalAuthSettingsEntryWidget extends CheckboxSettingsEntryWidget<App
 
   @override
   Future<void> changeValue(BuildContext context, WidgetRef ref, bool newValue) async {
-    String newMethod = newValue ? LocalAuthenticationAppUnlockMethod.kMethodId : NoneAppUnlockMethod.kMethodId;
-    Result result = await ref.read(appUnlockMethodSettingsEntryProvider.notifier).changeValueIfUnlockSucceed(context.appUnlockInteraction, newMethod);
+    final String newMethod = newValue ? LocalAuthenticationAppUnlockMethod.kMethodId : NoneAppUnlockMethod.kMethodId;
+    final Result result = await ref.read(appUnlockMethodSettingsEntryProvider.notifier).changeValueIfUnlockSucceed(context.appUnlockInteraction, newMethod);
     if (context.mounted) {
       handleResult(
         context,

@@ -13,7 +13,7 @@ class LocaleSettingsEntryWidget extends ConsumerWidget with FTileMixin {
   @override
   Widget build(BuildContext context, WidgetRef ref) => FSelectMenuTile<AppLocale>.fromMap(
     {
-      for (AppLocale locale in AppLocale.values) locale.languageCode: locale,
+      for (final AppLocale locale in AppLocale.values) locale.languageCode: locale,
     },
     selectControl: FMultiValueControl.managedRadio(
       initial: TranslationProvider.of(context).locale,

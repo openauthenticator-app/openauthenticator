@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:open_authenticator/model/database/database.dart';
 import 'package:open_authenticator/model/totp/json.dart';
 import 'package:open_authenticator/model/totp/totp.dart';
+import 'package:open_authenticator/utils/json.dart';
 import 'package:uuid/uuid.dart';
 
 /// Represents a push operation.
@@ -41,7 +42,7 @@ sealed class PushOperation<T> with Equatable {
   ];
 
   /// Converts the push operation to a JSON map.
-  Map<String, dynamic> toJson({
+  JsonMap toJson({
     bool httpRequest = false,
   }) => {
     'uuid': uuid,
@@ -54,13 +55,7 @@ sealed class PushOperation<T> with Equatable {
 }
 
 /// Represents a `set` push operation.
-class SetTotpsPushOperation extends PushOperation<Map<String, dynamic>> {
-  /// Creates a new `set` push operation instance from a raw payload.
-  SetTotpsPushOperation.raw({
-    super.uuid,
-    required super.payload,
-    super.createdAt,
-  });
+class SetTotpsPushOperation extends PushOperation<JsonMap> {
 
   /// Creates a new `set` push operation instance from a TOTPs list.
   SetTotpsPushOperation({
@@ -74,13 +69,19 @@ class SetTotpsPushOperation extends PushOperation<Map<String, dynamic>> {
          },
          createdAt: createdAt,
        );
+  /// Creates a new `set` push operation instance from a raw payload.
+  SetTotpsPushOperation.raw({
+    super.uuid,
+    required super.payload,
+    super.createdAt,
+  });
 
   @override
   PushOperationKind get _kind => PushOperationKind.set;
 
   @override
   SetTotpsPushOperation copyWith({
-    Map<String, dynamic>? payload,
+    JsonMap? payload,
     DateTime? createdAt,
   }) => SetTotpsPushOperation.raw(
     uuid: uuid,
@@ -91,12 +92,6 @@ class SetTotpsPushOperation extends PushOperation<Map<String, dynamic>> {
 
 /// Represents a `delete` push operation.
 class DeleteTotpsPushOperation extends PushOperation<Map<String, int>> {
-  /// Creates a new `delete` push operation instance from a raw payload.
-  DeleteTotpsPushOperation.raw({
-    super.uuid,
-    required super.payload,
-    super.createdAt,
-  });
 
   /// Creates a new `delete` push operation instance from a UUIDs list.
   DeleteTotpsPushOperation({
@@ -110,6 +105,12 @@ class DeleteTotpsPushOperation extends PushOperation<Map<String, int>> {
          },
          createdAt: createdAt,
        );
+  /// Creates a new `delete` push operation instance from a raw payload.
+  DeleteTotpsPushOperation.raw({
+    super.uuid,
+    required super.payload,
+    super.createdAt,
+  });
 
   @override
   PushOperationKind get _kind => PushOperationKind.delete;
@@ -142,27 +143,27 @@ extension Compact on List<PushOperation> {
       return [];
     }
 
-    List<PushOperation> sorted = List.of(this)
+    final List<PushOperation> sorted = List.of(this)
       ..sort((a, b) {
-        int createdAtComparison = b.createdAt.compareTo(a.createdAt);
+        final int createdAtComparison = b.createdAt.compareTo(a.createdAt);
         if (createdAtComparison != 0) {
           return createdAtComparison;
         }
-        int kindComparison = a._kind.index.compareTo(b._kind.index);
+        final int kindComparison = a._kind.index.compareTo(b._kind.index);
         if (kindComparison != 0) {
           return kindComparison;
         }
         return a.uuid.compareTo(b.uuid);
       });
 
-    Set<String> processedTotpUuids = {};
-    List<PushOperation> result = [];
+    final Set<String> processedTotpUuids = {};
+    final List<PushOperation> result = [];
 
-    for (PushOperation operation in sorted) {
+    for (final PushOperation operation in sorted) {
       switch (operation) {
         case SetTotpsPushOperation(:final payload):
-          Map<String, dynamic> newPayload = {
-            for (MapEntry<String, dynamic> entry in payload.entries)
+          final JsonMap newPayload = {
+            for (final MapEntry<String, dynamic> entry in payload.entries)
               if (processedTotpUuids.add(entry.key)) entry.key: entry.value,
           };
           if (newPayload.isNotEmpty) {
@@ -170,8 +171,8 @@ extension Compact on List<PushOperation> {
           }
           break;
         case DeleteTotpsPushOperation(:final payload):
-          Map<String, int> newPayload = {
-            for (MapEntry<String, int> entry in payload.entries)
+          final Map<String, int> newPayload = {
+            for (final MapEntry<String, int> entry in payload.entries)
               if (processedTotpUuids.add(entry.key)) entry.key: entry.value,
           };
           if (newPayload.isNotEmpty) {

@@ -26,8 +26,8 @@ class _TotpsListWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    bool isUnlocked = ref.watch(appLockStateProvider.select((state) => state.value == AppLockState.unlocked));
-    bool displayCopyButton = ref.watch(displayCopyButtonSettingsEntryProvider).value ?? true;
+    final bool isUnlocked = ref.watch(appLockStateProvider.select((state) => state.value == AppLockState.unlocked));
+    final bool displayCopyButton = ref.watch(displayCopyButtonSettingsEntryProvider).value ?? true;
     return totps.isEmpty
         ? Center(
             child: SingleChildScrollView(
@@ -47,8 +47,8 @@ class _TotpsListWidget extends ConsumerWidget {
               itemCount: totps.length,
               physics: const AlwaysScrollableScrollPhysics(),
               itemBuilder: (context, position) {
-                Totp totp = totps[position];
-                Widget totpWidget = TotpTile.adaptive(
+                final Totp totp = totps[position];
+                final Widget totpWidget = TotpTile.adaptive(
                   key: ValueKey(totp.uuid),
                   totp: totp,
                   displayCode: isUnlocked,
@@ -73,7 +73,7 @@ class _TotpsListWidget extends ConsumerWidget {
 
   /// Allows to edit the TOTP.
   Future<void> editTotp(BuildContext context, WidgetRef ref, Totp totp) async {
-    CryptoStore? currentCryptoStore = await ref.read(cryptoStoreProvider.future);
+    final CryptoStore? currentCryptoStore = await ref.read(cryptoStoreProvider.future);
     if (currentCryptoStore == null) {
       if (context.mounted) {
         ErrorDialog.openDialog(context);
@@ -82,7 +82,7 @@ class _TotpsListWidget extends ConsumerWidget {
     }
     if (!(totp.encryptedData.canDecryptData(currentCryptoStore))) {
       if (context.mounted) {
-        bool shouldContinue = await ConfirmationDialog.ask(
+        final bool shouldContinue = await ConfirmationDialog.ask(
           context,
           title: translations.totp.actions.editConfirmationDialog.title,
           message: translations.totp.actions.editConfirmationDialog.message,
@@ -105,7 +105,7 @@ class _TotpsListWidget extends ConsumerWidget {
 
   /// Allows to delete the TOTP.
   Future<void> deleteTotp(BuildContext context, WidgetRef ref, Totp totp) async {
-    bool confirmation = await ConfirmationDialog.ask(
+    final bool confirmation = await ConfirmationDialog.ask(
       context,
       title: translations.totp.actions.deleteConfirmationDialog.title,
       message: translations.totp.actions.deleteConfirmationDialog.message,
@@ -114,7 +114,7 @@ class _TotpsListWidget extends ConsumerWidget {
     if (!confirmation || !context.mounted) {
       return;
     }
-    Result result = await showWaitingOverlay(
+    final Result result = await showWaitingOverlay(
       context,
       future: ref.read(totpRepositoryProvider.notifier).deleteTotp(totp.uuid),
     );
@@ -134,7 +134,7 @@ class _TotpsListWidget extends ConsumerWidget {
 
   /// Tries to decrypt the current TOTP.
   Future<void> tryDecryptTotp(BuildContext context, WidgetRef ref, Totp totp) async {
-    String? password = await TextInputDialog.prompt(
+    final String? password = await TextInputDialog.prompt(
       context,
       title: translations.totp.decryptDialog.title,
       message: translations.totp.decryptDialog.message,
@@ -144,21 +144,21 @@ class _TotpsListWidget extends ConsumerWidget {
       return;
     }
 
-    TotpRepository repository = ref.read(totpRepositoryProvider.notifier);
+    final TotpRepository repository = ref.read(totpRepositoryProvider.notifier);
     (CryptoStore, List<DecryptedTotp>) decryptedTotps = await showWaitingOverlay(
       context,
       future: () async {
-        CryptoStore previousCryptoStore = CryptoStore.fromPassword(password, totp.encryptedData.encryptionSalt);
-        Totp targetTotp = totp.decrypt(previousCryptoStore);
+        final CryptoStore previousCryptoStore = CryptoStore.fromPassword(password, totp.encryptedData.encryptionSalt);
+        final Totp targetTotp = totp.decrypt(previousCryptoStore);
         if (!targetTotp.isDecrypted) {
           return (previousCryptoStore, <DecryptedTotp>[]);
         }
-        Set<DecryptedTotp> decryptedTotps = await repository.tryDecryptAll(previousCryptoStore);
+        final Set<DecryptedTotp> decryptedTotps = await repository.tryDecryptAll(previousCryptoStore);
         return (
           previousCryptoStore,
           [
             targetTotp as DecryptedTotp,
-            for (DecryptedTotp decryptedTotp in decryptedTotps)
+            for (final DecryptedTotp decryptedTotp in decryptedTotps)
               if (targetTotp.uuid != decryptedTotp.uuid) decryptedTotp,
           ],
         );
@@ -175,7 +175,7 @@ class _TotpsListWidget extends ConsumerWidget {
       return;
     }
 
-    TotpDecryptDialogResult? choice = await _TotpDecryptDialog.show(
+    final TotpDecryptDialogResult? choice = await _TotpDecryptDialog.show(
       context,
       decryptedTotps: decryptedTotps.$2,
     );
@@ -186,13 +186,13 @@ class _TotpsListWidget extends ConsumerWidget {
 
     Future<Result> changeTotpsKey(CryptoStore oldCryptoStore, List<DecryptedTotp> totps) async {
       try {
-        CryptoStore? currentCryptoStore = await ref.read(cryptoStoreProvider.future);
+        final CryptoStore? currentCryptoStore = await ref.read(cryptoStoreProvider.future);
         if (currentCryptoStore == null) {
           throw _NoCryptoStoreException();
         }
-        List<DecryptedTotp> toUpdate = [];
-        for (DecryptedTotp totp in totps) {
-          DecryptedTotp? decryptedTotpWithNewKey = totp.changeEncryptionKey(oldCryptoStore, currentCryptoStore);
+        final List<DecryptedTotp> toUpdate = [];
+        for (final DecryptedTotp totp in totps) {
+          final DecryptedTotp? decryptedTotpWithNewKey = totp.changeEncryptionKey(oldCryptoStore, currentCryptoStore);
           if (decryptedTotpWithNewKey == null || !decryptedTotpWithNewKey.isDecrypted) {
             throw _CryptoStoreChangeException();
           }
@@ -209,7 +209,7 @@ class _TotpsListWidget extends ConsumerWidget {
 
     switch (choice) {
       case .changeTotpKey:
-        Result result = await showWaitingOverlay(
+        final Result result = await showWaitingOverlay(
           context,
           future: changeTotpsKey(decryptedTotps.$1, [decryptedTotps.$2.first]),
         );
@@ -218,7 +218,7 @@ class _TotpsListWidget extends ConsumerWidget {
         }
         break;
       case .changeAllTotpsKey:
-        Result result = await showWaitingOverlay(
+        final Result result = await showWaitingOverlay(
           context,
           future: changeTotpsKey(decryptedTotps.$1, decryptedTotps.$2),
         );

@@ -12,7 +12,7 @@ class ConnectivityStateNotifier extends AsyncNotifier<ConnectivityState> {
   @override
   Future<ConnectivityState> build() async {
     try {
-      Connectivity connectivity = Connectivity();
+      final Connectivity connectivity = Connectivity();
 
       void onConnectivityChanged(List<ConnectivityResult> result) {
         if (ref.mounted) {
@@ -27,13 +27,13 @@ class ConnectivityStateNotifier extends AsyncNotifier<ConnectivityState> {
         }
       }
 
-      StreamSubscription<List<ConnectivityResult>>? subscription = connectivity.onConnectivityChanged.listen(
+      final StreamSubscription<List<ConnectivityResult>> subscription = connectivity.onConnectivityChanged.listen(
         onConnectivityChanged,
         onError: onConnectivityError,
       );
       ref.onDispose(subscription.cancel);
 
-      List<ConnectivityResult> result = await connectivity.checkConnectivity();
+      final List<ConnectivityResult> result = await connectivity.checkConnectivity();
       return result.associatedConnectivityState;
     } catch (ex, stackTrace) {
       printException(ex, stackTrace);

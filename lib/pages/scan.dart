@@ -52,7 +52,7 @@ class _ScanPageState extends ConsumerState<ScanPage> {
     children: [
       QrCodeScanner(
         onScan: (barcode) async {
-          Uri? uri = Uri.tryParse(barcode);
+          final Uri? uri = Uri.tryParse(barcode);
           if (uri == null || !(uri as OtpAuthTotpLink).isValid) {
             showErrorToast(context, text: translations.error.scan.noUri);
             return true;

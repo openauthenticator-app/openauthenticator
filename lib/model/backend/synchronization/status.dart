@@ -57,7 +57,7 @@ class SynchronizationStatus with Equatable {
 
   /// Waits before the next operation.
   Future<void> waitBeforeNextOperation() {
-    DateTime now = DateTime.now();
+    final DateTime now = DateTime.now();
     if (now.isAfter(nextPossibleOperationTime)) {
       return Future.value();
     }
@@ -66,10 +66,10 @@ class SynchronizationStatus with Equatable {
 
   /// Calculates the retry seconds.
   int calculateRetrySeconds() {
-    int retryAttempt = math.min(this.retryAttempt <= 0 ? 1 : this.retryAttempt, 10);
-    int baseSeconds = math.pow(2, retryAttempt).toInt();
-    int capSeconds = _kMaxBackoff.inSeconds;
-    int seconds = math.min(baseSeconds, capSeconds);
+    final int retryAttempt = math.min(this.retryAttempt <= 0 ? 1 : this.retryAttempt, 10);
+    final int baseSeconds = math.pow(2, retryAttempt).toInt();
+    final int capSeconds = _kMaxBackoff.inSeconds;
+    final int seconds = math.min(baseSeconds, capSeconds);
     return seconds;
   }
 }

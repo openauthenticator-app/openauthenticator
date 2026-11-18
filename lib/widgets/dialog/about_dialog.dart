@@ -56,7 +56,7 @@ class AboutAppDialog extends StatelessWidget {
     children: [
       if (applicationIcon != null)
         Center(
-          child: applicationIcon!,
+          child: applicationIcon,
         ),
       Center(
         child: Text.rich(
@@ -162,7 +162,7 @@ class _LicensesDialogState extends State<_LicensesDialog> {
             child: CenteredCircularProgressIndicator(),
           )
         else
-          for (_PackageLicense package in snapshot.data!)
+          for (final _PackageLicense package in snapshot.data!)
             _PackageRow(
               title: package.package,
               onPress: () => _openDetails(
@@ -176,17 +176,17 @@ class _LicensesDialogState extends State<_LicensesDialog> {
 
   /// Loads the licenses.
   Future<List<_PackageLicense>> _loadLicenses() async {
-    List<LicenseEntry> entries = await LicenseRegistry.licenses.toList();
+    final List<LicenseEntry> entries = await LicenseRegistry.licenses.toList();
 
-    Map<String, List<LicenseParagraph>> byPkg = {};
-    for (LicenseEntry entry in entries) {
-      for (String pkg in entry.packages) {
+    final Map<String, List<LicenseParagraph>> byPkg = {};
+    for (final LicenseEntry entry in entries) {
+      for (final String pkg in entry.packages) {
         (byPkg[pkg] ??= []).addAll(entry.paragraphs);
       }
     }
 
     return [
-      for (MapEntry<String, List<LicenseParagraph>> entry in byPkg.entries)
+      for (final MapEntry<String, List<LicenseParagraph>> entry in byPkg.entries)
         _PackageLicense(
           package: entry.key,
           paragraphs: entry.value,
@@ -210,7 +210,7 @@ class _LicensesDialogState extends State<_LicensesDialog> {
         ),
       ],
       children: [
-        for (LicenseParagraph paragraph in package.paragraphs)
+        for (final LicenseParagraph paragraph in package.paragraphs)
           Padding(
             padding: .only(
               left: math.max(0, paragraph.indent) * 12,

@@ -45,8 +45,8 @@ class _QrCodeScannerState extends State<QrCodeScanner> {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.sizeOf(context);
-    Rect scanWindow = Rect.fromCenter(
+    final Size size = MediaQuery.sizeOf(context);
+    final Rect scanWindow = Rect.fromCenter(
       center: size.center(Offset.zero),
       width: math.min(200, size.width),
       height: math.min(200, size.height),
@@ -58,7 +58,7 @@ class _QrCodeScannerState extends State<QrCodeScanner> {
           child: MobileScanner(
             placeholderBuilder: widget.placeholderBuilder,
             onDetect: (barcodes) {
-              String? barcodeValue = barcodes.barcodes.firstOrNull?.rawValue;
+              final String? barcodeValue = barcodes.barcodes.firstOrNull?.rawValue;
               if (barcodeValue != null && widget.onScan != null) {
                 controller.stop();
                 widget.onScan!(barcodeValue).then((resume) async {
@@ -130,9 +130,9 @@ class ScannerOverlay extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    Path backgroundPath = Path()..addRect(Rect.fromLTWH(0, 0, size.width, size.height));
+    final Path backgroundPath = Path()..addRect(Rect.fromLTWH(0, 0, size.width, size.height));
 
-    Path cutoutPath = Path()
+    final Path cutoutPath = Path()
       ..addRRect(
         RRect.fromRectAndCorners(
           scanWindow,
@@ -143,23 +143,23 @@ class ScannerOverlay extends CustomPainter {
         ),
       );
 
-    Paint backgroundPaint = Paint()
+    final Paint backgroundPaint = Paint()
       ..color = Colors.black.withValues(alpha: 0.5)
       ..style = PaintingStyle.fill
       ..blendMode = BlendMode.dstOver;
 
-    Path backgroundWithCutout = Path.combine(
+    final Path backgroundWithCutout = Path.combine(
       PathOperation.difference,
       backgroundPath,
       cutoutPath,
     );
 
-    Paint borderPaint = Paint()
+    final Paint borderPaint = Paint()
       ..color = Colors.white
       ..style = PaintingStyle.stroke
       ..strokeWidth = 4.0;
 
-    RRect borderRect = RRect.fromRectAndCorners(
+    final RRect borderRect = RRect.fromRectAndCorners(
       scanWindow,
       topLeft: Radius.circular(borderRadius),
       topRight: Radius.circular(borderRadius),

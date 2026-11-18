@@ -22,7 +22,7 @@ class TitleText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<String> parts = text.split(' ');
+    final List<String> parts = text.split(' ');
     if (parts.length == 1) {
       return _createGradientText(parts.first).child;
     }

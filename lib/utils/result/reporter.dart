@@ -71,7 +71,7 @@ void reportResult<T>(
     }
   }
   if (reporting != null) {
-    for (ResultReporter reporter in reporting._reporters) {
+    for (final ResultReporter reporter in reporting._reporters) {
       reporter.report(result);
     }
   }

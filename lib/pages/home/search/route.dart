@@ -70,7 +70,7 @@ class _SearchPage extends ConsumerStatefulWidget {
 class _SearchPageState extends ConsumerState<_SearchPage> {
   /// The focus node.
   late final FocusNode focusNode = FocusNode(
-    onKeyEvent: (FocusNode node, KeyEvent event) {
+    onKeyEvent: (node, event) {
       if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
         Navigator.pop(context);
         return KeyEventResult.handled;
@@ -99,7 +99,7 @@ class _SearchPageState extends ConsumerState<_SearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    AsyncValue<List<Totp>> totps = ref.watch(totpRepositoryProvider);
+    final AsyncValue<List<Totp>> totps = ref.watch(totpRepositoryProvider);
     return AppScaffold.asyncValue(
       header: FHeader.nested(
         prefixes: [
@@ -143,9 +143,9 @@ class _SearchPageState extends ConsumerState<_SearchPage> {
 
   /// Builds the results.
   List<Widget> buildResults(List<Totp> totps) {
-    List<Totp> searchResults = totps.search(queryController.text);
+    final List<Totp> searchResults = totps.search(queryController.text);
     return [
-      for (Totp totp in searchResults)
+      for (final Totp totp in searchResults)
         Padding(
           padding: const EdgeInsets.only(bottom: kBigSpace),
           child: TotpTile(

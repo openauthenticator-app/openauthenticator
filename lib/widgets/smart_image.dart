@@ -67,7 +67,7 @@ class SmartImage extends StatelessWidget {
         _ => _buildNetworkRaster(),
       };
     }
-    File file = File(source);
+    final File file = File(source);
     if (!file.existsSync()) {
       return const SizedBox.shrink();
     }
@@ -76,7 +76,7 @@ class SmartImage extends StatelessWidget {
         width: width,
         height: height,
         child: ScalableImageWidget.fromSISource(
-          si: ScalableImageSource.fromSvgFile(file, () => file.readAsString()),
+          si: ScalableImageSource.fromSvgFile(file, file.readAsString),
           key: imageKey,
           fit: fit,
           onError: errorBuilder,
@@ -261,7 +261,7 @@ class _ResolvedSmartImageState extends State<ResolvedSmartImage> {
           height: widget.height,
           fit: widget.fit,
           errorBuilder: widget.errorBuilder,
-          imageType: snapshot.data!,
+          imageType: snapshot.data,
           fadeInDuration: widget.fadeInDuration,
         );
       }
@@ -279,17 +279,17 @@ class _ResolvedSmartImageState extends State<ResolvedSmartImage> {
       return widget.imageType!;
     }
 
-    ImageType inferred = ImageType.inferFromSource(widget.source);
+    final ImageType inferred = ImageType.inferFromSource(widget.source);
     if (inferred != .other) {
       return inferred;
     }
 
-    ImageType? cached = _resolvedTypeCache[widget.source];
+    final ImageType? cached = _resolvedTypeCache[widget.source];
     if (cached != null) {
       return cached;
     }
 
-    ImageType resolved = await _resolveTypeFromSource(widget.source);
+    final ImageType resolved = await _resolveTypeFromSource(widget.source);
     _resolvedTypeCache[widget.source] = resolved;
     return resolved;
   }
@@ -298,8 +298,8 @@ class _ResolvedSmartImageState extends State<ResolvedSmartImage> {
   Future<ImageType> _resolveTypeFromSource(String source) async {
     if (source.startsWith('http://') || source.startsWith('https://')) {
       try {
-        http.Response response = await http.head(Uri.parse(source));
-        ImageType type = ImageType.inferFromMimeType(response.headers['content-type']);
+        final http.Response response = await http.head(Uri.parse(source));
+        final ImageType type = ImageType.inferFromMimeType(response.headers['content-type']);
         if (type != .other) {
           return type;
         }
@@ -307,13 +307,13 @@ class _ResolvedSmartImageState extends State<ResolvedSmartImage> {
       return .other;
     }
 
-    File file = File(source);
+    final File file = File(source);
     if (!await file.exists()) {
       return .other;
     }
     try {
-      List<int> bytes = await file.openRead(0, 512).fold<List<int>>([], (previous, element) => previous..addAll(element));
-      String header = String.fromCharCodes(bytes).trimLeft().toLowerCase();
+      final List<int> bytes = await file.openRead(0, 512).fold<List<int>>([], (previous, element) => previous..addAll(element));
+      final String header = String.fromCharCodes(bytes).trimLeft().toLowerCase();
       if (header.startsWith('<?xml') || header.startsWith('<svg')) {
         return .svg;
       }

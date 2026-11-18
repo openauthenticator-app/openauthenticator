@@ -19,7 +19,7 @@ class BackupPath implements Comparable<BackupPath> {
 
   /// Returns the backup path from the given [path].
   static BackupPath? fromPath({required String path}) {
-    DateTime? dateTime = _extractFromBackupPath(File(path));
+    final DateTime? dateTime = _extractFromBackupPath(File(path));
     return dateTime == null
         ? null
         : BackupPath._(
@@ -42,8 +42,8 @@ class BackupPath implements Comparable<BackupPath> {
     if (!file.existsSync()) {
       return null;
     }
-    RegExp backupRegex = RegExp(_kBackupFilenameRegex);
-    String filename = file.uri.pathSegments.last;
+    final RegExp backupRegex = RegExp(_kBackupFilenameRegex);
+    final String filename = file.uri.pathSegments.last;
     if (backupRegex.hasMatch(filename)) {
       return DateTime.fromMillisecondsSinceEpoch(int.parse(filename.substring(0, filename.length - '.bak'.length)));
     }
@@ -64,7 +64,7 @@ class BackupPath implements Comparable<BackupPath> {
 
   /// Creates the backup file if it doesn't exist.
   Future<File> createFile() async {
-    File file = this.file;
+    final File file = this.file;
     if (!file.existsSync()) {
       await file.create(recursive: true);
     }
@@ -73,7 +73,7 @@ class BackupPath implements Comparable<BackupPath> {
 
   /// Deletes this backup.
   Future<void> delete() async {
-    File file = this.file;
+    final File file = this.file;
     if (file.existsSync()) {
       await file.delete();
     }
@@ -81,8 +81,8 @@ class BackupPath implements Comparable<BackupPath> {
 
   /// Returns the backup directory.
   static Future<Directory> getBackupsDirectory({bool create = false}) async {
-    String name = '${App.appName} Backups${kDebugMode ? ' (Debug)' : ''}';
-    Directory directory = Directory(join((await getApplicationDocumentsDirectory()).path, name));
+    const String name = '${App.appName} Backups${kDebugMode ? ' (Debug)' : ''}';
+    final Directory directory = Directory(join((await getApplicationDocumentsDirectory()).path, name));
     if (create && !directory.existsSync()) {
       directory.createSync(recursive: true);
     }

@@ -26,7 +26,7 @@ class ButtonText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget child = Text(
+    final Widget child = Text(
       text,
       maxLines: maxLines,
       overflow: overflow,

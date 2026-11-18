@@ -158,7 +158,7 @@ class _MasterPasswordFormState extends State<MasterPasswordForm> {
     if (passwordInput.contains(RegExp(r'[!@#$%^&*(),.?":{}|]'))) {
       score += 10;
     }
-    Set<String> uniqueChars = {};
+    final Set<String> uniqueChars = {};
     for (int i = 0; i < passwordInput.length; i++) {
       uniqueChars.add(passwordInput[i]);
     }
@@ -170,7 +170,7 @@ class _MasterPasswordFormState extends State<MasterPasswordForm> {
 
   /// Returns the color matching to the [securityScore].
   Color get securityScoreColor {
-    int securityScore = this.securityScore;
+    final int securityScore = this.securityScore;
     if (securityScore <= 5) {
       return context.theme.colors.error.darken(amount: 0.25);
     }

@@ -52,7 +52,7 @@ class _UnlockChallengeState extends ConsumerState<UnlockChallenge> {
 
   @override
   Widget build(BuildContext context) {
-    AsyncValue<AppLockState> appLockState = ref.watch(appLockStateProvider);
+    final AsyncValue<AppLockState> appLockState = ref.watch(appLockStateProvider);
     return switch (appLockState) {
       AsyncData<AppLockState>(:final value) =>
         value == .unlocked
@@ -62,14 +62,14 @@ class _UnlockChallengeState extends ConsumerState<UnlockChallenge> {
                 children: [
                   Blur(
                     above: switch (cannotUnlockException) {
-                      LocalAuthenticationDeviceNotSupported(:final localizedErrorMessage) => _UnlockChallengeContent(
+                      LocalAuthenticationDeviceNotSupported(:final String localizedErrorMessage) => _UnlockChallengeContent(
                         text: localizedErrorMessage,
                         buttonIcon: FLucideIcons.x,
                         buttonLabel: translations.appUnlock.button.disable,
                         onButtonPress: () async {
-                          List<PasswordVerificationMethod> passwordVerificationMethod = await ref.read(passwordVerificationProvider.future);
+                          final List<PasswordVerificationMethod> passwordVerificationMethod = await ref.read(passwordVerificationProvider.future);
                           if (passwordVerificationMethod.isNotEmpty) {
-                            String? password = context.mounted ? (await MasterPasswordInputDialog.prompt(context)) : null;
+                            final String? password = context.mounted ? (await MasterPasswordInputDialog.prompt(context)) : null;
                             if (password == null) {
                               return;
                             }
@@ -78,12 +78,12 @@ class _UnlockChallengeState extends ConsumerState<UnlockChallenge> {
                           await tryUnlockIfNeeded();
                         },
                       ),
-                      MasterPasswordNoPasswordVerificationMethodAvailable(:final localizedErrorMessage) || MasterPasswordNoSalt(:final localizedErrorMessage) => _UnlockChallengeContent(
+                      MasterPasswordNoPasswordVerificationMethodAvailable(:final String localizedErrorMessage) || MasterPasswordNoSalt(:final String localizedErrorMessage) => _UnlockChallengeContent(
                         text: localizedErrorMessage,
                         buttonIcon: FLucideIcons.keyRound,
                         buttonLabel: translations.appUnlock.button.changeMasterPassword,
                         onButtonPress: () async {
-                          Result<String> changeResult = await ref.read(masterPasswordFlowProvider).changeMasterPassword(context, askForUnlock: false);
+                          final Result<String> changeResult = await ref.read(masterPasswordFlowProvider).changeMasterPassword(context, askForUnlock: false);
                           if (changeResult is ResultSuccess<String>) {
                             await ref.read(appUnlockMethodSettingsEntryProvider.notifier).changeValue(NoneAppUnlockMethod.kMethodId, disableResult: changeResult);
                             await tryUnlockIfNeeded();
@@ -107,11 +107,11 @@ class _UnlockChallengeState extends ConsumerState<UnlockChallenge> {
 
   /// Tries to unlock the app.
   Future<void> tryUnlockIfNeeded() async {
-    AppLockState lockState = await ref.read(appLockStateProvider.future);
+    final AppLockState lockState = await ref.read(appLockStateProvider.future);
     if (!mounted || lockState != AppLockState.locked) {
       return;
     }
-    Result result = await ref.read(appLockStateProvider.notifier).unlock(context.appUnlockInteraction);
+    final Result result = await ref.read(appLockStateProvider.notifier).unlock(context.appUnlockInteraction);
     if (!mounted || result is! ResultError) {
       return;
     }

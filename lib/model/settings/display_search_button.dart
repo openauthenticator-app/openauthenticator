@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/model/settings/entry.dart';
 
 /// The display search button settings entry provider.
-final displaySearchButtonSettingsEntryProvider = AsyncNotifierProvider.autoDispose<DisplaySearchButtonSettingsEntry, bool>(DisplaySearchButtonSettingsEntry.new);
+final AsyncNotifierProvider<DisplaySearchButtonSettingsEntry, bool> displaySearchButtonSettingsEntryProvider = AsyncNotifierProvider.autoDispose<DisplaySearchButtonSettingsEntry, bool>(DisplaySearchButtonSettingsEntry.new);
 
 /// A settings entry that allows to control whether to show a search button in the app bar.
 class DisplaySearchButtonSettingsEntry extends SettingsEntry<bool> {

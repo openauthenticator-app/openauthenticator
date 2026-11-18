@@ -111,7 +111,7 @@ class AppScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget child = _widgetBuilder.call(children, padding ?? context.theme.style.pagePadding);
+    final Widget child = _widgetBuilder.call(children, padding ?? context.theme.style.pagePadding);
     return FScaffold(
       scaffoldStyle: scaffoldStyle,
       childPad: false,

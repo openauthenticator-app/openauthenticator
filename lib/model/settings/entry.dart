@@ -6,7 +6,7 @@ import 'package:open_authenticator/utils/shared_preferences_with_prefix.dart';
 import 'package:open_authenticator/utils/utils.dart';
 
 /// The shared preferences provider.
-final sharedPreferencesProvider = FutureProvider.autoDispose<SharedPreferencesWithPrefix>((ref) async => await SharedPreferencesWithPrefix.create());
+final FutureProvider<SharedPreferencesWithPrefix> sharedPreferencesProvider = FutureProvider.autoDispose<SharedPreferencesWithPrefix>((ref) async => await SharedPreferencesWithPrefix.create());
 
 /// Represents a settings entry, which can be user configured (directly or not).
 class SettingsEntry<T> extends AsyncNotifier<T> {
@@ -26,7 +26,7 @@ class SettingsEntry<T> extends AsyncNotifier<T> {
 
   @override
   FutureOr<T> build() async {
-    SharedPreferencesWithPrefix preferences = await ref.watch(sharedPreferencesProvider.future);
+    final SharedPreferencesWithPrefix preferences = await ref.watch(sharedPreferencesProvider.future);
     if (preferences.containsKey(key)) {
       return await loadFromPreferences(preferences);
     }
@@ -37,7 +37,7 @@ class SettingsEntry<T> extends AsyncNotifier<T> {
   Future<void> changeValue(T value) async {
     if (value != state.value && ref.mounted) {
       state = AsyncData(value);
-      SharedPreferencesWithPrefix preferences = await ref.read(sharedPreferencesProvider.future);
+      final SharedPreferencesWithPrefix preferences = await ref.read(sharedPreferencesProvider.future);
       await saveToPreferences(preferences, value);
     }
   }
@@ -78,7 +78,7 @@ abstract class EnumSettingsEntry<T extends Enum> extends SettingsEntry<T> {
   @override
   @protected
   Future<T> loadFromPreferences(SharedPreferencesWithPrefix preferences) async {
-    String? value = preferences.getString(key);
+    final String? value = preferences.getString(key);
     return values.firstWhereOrNull((theme) => theme.name == value) ?? defaultValue;
   }
 

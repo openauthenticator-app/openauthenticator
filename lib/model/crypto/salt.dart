@@ -18,8 +18,8 @@ class SaltNotifier extends AsyncNotifier<Salt?> {
 
   @override
   Future<Salt?> build() async {
-    CachedSimpleSecureStorage simpleSecureStorage = await ref.watch(secureStorageProvider.future);
-    String? value = simpleSecureStorage.read(_kPasswordDerivedKeySaltKey);
+    final CachedSimpleSecureStorage simpleSecureStorage = await ref.watch(secureStorageProvider.future);
+    final String? value = simpleSecureStorage.read(_kPasswordDerivedKeySaltKey);
     if (value != null) {
       return Salt.base64Decode(
         string: value,
@@ -30,18 +30,18 @@ class SaltNotifier extends AsyncNotifier<Salt?> {
 
   /// Tries to recover the salt from the database.
   Future<Salt?> _tryRecoverSaltFromDatabase() async {
-    List<Totp> totps = await ref.read(appDatabaseProvider).listTotps();
-    Map<Salt, int> salts = {};
+    final List<Totp> totps = await ref.read(appDatabaseProvider).listTotps();
+    final Map<Salt, int> salts = {};
     (Salt, int)? best;
-    for (Totp totp in totps) {
-      int? count = salts[totp.encryptedData.encryptionSalt];
-      int newCount = count == null ? 1 : (count + 1);
+    for (final Totp totp in totps) {
+      final int? count = salts[totp.encryptedData.encryptionSalt];
+      final int newCount = count == null ? 1 : (count + 1);
       salts[totp.encryptedData.encryptionSalt] = newCount;
       if (best == null || newCount > best.$2) {
         best = (totp.encryptedData.encryptionSalt, newCount);
       }
     }
-    Salt? salt = best?.$1;
+    final Salt? salt = best?.$1;
     if (salt != null) {
       await _saveToLocalStorage(salt);
     }
@@ -68,7 +68,7 @@ class SaltNotifier extends AsyncNotifier<Salt?> {
 
   /// Saves the given [salt] to the local storage.
   Future<void> _saveToLocalStorage(Salt? salt) async {
-    CachedSimpleSecureStorage simpleSecureStorage = await ref.read(secureStorageProvider.future);
+    final CachedSimpleSecureStorage simpleSecureStorage = await ref.read(secureStorageProvider.future);
     if (salt == null) {
       await simpleSecureStorage.delete(_kPasswordDerivedKeySaltKey);
     } else {

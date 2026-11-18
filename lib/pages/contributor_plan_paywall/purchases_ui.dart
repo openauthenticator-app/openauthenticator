@@ -27,7 +27,7 @@ class ContributorPlanPaywall extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    AsyncValue<RevenueCatClient?> revenueCatClient = ref.watch(revenueCatClientProvider);
+    final AsyncValue<RevenueCatClient?> revenueCatClient = ref.watch(revenueCatClientProvider);
     if (revenueCatClient.isLoading) {
       return const CenteredCircularProgressIndicator();
     }
@@ -49,7 +49,7 @@ class ContributorPlanPaywall extends ConsumerWidget {
         }
         if (snapshot.hasData) {
           Future<void> handleSuccess() async {
-            Result<ContributorPlanState> result = await ref.read(contributorPlanStateProvider.notifier).refresh();
+            final Result<ContributorPlanState> result = await ref.read(contributorPlanStateProvider.notifier).refresh();
             if (!context.mounted) {
               return;
             }

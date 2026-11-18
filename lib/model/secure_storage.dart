@@ -20,7 +20,7 @@ class SecureStorageNotifier extends AsyncNotifier<CachedSimpleSecureStorage> {
 
   @override
   FutureOr<CachedSimpleSecureStorage> build() async {
-    InitializationOptions options = switch (currentPlatform) {
+    final InitializationOptions options = switch (currentPlatform) {
       .iOS || .macOS => _OpenAuthenticatorSSSDarwinInitializationOptions(),
       _ => _OpenAuthenticatorSSSInitializationOptions(),
     };
@@ -51,7 +51,7 @@ class _StorageRecovery {
     if (!isAvailable || ex is! PlatformException || ex.code != 'operation_failed') {
       return false;
     }
-    String error = [
+    final String error = [
       ex.message,
       ex.details,
     ].whereType<Object>().join('\n').toLowerCase();
@@ -78,7 +78,7 @@ class _StorageRecovery {
   /// Clears the restored encrypted shared preferences.
   static Future<void> clearRestoredEncryptedSharedPreferences(Ref ref) async {
     await _channel.invokeMethod('clearRestoredEncryptedSharedPreferences');
-    SharedPreferencesWithPrefix preferences = await ref.read(sharedPreferencesProvider.future);
+    final SharedPreferencesWithPrefix preferences = await ref.read(sharedPreferencesProvider.future);
     await preferences.remove(AppUnlockMethodSettingsEntry.kKey);
     ref.invalidate(appUnlockMethodSettingsEntryProvider);
   }

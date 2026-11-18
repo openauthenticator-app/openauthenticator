@@ -19,7 +19,7 @@ import 'package:open_authenticator/model/totp/totp.dart';
 import 'package:open_authenticator/utils/result/result.dart';
 
 /// The storage type settings entry provider.
-final storageTypeSettingsEntryProvider = AsyncNotifierProvider.autoDispose<StorageTypeSettingsEntry, StorageType>(StorageTypeSettingsEntry.new);
+final AsyncNotifierProvider<StorageTypeSettingsEntry, StorageType> storageTypeSettingsEntryProvider = AsyncNotifierProvider.autoDispose<StorageTypeSettingsEntry, StorageType>(StorageTypeSettingsEntry.new);
 
 /// A settings entry that allows to get and set the storage type.
 class StorageTypeSettingsEntry extends EnumSettingsEntry<StorageType> {
@@ -43,7 +43,7 @@ class StorageTypeSettingsEntry extends EnumSettingsEntry<StorageType> {
   }) async {
     try {
       if (masterPassword != null) {
-        Result<bool> passwordCheckResult = await (await ref.read(passwordVerificationProvider.future)).isPasswordValid(masterPassword);
+        final Result<bool> passwordCheckResult = await (await ref.read(passwordVerificationProvider.future)).isPasswordValid(masterPassword);
         if (passwordCheckResult is! ResultSuccess) {
           throw (passwordCheckResult as ResultError).exception;
         }
@@ -58,14 +58,14 @@ class StorageTypeSettingsEntry extends EnumSettingsEntry<StorageType> {
       }
 
       if (backupPassword != null) {
-        Result<Backup> backupResult = await ref.read(backupStoreProvider.notifier).doBackup(backupPassword);
+        final Result<Backup> backupResult = await ref.read(backupStoreProvider.notifier).doBackup(backupPassword);
         if (backupResult is! ResultSuccess) {
           throw _BackupException();
         }
       }
 
-      AppDatabase database = ref.read(appDatabaseProvider);
-      Result<GetUserTotpsResponse> result = await ref
+      final AppDatabase database = ref.read(appDatabaseProvider);
+      final Result<GetUserTotpsResponse> result = await ref
           .read(backendClientProvider.notifier)
           .sendHttpRequest(
             const GetUserTotpsRequest(),
@@ -74,12 +74,12 @@ class StorageTypeSettingsEntry extends EnumSettingsEntry<StorageType> {
         throw _GetTotpsError();
       }
 
-      GetUserTotpsResponse response = result.value;
-      DeletedTotpMap locallyDeletedTotps = await database.getDeletedTotps();
-      List<String> tombstonesToRemove = [];
-      DeletedTotpMap toDelete = {};
-      for (Totp totp in response.totps) {
-        DateTime? deletedAt = locallyDeletedTotps[totp.uuid];
+      final GetUserTotpsResponse response = result.value;
+      final DeletedTotpMap locallyDeletedTotps = await database.getDeletedTotps();
+      final List<String> tombstonesToRemove = [];
+      final DeletedTotpMap toDelete = {};
+      for (final Totp totp in response.totps) {
+        final DateTime? deletedAt = locallyDeletedTotps[totp.uuid];
         if (deletedAt != null) {
           switch (storageMigrationDeletedTotpPolicy) {
             case .keep:
@@ -94,14 +94,14 @@ class StorageTypeSettingsEntry extends EnumSettingsEntry<StorageType> {
         }
       }
 
-      List<Totp> currentStorageTotps = await database.listTotps();
-      List<Totp> toAdd = [];
+      final List<Totp> currentStorageTotps = await database.listTotps();
+      final List<Totp> toAdd = [];
       CryptoStore? newCryptoStore;
       if (masterPassword == null || response.totps.isEmpty) {
         toAdd.addAll(currentStorageTotps);
       } else {
-        for (Totp totp in response.totps) {
-          CryptoStore cryptoStore = CryptoStore.fromPassword(masterPassword, totp.encryptedData.encryptionSalt);
+        for (final Totp totp in response.totps) {
+          final CryptoStore cryptoStore = CryptoStore.fromPassword(masterPassword, totp.encryptedData.encryptionSalt);
           if (totp.encryptedData.canDecryptData(cryptoStore)) {
             newCryptoStore = cryptoStore;
             break;
@@ -109,8 +109,8 @@ class StorageTypeSettingsEntry extends EnumSettingsEntry<StorageType> {
         }
         newCryptoStore ??= CryptoStore.fromPassword(masterPassword, response.totps.first.encryptedData.encryptionSalt);
 
-        CryptoStore? currentCryptoStore = await ref.read(cryptoStoreProvider.future);
-        for (Totp totp in currentStorageTotps) {
+        final CryptoStore? currentCryptoStore = await ref.read(cryptoStoreProvider.future);
+        for (final Totp totp in currentStorageTotps) {
           CryptoStore oldCryptoStore;
           if (currentCryptoStore != null && totp.encryptedData.canDecryptData(currentCryptoStore)) {
             oldCryptoStore = currentCryptoStore;
@@ -119,7 +119,7 @@ class StorageTypeSettingsEntry extends EnumSettingsEntry<StorageType> {
           } else {
             oldCryptoStore = CryptoStore.fromPassword(masterPassword, totp.encryptedData.encryptionSalt);
           }
-          DecryptedTotp? decryptedTotp = totp.changeEncryptionKey(oldCryptoStore, newCryptoStore);
+          final DecryptedTotp? decryptedTotp = totp.changeEncryptionKey(oldCryptoStore, newCryptoStore);
           toAdd.add(decryptedTotp ?? totp);
         }
       }
@@ -133,7 +133,7 @@ class StorageTypeSettingsEntry extends EnumSettingsEntry<StorageType> {
         await ref.read(derivedKeyProvider.notifier).updateFromPassword(masterPassword!);
       }
 
-      PushOperationsQueue pushOperationsQueue = ref.read(pushOperationsQueueProvider.notifier);
+      final PushOperationsQueue pushOperationsQueue = ref.read(pushOperationsQueueProvider.notifier);
       if (toAdd.isNotEmpty) {
         await pushOperationsQueue.enqueue(
           SetTotpsPushOperation(

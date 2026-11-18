@@ -7,17 +7,17 @@ import 'package:open_authenticator/model/password_verification/methods/password_
 import 'package:open_authenticator/utils/result/result.dart';
 
 /// The provider instance.
-final passwordVerificationProvider = AsyncNotifierProvider.autoDispose<PasswordVerification, List<PasswordVerificationMethod>>(PasswordVerification.new);
+final AsyncNotifierProvider<PasswordVerification, List<PasswordVerificationMethod>> passwordVerificationProvider = AsyncNotifierProvider.autoDispose<PasswordVerification, List<PasswordVerificationMethod>>(PasswordVerification.new);
 
 /// Allows to check whether a given password is the user's master password.
 class PasswordVerification extends AsyncNotifier<List<PasswordVerificationMethod>> {
   @override
   FutureOr<List<PasswordVerificationMethod>> build() async {
-    Future<CryptoStoreVerificationMethod> cryptoStoreVerificationMethodFuture = ref.watch(cryptoStoreVerificationMethodProvider.future);
-    Future<PasswordSignatureVerificationMethod> passwordSignatureVerificationMethodFuture = ref.watch(passwordSignatureVerificationMethodProvider.future);
+    final Future<CryptoStoreVerificationMethod> cryptoStoreVerificationMethodFuture = ref.watch(cryptoStoreVerificationMethodProvider.future);
+    final Future<PasswordSignatureVerificationMethod> passwordSignatureVerificationMethodFuture = ref.watch(passwordSignatureVerificationMethodProvider.future);
 
-    CryptoStoreVerificationMethod cryptoStoreVerificationMethod = await cryptoStoreVerificationMethodFuture;
-    PasswordSignatureVerificationMethod passwordSignatureVerificationMethod = await passwordSignatureVerificationMethodFuture;
+    final CryptoStoreVerificationMethod cryptoStoreVerificationMethod = await cryptoStoreVerificationMethodFuture;
+    final PasswordSignatureVerificationMethod passwordSignatureVerificationMethod = await passwordSignatureVerificationMethodFuture;
     return List.unmodifiable([
       if (cryptoStoreVerificationMethod.enabled) cryptoStoreVerificationMethod,
       if (passwordSignatureVerificationMethod.enabled) passwordSignatureVerificationMethod,
@@ -31,7 +31,7 @@ extension PasswordValidity on List<PasswordVerificationMethod> {
   Future<Result<bool>> isPasswordValid(String password) async {
     try {
       int verificationCount = 0;
-      for (PasswordVerificationMethod verificationMethod in this) {
+      for (final PasswordVerificationMethod verificationMethod in this) {
         if (await verificationMethod.verify(password)) {
           verificationCount++;
           if (verificationMethod.isSure) {

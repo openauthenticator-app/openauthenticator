@@ -19,7 +19,7 @@ class _TotpsRefreshIndicatorWidget extends StatelessWidget {
   Widget build(BuildContext context) => CustomRefreshIndicator(
     onRefresh: onRefresh,
     builder: (context, child, controller) {
-      double iconSize = 30;
+      const double iconSize = 30;
       return Stack(
         alignment: Alignment.center,
         children: [
@@ -29,12 +29,12 @@ class _TotpsRefreshIndicatorWidget extends StatelessWidget {
               left: context.theme.style.pagePadding.left,
               right: context.theme.style.pagePadding.right,
               child: controller.isLoading
-                  ? FCircularProgress(
+                  ? const FCircularProgress(
                       style: .delta(
                         iconStyle: .delta(size: iconSize),
                       ),
                     )
-                  : Icon(
+                  : const Icon(
                       FLucideIcons.loaderCircle,
                       size: iconSize,
                     ),

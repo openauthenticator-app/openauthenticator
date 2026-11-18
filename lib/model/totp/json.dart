@@ -3,15 +3,16 @@ import 'dart:typed_data';
 import 'package:open_authenticator/model/crypto/salt.dart';
 import 'package:open_authenticator/model/totp/algorithm.dart';
 import 'package:open_authenticator/model/totp/totp.dart';
+import 'package:open_authenticator/utils/json.dart';
 
 /// Gives some useful properties for serializing TOTPs.
 extension JsonTotp on Totp {
   /// Force creating a new TOTP from the specified JSON data.
-  static Totp fromJson(Map<String, dynamic> data, {String? uuid}) => tryFromJson(data, uuid: uuid)!;
+  static Totp fromJson(JsonMap data, {String? uuid}) => tryFromJson(data, uuid: uuid)!;
 
   /// Creates a new TOTP from the specified JSON data.
-  static Totp? tryFromJson(Map<String, dynamic> data, {String? uuid}) {
-    EncryptedData? encryptedData = JsonEncryptedData.fromJson(data);
+  static Totp? tryFromJson(JsonMap data, {String? uuid}) {
+    final EncryptedData? encryptedData = JsonEncryptedData.fromJson(data);
     uuid ??= data[Totp.kUuidKey];
     if (encryptedData == null || uuid == null) {
       return null;
@@ -27,7 +28,7 @@ extension JsonTotp on Totp {
   }
 
   /// Converts this TOTP to a JSON compatible map.
-  Map<String, dynamic> toJson({bool includeUuid = true}) => {
+  JsonMap toJson({bool includeUuid = true}) => {
     if (includeUuid) Totp.kUuidKey: uuid,
     ...encryptedData.toJson(),
     if (algorithm != null) Totp.kAlgorithmKey: algorithm!.name.toUpperCase(),
@@ -40,7 +41,7 @@ extension JsonTotp on Totp {
 /// Gives some useful properties for serializing encrypted data.
 extension JsonEncryptedData on EncryptedData {
   /// Creates a new encrypted data from the specified JSON data.
-  static EncryptedData? fromJson(Map<String, dynamic> data) {
+  static EncryptedData? fromJson(JsonMap data) {
     if (data[Totp.kSecretKey] is! List || data[Totp.kEncryptionSaltKey] is! List) {
       return null;
     }
@@ -54,7 +55,7 @@ extension JsonEncryptedData on EncryptedData {
   }
 
   /// Converts this encrypted data to a JSON compatible map.
-  Map<String, dynamic> toJson() => {
+  JsonMap toJson() => {
     Totp.kSecretKey: encryptedSecret,
     if (encryptedLabel != null) Totp.kLabelKey: encryptedLabel,
     if (encryptedIssuer != null) Totp.kIssuerKey: encryptedIssuer,

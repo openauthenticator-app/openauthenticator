@@ -15,7 +15,7 @@ import 'package:open_authenticator/widgets/dialog/text_input_dialog.dart';
 import 'package:open_authenticator/widgets/waiting_overlay.dart';
 
 /// The email confirmation flow provider.
-final emailConfirmationFlowProvider = Provider.autoDispose<EmailConfirmationFlow>(EmailConfirmationFlow.new);
+final Provider<EmailConfirmationFlow> emailConfirmationFlowProvider = Provider.autoDispose<EmailConfirmationFlow>(EmailConfirmationFlow.new);
 
 /// Coordinates email confirmation user flows.
 class EmailConfirmationFlow extends AppFlow {
@@ -28,7 +28,7 @@ class EmailConfirmationFlow extends AppFlow {
     ResultPresentation presentation = .successAndErrorDialog,
   }) => keepAliveWhile(() async {
     Result result;
-    _ConfirmAction? confirmAction = await _ConfirmActionPickerDialog.openDialog(context);
+    final _ConfirmAction? confirmAction = await _ConfirmActionPickerDialog.openDialog(context);
     if (confirmAction == null || !context.mounted) {
       result = const ResultCancelled();
     } else {
@@ -50,7 +50,7 @@ class EmailConfirmationFlow extends AppFlow {
 
   /// Tries to cancel the confirmation.
   Future<Result> _tryCancelConfirmation(BuildContext context) async {
-    bool confirmation = await ConfirmationDialog.ask(
+    final bool confirmation = await ConfirmationDialog.ask(
       context,
       title: translations.emailConfirmation.confirmActionPickerDialog.cancelConfirmation.validationDialog.title,
       message: translations.emailConfirmation.confirmActionPickerDialog.cancelConfirmation.validationDialog.message,
@@ -67,7 +67,7 @@ class EmailConfirmationFlow extends AppFlow {
 
   /// Tries to confirm the user. He has to enter the code manually.
   Future<Result<RedirectResult>> _tryConfirm(BuildContext context) async {
-    String? code = (await TextInputDialog.prompt(
+    final String? code = (await TextInputDialog.prompt(
       context,
       title: translations.emailConfirmation.codeDialog.title,
       message: translations.emailConfirmation.codeDialog.message,

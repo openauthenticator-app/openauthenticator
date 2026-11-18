@@ -23,7 +23,7 @@ class SaveDerivedKeySettingsEntryWidget extends CheckboxSettingsEntryWidget<AppU
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    AsyncValue<String> unlockMethod = ref.watch(appUnlockMethodSettingsEntryProvider);
+    final AsyncValue<String> unlockMethod = ref.watch(appUnlockMethodSettingsEntryProvider);
     if (!unlockMethod.hasValue || unlockMethod.value == LocalAuthenticationAppUnlockMethod.kMethodId) {
       return const SizedBox.shrink();
     }
@@ -32,8 +32,8 @@ class SaveDerivedKeySettingsEntryWidget extends CheckboxSettingsEntryWidget<AppU
 
   @override
   Future<void> changeValue(BuildContext context, WidgetRef ref, bool newValue) async {
-    String newMethod = newValue ? NoneAppUnlockMethod.kMethodId : MasterPasswordAppUnlockMethod.kMethodId;
-    Result result = await ref.read(appUnlockMethodSettingsEntryProvider.notifier).changeValueIfUnlockSucceed(context.appUnlockInteraction, newMethod);
+    final String newMethod = newValue ? NoneAppUnlockMethod.kMethodId : MasterPasswordAppUnlockMethod.kMethodId;
+    final Result result = await ref.read(appUnlockMethodSettingsEntryProvider.notifier).changeValueIfUnlockSucceed(context.appUnlockInteraction, newMethod);
     if (context.mounted) {
       handleResult(
         context,

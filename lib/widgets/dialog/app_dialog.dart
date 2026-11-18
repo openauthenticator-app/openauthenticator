@@ -47,8 +47,8 @@ class AppDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    EdgeInsets? listViewPadding = contentPadding ?? kDefaultContentPadding;
-    List<Widget> children = [
+    final EdgeInsets listViewPadding = contentPadding ?? kDefaultContentPadding;
+    final List<Widget> children = [
       for (int i = 0; i < this.children.length; i++)
         Padding(
           padding: listViewPadding.copyWith(

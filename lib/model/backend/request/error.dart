@@ -1,5 +1,6 @@
 import 'package:open_authenticator/i18n/localizable_exception.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
+import 'package:open_authenticator/utils/json.dart';
 import 'package:open_authenticator/utils/result/reporter.dart';
 
 /// Represents a backend request error.
@@ -31,10 +32,10 @@ class BackendRequestError extends LocalizableException {
   factory BackendRequestError.fromJson({
     required String route,
     required int statusCode,
-    required Map<String, dynamic> json,
+    required JsonMap json,
   }) {
-    String? code = json['data']?['errorCode'];
-    String? message = json['data']?['message'];
+    final String? code = json['data']?['errorCode'];
+    final String? message = json['data']?['message'];
     switch (code) {
       case ExpiredSessionError.kErrorCode:
         return ExpiredSessionError._(

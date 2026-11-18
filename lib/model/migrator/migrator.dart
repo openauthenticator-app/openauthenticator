@@ -15,6 +15,7 @@ import 'package:open_authenticator/model/settings/storage_type.dart';
 import 'package:open_authenticator/model/totp/json.dart';
 import 'package:open_authenticator/model/totp/repository.dart';
 import 'package:open_authenticator/model/totp/totp.dart';
+import 'package:open_authenticator/utils/json.dart';
 import 'package:open_authenticator/utils/result/result.dart';
 import 'package:open_authenticator/utils/shared_preferences_with_prefix.dart';
 
@@ -25,12 +26,12 @@ final migratorProvider = AsyncNotifierProvider<Migrator, MigrationState>(Migrato
 class Migrator extends AsyncNotifier<MigrationState> {
   @override
   Future<MigrationState> build() async {
-    SharedPreferencesWithPrefix preferences = await ref.watch(sharedPreferencesProvider.future);
-    int migratorVersion = preferences.getInt('migratorVersion') ?? 1;
+    final SharedPreferencesWithPrefix preferences = await ref.watch(sharedPreferencesProvider.future);
+    final int migratorVersion = preferences.getInt('migratorVersion') ?? 1;
     if (migratorVersion >= 2) {
       return .done;
     }
-    String? storageType = preferences.getString('storageType');
+    final String? storageType = preferences.getString('storageType');
     if ({'local', 'online'}.contains(storageType)) {
       return .needed;
     }
@@ -47,15 +48,15 @@ class Migrator extends AsyncNotifier<MigrationState> {
   /// Migrates the app data to the new database and the new backend.
   Future<Result<StorageType>> migrate() async {
     try {
-      SharedPreferencesWithPrefix preferences = await ref.read(sharedPreferencesProvider.future);
-      String? storageType = preferences.getString('storageType');
-      StorageType newStorageType = storageType == 'online' ? .shared : .localOnly;
+      final SharedPreferencesWithPrefix preferences = await ref.read(sharedPreferencesProvider.future);
+      final String? storageType = preferences.getString('storageType');
+      final StorageType newStorageType = storageType == 'online' ? .shared : .localOnly;
       if (newStorageType == .shared) {
         await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
         await FirebaseAuth.instance.initialize(ref);
         await Future.delayed(const Duration(seconds: 2));
-        Result totpsMigrationResult = await _migrateFirebaseTotps();
-        Result userMigrationResult = await _migrateFirebaseUser();
+        final Result totpsMigrationResult = await _migrateFirebaseTotps();
+        final Result userMigrationResult = await _migrateFirebaseUser();
         if (totpsMigrationResult is! ResultSuccess || userMigrationResult is! ResultSuccess) {
           if (totpsMigrationResult is ResultError) {
             Error.throwWithStackTrace(totpsMigrationResult.exception, totpsMigrationResult.stackTrace);
@@ -86,23 +87,23 @@ class Migrator extends AsyncNotifier<MigrationState> {
     String updatedAtFieldName = 'updated',
   }) async {
     try {
-      User? user = FirebaseAuth.instance.currentUser;
+      final User? user = FirebaseAuth.instance.currentUser;
       if (user == null) {
         throw _NoFirebaseUserException();
       }
-      DocumentReference<Map<String, dynamic>> userDataDocument = FirebaseFirestore.instance.collection(user.uid).doc(userDataDocumentName);
-      CollectionReference totpsCollection = userDataDocument.collection(totpsCollectionName);
-      QuerySnapshot result = await totpsCollection.orderBy(Totp.kIssuerKey).get();
-      List<QueryDocumentSnapshot> docs = result.docs;
-      List<Totp> totps = [];
-      int now = DateTime.now().millisecondsSinceEpoch;
-      for (QueryDocumentSnapshot doc in docs) {
-        dynamic data = doc.data();
+      final DocumentReference<JsonMap> userDataDocument = FirebaseFirestore.instance.collection(user.uid).doc(userDataDocumentName);
+      final CollectionReference totpsCollection = userDataDocument.collection(totpsCollectionName);
+      final QuerySnapshot result = await totpsCollection.orderBy(Totp.kIssuerKey).get();
+      final List<QueryDocumentSnapshot> docs = result.docs;
+      final List<Totp> totps = [];
+      final int now = DateTime.now().millisecondsSinceEpoch;
+      for (final QueryDocumentSnapshot doc in docs) {
+        final dynamic data = doc.data();
         if (data is! Map<String, Object?>) {
           continue;
         }
-        int updatedAt = data[updatedAtFieldName] is Timestamp ? (data[updatedAtFieldName] as Timestamp).toDate().millisecondsSinceEpoch : now;
-        Totp? totp = JsonTotp.tryFromJson({
+        final int updatedAt = data[updatedAtFieldName] is Timestamp ? (data[updatedAtFieldName] as Timestamp).toDate().millisecondsSinceEpoch : now;
+        final Totp? totp = JsonTotp.tryFromJson({
           ...data,
           Totp.kUpdatedAtKey: updatedAt,
         });
@@ -123,15 +124,15 @@ class Migrator extends AsyncNotifier<MigrationState> {
   /// Migrates the Firebase user to the new backend.
   Future<Result<StorageType>> _migrateFirebaseUser() async {
     try {
-      User? user = FirebaseAuth.instance.currentUser;
+      final User? user = FirebaseAuth.instance.currentUser;
       if (user == null) {
         throw _NoFirebaseUserException();
       }
-      String? idToken = await user.getIdToken(forceRefresh: true);
+      final String? idToken = await user.getIdToken(forceRefresh: true);
       if (idToken == null) {
         throw _IdTokenException();
       }
-      http.Response response = await http.post(
+      final http.Response response = await http.post(
         Uri.https(
           'europe-west1-open-authenticator-by-skyost.cloudfunctions.net',
           '/migrate',
@@ -145,14 +146,14 @@ class Migrator extends AsyncNotifier<MigrationState> {
           'debug': kDebugMode,
         }),
       );
-      Map<String, dynamic> json = {'success': false};
+      JsonMap json = {'success': false};
       try {
         json = jsonDecode(response.body);
       } on FormatException catch (_) {
         throw _HttpErrorException(response: response);
       }
       if (!json['success']) {
-        String errorCode = json['data']?['errorCode'] ?? 'migration';
+        final String errorCode = json['data']?['errorCode'] ?? 'migration';
         if (errorCode == 'userAlreadyExists') {
           return const ResultSuccess();
         }
@@ -172,7 +173,7 @@ class Migrator extends AsyncNotifier<MigrationState> {
 
   /// Marks the migration as done.
   Future<void> markMigrated() async {
-    SharedPreferencesWithPrefix preferences = await ref.read(sharedPreferencesProvider.future);
+    final SharedPreferencesWithPrefix preferences = await ref.read(sharedPreferencesProvider.future);
     await preferences.setInt('migratorVersion', 2);
     if (ref.mounted) {
       state = const AsyncData(.done);

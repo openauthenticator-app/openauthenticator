@@ -17,7 +17,7 @@ class ThemeSettingsEntryWidget extends ConsumerWidget with FTileMixin {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    AsyncValue<ThemeMode> theme = ref.watch(themeSettingsEntryProvider);
+    final AsyncValue<ThemeMode> theme = ref.watch(themeSettingsEntryProvider);
     return ClickableTile(
       enabled: theme.hasValue,
       title: Text(translations.settings.application.theme.title),
@@ -25,7 +25,7 @@ class ThemeSettingsEntryWidget extends ConsumerWidget with FTileMixin {
       prefix: Icon(theme.value?.icon),
       suffix: const RightChevronSuffix(),
       onPress: () async {
-        ThemeMode? themeMode = await _ThemePickerDialog.show(context);
+        final ThemeMode? themeMode = await _ThemePickerDialog.show(context);
         if (themeMode != null) {
           await ref.read(themeSettingsEntryProvider.notifier).changeValue(themeMode);
         }
@@ -38,7 +38,7 @@ class ThemeSettingsEntryWidget extends ConsumerWidget with FTileMixin {
 class _ThemePickerDialog extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    AsyncValue<ThemeMode> theme = ref.watch(themeSettingsEntryProvider);
+    final AsyncValue<ThemeMode> theme = ref.watch(themeSettingsEntryProvider);
     return AppDialog(
       title: Text(translations.settings.application.theme.title),
       actions: [
@@ -49,7 +49,7 @@ class _ThemePickerDialog extends ConsumerWidget {
         ),
       ],
       children: [
-        for (ThemeMode mode in ThemeMode.values)
+        for (final ThemeMode mode in ThemeMode.values)
           ClickableTile(
             prefix: Icon(mode.icon),
             title: Text(translations.settings.application.theme.themePickerDialog.theme.name[mode.name]!),

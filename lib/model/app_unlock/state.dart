@@ -13,8 +13,8 @@ final appLockStateProvider = AsyncNotifierProvider<AppLockStateNotifier, AppLock
 class AppLockStateNotifier extends AsyncNotifier<AppLockState> {
   @override
   FutureOr<AppLockState> build() async {
-    String unlockMethodId = await ref.watch(appUnlockMethodSettingsEntryProvider.future);
-    AppUnlockMethod unlockMethod = ref.watch(appUnlockMethodProvider(unlockMethodId))!;
+    final String unlockMethodId = await ref.watch(appUnlockMethodSettingsEntryProvider.future);
+    final AppUnlockMethod unlockMethod = ref.watch(appUnlockMethodProvider(unlockMethodId))!;
     return state.value ?? unlockMethod.defaultAppLockState;
   }
 
@@ -24,7 +24,7 @@ class AppLockStateNotifier extends AsyncNotifier<AppLockState> {
       return const ResultCancelled();
     }
     state = const AsyncData(.unlockChallengedStarted);
-    Result result = await ref.read(appUnlockMethodSettingsEntryProvider.notifier).unlockWithCurrentMethod(interaction, .openApp);
+    final Result result = await ref.read(appUnlockMethodSettingsEntryProvider.notifier).unlockWithCurrentMethod(interaction, .openApp);
     if (!ref.mounted) {
       return const ResultCancelled();
     }

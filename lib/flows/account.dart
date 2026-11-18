@@ -15,7 +15,7 @@ import 'package:open_authenticator/widgets/dialog/toggle_link_dialog.dart';
 import 'package:open_authenticator/widgets/waiting_overlay.dart';
 
 /// The account flow provider.
-final accountFlowProvider = Provider.autoDispose<AccountFlow>(AccountFlow.new);
+final Provider<AccountFlow> accountFlowProvider = Provider.autoDispose<AccountFlow>(AccountFlow.new);
 
 /// Coordinates account-related user flows.
 class AccountFlow extends AppFlow {
@@ -24,7 +24,7 @@ class AccountFlow extends AppFlow {
 
   /// Prompts the user to choose an authentication provider, and use it to login.
   Future<Result> tryRequestSignIn(BuildContext context) => keepAliveWhile(() async {
-    SignInDialogAction? action = await SignInDialog.openDialog(context);
+    final SignInDialogAction? action = await SignInDialog.openDialog(context);
     if (action == null || !context.mounted) {
       return const ResultCancelled();
     }
@@ -38,11 +38,11 @@ class AccountFlow extends AppFlow {
 
   /// Prompts the user to choose an authentication provider, and use it to link or unlink its current account.
   Future<Result> tryRequestToggleLink(BuildContext context) => keepAliveWhile(() async {
-    ToggleLinkDialogResult? result = await ToggleLinkDialog.openDialog(context);
+    final ToggleLinkDialogResult? result = await ToggleLinkDialog.openDialog(context);
     if (result == null || !context.mounted) {
       return const ResultCancelled();
     }
-    bool unlink = !result.link;
+    final bool unlink = !result.link;
     if (unlink &&
         !(await ConfirmationDialog.ask(
           context,
@@ -65,7 +65,7 @@ class AccountFlow extends AppFlow {
 
   /// Prompts the user to choose an authentication provider, use it to re-authenticate and delete its account.
   Future<Result> tryDeleteAccount(BuildContext context) => keepAliveWhile(() async {
-    bool confirm = await ConfirmationDialog.ask(
+    final bool confirm = await ConfirmationDialog.ask(
       context,
       title: translations.authentication.deleteConfirmationDialog.title,
       message: translations.authentication.deleteConfirmationDialog.message,
@@ -75,8 +75,8 @@ class AccountFlow extends AppFlow {
       return const ResultCancelled();
     }
 
-    AppUnlockMethodSettingsEntry appUnlockerMethodsSettingsEntry = ref.read(appUnlockMethodSettingsEntryProvider.notifier);
-    Result unlockResult = await appUnlockerMethodsSettingsEntry.unlockWithCurrentMethod(context.appUnlockInteraction, UnlockReason.sensibleAction);
+    final AppUnlockMethodSettingsEntry appUnlockerMethodsSettingsEntry = ref.read(appUnlockMethodSettingsEntryProvider.notifier);
+    final Result unlockResult = await appUnlockerMethodsSettingsEntry.unlockWithCurrentMethod(context.appUnlockInteraction, UnlockReason.sensibleAction);
     if (unlockResult is! ResultSuccess || !context.mounted) {
       return unlockResult;
     }
@@ -96,7 +96,7 @@ class AccountFlow extends AppFlow {
     String? waitingDialogMessage,
     ResultPresentation presentation = .successAndErrorDialog,
   }) async {
-    Result result = await showWaitingOverlay(
+    final Result result = await showWaitingOverlay(
       context,
       future: action(),
       message: waitingDialogMessage,

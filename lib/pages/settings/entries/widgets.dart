@@ -51,7 +51,7 @@ abstract class CheckboxSettingsEntryWidget<T extends SettingsEntry<U>, U> extend
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    AsyncValue<U> value = ref.watch(provider);
+    final AsyncValue<U> value = ref.watch(provider);
     return switch (value) {
       AsyncData(:final value) => createTile(context, ref, value: value),
       AsyncError() => const SizedBox.shrink(),

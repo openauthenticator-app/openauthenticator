@@ -19,7 +19,7 @@ import 'package:open_authenticator/widgets/form/password_form_field.dart';
 import 'package:open_authenticator/widgets/waiting_overlay.dart';
 
 /// The storage migration flow provider.
-final storageMigrationFlowProvider = Provider.autoDispose<StorageMigrationFlow>(StorageMigrationFlow.new);
+final Provider<StorageMigrationFlow> storageMigrationFlowProvider = Provider.autoDispose<StorageMigrationFlow>(StorageMigrationFlow.new);
 
 /// Coordinates storage migration user flows.
 class StorageMigrationFlow extends AppFlow {
@@ -38,25 +38,25 @@ class StorageMigrationFlow extends AppFlow {
     StorageMigrationDeletedTotpPolicy storageMigrationDeletedTotpPolicy = .ask,
     ResultPresentation presentation = .successAndErrorDialog,
   }) => keepAliveWhile(() async {
-    Result result = await (() async {
-      StorageType currentType = await ref.read(storageTypeSettingsEntryProvider.future);
+    final Result result = await (() async {
+      final StorageType currentType = await ref.read(storageTypeSettingsEntryProvider.future);
       if (!context.mounted) {
         return const ResultCancelled();
       }
       if (newType != currentType) {
         if (showConfirmation) {
-          _ConfirmationResult? result = await _ConfirmationDialog.ask(context, newType == .shared);
+          final _ConfirmationResult? result = await _ConfirmationDialog.ask(context, newType == .shared);
           if (result == null || !result.confirm || !context.mounted) {
             return const ResultCancelled();
           }
           backupPassword ??= result.backupPassword;
         }
-        Result<bool> passwordCheckResult = await (await ref.read(passwordVerificationProvider.future)).isPasswordValid(currentStorageMasterPassword ?? '');
+        final Result<bool> passwordCheckResult = await (await ref.read(passwordVerificationProvider.future)).isPasswordValid(currentStorageMasterPassword ?? '');
         if (passwordCheckResult is! ResultSuccess<bool> || !passwordCheckResult.value) {
           if (!context.mounted) {
             return const ResultCancelled();
           }
-          String? enteredCurrentStorageMasterPassword = await MasterPasswordInputDialog.prompt(context);
+          final String? enteredCurrentStorageMasterPassword = await MasterPasswordInputDialog.prompt(context);
           if (enteredCurrentStorageMasterPassword == null || !context.mounted) {
             return const ResultCancelled();
           }
@@ -83,7 +83,7 @@ class StorageMigrationFlow extends AppFlow {
       switch (result) {
         case ResultSuccess():
           if (logout) {
-            Result logoutResult = await showWaitingOverlay(
+            final Result logoutResult = await showWaitingOverlay(
               context,
               future: ref.read(userProvider.notifier).logoutUser(),
             );
@@ -92,7 +92,7 @@ class StorageMigrationFlow extends AppFlow {
           break;
         case ResultError(:final exception):
           if (exception is ShouldAskForDifferentDeletedTotpPolicyException) {
-            StorageMigrationDeletedTotpPolicy? enteredStorageMigrationDeletedTotpPolicy = await _StorageMigrationDeletedTotpPolicyPickerDialog.openDialog(context);
+            final StorageMigrationDeletedTotpPolicy? enteredStorageMigrationDeletedTotpPolicy = await _StorageMigrationDeletedTotpPolicyPickerDialog.openDialog(context);
             if (enteredStorageMigrationDeletedTotpPolicy == null || !context.mounted) {
               return result;
             }

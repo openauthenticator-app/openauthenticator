@@ -27,7 +27,7 @@ class _RevealFloatingActionButtonWidget extends StatelessWidget {
       ? NotificationListener<UserScrollNotification>(
           onNotification: (notification) {
             if (notification.metrics.maxScrollExtent != notification.metrics.minScrollExtent) {
-              ScrollDirection direction = notification.direction;
+              final ScrollDirection direction = notification.direction;
               if (direction == ScrollDirection.reverse) {
                 onHideFloatingActionButton?.call();
               } else if (direction == ScrollDirection.forward) {
@@ -65,7 +65,7 @@ class _FloatingAddButton extends StatelessWidget {
         begin: const Alignment(-1, -1),
         end: const Alignment(0.8, 0.8),
         colors: [
-          for (Color color in AppTitleGradient.gradient.colors) color.darken(amount: darken),
+          for (final Color color in AppTitleGradient.gradient.colors) color.darken(amount: darken),
         ],
         stops: AppTitleGradient.gradient.stops,
       ),

@@ -7,6 +7,7 @@ import 'package:open_authenticator/model/backend/authentication/providers/provid
 import 'package:open_authenticator/model/backend/request/error.dart';
 import 'package:open_authenticator/model/backend/request/response.dart';
 import 'package:open_authenticator/model/backend/synchronization/push/operation.dart';
+import 'package:open_authenticator/utils/json.dart';
 
 /// Represents a backend request.
 sealed class BackendRequest<T extends BackendResponse> {
@@ -28,7 +29,7 @@ sealed class BackendRequest<T extends BackendResponse> {
   /// Converts the response to a backend response.
   T toResponse(http.Response response) {
     try {
-      Map<String, dynamic> json = jsonDecode(response.body);
+      final JsonMap json = decodeJsonMap(response.body);
       if (!json.containsKey('success') || !json.containsKey('data')) {
         throw InvalidJsonResponse(
           route: route,
@@ -355,7 +356,7 @@ class SynchronizationPushRequest extends BackendPostRequest<SynchronizationPushR
 
   @override
   Object? get jsonBody => [
-    for (PushOperation operation in operations) operation.toJson(httpRequest: true),
+    for (final PushOperation operation in operations) operation.toJson(httpRequest: true),
   ];
 
   @override

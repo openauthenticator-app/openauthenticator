@@ -56,9 +56,9 @@ class StoredSessionNotifier extends AsyncNotifier<Session?> {
 
   @override
   Future<Session?> build() async {
-    CachedSimpleSecureStorage simpleSecureStorage = await ref.watch(secureStorageProvider.future);
-    String? accessToken = simpleSecureStorage.read(_kAccessToken);
-    String? refreshToken = simpleSecureStorage.read(_kRefreshToken);
+    final CachedSimpleSecureStorage simpleSecureStorage = await ref.watch(secureStorageProvider.future);
+    final String? accessToken = simpleSecureStorage.read(_kAccessToken);
+    final String? refreshToken = simpleSecureStorage.read(_kRefreshToken);
     return accessToken == null || refreshToken == null
         ? null
         : Session(
@@ -69,7 +69,7 @@ class StoredSessionNotifier extends AsyncNotifier<Session?> {
 
   /// Stores the session and uses it.
   Future<void> storeAndUse(Session session) async {
-    CachedSimpleSecureStorage simpleSecureStorage = await ref.read(secureStorageProvider.future);
+    final CachedSimpleSecureStorage simpleSecureStorage = await ref.read(secureStorageProvider.future);
     await simpleSecureStorage.write(_kAccessToken, session.accessToken);
     await simpleSecureStorage.write(_kRefreshToken, session.refreshToken);
     if (ref.mounted) {
@@ -119,10 +119,10 @@ class SessionRefreshManager extends Notifier<SessionRefreshState> {
       return await (state as SessionRefreshStateInProgress)._pendingRefresh.future;
     }
 
-    Completer<Result<Session>>? pendingRefresh = Completer();
+    final Completer<Result<Session>> pendingRefresh = Completer();
     state = SessionRefreshStateInProgress(pendingRefresh: pendingRefresh);
     try {
-      BackendClient backend = await ref.read(backendClientProvider.notifier);
+      final BackendClient backend = await ref.read(backendClientProvider.notifier);
       result = await _sendRefreshRequest(backend, session: session);
       switch (result) {
         case ResultSuccess<Session>():
@@ -151,7 +151,7 @@ class SessionRefreshManager extends Notifier<SessionRefreshState> {
 
   /// Handles a backend request error.
   void handleBackendRequestError(BackendRequestError ex) {
-    List<String> invalidSessionCodes = [
+    final List<String> invalidSessionCodes = [
       InvalidPayloadError.kErrorCode,
       InvalidTokenError.kErrorCode,
       InvalidSessionError.kErrorCode,
@@ -169,7 +169,7 @@ class SessionRefreshManager extends Notifier<SessionRefreshState> {
       if (session == null) {
         throw NoSessionException();
       }
-      Result<RefreshSessionResponse> result = await backend.sendHttpRequest(
+      final Result<RefreshSessionResponse> result = await backend.sendHttpRequest(
         RefreshSessionRequest(
           refreshToken: session.refreshToken,
         ),

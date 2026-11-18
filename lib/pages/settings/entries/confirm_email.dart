@@ -16,7 +16,7 @@ class ConfirmEmailSettingsEntryWidget extends ConsumerWidget with FTileMixin {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    AsyncValue<EmailConfirmationData?> emailToConfirm = ref.watch(emailConfirmationStateProvider);
+    final AsyncValue<EmailConfirmationData?> emailToConfirm = ref.watch(emailConfirmationStateProvider);
     return emailToConfirm.value == null
         ? const SizedBox.shrink()
         : ClickableTile(

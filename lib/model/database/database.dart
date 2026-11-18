@@ -14,6 +14,7 @@ import 'package:open_authenticator/model/totp/algorithm.dart';
 import 'package:open_authenticator/model/totp/json.dart';
 import 'package:open_authenticator/model/totp/totp.dart';
 import 'package:open_authenticator/utils/drift.dart';
+import 'package:open_authenticator/utils/json.dart';
 import 'package:open_authenticator/utils/riverpod.dart';
 import 'package:open_authenticator/utils/sqlite.dart';
 import 'package:path_provider/path_provider.dart';
@@ -26,8 +27,8 @@ part 'tables.dart';
 typedef DeletedTotpMap = Map<String, DateTime>;
 
 /// The app database provider.
-final appDatabaseProvider = Provider.autoDispose<AppDatabase>((ref) {
-  AppDatabase storage = AppDatabase();
+final Provider<AppDatabase> appDatabaseProvider = Provider.autoDispose<AppDatabase>((ref) {
+  final AppDatabase storage = AppDatabase();
   ref.onDispose(storage.close);
   ref.cacheFor(const Duration(seconds: 1));
   return storage;
@@ -91,7 +92,7 @@ class AppDatabase extends _$AppDatabase {
       batch.replaceAll(
         this.totps,
         [
-          for (Totp totp in totps) totp.asDriftTotp,
+          for (final Totp totp in totps) totp.asDriftTotp,
         ],
       );
     });
@@ -99,7 +100,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// Returns the TOTP associated to the given [uuid].
   Future<Totp?> getTotp(String uuid) async {
-    _DriftTotp? totp =
+    final _DriftTotp? totp =
         await (select(totps)
               ..where((totp) => totp.uuid.isValue(uuid))
               ..limit(1))
@@ -125,7 +126,7 @@ class AppDatabase extends _$AppDatabase {
   Future<void> replaceTotps(List<Totp> totpsToInsert, DeletedTotpMap tombstonesToInsert) async {
     await totps.deleteAll();
     await removeDeletionMarks([
-      for (Totp totp in totpsToInsert) totp.uuid,
+      for (final Totp totp in totpsToInsert) totp.uuid,
     ]);
     await markAsDeleted(tombstonesToInsert);
     await addTotps(totpsToInsert);
@@ -133,16 +134,16 @@ class AppDatabase extends _$AppDatabase {
 
   /// Returns all deleted TOTPs.
   Future<DeletedTotpMap> getDeletedTotps() async {
-    List<MapEntry<String, DateTime>> tombstones = await (select(deletedTotps)).map((deletedTotp) => MapEntry(deletedTotp.uuid, deletedTotp.deletedAt)).get();
+    final List<MapEntry<String, DateTime>> tombstones = await (select(deletedTotps)).map((deletedTotp) => MapEntry(deletedTotp.uuid, deletedTotp.deletedAt)).get();
     return Map.fromEntries(tombstones);
   }
 
   /// Adds the given [tombstones] to the deleted TOTPs table.
   Future<void> markAsDeleted(DeletedTotpMap tombstones) async {
-    DeletedTotpMap merged = await getDeletedTotps();
+    final DeletedTotpMap merged = await getDeletedTotps();
 
-    for (MapEntry<String, DateTime> entry in tombstones.entries) {
-      DateTime? current = merged[entry.key];
+    for (final MapEntry<String, DateTime> entry in tombstones.entries) {
+      final DateTime? current = merged[entry.key];
       if (current == null || current.isBefore(entry.value)) {
         merged[entry.key] = entry.value;
       }
@@ -153,7 +154,7 @@ class AppDatabase extends _$AppDatabase {
       batch.insertAll(
         deletedTotps,
         [
-          for (MapEntry<String, DateTime> entry in merged.entries)
+          for (final MapEntry<String, DateTime> entry in merged.entries)
             _DriftDeletedTotp(
               uuid: entry.key,
               deletedAt: entry.value,
@@ -170,7 +171,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// Returns the push operation associated to the given [uuid].
   Future<PushOperation?> getPendingBackendPushOperation(String uuid) async {
-    _DriftBackendPushOperation? operation =
+    final _DriftBackendPushOperation? operation =
         await (select(pendingBackendPushOperations)
               ..where((operation) => operation.uuid.isValue(uuid))
               ..limit(1))
@@ -180,7 +181,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// Selects the pending backend push operations.
   Selectable<PushOperation> _selectPendingBackendPushOperations() {
-    SimpleSelectStatement<$PendingBackendPushOperationsTable, _DriftBackendPushOperation> operations = select(pendingBackendPushOperations)
+    final SimpleSelectStatement<$PendingBackendPushOperationsTable, _DriftBackendPushOperation> operations = select(pendingBackendPushOperations)
       ..orderBy([
         (table) => OrderingTerm.desc(table.createdAt),
         (table) => OrderingTerm.asc(table.kind),
@@ -207,7 +208,7 @@ class AppDatabase extends _$AppDatabase {
       batch.insertAll(
         pendingBackendPushOperations,
         [
-          for (PushOperation operation in operations) operation.asDriftBackendPushOperation,
+          for (final PushOperation operation in operations) operation.asDriftBackendPushOperation,
         ],
       );
     });
@@ -220,37 +221,37 @@ class AppDatabase extends _$AppDatabase {
 
   /// Applies the given push response.
   Future<void> applyPushResponse(SynchronizationPushResponse value) async {
-    Set<String> operationUuidsToDelete = {};
-    Map<String, List<PushOperationResult>> resultsWithErrors = {};
-    for (PushOperationResult result in value.result) {
+    final Set<String> operationUuidsToDelete = {};
+    final Map<String, List<PushOperationResult>> resultsWithErrors = {};
+    for (final PushOperationResult result in value.result) {
       operationUuidsToDelete.add(result.operationUuid);
       if (!result.success) {
         resultsWithErrors.putIfAbsent(result.totpUuid, () => []).add(result);
       }
     }
 
-    Map<String, PushOperation> pendingOperationsByUuid = {
-      for (PushOperation operation in await listPendingBackendPushOperations())
+    final Map<String, PushOperation> pendingOperationsByUuid = {
+      for (final PushOperation operation in await listPendingBackendPushOperations())
         if (operationUuidsToDelete.contains(operation.uuid)) operation.uuid: operation,
     };
 
-    Map<String, Totp> retrySets = {};
-    DeletedTotpMap retryDeletes = {};
-    List<_DriftBackendPushOperationError> errors = [];
-    for (MapEntry<String, List<PushOperationResult>> entry in resultsWithErrors.entries) {
-      for (PushOperationResult result in entry.value) {
+    final Map<String, Totp> retrySets = {};
+    final DeletedTotpMap retryDeletes = {};
+    final List<_DriftBackendPushOperationError> errors = [];
+    for (final MapEntry<String, List<PushOperationResult>> entry in resultsWithErrors.entries) {
+      for (final PushOperationResult result in entry.value) {
         if (!result.errorKind!.isPermanent) {
-          PushOperation? operation = pendingOperationsByUuid[result.operationUuid];
+          final PushOperation? operation = pendingOperationsByUuid[result.operationUuid];
           if (operation != null) {
             switch (operation) {
-              case SetTotpsPushOperation(:final payload):
-                Map<String, dynamic>? totpData = payload[result.totpUuid];
+              case SetTotpsPushOperation(:final JsonMap payload):
+                final JsonMap? totpData = payload[result.totpUuid];
                 if (totpData != null) {
                   retrySets[result.totpUuid] = JsonTotp.fromJson(totpData, uuid: result.totpUuid);
                 }
                 break;
-              case DeleteTotpsPushOperation(:final payload):
-                int? deletedAt = payload[result.totpUuid];
+              case DeleteTotpsPushOperation(:final Map<String, int> payload):
+                final int? deletedAt = payload[result.totpUuid];
                 if (deletedAt != null) {
                   retryDeletes[result.totpUuid] = DateTime.fromMillisecondsSinceEpoch(deletedAt);
                 }
@@ -262,7 +263,7 @@ class AppDatabase extends _$AppDatabase {
       }
     }
 
-    List<PushOperation> retries = <PushOperation>[
+    final List<PushOperation> retries = <PushOperation>[
       if (retrySets.isNotEmpty) SetTotpsPushOperation(totps: retrySets.values.toList()),
       if (retryDeletes.isNotEmpty) DeleteTotpsPushOperation(tombstones: retryDeletes),
     ].compacted;
@@ -272,7 +273,7 @@ class AppDatabase extends _$AppDatabase {
       batch.insertAll(
         pendingBackendPushOperations,
         [
-          for (PushOperation operation in retries) operation.asDriftBackendPushOperation,
+          for (final PushOperation operation in retries) operation.asDriftBackendPushOperation,
         ],
       );
       batch.insertAll(backendPushOperationErrors, errors);
@@ -281,7 +282,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// Selects the backend push operation errors.
   Selectable<PushOperationError> _selectBackendPushOperationErrors() {
-    SimpleSelectStatement<$BackendPushOperationErrorsTable, _DriftBackendPushOperationError> operations = select(backendPushOperationErrors)..orderBy([(table) => OrderingTerm.desc(table.createdAt)]);
+    final SimpleSelectStatement<$BackendPushOperationErrorsTable, _DriftBackendPushOperationError> operations = select(backendPushOperationErrors)..orderBy([(table) => OrderingTerm.desc(table.createdAt)]);
     return operations.map((operation) => operation.asBackendPushOperationResult as PushOperationError);
   }
 
@@ -295,7 +296,7 @@ class AppDatabase extends _$AppDatabase {
   Future<void> deleteBackendPushOperationError(PushOperationError error) async {
     assert(!error.success, 'Cannot delete a successful operation.');
     Expression<bool> predicate(BackendPushOperationErrors operation) {
-      Expression<bool> errorDetailsPredicate = error.errorDetails == null ? operation.errorDetails.isNull() : operation.errorDetails.isValue(error.errorDetails!);
+      final Expression<bool> errorDetailsPredicate = error.errorDetails == null ? operation.errorDetails.isNull() : operation.errorDetails.isValue(error.errorDetails!);
       return operation.totpUuid.isValue(error.totpUuid) &
           operation.operationUuid.isValue(error.operationUuid) &
           operation.errorKind.isValue(error.errorCode) &
@@ -320,21 +321,19 @@ class AppDatabase extends _$AppDatabase {
   });
 
   /// Opens the connection to the [_kDbFileName] and imports the legacy database if needed.
-  static QueryExecutor _openConnection() {
-    return LazyDatabase(() async {
+  static QueryExecutor _openConnection() => LazyDatabase(() async {
       await _importLegacyDatabaseIfNeeded();
       return SqliteUtils.openConnection(_kDbFileName);
     });
-  }
 
   /// Imports the legacy database if needed.
   static Future<void> _importLegacyDatabaseIfNeeded() async {
-    File oldDatabase = await _getDatabaseFile(_kLegacyDbFileName);
+    final File oldDatabase = await _getDatabaseFile(_kLegacyDbFileName);
     if (!await oldDatabase.exists()) {
       return;
     }
 
-    File newDatabase = await _getDatabaseFile(_kDbFileName);
+    final File newDatabase = await _getDatabaseFile(_kDbFileName);
 
     await _replaceDatabaseFiles(
       sourceMainFile: oldDatabase,
@@ -349,7 +348,7 @@ class AppDatabase extends _$AppDatabase {
     if (addDebugModeSuffix && kDebugMode) {
       dbFileName += '_debug';
     }
-    Directory directory = await getApplicationSupportDirectory();
+    final Directory directory = await getApplicationSupportDirectory();
     return File('${directory.path}/$dbFileName.sqlite');
   }
 
@@ -358,13 +357,13 @@ class AppDatabase extends _$AppDatabase {
     required File sourceMainFile,
     required File targetMainFile,
   }) async {
-    File sourceWal = File('${sourceMainFile.path}-wal');
-    File sourceShm = File('${sourceMainFile.path}-shm');
-    File sourceJournal = File('${sourceMainFile.path}-journal');
+    final File sourceWal = File('${sourceMainFile.path}-wal');
+    final File sourceShm = File('${sourceMainFile.path}-shm');
+    final File sourceJournal = File('${sourceMainFile.path}-journal');
 
-    File targetWal = File('${targetMainFile.path}-wal');
-    File targetShm = File('${targetMainFile.path}-shm');
-    File targetJournal = File('${targetMainFile.path}-journal');
+    final File targetWal = File('${targetMainFile.path}-wal');
+    final File targetShm = File('${targetMainFile.path}-shm');
+    final File targetJournal = File('${targetMainFile.path}-journal');
 
     await targetMainFile.parent.create(recursive: true);
 

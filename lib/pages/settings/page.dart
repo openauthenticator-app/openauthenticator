@@ -97,9 +97,9 @@ class SettingsPage extends ConsumerWidget {
         padding: const EdgeInsets.only(bottom: kSpace),
         child: FTileGroup(
           label: Text(translations.settings.backups.title),
-          children: [
-            const BackupNowSettingsEntryWidget(),
-            const ManageBackupSettingsEntryWidget(),
+          children: const [
+            BackupNowSettingsEntryWidget(),
+            ManageBackupSettingsEntryWidget(),
           ],
         ),
       ),
@@ -140,22 +140,22 @@ class SettingsPage extends ConsumerWidget {
             ]),
           ),
           label: Text(translations.settings.dangerZone.title),
-          children: [
-            const ChangeBackendUrlSettingsEntryWidget(),
-            const DeleteAccountSettingsEntryWidget(),
-            const ClearDataSettingsEntryWidget(),
+          children: const [
+            ChangeBackendUrlSettingsEntryWidget(),
+            DeleteAccountSettingsEntryWidget(),
+            ClearDataSettingsEntryWidget(),
           ],
         ),
       ),
       if (kDebugMode)
         FTileGroup(
           label: const Text('Debug'),
-          children: [
-            const ShowIntroPageSettingsEntryWidget(),
-            const ContributorPlanStateSettingsEntryWidget(),
-            const MigrationStateSettingsEntryWidget(),
-            const LocaleSettingsEntryWidget(),
-            const LinkInputSettingsEntryWidget(),
+          children: const [
+            ShowIntroPageSettingsEntryWidget(),
+            ContributorPlanStateSettingsEntryWidget(),
+            MigrationStateSettingsEntryWidget(),
+            LocaleSettingsEntryWidget(),
+            LinkInputSettingsEntryWidget(),
           ],
         ),
     ],

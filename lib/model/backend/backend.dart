@@ -34,9 +34,9 @@ class BackendClient extends AsyncNotifier<Map<String, String>> {
 
   @override
   FutureOr<Map<String, String>> build() async {
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    CachedSimpleSecureStorage simpleSecureStorage = await ref.watch(secureStorageProvider.future);
-    String? appClientId = simpleSecureStorage.read(_kAppClientIdKey);
+    final PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    final CachedSimpleSecureStorage simpleSecureStorage = await ref.watch(secureStorageProvider.future);
+    final String? appClientId = simpleSecureStorage.read(_kAppClientIdKey);
     ref.onDispose(_client.close);
     return {
       'App-Version': packageInfo.version,
@@ -47,11 +47,11 @@ class BackendClient extends AsyncNotifier<Map<String, String>> {
 
   /// Writes the app client ID if it doesn't exist.
   Future<Map<String, String>> _writeAppClientIdIfNeeded() async {
-    Map<String, String> headers = Map.of(await future);
+    final Map<String, String> headers = Map.of(await future);
     if (!headers.containsKey('App-Client-Id')) {
-      String appClientId = currentPlatform.generateAppClientId();
+      final String appClientId = currentPlatform.generateAppClientId();
       headers['App-Client-Id'] = appClientId;
-      CachedSimpleSecureStorage simpleSecureStorage = await ref.read(secureStorageProvider.future);
+      final CachedSimpleSecureStorage simpleSecureStorage = await ref.read(secureStorageProvider.future);
       await simpleSecureStorage.write(_kAppClientIdKey, appClientId);
       if (ref.mounted) {
         state = AsyncData(headers);
@@ -69,12 +69,12 @@ class BackendClient extends AsyncNotifier<Map<String, String>> {
     Duration timeout = _kDefaultTimeout,
   }) async {
     try {
-      bool canSendRequests = (await ref.read(connectivityStateProvider.future)).canSendRequests;
+      final bool canSendRequests = (await ref.read(connectivityStateProvider.future)).canSendRequests;
       if (!canSendRequests) {
         throw const SocketException('No internet connection.');
       }
 
-      Map<String, String> headers = await _writeAppClientIdIfNeeded();
+      final Map<String, String> headers = await _writeAppClientIdIfNeeded();
       if (request.needsAuthorization) {
         if (ref.read(sessionRefreshManagerProvider) is SessionRefreshStateInvalidSession) {
           throw InvalidSessionException();
@@ -87,7 +87,7 @@ class BackendClient extends AsyncNotifier<Map<String, String>> {
       }
 
       backendUrl ??= (await ref.read(backendUrlSettingsEntryProvider.future)).backendUrl;
-      http.Response response = await request
+      final http.Response response = await request
           .execute(
             _client,
             UriBuilder.prefix(
@@ -104,7 +104,7 @@ class BackendClient extends AsyncNotifier<Map<String, String>> {
       switch (ex) {
         case ExpiredSessionError():
           if (autoRefreshAccessToken) {
-            Result result = await ref.read(sessionRefreshManagerProvider.notifier).refresh();
+            final Result result = await ref.read(sessionRefreshManagerProvider.notifier).refresh();
             if (result is! ResultSuccess) {
               return result.to((value) => null);
             }

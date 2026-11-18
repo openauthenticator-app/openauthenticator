@@ -12,17 +12,19 @@ import 'package:open_authenticator/model/totp/totp.dart';
 import 'package:open_authenticator/pages/totp.dart';
 import 'package:open_authenticator/utils/image_type.dart';
 import 'package:open_authenticator/utils/jovial_svg.dart';
+import 'package:open_authenticator/utils/json.dart';
 import 'package:open_authenticator/utils/result/reporter.dart';
 import 'package:open_authenticator/widgets/totp/image.dart';
 import 'package:open_authenticator/widgets/totp/widget.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:riverpod/src/providers/future_provider.dart';
 
 /// The TOTP image cache manager provider.
 final totpImageCacheManagerProvider = AsyncNotifierProvider<TotpImageCacheManager, Map<String, CacheObject>>(TotpImageCacheManager.new);
 
 /// Resolves the best image source for a TOTP.
-final totpResolvedImageProvider = FutureProvider.family.autoDispose<ResolvedTotpImage?, ({String uuid, String? imageUrl})>((ref, args) async {
+final FutureProviderFamily<ResolvedTotpImage?, ({String? imageUrl, String uuid})> totpResolvedImageProvider = FutureProvider.family.autoDispose<ResolvedTotpImage?, ({String uuid, String? imageUrl})>((ref, args) async {
   ref.watch(totpImageCacheManagerProvider);
   return ref
       .read(totpImageCacheManagerProvider.notifier)
@@ -51,12 +53,12 @@ class TotpImageCacheManager extends AsyncNotifier<Map<String, CacheObject>> {
 
   @override
   FutureOr<Map<String, CacheObject>> build() async {
-    File index = await _getIndexFile();
+    final File index = await _getIndexFile();
     Map<String, CacheObject> cached = {};
     if (await index.exists()) {
-      Map<String, dynamic> json = jsonDecode(await index.readAsString());
+      final JsonMap json = decodeJsonMap(await index.readAsString());
       cached = {
-        for (MapEntry<String, dynamic> entry in json.entries) //
+        for (final MapEntry<String, dynamic> entry in json.entries) //
           entry.key: CacheObject.fromJson(entry.value),
       };
     }
@@ -70,21 +72,21 @@ class TotpImageCacheManager extends AsyncNotifier<Map<String, CacheObject>> {
         return;
       }
       if (checkSettings) {
-        bool cacheEnabled = await ref.read(cacheTotpPicturesSettingsEntryProvider.future);
+        final bool cacheEnabled = await ref.read(cacheTotpPicturesSettingsEntryProvider.future);
         if (!cacheEnabled) {
           return;
         }
       }
-      String? imageUrl = (totp as DecryptedTotp).imageUrl;
+      final String? imageUrl = (totp as DecryptedTotp).imageUrl;
       if (imageUrl == null) {
         await deleteCachedImage(totp.uuid);
       } else {
-        File file = await _getTotpCachedImageFile(totp.uuid, createDirectory: true);
-        CacheObject? previousCacheObject = (_currentCachedState() ?? await future)[totp.uuid];
+        final File file = await _getTotpCachedImageFile(totp.uuid, createDirectory: true);
+        final CacheObject? previousCacheObject = (_currentCachedState() ?? await future)[totp.uuid];
         if (previousCacheObject?.url == imageUrl && await file.exists()) {
           return;
         }
-        http.Response response = await http.get(Uri.parse(imageUrl));
+        final http.Response response = await http.get(Uri.parse(imageUrl));
         if (response.statusCode < 200 || response.statusCode >= 300) {
           throw HttpException(
             'Failed to cache image: HTTP ${response.statusCode}.',
@@ -104,7 +106,7 @@ class TotpImageCacheManager extends AsyncNotifier<Map<String, CacheObject>> {
         }
 
         await _enqueueCacheMutation(() async {
-          Map<String, CacheObject> cached = await _readCachedState();
+          final Map<String, CacheObject> cached = await _readCachedState();
           cached[totp.uuid] = CacheObject(
             url: imageUrl,
             imageType: imageType,
@@ -128,9 +130,9 @@ class TotpImageCacheManager extends AsyncNotifier<Map<String, CacheObject>> {
   /// Deletes the cached images, if possible.
   Future<void> deleteCachedImages(Iterable<String> uuids) async {
     await _enqueueCacheMutation(() async {
-      Map<String, CacheObject> cached = await _readCachedState();
-      for (String uuid in uuids) {
-        File file = await _getTotpCachedImageFile(uuid);
+      final Map<String, CacheObject> cached = await _readCachedState();
+      for (final String uuid in uuids) {
+        final File file = await _getTotpCachedImageFile(uuid);
         await _evictCachedImageFile(file);
         await file.deleteIfExists();
         cached.remove(uuid);
@@ -151,20 +153,20 @@ class TotpImageCacheManager extends AsyncNotifier<Map<String, CacheObject>> {
       return null;
     }
 
-    Map<String, CacheObject> cached = await future;
-    CacheObject? cacheObject = cached[uuid];
+    final Map<String, CacheObject> cached = await future;
+    final CacheObject? cacheObject = cached[uuid];
     if (cacheObject?.url != imageUrl) {
       return null;
     }
 
-    File file = await _getTotpCachedImageFile(uuid);
-    String source = await file.exists() ? file.path : imageUrl;
+    final File file = await _getTotpCachedImageFile(uuid);
+    final String source = await file.exists() ? file.path : imageUrl;
 
-    DateTime now = DateTime.now();
+    final DateTime now = DateTime.now();
     if (cacheObject!.lastAccessedAt == null || now.difference(cacheObject.lastAccessedAt!).inMinutes >= 1) {
       await _enqueueCacheMutation(() async {
-        Map<String, CacheObject> updated = await _readCachedState();
-        CacheObject? current = updated[uuid];
+        final Map<String, CacheObject> updated = await _readCachedState();
+        final CacheObject? current = updated[uuid];
         if (current?.url != imageUrl) {
           return;
         }
@@ -190,16 +192,16 @@ class TotpImageCacheManager extends AsyncNotifier<Map<String, CacheObject>> {
     bool checkSettings = true,
   }) async {
     if (checkSettings) {
-      bool cacheEnabled = await ref.read(cacheTotpPicturesSettingsEntryProvider.future);
+      final bool cacheEnabled = await ref.read(cacheTotpPicturesSettingsEntryProvider.future);
       if (!cacheEnabled) {
         return;
       }
     }
-    List<Totp> cacheableTotps = List.of(totps ?? await ref.read(totpRepositoryProvider.future));
+    final List<Totp> cacheableTotps = List.of(totps ?? await ref.read(totpRepositoryProvider.future));
     for (int i = 0; i < cacheableTotps.length; i += _kFillCacheConcurrency) {
-      int end = (i + _kFillCacheConcurrency).clamp(0, cacheableTotps.length);
+      final int end = (i + _kFillCacheConcurrency).clamp(0, cacheableTotps.length);
       await Future.wait([
-        for (Totp totp in cacheableTotps.sublist(i, end))
+        for (final Totp totp in cacheableTotps.sublist(i, end))
           cacheImage(
             totp,
             checkSettings: false,
@@ -211,7 +213,7 @@ class TotpImageCacheManager extends AsyncNotifier<Map<String, CacheObject>> {
   /// Clears the cache.
   Future<void> clearCache() async {
     await _enqueueCacheMutation(() async {
-      Directory directory = await _getTotpImagesDirectory();
+      final Directory directory = await _getTotpImagesDirectory();
       if (await directory.exists()) {
         await directory.delete(recursive: true);
       }
@@ -227,11 +229,11 @@ class TotpImageCacheManager extends AsyncNotifier<Map<String, CacheObject>> {
   /// Saves the content to the index.
   Future<void> _saveIndex({Map<String, CacheObject>? content}) async {
     content ??= await _readCachedState();
-    File index = await _getIndexFile();
+    final File index = await _getIndexFile();
     await index.create(recursive: true);
     await index.writeAsString(
       jsonEncode({
-        for (MapEntry<String, CacheObject> entry in content.entries) //
+        for (final MapEntry<String, CacheObject> entry in content.entries) //
           entry.key: entry.value.toJson(),
       }),
     );
@@ -239,7 +241,7 @@ class TotpImageCacheManager extends AsyncNotifier<Map<String, CacheObject>> {
 
   /// Queues a cache mutation to keep the state and index consistent.
   Future<void> _enqueueCacheMutation(Future<void> Function() mutation) {
-    Future<void> next = _cacheMutationQueue.catchError((Object error, StackTrace stackTrace) {}).then((_) => mutation());
+    final Future<void> next = _cacheMutationQueue.catchError((Object error, StackTrace stackTrace) {}).then((_) => mutation());
     _cacheMutationQueue = next;
     return next;
   }
@@ -249,22 +251,22 @@ class TotpImageCacheManager extends AsyncNotifier<Map<String, CacheObject>> {
 
   /// Repairs the cache index and cached files so they match the current TOTP list.
   Future<Map<String, CacheObject>> _repairCache(Map<String, CacheObject> cached) async {
-    DateTime now = DateTime.now();
-    List<Totp> totps = await ref.read(totpRepositoryProvider.future);
-    Map<String, String> currentImageUrls = {
-      for (Totp totp in totps)
+    final DateTime now = DateTime.now();
+    final List<Totp> totps = await ref.read(totpRepositoryProvider.future);
+    final Map<String, String> currentImageUrls = {
+      for (final Totp totp in totps)
         if (totp.isDecrypted && (totp as DecryptedTotp).imageUrl != null) totp.uuid: totp.imageUrl!,
     };
-    Directory directory = await _getTotpImagesDirectory();
-    Set<String> fileNames = await directory.exists() ? (await directory.list().toList()).whereType<File>().map((file) => basename(file.path)).where((name) => name != 'index.json').toSet() : {};
+    final Directory directory = await _getTotpImagesDirectory();
+    final Set<String> fileNames = await directory.exists() ? (await directory.list().toList()).whereType<File>().map((file) => basename(file.path)).where((name) => name != 'index.json').toSet() : {};
 
     bool changed = false;
-    Map<String, CacheObject> repaired = {};
+    final Map<String, CacheObject> repaired = {};
 
-    for (MapEntry<String, CacheObject> entry in cached.entries) {
-      String? currentImageUrl = currentImageUrls[entry.key];
-      bool isUnusedForTooLong = entry.value.lastAccessedAt != null && now.difference(entry.value.lastAccessedAt!) >= _kUnusedCacheTtl;
-      bool keep = currentImageUrl != null && currentImageUrl == entry.value.url && fileNames.contains(entry.key) && !isUnusedForTooLong;
+    for (final MapEntry<String, CacheObject> entry in cached.entries) {
+      final String? currentImageUrl = currentImageUrls[entry.key];
+      final bool isUnusedForTooLong = entry.value.lastAccessedAt != null && now.difference(entry.value.lastAccessedAt!) >= _kUnusedCacheTtl;
+      final bool keep = currentImageUrl != null && currentImageUrl == entry.value.url && fileNames.contains(entry.key) && !isUnusedForTooLong;
       if (keep) {
         repaired[entry.key] = entry.value;
       } else {
@@ -273,7 +275,7 @@ class TotpImageCacheManager extends AsyncNotifier<Map<String, CacheObject>> {
       }
     }
 
-    for (String fileName in fileNames.difference(repaired.keys.toSet())) {
+    for (final String fileName in fileNames.difference(repaired.keys.toSet())) {
       changed = true;
       await (await _getTotpCachedImageFile(fileName)).deleteIfExists();
     }
@@ -286,7 +288,7 @@ class TotpImageCacheManager extends AsyncNotifier<Map<String, CacheObject>> {
 
   /// Returns the current cached state if it is already loaded.
   Map<String, CacheObject>? _currentCachedState() => switch (state) {
-    AsyncData(:final value) => value,
+    AsyncData(:final Map<String, CacheObject> value) => value,
     _ => null,
   };
 
@@ -295,10 +297,10 @@ class TotpImageCacheManager extends AsyncNotifier<Map<String, CacheObject>> {
 
   /// Evicts every image provider variant used by TOTP images.
   static Future<void> _evictCachedImageFile(File file) async {
-    FileImage fileImage = FileImage(file);
+    final FileImage fileImage = FileImage(file);
     await fileImage.evict();
     await Future.wait([
-      for (double size in [
+      for (final double size in [
         TotpTile.kDefaultImageSize,
         TotpImage.kDefaultSize,
         TotpPage.kDefaultTotpImageSize,
@@ -309,7 +311,7 @@ class TotpImageCacheManager extends AsyncNotifier<Map<String, CacheObject>> {
 
   /// Returns the totp images directory, creating it if doesn't exist yet.
   static Future<Directory> _getTotpImagesDirectory({bool create = false}) async {
-    Directory directory = Directory(join((await getApplicationCacheDirectory()).path, 'totps_images'));
+    final Directory directory = Directory(join((await getApplicationCacheDirectory()).path, 'totps_images'));
     if (create && !await directory.exists()) {
       await directory.create(recursive: true);
     }
@@ -349,7 +351,7 @@ class CacheObject {
         legacy: true,
       );
     }
-    String url = json['url'];
+    final String url = json['url'];
     return CacheObject(
       url: url,
       imageType: ImageType.values.firstWhere(

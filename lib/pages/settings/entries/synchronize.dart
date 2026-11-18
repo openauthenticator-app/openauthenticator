@@ -33,7 +33,7 @@ class SynchronizeSettingsEntryWidget extends CheckboxSettingsEntryWidget<Storage
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    User? user = ref.watch(userProvider).value;
+    final User? user = ref.watch(userProvider).value;
     return user == null ? const SizedBox.shrink() : super.build(context, ref);
   }
 
@@ -46,7 +46,7 @@ class SynchronizeSettingsEntryWidget extends CheckboxSettingsEntryWidget<Storage
         enabled: false,
       );
     }
-    AsyncValue<ContributorPlanState> state = ref.watch(contributorPlanStateProvider);
+    final AsyncValue<ContributorPlanState> state = ref.watch(contributorPlanStateProvider);
     return switch (state) {
       AsyncData() =>
         state.value == .inactive
@@ -76,9 +76,9 @@ class SynchronizeSettingsEntryWidget extends CheckboxSettingsEntryWidget<Storage
 
   @override
   Widget? buildSubtitle(BuildContext context, WidgetRef ref, StorageType? storageType) {
-    ContributorPlanState? contributorPlanState = ref.watch(contributorPlanStateProvider).value;
-    User user = ref.watch(userProvider).value!;
-    AsyncValue<List<Totp>> totps = ref.watch(totpRepositoryProvider);
+    final ContributorPlanState? contributorPlanState = ref.watch(contributorPlanStateProvider).value;
+    final User user = ref.watch(userProvider).value!;
+    final AsyncValue<List<Totp>> totps = ref.watch(totpRepositoryProvider);
     if (totps is! AsyncData<List<Totp>>) {
       return Text(translations.settings.synchronization.synchronizeTotps.subtitle.description);
     }

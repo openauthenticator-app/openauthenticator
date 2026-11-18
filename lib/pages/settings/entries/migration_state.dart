@@ -12,11 +12,11 @@ class MigrationStateSettingsEntryWidget extends ConsumerWidget with FTileMixin {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    MigrationState? migrationState = ref.watch(migratorProvider).value;
+    final MigrationState? migrationState = ref.watch(migratorProvider).value;
     return migrationState == null
         ? const SizedBox.shrink()
         : FSelectMenuTile<MigrationState>.fromMap(
-            {
+            const {
               'Not needed': .notNeeded,
               'Needed': .needed,
               'Done': .done,

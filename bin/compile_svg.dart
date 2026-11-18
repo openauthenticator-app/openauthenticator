@@ -7,7 +7,7 @@ void main() {
 
 /// Explores the given [directory] looking for SVG files.
 void _exploreDirectory(Directory directory, Directory destination) {
-  for (FileSystemEntity file in directory.listSync()) {
+  for (final FileSystemEntity file in directory.listSync()) {
     if (file is Directory) {
       _exploreDirectory(file, Directory('${destination.path}/${file.name}'));
       continue;
@@ -38,7 +38,7 @@ void _compileSvg(File file, Directory destination) {
 extension _Name on Directory {
   /// Returns the directory name.
   String get name {
-    List<String> pathSegments = List.of(uri.pathSegments);
+    final List<String> pathSegments = List.of(uri.pathSegments);
     if (pathSegments.isEmpty) {
       return '';
     }

@@ -115,7 +115,7 @@ class _ExpandableTileState extends ConsumerState<ExpandableTile> with SingleTick
 
   /// Toggles the expand state.
   void _toggle() {
-    bool willExpand = !expand;
+    final bool willExpand = !expand;
     setState(() => expand = willExpand);
     if (willExpand) {
       expandController.forward();

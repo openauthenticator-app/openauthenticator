@@ -33,7 +33,7 @@ extension type OtpAuthTotpLink(Uri uri) implements Uri {
     int? digits,
     Duration? validity,
   }) {
-    UriBuilder builder = UriBuilder(
+    final UriBuilder builder = UriBuilder(
       scheme: _kScheme,
       host: _kHost,
       path: label,
@@ -80,7 +80,7 @@ extension type OtpAuthTotpLink(Uri uri) implements Uri {
 
   /// Returns the validity.
   Duration? get validity {
-    int? validity = uri.queryParameters.containsKey(_kPeriodKey) ? int.tryParse(uri.queryParameters[_kPeriodKey]!) : null;
+    final int? validity = uri.queryParameters.containsKey(_kPeriodKey) ? int.tryParse(uri.queryParameters[_kPeriodKey]!) : null;
     return validity == null ? null : Duration(seconds: validity);
   }
 }

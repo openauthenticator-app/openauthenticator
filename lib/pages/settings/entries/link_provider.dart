@@ -17,15 +17,15 @@ class AccountLinkSettingsEntryWidget extends ConsumerWidget with FTileMixin {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    SessionRefreshState sessionRefreshState = ref.watch(sessionRefreshManagerProvider);
+    final SessionRefreshState sessionRefreshState = ref.watch(sessionRefreshManagerProvider);
     if (sessionRefreshState is SessionRefreshStateInvalidSession) {
       return const SizedBox.shrink();
     }
-    User? user = ref.watch(userProvider).value;
+    final User? user = ref.watch(userProvider).value;
     if (user == null) {
       return const SizedBox.shrink();
     }
-    List<String> providers = [
+    final List<String> providers = [
       if (user.email != null) 'email',
       if (user.googleId != null) 'google.com',
       if (user.githubId != null) 'github.com',

@@ -31,7 +31,7 @@ class ChangeBackendUrlSettingsEntryWidget extends ConsumerWidget with FTileMixin
     title: Text(translations.settings.dangerZone.changeBackendUrl.title),
     subtitle: Text(translations.settings.dangerZone.changeBackendUrl.subtitle),
     onPress: () async {
-      Result result = await ref
+      final Result result = await ref
           .read(storageMigrationFlowProvider)
           .changeStorageType(
             context,
@@ -42,14 +42,14 @@ class ChangeBackendUrlSettingsEntryWidget extends ConsumerWidget with FTileMixin
       if (!context.mounted || result is! ResultSuccess) {
         return;
       }
-      String currentUrl = await showWaitingOverlay(
+      final String currentUrl = await showWaitingOverlay(
         context,
         future: ref.read(backendUrlSettingsEntryProvider.future),
       );
       if (!context.mounted) {
         return;
       }
-      String? url = await TextInputDialog.prompt(
+      final String? url = await TextInputDialog.prompt(
         context,
         title: translations.settings.dangerZone.changeBackendUrl.inputDialog.title,
         message: translations.settings.dangerZone.changeBackendUrl.inputDialog.message(defaultBackendUrl: App.defaultBackendUrl),
@@ -60,7 +60,7 @@ class ChangeBackendUrlSettingsEntryWidget extends ConsumerWidget with FTileMixin
       if (url == null || !context.mounted) {
         return;
       }
-      Result<PingBackendResponse> pingBackendResponse = await showWaitingOverlay(
+      final Result<PingBackendResponse> pingBackendResponse = await showWaitingOverlay(
         context,
         future: ref
             .read(backendClientProvider.notifier)
@@ -84,7 +84,7 @@ class ChangeBackendUrlSettingsEntryWidget extends ConsumerWidget with FTileMixin
       if (!context.mounted) {
         return;
       }
-      Result cancelConfirmationResult = await showWaitingOverlay(
+      final Result cancelConfirmationResult = await showWaitingOverlay(
         context,
         future: ref.read(authenticationProviders).email.cancelConfirmation(),
       );

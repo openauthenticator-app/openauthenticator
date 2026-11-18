@@ -35,6 +35,17 @@ class TotpTile extends StatelessWidget {
   /// the trailing widget builder.
   final WidgetBuilder? suffixBuilder;
 
+  /// Creates a new TOTP widget instance.
+  const TotpTile({
+    super.key,
+    required this.totp,
+    this.imageSize = kDefaultImageSize,
+    this.displayCode = true,
+    this.onTap,
+    this.onLongPress,
+    this.suffixBuilder,
+  });
+
   /// Creates a new TOTP widget instance that adapts itself to the current platform.
   TotpTile.adaptive({
     Key? key,
@@ -65,17 +76,6 @@ class TotpTile extends StatelessWidget {
            onDeletePress: onDeletePress,
          ),
        );
-
-  /// Creates a new TOTP widget instance.
-  const TotpTile({
-    super.key,
-    required this.totp,
-    this.imageSize = kDefaultImageSize,
-    this.displayCode = true,
-    this.onTap,
-    this.onLongPress,
-    this.suffixBuilder,
-  });
 
   @override
   Widget build(BuildContext context) => ClickableTile(
@@ -178,7 +178,7 @@ class TotpTile extends StatelessWidget {
     VoidCallback? onDeletePress,
   }) async {
     HapticFeedback.heavyImpact();
-    _MobileActionsDialogResult? choice = await showFDialog<_MobileActionsDialogResult>(
+    final _MobileActionsDialogResult? choice = await showFDialog<_MobileActionsDialogResult>(
       context: context,
       builder: (context, style, animation) => _MobileActionsDialog(
         canEdit: totp.isDecrypted,
@@ -328,7 +328,7 @@ class _DesktopActions extends StatelessWidget {
     builder: (_, controller, child) => ClickableButton.icon(
       variant: .ghost,
       onPress: controller.toggle,
-      child: child!,
+      child: child,
     ),
   );
 }

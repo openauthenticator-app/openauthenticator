@@ -17,12 +17,12 @@ final cryptoStoreProvider = AsyncNotifierProvider<CryptoStoreNotifier, CryptoSto
 class CryptoStoreNotifier extends AsyncNotifier<CryptoStore?> {
   @override
   FutureOr<CryptoStore?> build() async {
-    DerivedKey? derivedKey = await ref.watch(derivedKeyProvider.future);
+    final DerivedKey? derivedKey = await ref.watch(derivedKeyProvider.future);
     if (derivedKey == null) {
       return null;
     }
 
-    Salt? salt = await ref.watch(saltProvider.future);
+    final Salt? salt = await ref.watch(saltProvider.future);
     if (salt == null) {
       return null;
     }
@@ -60,7 +60,7 @@ class CryptoStore with Equatable {
 
   /// Encrypts the given text.
   Uint8List? encrypt(String text) {
-    Uint8List initializationVector = randomBytes(_initializationVectorLength);
+    final Uint8List initializationVector = randomBytes(_initializationVectorLength);
     return Uint8List.fromList([
       ...initializationVector,
       ...key.aes.gcm(initializationVector).encryptString(text, utf8),
@@ -71,8 +71,8 @@ class CryptoStore with Equatable {
   /// Returns `null` if not possible.
   String? decrypt(Uint8List encryptedData) {
     try {
-      Uint8List initializationVector = encryptedData.sublist(0, _initializationVectorLength);
-      Uint8List encryptedBytes = encryptedData.sublist(_initializationVectorLength);
+      final Uint8List initializationVector = encryptedData.sublist(0, _initializationVectorLength);
+      final Uint8List encryptedBytes = encryptedData.sublist(_initializationVectorLength);
       return utf8.decode(key.aes.gcm(initializationVector).decrypt(encryptedBytes));
     } catch (ex, stackTrace) {
       if (ex is! StateError) {

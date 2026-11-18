@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/model/settings/entry.dart';
 
 /// The theme settings entry provider.
-final themeSettingsEntryProvider = AsyncNotifierProvider.autoDispose<ThemeSettingsEntry, ThemeMode>(ThemeSettingsEntry.new);
+final AsyncNotifierProvider<ThemeSettingsEntry, ThemeMode> themeSettingsEntryProvider = AsyncNotifierProvider.autoDispose<ThemeSettingsEntry, ThemeMode>(ThemeSettingsEntry.new);
 
 /// A settings entry that allows to change the theme.
 class ThemeSettingsEntry extends EnumSettingsEntry<ThemeMode> {

@@ -40,7 +40,7 @@ class ClearDataSettingsEntryWidget extends ConsumerWidget with FTileMixin {
     title: Text(translations.settings.dangerZone.clearData.title),
     subtitle: Text(translations.settings.dangerZone.clearData.subtitle),
     onPress: () async {
-      bool confirm = await ConfirmationDialog.ask(
+      final bool confirm = await ConfirmationDialog.ask(
         context,
         title: translations.settings.dangerZone.clearData.confirmationDialog.title,
         message: translations.settings.dangerZone.clearData.confirmationDialog.message,
@@ -50,13 +50,13 @@ class ClearDataSettingsEntryWidget extends ConsumerWidget with FTileMixin {
         return;
       }
 
-      AppUnlockMethodSettingsEntry appUnlockerMethodsSettingsEntry = ref.read(appUnlockMethodSettingsEntryProvider.notifier);
-      Result unlockResult = await appUnlockerMethodsSettingsEntry.unlockWithCurrentMethod(context.appUnlockInteraction, UnlockReason.sensibleAction);
+      final AppUnlockMethodSettingsEntry appUnlockerMethodsSettingsEntry = ref.read(appUnlockMethodSettingsEntryProvider.notifier);
+      final Result unlockResult = await appUnlockerMethodsSettingsEntry.unlockWithCurrentMethod(context.appUnlockInteraction, UnlockReason.sensibleAction);
       if (unlockResult is! ResultSuccess || !context.mounted) {
         return;
       }
 
-      bool deleteBackups = await ConfirmationDialog.ask(
+      final bool deleteBackups = await ConfirmationDialog.ask(
         context,
         title: translations.settings.dangerZone.clearData.backupDeleteConfirmationDialog.title,
         message: translations.settings.dangerZone.clearData.backupDeleteConfirmationDialog.message,
@@ -69,7 +69,7 @@ class ClearDataSettingsEntryWidget extends ConsumerWidget with FTileMixin {
       await showWaitingOverlay(
         context,
         future: () async {
-          Result logoutResult = await ref.read(userProvider.notifier).logoutUser();
+          final Result logoutResult = await ref.read(userProvider.notifier).logoutUser();
           if (!context.mounted) {
             return;
           }
@@ -81,24 +81,24 @@ class ClearDataSettingsEntryWidget extends ConsumerWidget with FTileMixin {
             );
             return;
           }
-          CachedSimpleSecureStorage simpleSecureStorage = await ref.read(secureStorageProvider.future);
+          final CachedSimpleSecureStorage simpleSecureStorage = await ref.read(secureStorageProvider.future);
           await simpleSecureStorage.clear();
-          TotpImageCacheManager totpImageCacheManager = ref.read(totpImageCacheManagerProvider.notifier);
+          final TotpImageCacheManager totpImageCacheManager = ref.read(totpImageCacheManagerProvider.notifier);
           await totpImageCacheManager.clearCache();
-          SharedPreferencesWithPrefix preferences = await ref.read(sharedPreferencesProvider.future);
+          final SharedPreferencesWithPrefix preferences = await ref.read(sharedPreferencesProvider.future);
           await preferences.clear();
-          AppDatabase database = ref.read(appDatabaseProvider);
+          final AppDatabase database = ref.read(appDatabaseProvider);
           await database.clear();
           if (deleteBackups) {
-            List<ResultError> errors = [];
-            List<BackupPath> backups = await ref.read(backupStoreProvider.future);
-            for (BackupPath backup in backups) {
-              Result deleteResult = await ref.read(backupStoreProvider.notifier).deleteBackup(backup);
+            final List<ResultError> errors = [];
+            final List<BackupPath> backups = await ref.read(backupStoreProvider.future);
+            for (final BackupPath backup in backups) {
+              final Result deleteResult = await ref.read(backupStoreProvider.notifier).deleteBackup(backup);
               if (deleteResult is ResultError) {
                 errors.add(deleteResult);
               }
             }
-            for (ResultError error in errors) {
+            for (final ResultError error in errors) {
               printException(error.exception, error.stackTrace);
             }
           }
@@ -116,7 +116,7 @@ class ClearDataSettingsEntryWidget extends ConsumerWidget with FTileMixin {
 
   /// Shows the dialog that indicates the user he has to restart the app.
   Future<void> _showCloseDialog(BuildContext context) async {
-    bool canExitWithConfirmDialog = _canExitWithConfirmDialog;
+    final bool canExitWithConfirmDialog = _canExitWithConfirmDialog;
     await showFDialog(
       context: context,
       barrierDismissible: false,

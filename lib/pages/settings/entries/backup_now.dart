@@ -22,7 +22,7 @@ class BackupNowSettingsEntryWidget extends ConsumerWidget with FTileMixin {
     title: Text(translations.settings.backups.backupNow.title),
     subtitle: Text(translations.settings.backups.backupNow.subtitle),
     onPress: () async {
-      String? password = await TextInputDialog.prompt(
+      final String? password = await TextInputDialog.prompt(
         context,
         title: translations.settings.backups.backupNow.passwordDialog.title,
         message: translations.settings.backups.backupNow.passwordDialog.message,
@@ -31,7 +31,7 @@ class BackupNowSettingsEntryWidget extends ConsumerWidget with FTileMixin {
       if (password == null || !context.mounted) {
         return;
       }
-      Result<Backup> result = await showWaitingOverlay(
+      final Result<Backup> result = await showWaitingOverlay(
         context,
         future: ref.read(backupStoreProvider.notifier).doBackup(password),
       );

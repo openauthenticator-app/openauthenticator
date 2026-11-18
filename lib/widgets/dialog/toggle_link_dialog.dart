@@ -24,11 +24,11 @@ class ToggleLinkDialog extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    List<AuthenticationProvider> providers = ref.watch(authenticationProviders);
-    List<AuthenticationProvider> currentProviders = ref.watch(userAuthenticationProviders);
-    EmailConfirmationData? confirmationData = ref.watch(emailConfirmationStateProvider).value;
+    final List<AuthenticationProvider> providers = ref.watch(authenticationProviders);
+    final List<AuthenticationProvider> currentProviders = ref.watch(userAuthenticationProviders);
+    final EmailConfirmationData? confirmationData = ref.watch(emailConfirmationStateProvider).value;
     Widget createTile(AuthenticationProvider provider) {
-      bool unlink = currentProviders.contains(provider);
+      final bool unlink = currentProviders.contains(provider);
       return _ProviderTile(
         providerId: provider.id,
         trailingIcon: unlink ? FLucideIcons.unlink : null,
@@ -40,7 +40,7 @@ class ToggleLinkDialog extends ConsumerWidget {
                 : (() async {
                     switch (provider) {
                       case EmailAuthenticationProvider():
-                        String? email = await TextInputDialog.prompt(
+                        final String? email = await TextInputDialog.prompt(
                           context,
                           title: translations.authentication.emailDialog.title,
                           message: translations.authentication.emailDialog.message,
@@ -71,7 +71,7 @@ class ToggleLinkDialog extends ConsumerWidget {
         ),
       ],
       children: [
-        for (AuthenticationProvider provider in providers)
+        for (final AuthenticationProvider provider in providers)
           if (currentProviders.length != 1 || provider != currentProviders.first)
             if (provider is! EmailAuthenticationProvider || confirmationData == null) createTile(provider),
       ],
@@ -115,18 +115,18 @@ class _ProviderTile extends ConsumerStatefulWidget {
 class _ProviderTileState extends ConsumerState<_ProviderTile> with BrightnessListener {
   @override
   Widget build(BuildContext context) {
-    Widget image = AuthenticationProviderImage(
+    final Widget image = AuthenticationProviderImage(
       providerId: widget.providerId,
       width: widget.size,
       height: widget.size,
     );
-    bool invertIconOnBrightnessChance =
+    final bool invertIconOnBrightnessChance =
         widget.providerId == EmailAuthenticationProvider.kProviderId ||
         widget.providerId == AppleAuthenticationProvider.kProviderId ||
         // widget.providerId == TwitterAuthenticationProvider.kProviderId ||
         widget.providerId == GithubAuthenticationProvider.kProviderId;
-    String? title = translations.authentication.authenticationProvider[widget.providerId].name;
-    String? subtitle = translations.authentication.authenticationProvider[widget.providerId].description;
+    final String? title = translations.authentication.authenticationProvider[widget.providerId].name;
+    final String? subtitle = translations.authentication.authenticationProvider[widget.providerId].description;
     return ClickableTile(
       prefix: invertIconOnBrightnessChance && currentBrightness == Brightness.dark ? InvertColors(child: image) : image,
       title: title == null ? const SizedBox.shrink() : Text(title),

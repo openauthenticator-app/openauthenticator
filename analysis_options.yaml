@@ -1,13 +1,11 @@
 include: package:flutter_lints/flutter.yaml
-plugins:
-  riverpod_lint: ^3.1.4
 
 analyzer:
   errors:
     unreachable_switch_default: ignore
     unused_element_parameter: ignore
   exclude:
-    - '**.g.dart'
+    - "**/*.g.dart"
     - build/**
     - android/**
     - ios/**
@@ -18,10 +16,77 @@ analyzer:
 
 linter:
   rules:
-    prefer_single_quotes: true
-    unnecessary_lambdas: true
-    avoid_renaming_method_parameters: false
-    prefer_const_constructors: true
+    - always_declare_return_types
+    - always_put_control_body_on_new_line
+    # - always_specify_types
+    - always_use_package_imports
+    - annotate_redeclares
+    # - async_return_with_no_await
+    - avoid_final_parameters
+    - avoid_multiple_declarations_per_line
+    - avoid_returning_this
+    - avoid_types_on_closure_parameters
+    - avoid_void_async
+    - close_sinks
+    - combinators_ordering
+    - constant_identifier_names
+    - directives_ordering
+    # - discarded_futures
+    - empty_container_bodies
+    - eol_at_end_of_file
+    - implicit_reopen
+    - invalid_case_patterns
+    - library_names
+    - matching_super_parameters
+    - missing_code_block_language_in_doc_comment
+    - no_adjacent_strings_in_list
+    - no_literal_bool_comparisons
+    - no_self_assignments
+    - noop_primitive_operations
+    - only_throw_errors
+    - package_prefixed_library_names
+    - parameter_assignments
+    - prefer_asserts_in_initializer_lists
+    - prefer_asserts_with_message
+    - prefer_const_constructors
+    - prefer_const_declarations
+    - prefer_const_literals_to_create_immutables
+    - prefer_constructors_over_static_methods
+    - prefer_expression_function_bodies
+    - prefer_final_in_for_each
+    - prefer_final_locals
+    - prefer_foreach
+    - prefer_if_elements_to_conditional_expressions
+    - prefer_mixin
+    - prefer_null_aware_method_calls
+    - prefer_single_quotes
+    - public_member_api_docs
+    - require_trailing_commas
+    - simple_directive_paths
+    - simplify_variable_pattern
+    - sized_box_shrink_expand
+    - sort_unnamed_constructors_first
+    - specify_nonobvious_local_variable_types
+    - specify_nonobvious_property_types
+    - switch_on_type
+    - test_types_in_equals
+    - throw_in_finally
+    - tighten_type_of_initializing_formals
+    - type_annotate_public_apis
+    - unnecessary_async
+    - unnecessary_lambdas
+    - unnecessary_null_checks
+    - unnecessary_primary_constructor_body
+    - unnecessary_statements
+    - unnecessary_unawaited
+    - use_colored_box
+    - use_declaring_parameters
+    - use_decorated_box
+    - use_is_even_rather_than_modulo
+    - use_named_constants
+    # - use_setters_to_change_properties
+    - use_truncating_division
+    - var_with_no_type_annotation
 
 formatter:
   trailing_commas: preserve

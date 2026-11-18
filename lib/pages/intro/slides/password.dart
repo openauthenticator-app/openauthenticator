@@ -46,7 +46,7 @@ class PasswordIntroPageSlide extends StatelessWidget {
       ),
       Consumer(
         builder: (context, ref, child) {
-          String? unlockMethod = ref.watch(appUnlockMethodSettingsEntryProvider).value;
+          final String? unlockMethod = ref.watch(appUnlockMethodSettingsEntryProvider).value;
           return {MasterPasswordAppUnlockMethod.kMethodId, LocalAuthenticationAppUnlockMethod.kMethodId}.contains(unlockMethod)
               ? SizedBox.fromSize(
                   size: const Size.fromHeight(kSpace),

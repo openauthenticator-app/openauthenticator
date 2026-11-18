@@ -62,8 +62,8 @@ class TotpPage extends ConsumerStatefulWidget {
 
   /// Opens this page from a scanned [uri].
   static Future<void> openFromUri(BuildContext context, WidgetRef ref, OtpAuthTotpLink uri) async {
-    CryptoStore? cryptoStore = await ref.read(cryptoStoreProvider.future);
-    DecryptedTotp? totp = DecryptedTotp.fromUri(uri, cryptoStore);
+    final CryptoStore? cryptoStore = await ref.read(cryptoStoreProvider.future);
+    final DecryptedTotp? totp = DecryptedTotp.fromUri(uri, cryptoStore);
     if (!context.mounted) {
       return;
     }
@@ -158,7 +158,7 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
   late final TextEditingController validityController = TextEditingController(text: validity?.inSeconds.toString())
     ..addListener(() {
       if (mounted) {
-        int? validity = int.tryParse(validityController.value.text);
+        final int? validity = int.tryParse(validityController.value.text);
         setState(() => this.validity = validity == null ? null : Duration(seconds: validity));
       }
     });
@@ -196,7 +196,7 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
           if (!widget.add)
             ClickableHeaderAction(
               onPress: () async {
-                bool confirmation = await ConfirmationDialog.ask(
+                final bool confirmation = await ConfirmationDialog.ask(
                   context,
                   title: translations.totp.actions.deleteConfirmationDialog.title,
                   message: translations.totp.actions.deleteConfirmationDialog.message,
@@ -205,7 +205,7 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
                 if (!confirmation || !context.mounted) {
                   return;
                 }
-                Result result = await showWaitingOverlay(
+                final Result result = await showWaitingOverlay(
                   context,
                   future: ref.read(totpRepositoryProvider.notifier).deleteTotp(widget.totp!.uuid),
                 );
@@ -246,13 +246,13 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
         ),
         onPress: isValidTotp && enabled
             ? () async {
-                bool validateResult = formKey.currentState!.validate();
+                final bool validateResult = formKey.currentState!.validate();
                 if (!validateResult) {
                   return;
                 }
                 setState(() => enabled = false);
                 formKey.currentState!.save();
-                Result editResult = await (widget.add ? addTotp() : updateTotp());
+                final Result editResult = await (widget.add ? addTotp() : updateTotp());
                 if (!context.mounted) {
                   return;
                 }
@@ -281,11 +281,11 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
                     ),
                     width: widget.imageSize + 2,
                     height: widget.imageSize + 2,
-                    child: child!,
+                    child: child,
                   ),
                   child: createImageWidget(),
                   onPress: () async {
-                    String? imageUrl = await LogoPickerDialog.openDialog(context, initialSearchKeywords: issuer);
+                    final String? imageUrl = await LogoPickerDialog.openDialog(context, initialSearchKeywords: issuer);
                     if (imageUrl != null && mounted) {
                       setState(() => this.imageUrl = imageUrl);
                     }
@@ -357,7 +357,7 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
         text: translations.totp.page.algorithm,
       ),
       items: {
-        for (Algorithm algorithm in Algorithm.values) algorithm.name.toUpperCase(): algorithm,
+        for (final Algorithm algorithm in Algorithm.values) algorithm.name.toUpperCase(): algorithm,
       },
       hint: Totp.kDefaultAlgorithm.name.toUpperCase(),
       enabled: enabled,
@@ -425,7 +425,7 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
 
   /// Creates the QR code widget.
   Widget createQrCodeWidget(BuildContext context) {
-    Color color = currentBrightness == Brightness.light ? context.theme.colors.primary : Colors.white;
+    final Color color = currentBrightness == Brightness.light ? context.theme.colors.primary : Colors.white;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: kSpace),
       child: Center(
@@ -492,7 +492,7 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
     if (digits == null || digits.isEmpty) {
       return null;
     }
-    int? parsedDigits = int.tryParse(digits);
+    final int? parsedDigits = int.tryParse(digits);
     if (parsedDigits == null) {
       return translations.error.validation.number;
     }
@@ -507,7 +507,7 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
     if (validity == null || validity.isEmpty) {
       return null;
     }
-    int? parsedValidity = int.tryParse(validity);
+    final int? parsedValidity = int.tryParse(validity);
     if (parsedValidity == null) {
       return translations.error.validation.number;
     }
@@ -516,7 +516,7 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
 
   /// Adds the TOTP to the repository.
   Future<Result> addTotp() async {
-    bool willExceed = (await ref.read(totpLimitProvider.future)).willExceedIfAddMore(count: 1);
+    final bool willExceed = (await ref.read(totpLimitProvider.future)).willExceedIfAddMore(count: 1);
     if (willExceed) {
       if (mounted) {
         await TotpLimitDialog.show(context);
@@ -524,7 +524,7 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
       return const ResultCancelled();
     }
 
-    DecryptedTotp? totp = await _createTotp();
+    final DecryptedTotp? totp = await _createTotp();
     if (totp == null) {
       return ResultError(exception: _TotpCreationFailed());
     }
@@ -533,7 +533,7 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
 
   /// Updates the TOTP in the repository.
   Future<Result> updateTotp() async {
-    DecryptedTotp? totp = await _createTotp();
+    final DecryptedTotp? totp = await _createTotp();
     if (totp == null) {
       return ResultError(exception: _TotpCreationFailed());
     }

@@ -58,7 +58,7 @@ class TotpImage extends ConsumerWidget {
     if ((label == null || label!.isEmpty) && (issuer == null || issuer!.isEmpty)) {
       return Colors.transparent;
     }
-    Random random = Random(label.hashCode + (issuer ?? '').hashCode);
+    final Random random = Random(label.hashCode + (issuer ?? '').hashCode);
     return Colors.primaries[random.nextInt(Colors.primaries.length)];
   }
 
@@ -68,7 +68,7 @@ class TotpImage extends ConsumerWidget {
       return _makeCircle(_createDefaultImage());
     }
 
-    AsyncValue<ResolvedTotpImage?> resolved = ref.watch(
+    final AsyncValue<ResolvedTotpImage?> resolved = ref.watch(
       totpResolvedImageProvider((
         uuid: uuid!,
         imageUrl: imageUrl,
@@ -272,7 +272,7 @@ class _TotpCountdownImageCircularProgressState extends TimeBasedTotpWidgetState<
 
   /// Changes the colors.
   void changeColors() {
-    Color? temporary = color;
+    final Color temporary = color;
     color = backgroundColor;
     backgroundColor = temporary;
   }

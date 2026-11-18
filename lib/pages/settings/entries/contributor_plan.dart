@@ -21,7 +21,7 @@ class ContributorPlanEntryWidget extends ConsumerWidget with FTileMixin {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    AsyncValue<ContributorPlanState> state = ref.watch(contributorPlanStateProvider);
+    final AsyncValue<ContributorPlanState> state = ref.watch(contributorPlanStateProvider);
     switch (state) {
       case AsyncData(:final value):
         switch (value) {
@@ -52,10 +52,10 @@ class ContributorPlanEntryWidget extends ConsumerWidget with FTileMixin {
                     ClickableButton(
                       variant: .secondary,
                       onPress: () async {
-                        String? url = await showWaitingOverlay(
+                        final String? url = await showWaitingOverlay(
                           context,
                           future: (() async {
-                            RevenueCatClient? client = await ref.read(revenueCatClientProvider.future);
+                            final RevenueCatClient? client = await ref.read(revenueCatClientProvider.future);
                             return client?.getManagementUrl();
                           })(),
                         );

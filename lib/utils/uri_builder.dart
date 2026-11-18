@@ -3,11 +3,6 @@ class UriBuilder {
   /// The underlying URI.
   Uri _uri;
 
-  /// Creates a new [UriBuilder] from a [Uri].
-  UriBuilder._({
-    required this._uri,
-  });
-
   /// Creates a new [UriBuilder].
   UriBuilder({
     String? scheme,
@@ -29,6 +24,11 @@ class UriBuilder {
          fragment: fragment,
        );
 
+  /// Creates a new [UriBuilder] from a [Uri].
+  UriBuilder._({
+    required this._uri,
+  });
+
   /// Creates a new [UriBuilder] from a [prefix].
   factory UriBuilder.prefix({
     required String prefix,
@@ -38,7 +38,7 @@ class UriBuilder {
     Map<String, dynamic>? queryParameters,
     String? fragment,
   }) {
-    UriBuilder builder = UriBuilder._(
+    final UriBuilder builder = UriBuilder._(
       uri: Uri.parse(
         '$prefix$path',
       ),

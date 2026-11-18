@@ -20,7 +20,7 @@ class PasswordSignatureVerificationMethodNotifier extends AsyncNotifier<Password
 
   @override
   FutureOr<PasswordSignatureVerificationMethod> build() async {
-    CachedSimpleSecureStorage simpleSecureStorage = await ref.watch(secureStorageProvider.future);
+    final CachedSimpleSecureStorage simpleSecureStorage = await ref.watch(secureStorageProvider.future);
     return PasswordSignatureVerificationMethod(
       passwordSignature: simpleSecureStorage.read(_kPasswordSignatureKey),
       salt: await ref.watch(saltProvider.future),
@@ -32,13 +32,13 @@ class PasswordSignatureVerificationMethodNotifier extends AsyncNotifier<Password
     if (password == null) {
       return false;
     }
-    Salt? salt = await ref.read(saltProvider.future);
+    final Salt? salt = await ref.read(saltProvider.future);
     if (salt == null) {
       return false;
     }
-    CryptoStore cryptoStore = CryptoStore.fromPassword(password, salt);
-    String passwordSignature = cryptoStore.hmacSecretKey.string(password, utf8).base64();
-    CachedSimpleSecureStorage simpleSecureStorage = await ref.read(secureStorageProvider.future);
+    final CryptoStore cryptoStore = CryptoStore.fromPassword(password, salt);
+    final String passwordSignature = cryptoStore.hmacSecretKey.string(password, utf8).base64();
+    final CachedSimpleSecureStorage simpleSecureStorage = await ref.read(secureStorageProvider.future);
     await simpleSecureStorage.write(_kPasswordSignatureKey, passwordSignature);
     if (ref.mounted) {
       state = AsyncData(
@@ -56,7 +56,7 @@ class PasswordSignatureVerificationMethodNotifier extends AsyncNotifier<Password
 
   /// Disables the password signature verification method.
   Future<void> disable() async {
-    CachedSimpleSecureStorage simpleSecureStorage = await ref.read(secureStorageProvider.future);
+    final CachedSimpleSecureStorage simpleSecureStorage = await ref.read(secureStorageProvider.future);
     await simpleSecureStorage.delete(_kPasswordSignatureKey);
     if (ref.mounted) {
       state = const AsyncData(PasswordSignatureVerificationMethod());
@@ -86,7 +86,7 @@ class PasswordSignatureVerificationMethod with PasswordVerificationMethod {
     if (!(await super.verify(password))) {
       return false;
     }
-    CryptoStore cryptoStore = CryptoStore.fromPassword(password, salt!);
+    final CryptoStore cryptoStore = CryptoStore.fromPassword(password, salt!);
     return cryptoStore.hmacSecretKey.verify(base64.decode(passwordSignature!), utf8.encode(password));
   }
 }

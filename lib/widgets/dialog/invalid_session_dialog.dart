@@ -36,7 +36,7 @@ class InvalidSessionDialog extends ConsumerWidget {
 
   /// Opens the invalid session dialog.
   static Future<InvalidSessionDialogChoice?> openDialog(BuildContext context, WidgetRef ref, {bool handleResult = false}) async {
-    InvalidSessionDialogChoice? result = await showFDialog<InvalidSessionDialogChoice>(
+    final InvalidSessionDialogChoice? result = await showFDialog<InvalidSessionDialogChoice>(
       context: context,
       builder: (context, style, animation) => const InvalidSessionDialog._(),
     );

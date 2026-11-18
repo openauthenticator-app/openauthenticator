@@ -61,11 +61,11 @@ class _SearchBoxWidgetState extends ConsumerState<_SearchBox> {
   );
 
   /// Triggered when the focus changes.
-  void onFocusChange() async {
+  Future<void> onFocusChange() async {
     if (focusNode.hasFocus) {
       focusNode.unfocus();
       if (mounted) {
-        Totp? result = await _showTotpSearch(context);
+        final Totp? result = await _showTotpSearch(context);
         if (result != null) {
           widget.onTotpFound?.call(result);
         }

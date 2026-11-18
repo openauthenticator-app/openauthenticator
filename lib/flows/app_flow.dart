@@ -11,7 +11,7 @@ abstract class AppFlow {
 
   /// Keeps the flow provider alive while [action] is running.
   Future<T> keepAliveWhile<T>(Future<T> Function() action) async {
-    KeepAliveLink keepAliveLink = ref.keepAlive();
+    final KeepAliveLink keepAliveLink = ref.keepAlive();
     try {
       return await action();
     } finally {

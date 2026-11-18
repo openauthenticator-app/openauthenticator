@@ -15,7 +15,7 @@ class MasterPasswordAppUnlockMethod extends AppUnlockMethod<String> {
   @override
   Future<Result<String>> _tryUnlock(AppUnlockInteraction interaction, UnlockReason reason) async {
     if (reason != .openApp && reason != .sensibleAction) {
-      List<Totp> totps = await _ref.read(totpRepositoryProvider.future);
+      final List<Totp> totps = await _ref.read(totpRepositoryProvider.future);
       if (totps.isEmpty) {
         return const ResultSuccess();
       }
@@ -24,7 +24,7 @@ class MasterPasswordAppUnlockMethod extends AppUnlockMethod<String> {
       return const ResultCancelled();
     }
 
-    Result<String> result = await _promptMasterPasswordForUnlock(interaction, reason == .openApp ? translations.appUnlock.masterPasswordDialogMessage : null);
+    final Result<String> result = await _promptMasterPasswordForUnlock(interaction, reason == .openApp ? translations.appUnlock.masterPasswordDialogMessage : null);
     if (result is! ResultSuccess<String>) {
       return result;
     }
@@ -38,7 +38,7 @@ class MasterPasswordAppUnlockMethod extends AppUnlockMethod<String> {
 
   @override
   Future<void> onMethodChosen({ResultSuccess<String>? enableResult}) async {
-    String? password = enableResult?.valueOrNull;
+    final String? password = enableResult?.valueOrNull;
     if (await _ref.read(passwordSignatureVerificationMethodProvider.notifier).enable(password)) {
       await _ref.read(derivedKeyProvider.notifier).deleteFromLocalStorage();
     }
@@ -47,7 +47,7 @@ class MasterPasswordAppUnlockMethod extends AppUnlockMethod<String> {
   @override
   Future<void> onMethodChanged({ResultSuccess<String>? disableResult}) async {
     await _ref.read(passwordSignatureVerificationMethodProvider.notifier).disable();
-    String? password = disableResult?.valueOrNull;
+    final String? password = disableResult?.valueOrNull;
     if (password != null) {
       await _ref.read(derivedKeyProvider.notifier).updateFromPassword(password, andWrite: true);
     }
@@ -56,16 +56,16 @@ class MasterPasswordAppUnlockMethod extends AppUnlockMethod<String> {
   @override
   Future<CannotUnlockException?> canUnlock(UnlockReason reason) async {
     if (reason != .openApp && reason != .sensibleAction) {
-      List<Totp> totps = await _ref.read(totpRepositoryProvider.future);
+      final List<Totp> totps = await _ref.read(totpRepositoryProvider.future);
       if (totps.isEmpty) {
         return null;
       }
     }
-    Salt? salt = await _ref.read(saltProvider.future);
+    final Salt? salt = await _ref.read(saltProvider.future);
     if (salt == null) {
       return MasterPasswordNoSalt();
     }
-    List<PasswordVerificationMethod> passwordVerificationMethods = await _ref.read(passwordVerificationProvider.future);
+    final List<PasswordVerificationMethod> passwordVerificationMethods = await _ref.read(passwordVerificationProvider.future);
     if (passwordVerificationMethods.isEmpty) {
       return MasterPasswordNoPasswordVerificationMethodAvailable();
     }
@@ -74,14 +74,14 @@ class MasterPasswordAppUnlockMethod extends AppUnlockMethod<String> {
 
   /// Prompts master password for unlock.
   Future<Result<String>> _promptMasterPasswordForUnlock(AppUnlockInteraction interaction, String? message) async {
-    String? password = await interaction.promptMasterPassword(
+    final String? password = await interaction.promptMasterPassword(
       message: message,
     );
     if (password == null) {
       return const ResultCancelled();
     }
 
-    Result<bool> passwordCheckResult = await (await _ref.read(passwordVerificationProvider.future)).isPasswordValid(password);
+    final Result<bool> passwordCheckResult = await (await _ref.read(passwordVerificationProvider.future)).isPasswordValid(password);
     if (passwordCheckResult is! ResultSuccess || !(passwordCheckResult as ResultSuccess<bool>).value) {
       return passwordCheckResult is ResultError
           ? passwordCheckResult.to<String>((_) => null)

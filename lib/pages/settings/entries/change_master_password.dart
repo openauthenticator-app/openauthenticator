@@ -16,7 +16,7 @@ class ChangeMasterPasswordSettingsEntryWidget extends ConsumerWidget with FTileM
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    AsyncValue<StorageType> storageType = ref.watch(storageTypeSettingsEntryProvider);
+    final AsyncValue<StorageType> storageType = ref.watch(storageTypeSettingsEntryProvider);
     return ClickableTile(
       prefix: const Icon(FLucideIcons.rectangleEllipsis),
       title: Text(translations.settings.security.changeMasterPassword.title),

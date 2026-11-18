@@ -20,7 +20,7 @@ class FirebaseAuthDefault extends FirebaseAuth {
   Future<void> initialize(Ref ref) async {
     await super.initialize(ref);
     await firebase_auth.FirebaseAuth.instance.setLanguageCode(locale);
-    firebase_auth.User? user = firebase_auth.FirebaseAuth.instance.currentUser;
+    final firebase_auth.User? user = firebase_auth.FirebaseAuth.instance.currentUser;
     _currentUser = _createUserFromFirebaseUser(user);
     _userStreamSubscription = firebase_auth.FirebaseAuth.instance.userChanges().map(_createUserFromFirebaseUser).listen((user) {
       _currentUser = user;
@@ -42,7 +42,7 @@ class FirebaseAuthDefault extends FirebaseAuth {
     if (_currentUser == null) {
       throw Exception('User must be logged in.');
     }
-    firebase_auth.User user = await _currentUser!.unlinkFromProvider(providerId);
+    final firebase_auth.User user = await _currentUser!.unlinkFromProvider(providerId);
     return SignInResult(
       email: user.email,
       localId: user.uid,
@@ -91,7 +91,7 @@ class FirebaseAuthUser extends User {
 
   @override
   List<String> get providers => [
-    for (firebase_auth.UserInfo userInfo in _firebaseUser.providerData) userInfo.providerId,
+    for (final firebase_auth.UserInfo userInfo in _firebaseUser.providerData) userInfo.providerId,
   ];
 
   @override
@@ -115,14 +115,14 @@ mixin _ProviderAuthMethod on FirebaseAuthMethod, CanLinkTo {
   @override
   @protected
   Future<SignInResult> signIn() async {
-    firebase_auth.UserCredential credential = await firebase_auth.FirebaseAuth.instance.signInWithProvider(_createAuthProvider());
+    final firebase_auth.UserCredential credential = await firebase_auth.FirebaseAuth.instance.signInWithProvider(_createAuthProvider());
     return await credentialToResult(credential);
   }
 
   @override
   Future<SignInResult> reAuthenticate(User user) async {
     assert(user is FirebaseAuthUser, 'You must use this class with FirebaseAuthDefault.');
-    firebase_auth.UserCredential credential = await (user as FirebaseAuthUser).reAuthenticateWithProvider(_createAuthProvider());
+    final firebase_auth.UserCredential credential = await (user as FirebaseAuthUser).reAuthenticateWithProvider(_createAuthProvider());
     return await credentialToResult(credential);
   }
 
@@ -130,7 +130,7 @@ mixin _ProviderAuthMethod on FirebaseAuthMethod, CanLinkTo {
   @protected
   Future<SignInResult> linkTo(User user) async {
     assert(user is FirebaseAuthUser, 'You must use this class with FirebaseAuthDefault.');
-    firebase_auth.UserCredential credential = await (user as FirebaseAuthUser).linkWithProvider(_createAuthProvider());
+    final firebase_auth.UserCredential credential = await (user as FirebaseAuthUser).linkWithProvider(_createAuthProvider());
     return await credentialToResult(credential);
   }
 
@@ -163,7 +163,7 @@ class AppleAuthMethodDefault extends AppleAuthMethod with _ProviderAuthMethod {
 
   @override
   firebase_auth.AppleAuthProvider _createAuthProvider() {
-    firebase_auth.AppleAuthProvider appleProvider = firebase_auth.AppleAuthProvider();
+    final firebase_auth.AppleAuthProvider appleProvider = firebase_auth.AppleAuthProvider();
     scopes.forEach(appleProvider.addScope);
     appleProvider.addScope('email');
     appleProvider.setCustomParameters(customParameters);
@@ -187,7 +187,7 @@ class EmailLinkAuthMethodDefault extends EmailLinkAuthMethod {
 
   @override
   Future<SignInResult> signIn() async {
-    firebase_auth.UserCredential credential = await firebase_auth.FirebaseAuth.instance.signInWithEmailLink(
+    final firebase_auth.UserCredential credential = await firebase_auth.FirebaseAuth.instance.signInWithEmailLink(
       email: email,
       emailLink: emailLink,
     );
@@ -226,7 +226,7 @@ class GithubAuthMethodDefault extends GithubAuthMethod with _ProviderAuthMethod 
 
   @override
   firebase_auth.GithubAuthProvider _createAuthProvider() {
-    firebase_auth.GithubAuthProvider githubAuthProvider = firebase_auth.GithubAuthProvider();
+    final firebase_auth.GithubAuthProvider githubAuthProvider = firebase_auth.GithubAuthProvider();
     scopes.forEach(githubAuthProvider.addScope);
     githubAuthProvider.setCustomParameters(customParameters);
     return githubAuthProvider;
@@ -249,7 +249,7 @@ class GoogleAuthMethodDefault extends GoogleAuthMethod with _ProviderAuthMethod 
 
   @override
   firebase_auth.GoogleAuthProvider _createAuthProvider() {
-    firebase_auth.GoogleAuthProvider googleAuthProvider = firebase_auth.GoogleAuthProvider();
+    final firebase_auth.GoogleAuthProvider googleAuthProvider = firebase_auth.GoogleAuthProvider();
     scopes.forEach(googleAuthProvider.addScope);
     googleAuthProvider.setCustomParameters(customParameters);
     return googleAuthProvider;
@@ -272,7 +272,7 @@ class MicrosoftAuthMethodDefault extends MicrosoftAuthMethod with _ProviderAuthM
 
   @override
   firebase_auth.MicrosoftAuthProvider _createAuthProvider() {
-    firebase_auth.MicrosoftAuthProvider microsoftAuthProvider = firebase_auth.MicrosoftAuthProvider();
+    final firebase_auth.MicrosoftAuthProvider microsoftAuthProvider = firebase_auth.MicrosoftAuthProvider();
     scopes.forEach(microsoftAuthProvider.addScope);
     microsoftAuthProvider.setCustomParameters(customParameters);
     return microsoftAuthProvider;
@@ -291,7 +291,7 @@ class TwitterAuthMethodDefault extends TwitterAuthMethod with _ProviderAuthMetho
 
   @override
   firebase_auth.TwitterAuthProvider _createAuthProvider() {
-    firebase_auth.TwitterAuthProvider twitterAuthProvider = firebase_auth.TwitterAuthProvider();
+    final firebase_auth.TwitterAuthProvider twitterAuthProvider = firebase_auth.TwitterAuthProvider();
     twitterAuthProvider.setCustomParameters(customParameters);
     return twitterAuthProvider;
   }

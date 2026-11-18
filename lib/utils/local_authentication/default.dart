@@ -28,7 +28,7 @@ class LocalAuthenticationDefault extends LocalAuthentication {
       await windowManager.focus();
       await windowManager.setAlwaysOnTop(true);
     }
-    bool result = await _localAuthentication.authenticate(
+    final bool result = await _localAuthentication.authenticate(
       localizedReason: translations.appUnlock.localAuthentication[reason.name] ?? 'Authenticate to access the app.',
       authMessages: [
         IOSAuthMessages(

@@ -17,10 +17,10 @@ import 'package:open_authenticator/utils/result/reporter.dart';
 class JovialSvgUtils {
   /// Compiles a SVG string into an SI file.
   static Future<bool> svgToSi(String svg, File destinationFile) async {
-    IOSink ioSink = destinationFile.openWrite();
+    final IOSink ioSink = destinationFile.openWrite();
     try {
-      DataOutputSink outputSink = DataOutputSink(ioSink, Endian.big);
-      SICompactBuilderNoUI siCompactBuilder = SICompactBuilderNoUI(bigFloats: false, warn: (_) {});
+      final DataOutputSink outputSink = DataOutputSink(ioSink, Endian.big);
+      final SICompactBuilderNoUI siCompactBuilder = SICompactBuilderNoUI(bigFloats: false, warn: (_) {});
       StringSvgParser(svg, [], siCompactBuilder, warn: (_) {}).parse();
       siCompactBuilder.si.writeToFile(outputSink);
       return true;
@@ -56,7 +56,7 @@ class SIFileSource extends ScalableImageSource {
 
   @override
   Future<ScalableImage> createSI({bool compact = false}) async {
-    ScalableImageCompact scalableImageCompact = ScalableImageCompact.fromBytes(file.readAsBytesSync(), currentColor: currentColor);
+    final ScalableImageCompact scalableImageCompact = ScalableImageCompact.fromBytes(file.readAsBytesSync(), currentColor: currentColor);
     if (compact) {
       return scalableImageCompact;
     } else {
@@ -65,7 +65,7 @@ class SIFileSource extends ScalableImageSource {
   }
 
   @override
-  bool operator ==(final Object other) {
+  bool operator ==(Object other) {
     if (other is SIFileSource) {
       return file == other.file && currentColor == other.currentColor;
     } else {

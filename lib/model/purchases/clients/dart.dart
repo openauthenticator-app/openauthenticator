@@ -18,7 +18,7 @@ class RevenueCatDartClient extends RevenueCatClient {
 
   @override
   Future<void> initialize(Ref ref) async {
-    SharedPreferencesWithPrefix sharedPreferencesWithPrefix = await ref.watch(sharedPreferencesProvider.future);
+    final SharedPreferencesWithPrefix sharedPreferencesWithPrefix = await ref.watch(sharedPreferencesProvider.future);
     await _PurchasesDartConfigurator.configure(
       cacheManager: _SharedPreferencesWithPrefixCacheManager(
         storage: sharedPreferencesWithPrefix,
@@ -40,7 +40,7 @@ class RevenueCatDartClient extends RevenueCatClient {
 
   @override
   Future<bool> purchasePackage(Package package) async {
-    Uri? webCheckoutUrl = await PurchasesDart.getWebCheckoutUrl(
+    final Uri? webCheckoutUrl = await PurchasesDart.getWebCheckoutUrl(
       package,
       email: purchasesConfiguration.email,
     );

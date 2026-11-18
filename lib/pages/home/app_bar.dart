@@ -25,7 +25,7 @@ class _HomePageHeader extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    Widget header = FHeader.nested(
+    final Widget header = FHeader.nested(
       title: const _AppBarTitle(),
       prefixes: [
         _RequireProviderValueWidget.cryptoStoreAndTotpList(
@@ -61,8 +61,8 @@ class _HomePageHeader extends ConsumerWidget {
 
   /// Triggered when a TOTP is selected following a search.
   Future<void> onTotpFound(WidgetRef ref, Totp totp) async {
-    List<Totp> totps = await ref.read(totpRepositoryProvider.future);
-    int index = totps.indexOf(totp);
+    final List<Totp> totps = await ref.read(totpRepositoryProvider.future);
+    final int index = totps.indexOf(totp);
     if (index >= 0) {
       onTotpSelectedFollowingSearch?.call(index);
     }
@@ -102,11 +102,11 @@ class _AppBarTitle extends StatelessWidget {
 class _SyncHeaderAction extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    StorageType? storageType = ref.watch(storageTypeSettingsEntryProvider).value;
+    final StorageType? storageType = ref.watch(storageTypeSettingsEntryProvider).value;
     if (storageType != .shared) {
       return const SizedBox.shrink();
     }
-    SynchronizationPhase phase = ref.watch(synchronizationControllerProvider.select((status) => status.phase));
+    final SynchronizationPhase phase = ref.watch(synchronizationControllerProvider.select((status) => status.phase));
     switch (phase) {
       case SynchronizationPhaseOffline():
         return const ClickableHeaderAction(
@@ -130,7 +130,7 @@ class _SyncHeaderAction extends ConsumerWidget {
             if (exception is InvalidSessionException || exception is NoSessionException) {
               InvalidSessionDialog.openDialog(context, ref, handleResult: true);
             } else {
-              ErrorDialogResult? result = await ErrorDialog.openDialog(
+              final ErrorDialogResult? result = await ErrorDialog.openDialog(
                 context,
                 error: exception,
                 stackTrace: stackTrace,
@@ -147,7 +147,7 @@ class _SyncHeaderAction extends ConsumerWidget {
           ),
         );
       default:
-        AsyncValue<List<PushOperationResult>> errors = ref.watch(pushOperationsErrorsProvider);
+        final AsyncValue<List<PushOperationResult>> errors = ref.watch(pushOperationsErrorsProvider);
         if (errors.hasValue && errors.value!.isNotEmpty) {
           return ClickableHeaderAction(
             onPress: () => Navigator.pushNamed(context, SyncIssuesPage.name),

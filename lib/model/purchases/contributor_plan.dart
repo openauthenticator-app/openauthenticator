@@ -21,16 +21,16 @@ class ContributorPlan extends AsyncNotifier<ContributorPlanState> {
     if (AppContributorPlan.offeringId.isEmpty) {
       return .impossible;
     }
-    bool hasBackendUrlChanged = ref.watch(backendUrlSettingsEntryProvider).value?.hasBackendUrlChanged ?? false;
+    final bool hasBackendUrlChanged = ref.watch(backendUrlSettingsEntryProvider).value?.hasBackendUrlChanged ?? false;
     if (hasBackendUrlChanged && !kDebugMode) {
       return .impossible;
     }
-    RevenueCatClient? client = await ref.watch(revenueCatClientProvider.future);
+    final RevenueCatClient? client = await ref.watch(revenueCatClientProvider.future);
     if (client == null) {
       return .impossible;
     }
     await client.initialize(ref);
-    User? user = await ref.watch(userProvider.future);
+    final User? user = await ref.watch(userProvider.future);
     return user?.contributorPlan == true ? .active : .inactive;
   }
 
@@ -44,22 +44,22 @@ class ContributorPlan extends AsyncNotifier<ContributorPlanState> {
   /// Returns the prices of the contributor plan.
   Future<Result<Prices>> getPrices() async {
     try {
-      RevenueCatClient? revenueCatClient = await ref.read(revenueCatClientProvider.future);
+      final RevenueCatClient? revenueCatClient = await ref.read(revenueCatClientProvider.future);
       if (revenueCatClient == null) {
         throw _NoRevenueCatClientException();
       }
-      Map<PackageType, Price> packagesPrice = await revenueCatClient.getPrices(Purchasable.contributorPlan);
-      List<PackageType> packages = List.of(packagesPrice.keys);
+      final Map<PackageType, Price> packagesPrice = await revenueCatClient.getPrices(Purchasable.contributorPlan);
+      final List<PackageType> packages = List.of(packagesPrice.keys);
       packages.sort((a, b) => b.index.compareTo(a.index));
-      PackageType? reference = packages.firstOrNull;
-      Map<PackageType, int> promotions = {};
+      final PackageType? reference = packages.firstOrNull;
+      final Map<PackageType, int> promotions = {};
       if (reference != null && reference.inAYear != null) {
-        double referencePricePerYear = packagesPrice[reference]!.amount * reference.inAYear!;
-        for (MapEntry<PackageType, Price> entry in packagesPrice.entries) {
+        final double referencePricePerYear = packagesPrice[reference]!.amount * reference.inAYear!;
+        for (final MapEntry<PackageType, Price> entry in packagesPrice.entries) {
           if (entry.key.inAYear == null) {
             continue;
           }
-          double pricePerYear = entry.value.amount * entry.key.inAYear!;
+          final double pricePerYear = entry.value.amount * entry.key.inAYear!;
           if (pricePerYear < referencePricePerYear) {
             promotions[entry.key] = (((pricePerYear / referencePricePerYear) - 1) * 100).round();
           }
@@ -82,7 +82,7 @@ class ContributorPlan extends AsyncNotifier<ContributorPlanState> {
   /// Tries to restore the subscription.
   Future<Result<ContributorPlanState>> restore() async {
     try {
-      RevenueCatClient? revenueCatClient = await ref.read(revenueCatClientProvider.future);
+      final RevenueCatClient? revenueCatClient = await ref.read(revenueCatClientProvider.future);
       if (revenueCatClient == null) {
         throw _NoRevenueCatClientException();
       }
@@ -97,7 +97,7 @@ class ContributorPlan extends AsyncNotifier<ContributorPlanState> {
       if (!ref.mounted) {
         return const ResultCancelled();
       }
-      Result<User> result = await ref.read(userProvider.notifier).refreshUserInfo();
+      final Result<User> result = await ref.read(userProvider.notifier).refreshUserInfo();
       return result.to((user) => user?.contributorPlan == true ? .active : .inactive);
     } catch (ex, stackTrace) {
       return ResultError(
@@ -110,11 +110,11 @@ class ContributorPlan extends AsyncNotifier<ContributorPlanState> {
   /// Tries to refresh the subscription state.
   Future<Result<ContributorPlanState>> refresh() async {
     try {
-      RevenueCatClient? revenueCatClient = await ref.read(revenueCatClientProvider.future);
+      final RevenueCatClient? revenueCatClient = await ref.read(revenueCatClientProvider.future);
       if (revenueCatClient == null) {
         throw _NoRevenueCatClientException();
       }
-      Result<User> result = await ref.read(userProvider.notifier).refreshUserInfo();
+      final Result<User> result = await ref.read(userProvider.notifier).refreshUserInfo();
       if (!ref.mounted) {
         return const ResultCancelled();
       }
@@ -130,17 +130,17 @@ class ContributorPlan extends AsyncNotifier<ContributorPlanState> {
   /// Purchases the given item.
   Future<Result<ContributorPlanState>> purchase(PackageType packageType) async {
     try {
-      RevenueCatClient? revenueCatClient = await ref.read(revenueCatClientProvider.future);
+      final RevenueCatClient? revenueCatClient = await ref.read(revenueCatClientProvider.future);
       if (revenueCatClient == null) {
         throw _NoRevenueCatClientException();
       }
-      bool shouldRefreshUser = await revenueCatClient.purchase(Purchasable.contributorPlan, packageType);
+      final bool shouldRefreshUser = await revenueCatClient.purchase(Purchasable.contributorPlan, packageType);
       if (shouldRefreshUser) {
         await Future.delayed(const Duration(seconds: 5));
         if (!ref.mounted) {
           return const ResultCancelled();
         }
-        Result<User> result = await ref.read(userProvider.notifier).refreshUserInfo();
+        final Result<User> result = await ref.read(userProvider.notifier).refreshUserInfo();
         return result.to((user) => user?.contributorPlan == true ? .active : .inactive);
       }
       return const ResultSuccess(value: .inactive);

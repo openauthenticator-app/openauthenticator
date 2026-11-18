@@ -13,14 +13,14 @@ class _SearchAction extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    AsyncValue<List<Totp>> totps = ref.watch(totpRepositoryProvider);
+    final AsyncValue<List<Totp>> totps = ref.watch(totpRepositoryProvider);
     return switch (totps) {
       AsyncData<List<Totp>>(:final value) =>
         value.isEmpty
             ? const SizedBox.shrink()
             : ClickableHeaderAction(
                 onPress: () async {
-                  Totp? result = await _showTotpSearch(context);
+                  final Totp? result = await _showTotpSearch(context);
                   if (result != null) {
                     onTotpFound?.call(result);
                   }

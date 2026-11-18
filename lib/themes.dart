@@ -5,7 +5,7 @@ import 'package:open_authenticator/utils/utils.dart';
 
 /// The light and dark variants of a green theme.
 ({FPlatformThemeData light, FPlatformThemeData dark}) get greenTheme {
-  FColors lightColors = FColors(
+  final FColors lightColors = FColors(
     brightness: .light,
     systemOverlayStyle: .dark,
     barrier: const Color(0x33000000),
@@ -24,7 +24,7 @@ import 'package:open_authenticator/utils/utils.dart';
     card: const Color(0xFFFFFFFF),
     border: const Color(0xFFE3E3E6),
   );
-  FColors darkColors = FColors(
+  final FColors darkColors = FColors(
     brightness: .dark,
     systemOverlayStyle: .light,
     barrier: const Color(0x7A000000),
@@ -100,8 +100,8 @@ FThemeData _greenThemeData({
   required FColors colors,
   FStyleDelta? generalStyle,
 }) {
-  FTypography typography = FTypography.inherit(colors: colors, touch: touch);
-  FStyle style = FStyle.inherit(colors: colors, typography: typography, touch: touch);
+  final FTypography typography = FTypography.inherit(colors: colors, touch: touch);
+  final FStyle style = FStyle.inherit(colors: colors, typography: typography, touch: touch);
   return FThemeData(
     touch: touch,
     debugLabel: debugLabel,
@@ -113,7 +113,7 @@ FThemeData _greenThemeData({
 
 /// Adapts the light theme.
 FThemeData _adaptLightTheme(FThemeData light, {required bool touch}) {
-  BoxShadow tileShadow = _lightTileShadow;
+  final BoxShadow tileShadow = _lightTileShadow;
   return light.copyWith(
     headerStyles: _adaptHeaderStyles(
       originalPadding: light.headerStyles.base.padding,

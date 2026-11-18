@@ -19,7 +19,7 @@ import 'package:open_authenticator/widgets/form/password_form_field.dart';
 import 'package:open_authenticator/widgets/waiting_overlay.dart';
 
 /// The master password flow provider.
-final masterPasswordFlowProvider = Provider.autoDispose<MasterPasswordFlow>(MasterPasswordFlow.new);
+final Provider<MasterPasswordFlow> masterPasswordFlowProvider = Provider.autoDispose<MasterPasswordFlow>(MasterPasswordFlow.new);
 
 /// Coordinates master password user flows.
 class MasterPasswordFlow extends AppFlow {
@@ -33,8 +33,8 @@ class MasterPasswordFlow extends AppFlow {
     String? password,
   }) => keepAliveWhile(() async {
     if (askForUnlock) {
-      AppUnlockMethodSettingsEntry appUnlockerMethodsSettingsEntry = ref.read(appUnlockMethodSettingsEntryProvider.notifier);
-      Result unlockResult = await appUnlockerMethodsSettingsEntry.unlockWithCurrentMethod(context.appUnlockInteraction, UnlockReason.sensibleAction);
+      final AppUnlockMethodSettingsEntry appUnlockerMethodsSettingsEntry = ref.read(appUnlockMethodSettingsEntryProvider.notifier);
+      final Result unlockResult = await appUnlockerMethodsSettingsEntry.unlockWithCurrentMethod(context.appUnlockInteraction, UnlockReason.sensibleAction);
       if (unlockResult is! ResultSuccess) {
         return unlockResult.to((value) => null);
       }
@@ -42,7 +42,7 @@ class MasterPasswordFlow extends AppFlow {
         return const ResultCancelled();
       }
     }
-    _ChangeMasterPasswordDialogResult? result = await showFDialog<_ChangeMasterPasswordDialogResult>(
+    final _ChangeMasterPasswordDialogResult? result = await showFDialog<_ChangeMasterPasswordDialogResult>(
       context: context,
       builder: (context, style, animation) => _ChangeMasterPasswordDialog(
         defaultPassword: password,
@@ -51,7 +51,7 @@ class MasterPasswordFlow extends AppFlow {
     if (result == null || result.newPassword == null || !context.mounted) {
       return const ResultCancelled();
     }
-    Result<String> changeResult = await showWaitingOverlay(
+    final Result<String> changeResult = await showWaitingOverlay(
       context,
       future: ref.read(totpRepositoryProvider.notifier).changeMasterPassword(result.newPassword!, backupPassword: result.backupPassword),
     );
@@ -98,7 +98,7 @@ class _ChangeMasterPasswordDialogState extends ConsumerState<_ChangeMasterPasswo
     title: Text(translations.masterPassword.changeDialog.title),
     actions: [
       ClickableButton(
-        onPress: () async {
+        onPress: () {
           if (!newPasswordFormKey.currentState!.validate() || (createBackup && !backupPasswordFormKey.currentState!.validate())) {
             return;
           }

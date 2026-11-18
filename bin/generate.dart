@@ -5,7 +5,7 @@ import 'package:args/args.dart';
 
 /// Generates "lib/app.dart".
 void main(List<String> arguments) {
-  ArgParser parser = ArgParser()
+  final ArgParser parser = ArgParser()
     ..addOption(
       'app-name',
       defaultsTo: 'Open Authenticator',
@@ -93,13 +93,13 @@ void main(List<String> arguments) {
       help: 'Show this help message.',
     );
 
-  ArgResults results = parser.parse(arguments);
-  if (results['help']) {
+  final ArgResults results = parser.parse(arguments);
+  if (results['help'] == true) {
     stdout.writeln(parser.usage);
     return;
   }
 
-  String content =
+  final String content =
       '''
 /// Contains some app constants.
 class App {
@@ -177,7 +177,7 @@ class Argon2Parameters {
 }
 ''';
 
-  File file = File('lib/app.dart');
+  final File file = File('lib/app.dart');
   file.writeAsStringSync(content);
   stdout.writeln('lib/app.dart generated successfully.');
 }

@@ -10,7 +10,7 @@ import 'package:open_authenticator/utils/shared_preferences_with_prefix.dart';
 import 'package:simple_secure_storage/simple_secure_storage.dart';
 
 /// The app unlock method settings entry provider.
-final appUnlockMethodSettingsEntryProvider = AsyncNotifierProvider.autoDispose<AppUnlockMethodSettingsEntry, String>(AppUnlockMethodSettingsEntry.new);
+final AsyncNotifierProvider<AppUnlockMethodSettingsEntry, String> appUnlockMethodSettingsEntryProvider = AsyncNotifierProvider.autoDispose<AppUnlockMethodSettingsEntry, String>(AppUnlockMethodSettingsEntry.new);
 
 /// A settings entry that allows to get and set the app unlock method.
 class AppUnlockMethodSettingsEntry extends SettingsEntry<String> {
@@ -30,12 +30,12 @@ class AppUnlockMethodSettingsEntry extends SettingsEntry<String> {
     if (!preferences.containsKey(key)) {
       return defaultValue;
     }
-    String value = await super.loadFromPreferences(preferences);
+    final String value = await super.loadFromPreferences(preferences);
     if (value != NoneAppUnlockMethod.kMethodId) {
       return value;
     }
-    CachedSimpleSecureStorage simpleSecureStorage = await ref.watch(secureStorageProvider.future);
-    String? secureValue = simpleSecureStorage.read(key);
+    final CachedSimpleSecureStorage simpleSecureStorage = await ref.watch(secureStorageProvider.future);
+    final String? secureValue = simpleSecureStorage.read(key);
     if (secureValue == null) {
       return value;
     }
@@ -69,36 +69,36 @@ class AppUnlockMethodSettingsEntry extends SettingsEntry<String> {
     if (!interaction.canInteract) {
       return const ResultCancelled();
     }
-    AppUnlockMethod? unlockMethod = ref.read(appUnlockMethodProvider(unlockMethodId));
+    final AppUnlockMethod? unlockMethod = ref.read(appUnlockMethodProvider(unlockMethodId));
     if (unlockMethod == null) {
       return const ResultCancelled();
     }
-    Result result = await unlockMethod.unlock(interaction, unlockReason);
+    final Result result = await unlockMethod.unlock(interaction, unlockReason);
     return result;
   }
 
   /// Changes the entry value but check for unlock success before.
   Future<Result> changeValueIfUnlockSucceed(AppUnlockInteraction interaction, String newMethodId) async {
-    String currentMethodId = await future;
+    final String currentMethodId = await future;
     if (!interaction.canInteract) {
       return const ResultCancelled();
     }
-    AppUnlockMethod? currentMethod = ref.read(appUnlockMethodProvider(currentMethodId));
+    final AppUnlockMethod? currentMethod = ref.read(appUnlockMethodProvider(currentMethodId));
     if (currentMethod == null) {
       return const ResultCancelled();
     }
-    Result disableResult = await currentMethod.unlock(interaction, .disable);
+    final Result disableResult = await currentMethod.unlock(interaction, .disable);
     if (disableResult is! ResultSuccess) {
       return disableResult;
     }
     if (!interaction.canInteract) {
       return const ResultCancelled();
     }
-    AppUnlockMethod? newMethod = ref.read(appUnlockMethodProvider(newMethodId));
+    final AppUnlockMethod? newMethod = ref.read(appUnlockMethodProvider(newMethodId));
     if (newMethod == null) {
       return const ResultCancelled();
     }
-    Result enableResult = await newMethod.unlock(interaction, .enable);
+    final Result enableResult = await newMethod.unlock(interaction, .enable);
     if (enableResult is! ResultSuccess) {
       return enableResult;
     }
@@ -108,7 +108,7 @@ class AppUnlockMethodSettingsEntry extends SettingsEntry<String> {
 
   @override
   Future<void> changeValue(String value, {ResultSuccess? enableResult, ResultSuccess? disableResult}) async {
-    CachedSimpleSecureStorage simpleSecureStorage = await ref.read(secureStorageProvider.future);
+    final CachedSimpleSecureStorage simpleSecureStorage = await ref.read(secureStorageProvider.future);
     switch (value) {
       case NoneAppUnlockMethod.kMethodId:
         await simpleSecureStorage.delete(key);
@@ -120,8 +120,8 @@ class AppUnlockMethodSettingsEntry extends SettingsEntry<String> {
       default:
         return;
     }
-    AppUnlockMethod? currentMethod = ref.read(appUnlockMethodProvider(await future));
-    AppUnlockMethod newMethod = ref.read(appUnlockMethodProvider(value))!;
+    final AppUnlockMethod? currentMethod = ref.read(appUnlockMethodProvider(await future));
+    final AppUnlockMethod newMethod = ref.read(appUnlockMethodProvider(value))!;
     await newMethod.onMethodChosen(enableResult: enableResult);
     await currentMethod?.onMethodChanged(disableResult: disableResult);
     await super.changeValue(value);

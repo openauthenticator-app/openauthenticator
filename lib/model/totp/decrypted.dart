@@ -65,11 +65,11 @@ class DecryptedTotp extends Totp {
   @override
   int compareTo(Totp other) {
     if (other.isDecrypted) {
-      int issuersComparison = (issuer ?? '').compareTo((other as DecryptedTotp).issuer ?? '');
+      final int issuersComparison = (issuer ?? '').compareTo((other as DecryptedTotp).issuer ?? '');
       if (issuersComparison != 0) {
         return issuersComparison;
       }
-      int labelsComparison = (label ?? '').compareTo(other.label ?? '');
+      final int labelsComparison = (label ?? '').compareTo(other.label ?? '');
       if (labelsComparison != 0) {
         return labelsComparison;
       }
@@ -118,7 +118,7 @@ class DecryptedTotp extends Totp {
     String? imageUrl,
     DateTime? updatedAt,
   }) {
-    EncryptedData? encryptedData = EncryptedData.encrypt(
+    final EncryptedData? encryptedData = EncryptedData.encrypt(
       cryptoStore: cryptoStore,
       secret: secret,
       label: label,
@@ -228,7 +228,7 @@ class DecryptedData extends EncryptedData {
     if (encryptedData is DecryptedData) {
       return encryptedData;
     }
-    String? decryptedSecret = cryptoStore?.decrypt(encryptedData.encryptedSecret);
+    final String? decryptedSecret = cryptoStore?.decrypt(encryptedData.encryptedSecret);
     if (decryptedSecret == null) {
       return null;
     }
@@ -267,7 +267,7 @@ class DecryptedData extends EncryptedData {
     if (canDecryptData(newCryptoStore)) {
       return this;
     }
-    EncryptedData? encryptedData = EncryptedData.encrypt(
+    final EncryptedData? encryptedData = EncryptedData.encrypt(
       cryptoStore: newCryptoStore,
       secret: decryptedSecret,
       issuer: decryptedIssuer,

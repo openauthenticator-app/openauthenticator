@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/model/settings/entry.dart';
 
 /// The display copy icon settings entry provider.
-final displayCopyButtonSettingsEntryProvider = AsyncNotifierProvider.autoDispose<DisplayCopyButtonSettingsEntry, bool>(DisplayCopyButtonSettingsEntry.new);
+final AsyncNotifierProvider<DisplayCopyButtonSettingsEntry, bool> displayCopyButtonSettingsEntryProvider = AsyncNotifierProvider.autoDispose<DisplayCopyButtonSettingsEntry, bool>(DisplayCopyButtonSettingsEntry.new);
 
 /// A settings entry that allows to display or hide the copy icon.
 class DisplayCopyButtonSettingsEntry extends SettingsEntry<bool> {

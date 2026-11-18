@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
+import 'package:open_authenticator/utils/json.dart';
 
 /// Represents a push operation result.
 class PushOperationResult with Equatable {
@@ -17,15 +18,6 @@ class PushOperationResult with Equatable {
 
   /// The operation creation date.
   final DateTime createdAt;
-
-  /// Creates a new push operation result instance.
-  PushOperationResult._({
-    required this.operationUuid,
-    required this.totpUuid,
-    this.errorCode,
-    this.errorDetails,
-    DateTime? createdAt,
-  }) : createdAt = createdAt ?? DateTime.now();
 
   /// Creates a new push operation result instance, returning a [PushOperationError] if [errorCode] is not null.
   factory PushOperationResult({
@@ -50,8 +42,17 @@ class PushOperationResult with Equatable {
           createdAt: createdAt,
         );
 
+  /// Creates a new push operation result instance.
+  PushOperationResult._({
+    required this.operationUuid,
+    required this.totpUuid,
+    this.errorCode,
+    this.errorDetails,
+    DateTime? createdAt,
+  }) : createdAt = createdAt ?? DateTime.now();
+
   /// Creates a new push operation result instance from a JSON map.
-  PushOperationResult.fromJson(Map<String, dynamic> json)
+  PushOperationResult.fromJson(JsonMap json)
     : this._(
         operationUuid: json['operationUuid'],
         totpUuid: json['totpUuid'],

@@ -61,7 +61,7 @@ extension PresentResult<T> on Result<T> {
   /// Shows an error dialog for a [ResultError].
   void showErrorDialog(BuildContext context, MessageBuilder<Object?>? errorMessage) {
     if (this is ResultError) {
-      String? message = errorMessage?.call((this as ResultError).exception);
+      final String? message = errorMessage?.call((this as ResultError).exception);
       ErrorDialog.openDialog(
         context,
         error: (this as ResultError).exception,

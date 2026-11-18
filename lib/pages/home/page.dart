@@ -104,9 +104,9 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    AsyncValue<List<Totp>> totps = ref.watch(totpRepositoryProvider);
-    StorageType? storageType = ref.watch(storageTypeSettingsEntryProvider).value;
-    bool displaySearchButton = ref.read(displaySearchButtonSettingsEntryProvider).value ?? true;
+    final AsyncValue<List<Totp>> totps = ref.watch(totpRepositoryProvider);
+    final StorageType? storageType = ref.watch(storageTypeSettingsEntryProvider).value;
+    final bool displaySearchButton = ref.read(displaySearchButtonSettingsEntryProvider).value ?? true;
     return AppScaffold.asyncValue(
       asyncValue: totps,
       scrollable: !totps.hasValue,
@@ -125,7 +125,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             }
           });
           if (!(await ref.read(displayCopyButtonSettingsEntryProvider.future))) {
-            Totp? totp = totps.value?[index];
+            final Totp? totp = totps.value?[index];
             if (context.mounted && totp?.isDecrypted == true) {
               _TotpsListWidget.copyCode(context, totp as DecryptedTotp);
             }
@@ -134,7 +134,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         showSearchBox: showSearchBox,
       ),
       builder: (value) {
-        Widget body = _RequireProviderValueWidget.cryptoStore(
+        final Widget body = _RequireProviderValueWidget.cryptoStore(
           childIfAbsent: Center(
             child: SingleChildScrollView(
               padding: context.theme.scaffoldStyle.childPadding,
@@ -208,12 +208,12 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   /// Triggered when the "Add" button is pressed.
-  void onAddButtonPress(BuildContext context) async {
+  Future<void> onAddButtonPress(BuildContext context) async {
     if (!kDebugMode && !_AddTotpDialog.isSupported) {
       Navigator.pushNamed(context, TotpPage.name);
       return;
     }
-    AddTotpDialogResult? choice = await _AddTotpDialog.show(context);
+    final AddTotpDialogResult? choice = await _AddTotpDialog.show(context);
     if (choice == null || !context.mounted) {
       return;
     }

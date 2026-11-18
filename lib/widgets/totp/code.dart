@@ -26,7 +26,7 @@ class _TotpCodeState extends TimeBasedTotpWidgetState<TotpCode> {
 
   @override
   Widget build(BuildContext context) {
-    TextStyle textStyle = widget.textStyle ?? context.theme.typography.display.md;
+    final TextStyle textStyle = widget.textStyle ?? context.theme.typography.display.md;
     return Container(
       decoration: BoxDecoration(
         color: context.theme.colors.primary.withValues(alpha: 0.15),
@@ -52,11 +52,11 @@ class _TotpCodeState extends TimeBasedTotpWidgetState<TotpCode> {
     if (!widget.totp.isDecrypted) {
       return '';
     }
-    String code = (widget.totp as DecryptedTotp).generateCode();
-    StringBuffer buffer = StringBuffer();
+    final String code = (widget.totp as DecryptedTotp).generateCode();
+    final StringBuffer buffer = StringBuffer();
     for (int i = 0; i < code.length; i++) {
       buffer.write(code[i]);
-      int nonZeroIndex = i + 1;
+      final int nonZeroIndex = i + 1;
       if (nonZeroIndex % 3 == 0 && nonZeroIndex != code.length) {
         buffer.write(' ');
       }

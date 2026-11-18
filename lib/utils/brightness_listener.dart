@@ -23,7 +23,7 @@ mixin BrightnessListener<T extends ConsumerStatefulWidget> on ConsumerState<T> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    Brightness brightness = MediaQuery.platformBrightnessOf(context);
+    final Brightness brightness = MediaQuery.platformBrightnessOf(context);
     if (currentBrightness != brightness) {
       onBrightnessChange(brightness);
     }
@@ -42,7 +42,7 @@ mixin BrightnessListener<T extends ConsumerStatefulWidget> on ConsumerState<T> {
   /// Triggered when [themeSettingsEntryProvider] has changed.
   @protected
   void onThemeSettingsEntryChange(AsyncValue<ThemeMode>? previous, AsyncValue<ThemeMode> next) {
-    ThemeMode themeMode = next.value ?? ThemeMode.system;
+    final ThemeMode themeMode = next.value ?? ThemeMode.system;
     void changeThemeMode() => _currentThemeMode = themeMode;
     if (mounted) {
       setState(changeThemeMode);

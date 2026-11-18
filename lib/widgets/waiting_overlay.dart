@@ -14,7 +14,7 @@ Future<T> showWaitingOverlay<T>(
   String? timeoutMessage,
   bool Function()? onCancel,
 }) async {
-  OverlayEntry entry = OverlayEntry(
+  final OverlayEntry entry = OverlayEntry(
     builder: (context) => Stack(
       children: [
         const ModalBarrier(
@@ -33,7 +33,7 @@ Future<T> showWaitingOverlay<T>(
   Overlay.of(context).insert(entry);
   if (future != null) {
     try {
-      T result = await future;
+      final T result = await future;
       return result;
     } catch (ex) {
       rethrow;

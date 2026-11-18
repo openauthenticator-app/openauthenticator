@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 extension IterableUtils<T> on Iterable<T> {
   /// Returns the first element satisfying [test], or `null` if there are none.
   T? firstWhereOrNull(bool Function(T element) test) {
-    for (var element in this) {
+    for (final element in this) {
       if (test(element)) return element;
     }
     return null;
@@ -105,8 +105,8 @@ extension ColorUtils on Color {
   Color lighten({double amount = 0.1}) {
     assert(amount >= 0 && amount <= 1);
 
-    HSLColor hsl = HSLColor.fromColor(this);
-    HSLColor hslDark = hsl.withLightness((hsl.lightness + amount).clamp(0.0, 1.0));
+    final HSLColor hsl = HSLColor.fromColor(this);
+    final HSLColor hslDark = hsl.withLightness((hsl.lightness + amount).clamp(0.0, 1.0));
 
     return hslDark.toColor();
   }
@@ -115,8 +115,8 @@ extension ColorUtils on Color {
   Color darken({double amount = 0.1}) {
     assert(amount >= 0 && amount <= 1);
 
-    HSLColor hsl = HSLColor.fromColor(this);
-    HSLColor hslDark = hsl.withLightness((hsl.lightness - amount).clamp(0.0, 1.0));
+    final HSLColor hsl = HSLColor.fromColor(this);
+    final HSLColor hslDark = hsl.withLightness((hsl.lightness - amount).clamp(0.0, 1.0));
 
     return hslDark.toColor();
   }

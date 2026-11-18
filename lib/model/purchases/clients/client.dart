@@ -11,16 +11,16 @@ import 'package:purchases_flutter/models/purchases_configuration.dart' as rc_pur
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 /// The RevenueCat client provider.
-final revenueCatClientProvider = FutureProvider((ref) async {
-  String? backendHost = Uri.tryParse(await ref.watch(backendUrlSettingsEntryProvider.future))?.host;
+final FutureProvider<RevenueCatClient?> revenueCatClientProvider = FutureProvider((ref) async {
+  final String? backendHost = Uri.tryParse(await ref.watch(backendUrlSettingsEntryProvider.future))?.host;
   if (backendHost == null) {
     return null;
   }
-  User? user = await ref.watch(userProvider.future);
+  final User? user = await ref.watch(userProvider.future);
   if (user == null) {
     return null;
   }
-  String? apiKey = switch (currentPlatform) {
+  final String? apiKey = switch (currentPlatform) {
     Platform.android => AppCredentials.revenueCatPublicKeyAndroid,
     Platform.iOS || Platform.macOS => AppCredentials.revenueCatPublicKeyDarwin,
     Platform.windows => AppCredentials.revenueCatPublicKeyWindows,
@@ -91,21 +91,21 @@ abstract class RevenueCatClient {
   /// Returns the available package types.
   /// Note that only RevenueCat default identifiers are supported.
   Future<List<PackageType>> getAvailablePackageTypes(String offeringId) async {
-    Offerings? offerings = await getOfferings();
-    Offering? offering = offerings?.getOffering(offeringId);
+    final Offerings? offerings = await getOfferings();
+    final Offering? offering = offerings?.getOffering(offeringId);
     return offering?.availablePackages.map((package) => package.packageType).toList() ?? [];
   }
 
   /// Purchases the given [purchasable].
   /// Returns whether the user info should be refreshed.
   Future<bool> purchase(Purchasable purchasable, PackageType packageType) async {
-    Offerings? offerings = await getOfferings();
-    Offering? offering = offerings?.getOffering(purchasable.offeringId);
+    final Offerings? offerings = await getOfferings();
+    final Offering? offering = offerings?.getOffering(purchasable.offeringId);
     if (offering == null) {
       return false;
     }
 
-    Package? package = offering.availablePackages.firstWhereOrNull((package) => package.packageType == packageType);
+    final Package? package = offering.availablePackages.firstWhereOrNull((package) => package.packageType == packageType);
     if (package != null) {
       return await purchasePackage(package);
     }
@@ -118,13 +118,13 @@ abstract class RevenueCatClient {
 
   /// Returns the prices of the [purchasable].
   Future<Map<PackageType, Price>> getPrices(Purchasable purchasable) async {
-    Offerings? offerings = await getOfferings();
-    Offering? offering = offerings?.getOffering(purchasable.offeringId);
+    final Offerings? offerings = await getOfferings();
+    final Offering? offering = offerings?.getOffering(purchasable.offeringId);
     if (offering == null) {
       return {};
     }
-    Map<PackageType, Price> result = {};
-    for (Package package in offering.availablePackages) {
+    final Map<PackageType, Price> result = {};
+    for (final Package package in offering.availablePackages) {
       result[package.packageType] = Price(
         amount: package.storeProduct.price / 100,
         currencyCode: package.storeProduct.currencyCode,
@@ -135,7 +135,7 @@ abstract class RevenueCatClient {
 
   /// Returns the user management URL.
   Future<String?> getManagementUrl() async {
-    CustomerInfo? customerInfo = await getCustomerInfo();
+    final CustomerInfo? customerInfo = await getCustomerInfo();
     return customerInfo?.managementURL;
   }
 }

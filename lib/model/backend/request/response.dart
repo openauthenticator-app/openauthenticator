@@ -3,6 +3,7 @@ import 'package:open_authenticator/model/backend/synchronization/push/result.dar
 import 'package:open_authenticator/model/backend/user.dart';
 import 'package:open_authenticator/model/totp/json.dart';
 import 'package:open_authenticator/model/totp/totp.dart';
+import 'package:open_authenticator/utils/json.dart';
 
 /// Represents a backend response.
 abstract class BackendResponse {
@@ -21,7 +22,7 @@ class GetUserInfoResponse extends BackendResponse {
   });
 
   /// Creates a new get user info response instance from a JSON map.
-  GetUserInfoResponse.fromJson(Map<String, dynamic> json)
+  GetUserInfoResponse.fromJson(JsonMap json)
     : this(
         user: User.fromJson(json),
       );
@@ -33,7 +34,7 @@ class DeleteUserResponse extends BackendResponse {
   const DeleteUserResponse();
 
   /// Creates a new delete user response instance from a JSON map.
-  const DeleteUserResponse.fromJson(Map<String, dynamic> json) : this();
+  const DeleteUserResponse.fromJson(JsonMap json) : this();
 }
 
 /// Represents a get user TOTPs response.
@@ -47,7 +48,7 @@ class GetUserTotpsResponse extends BackendResponse {
   });
 
   /// Creates a new get user TOTPs response instance from a JSON map.
-  GetUserTotpsResponse.fromJson(Map<String, dynamic> json)
+  GetUserTotpsResponse.fromJson(JsonMap json)
     : this(
         totps: [
           for (String uuid in json.keys)
@@ -70,7 +71,7 @@ class RefreshSessionResponse extends BackendResponse {
   });
 
   /// Creates a new refresh token response instance from a JSON map.
-  RefreshSessionResponse.fromJson(Map<String, dynamic> json)
+  RefreshSessionResponse.fromJson(JsonMap json)
     : this(
         session: Session(
           accessToken: json['accessToken'],
@@ -85,7 +86,7 @@ class UserLogoutResponse extends BackendResponse {
   const UserLogoutResponse();
 
   /// Creates a new user logout response instance from a JSON map.
-  const UserLogoutResponse.fromJson(Map<String, dynamic> json) : this();
+  const UserLogoutResponse.fromJson(JsonMap json) : this();
 }
 
 /// Represents an email confirm response.
@@ -114,7 +115,7 @@ class ProviderLoginResponse extends BackendResponse {
   });
 
   /// Creates a new provider login response instance from a JSON map.
-  ProviderLoginResponse.fromJson(Map<String, dynamic> json)
+  ProviderLoginResponse.fromJson(JsonMap json)
     : this(
         session: Session(
           accessToken: json['accessToken'],
@@ -129,7 +130,7 @@ class EmailConfirmationCancelResponse extends BackendResponse {
   const EmailConfirmationCancelResponse();
 
   /// Creates a new email confirmation cancel response instance from a JSON map.
-  const EmailConfirmationCancelResponse.fromJson(Map<String, dynamic> json) : this();
+  const EmailConfirmationCancelResponse.fromJson(JsonMap json) : this();
 }
 
 /// Represents a provider link response.
@@ -147,7 +148,7 @@ class ProviderLinkResponse extends BackendResponse {
   });
 
   /// Creates a new provider link response instance from a JSON map.
-  ProviderLinkResponse.fromJson(Map<String, dynamic> json)
+  ProviderLinkResponse.fromJson(JsonMap json)
     : this(
         userId: json['userId'],
         providerUserId: json['providerUserId'],
@@ -160,7 +161,7 @@ class ProviderUnlinkResponse extends BackendResponse {
   const ProviderUnlinkResponse();
 
   /// Creates a new provider unlink response instance from a JSON map.
-  const ProviderUnlinkResponse.fromJson(Map<String, dynamic> json) : this();
+  const ProviderUnlinkResponse.fromJson(JsonMap json) : this();
 }
 
 /// Represents a synchronization push response.
@@ -199,7 +200,7 @@ class SynchronizationPullResponse extends BackendResponse {
   });
 
   /// Creates a new synchronization pull response instance from a JSON map.
-  SynchronizationPullResponse.fromJson(Map<String, dynamic> json)
+  SynchronizationPullResponse.fromJson(JsonMap json)
     : this(
         inserts: _totpListFromJson(json['inserts']),
         updates: _totpListFromJson(json['updates']),
@@ -208,7 +209,7 @@ class SynchronizationPullResponse extends BackendResponse {
 
   /// Creates a new synchronization pull response instance from a JSON map.
   static List<Totp> _totpListFromJson(Map json) => [
-    for (String uuid in json.keys)
+    for (final String uuid in json.keys)
       JsonTotp.fromJson(
         json[uuid],
         uuid: uuid,
@@ -222,5 +223,5 @@ class PingBackendResponse extends BackendResponse {
   const PingBackendResponse();
 
   /// Creates a new ping backend response instance from a JSON map.
-  const PingBackendResponse.fromJson(Map<String, dynamic> json) : this();
+  const PingBackendResponse.fromJson(JsonMap json) : this();
 }

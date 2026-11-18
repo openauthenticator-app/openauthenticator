@@ -14,6 +14,7 @@ import 'package:open_authenticator/model/totp/decrypted.dart';
 import 'package:open_authenticator/model/totp/json.dart';
 import 'package:open_authenticator/model/totp/repository.dart';
 import 'package:open_authenticator/model/totp/totp.dart';
+import 'package:open_authenticator/utils/json.dart';
 import 'package:open_authenticator/utils/result/result.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -61,7 +62,7 @@ class Backup implements Comparable<Backup> {
       return false;
     }
     try {
-      Map<String, dynamic> jsonData = jsonDecode(file.readAsStringSync());
+      final JsonMap jsonData = jsonDecode(file.readAsStringSync());
       return jsonData[kTotpsKey] is List && jsonData[kSaltKey] is String && jsonData[kPasswordSignatureKey] is String;
     } on FormatException {
       return false;
@@ -69,10 +70,10 @@ class Backup implements Comparable<Backup> {
   }
 
   static Future<Backup> _create(String password, CryptoStore currentCryptoStore, List<Totp> totps) async {
-    CryptoStore newStore = CryptoStore.fromPassword(password, Salt.generate());
-    List<Totp> toBackup = [];
-    for (Totp totp in totps) {
-      DecryptedTotp? decryptedTotp = totp.changeEncryptionKey(currentCryptoStore, newStore);
+    final CryptoStore newStore = CryptoStore.fromPassword(password, Salt.generate());
+    final List<Totp> toBackup = [];
+    for (final Totp totp in totps) {
+      final DecryptedTotp? decryptedTotp = totp.changeEncryptionKey(currentCryptoStore, newStore);
       toBackup.add(decryptedTotp ?? totp);
     }
     return Backup._(
@@ -85,7 +86,7 @@ class Backup implements Comparable<Backup> {
 
   /// Read the backup content from the given file.
   static Backup _read(BackupPath backupPath, CryptoStore currentCryptoStore, String password) {
-    File file = backupPath.file;
+    final File file = backupPath.file;
     if (!file.existsSync()) {
       throw _BackupFileDoesNotExistException(path: file.path);
     }
@@ -94,32 +95,32 @@ class Backup implements Comparable<Backup> {
       throw _InvalidBackupContentException();
     }
 
-    Map<String, dynamic> jsonData = jsonDecode(file.readAsStringSync());
-    CryptoStore cryptoStore = CryptoStore.fromPassword(password, Salt.base64Decode(string: jsonData[kSaltKey]));
+    final JsonMap jsonData = jsonDecode(file.readAsStringSync());
+    final CryptoStore cryptoStore = CryptoStore.fromPassword(password, Salt.base64Decode(string: jsonData[kSaltKey]));
     if (!(cryptoStore.hmacSecretKey.verify(base64.decode(jsonData[kPasswordSignatureKey]), utf8.encode(password)))) {
       throw InvalidBackupPasswordException();
     }
 
-    List jsonTotps = jsonData[kTotpsKey];
-    List<Totp> totps = [];
-    int defaultUpdatedAt = file.lastModifiedSync().millisecondsSinceEpoch;
-    for (dynamic jsonTotp in jsonTotps) {
-      if (jsonTotp is! Map<String, dynamic>) {
+    final List jsonTotps = jsonData[kTotpsKey];
+    final List<Totp> totps = [];
+    final int defaultUpdatedAt = file.lastModifiedSync().millisecondsSinceEpoch;
+    for (final dynamic jsonTotp in jsonTotps) {
+      if (jsonTotp is! JsonMap) {
         continue;
       }
       if (jsonTotp[Totp.kUpdatedAtKey] == null) {
         jsonTotp[Totp.kUpdatedAtKey] = defaultUpdatedAt;
       }
-      Totp? totp = JsonTotp.tryFromJson(jsonTotp);
+      final Totp? totp = JsonTotp.tryFromJson(jsonTotp);
       if (totp != null) {
-        DecryptedTotp? decryptedTotp = totp.changeEncryptionKey(cryptoStore, currentCryptoStore);
+        final DecryptedTotp? decryptedTotp = totp.changeEncryptionKey(cryptoStore, currentCryptoStore);
         totps.add(decryptedTotp ?? totp);
       }
     }
     if (totps.isEmpty && jsonTotps.isNotEmpty) {
       throw InvalidBackupPasswordException();
     }
-    Map<String, dynamic> backupData = jsonDecode(file.readAsStringSync());
+    final JsonMap backupData = jsonDecode(file.readAsStringSync());
     return Backup._(
       backupPath: BackupPath.fromPath(path: file.path)!,
       passwordSignature: backupData[kPasswordSignatureKey],
@@ -133,13 +134,13 @@ class Backup implements Comparable<Backup> {
 
   /// Saves this backup content.
   Future<void> save() async {
-    File file = await backupPath.createFile();
+    final File file = await backupPath.createFile();
     await file.writeAsString(
       jsonEncode({
         kPasswordSignatureKey: passwordSignature,
         kSaltKey: base64.encode(salt.value),
         kTotpsKey: [
-          for (Totp totp in totps) totp.toJson(),
+          for (final Totp totp in totps) totp.toJson(),
         ],
       }),
     );

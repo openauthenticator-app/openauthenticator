@@ -52,7 +52,7 @@ class _DragAreaState extends State<_DragArea> with WindowListener {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      bool isMaximized = await windowManager.isMaximized();
+      final bool isMaximized = await windowManager.isMaximized();
       if (mounted) {
         setState(() => this.isMaximized = isMaximized);
       }
@@ -115,7 +115,7 @@ class _DragAreaState extends State<_DragArea> with WindowListener {
   );
 
   /// Executes the given future and sets the loading state accordingly.
-  void doFuture<T>(Future<T> Function() future) async {
+  Future<void> doFuture<T>(Future<T> Function() future) async {
     setState(() => isLoading = true);
     await future();
     if (mounted) {

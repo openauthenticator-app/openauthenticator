@@ -26,7 +26,7 @@ class SyncIssuesPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    AsyncValue<List<PushOperationError>> errors = ref.watch(pushOperationsErrorsProvider);
+    final AsyncValue<List<PushOperationError>> errors = ref.watch(pushOperationsErrorsProvider);
     return AppScaffold.asyncValue(
       header: FHeader.nested(
         prefixes: [

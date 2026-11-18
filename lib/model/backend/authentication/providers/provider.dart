@@ -42,13 +42,13 @@ final authenticationProviders = Provider<List<AuthenticationProvider>>(
 
 /// The user authentication providers provider.
 final userAuthenticationProviders = Provider<List<AuthenticationProvider>>((ref) {
-  User? user = ref.watch(userProvider).value;
+  final User? user = ref.watch(userProvider).value;
   if (user == null) {
     return [];
   }
-  List<AuthenticationProvider> providers = ref.watch(authenticationProviders);
+  final List<AuthenticationProvider> providers = ref.watch(authenticationProviders);
   return List.unmodifiable([
-    for (AuthenticationProvider provider in providers)
+    for (final AuthenticationProvider provider in providers)
       if (user.hasAuthenticationProvider(provider.id)) provider,
   ]);
 });
@@ -73,11 +73,11 @@ sealed class AuthenticationProvider {
   /// Unlinks the provider.
   Future<Result> unlink() async {
     try {
-      User? user = await _ref.read(userProvider.future);
+      final User? user = await _ref.read(userProvider.future);
       if (user == null) {
         return const ResultCancelled();
       }
-      Result result = await _ref
+      final Result result = await _ref
           .read(backendClientProvider.notifier)
           .sendHttpRequest(
             ProviderUnlinkRequest(
@@ -125,10 +125,10 @@ sealed class AuthenticationProvider {
       if (!(uri as FinishAuthAppLink).isValid) {
         throw _InvalidUriException();
       }
-      User? user = await _ref.read(userProvider.future);
-      SessionRefreshState sessionRefreshState = _ref.read(sessionRefreshManagerProvider);
+      final User? user = await _ref.read(userProvider.future);
+      final SessionRefreshState sessionRefreshState = _ref.read(sessionRefreshManagerProvider);
       if (user == null || sessionRefreshState is SessionRefreshStateInvalidSession) {
-        Result<ProviderLoginResponse> response = await _ref
+        final Result<ProviderLoginResponse> response = await _ref
             .read(backendClientProvider.notifier)
             .sendHttpRequest(
               ProviderLoginRequest(
@@ -145,7 +145,7 @@ sealed class AuthenticationProvider {
           value: LogInSuccess(providerId: id),
         );
       } else {
-        Result<ProviderLinkResponse> response = await _ref
+        final Result<ProviderLinkResponse> response = await _ref
             .read(backendClientProvider.notifier)
             .sendHttpRequest(
               ProviderLinkRequest(
@@ -217,8 +217,8 @@ mixin OAuthenticationProvider on AuthenticationProvider {
 
   /// Requests a login for either signing in or linking.
   Future<Result> _requestLogin({bool link = false}) async {
-    String backendUrl = await _ref.read(backendUrlSettingsEntryProvider.future);
-    UriBuilder uriBuilder = UriBuilder.prefix(
+    final String backendUrl = await _ref.read(backendUrlSettingsEntryProvider.future);
+    final UriBuilder uriBuilder = UriBuilder.prefix(
       prefix: backendUrl,
       path: '/auth/provider/$id/redirect',
       queryParameters: {
@@ -226,7 +226,7 @@ mixin OAuthenticationProvider on AuthenticationProvider {
       },
     );
     if (link) {
-      User? user = await _ref.read(userProvider.future);
+      final User? user = await _ref.read(userProvider.future);
       uriBuilder.appendQueryParameter('userId', user!.id);
       uriBuilder.appendQueryParameter('mode', 'link');
     } else {

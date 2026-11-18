@@ -122,6 +122,9 @@ abstract class AppleAuthMethod with FirebaseAuthMethod, CanLinkTo {
   /// The provider id.
   static const String providerId = 'apple.com';
 
+  /// Creates a new Apple auth method instance.
+  const AppleAuthMethod();
+
   /// Creates a new default Apple auth method instance.
   factory AppleAuthMethod.defaultMethod({
     List<String> scopes = const [],
@@ -139,15 +142,15 @@ abstract class AppleAuthMethod with FirebaseAuthMethod, CanLinkTo {
     idToken: idToken,
     nonce: nonce,
   );
-
-  /// Creates a new Apple auth method instance.
-  const AppleAuthMethod();
 }
 
 /// Authenticates using an email link.
 abstract class EmailLinkAuthMethod with FirebaseAuthMethod {
   /// The provider id.
   static const String providerId = 'password';
+
+  /// Creates a new email link auth method instance.
+  const EmailLinkAuthMethod();
 
   /// Creates a new default email link auth method instance.
   factory EmailLinkAuthMethod.defaultMethod({
@@ -166,15 +169,15 @@ abstract class EmailLinkAuthMethod with FirebaseAuthMethod {
     email: email,
     oobCode: oobCode,
   );
-
-  /// Creates a new email link auth method instance.
-  const EmailLinkAuthMethod();
 }
 
 /// Authenticates using Github.
 abstract class GithubAuthMethod with FirebaseAuthMethod, CanLinkTo {
   /// The provider id.
   static const String providerId = 'github.com';
+
+  /// Creates a new Github auth method instance.
+  const GithubAuthMethod();
 
   /// Creates a new default Github auth method instance.
   factory GithubAuthMethod.defaultMethod({
@@ -191,15 +194,15 @@ abstract class GithubAuthMethod with FirebaseAuthMethod, CanLinkTo {
   }) => GithubAuthMethodRest(
     accessToken: accessToken,
   );
-
-  /// Creates a new Github auth method instance.
-  const GithubAuthMethod();
 }
 
 /// Authenticates using Google.
 abstract class GoogleAuthMethod with FirebaseAuthMethod, CanLinkTo {
   /// The provider id.
   static const String providerId = 'google.com';
+
+  /// Creates a new Google auth method instance.
+  const GoogleAuthMethod();
 
   /// Creates a new default Google auth method instance.
   factory GoogleAuthMethod.defaultMethod({
@@ -218,15 +221,15 @@ abstract class GoogleAuthMethod with FirebaseAuthMethod, CanLinkTo {
     accessToken: accessToken,
     idToken: idToken,
   );
-
-  /// Creates a new Google auth method instance.
-  const GoogleAuthMethod();
 }
 
 /// Authenticates using Microsoft.
 abstract class MicrosoftAuthMethod with FirebaseAuthMethod, CanLinkTo {
   /// The provider id.
   static const String providerId = 'microsoft.com';
+
+  /// Creates a new Microsoft auth method instance.
+  const MicrosoftAuthMethod();
 
   /// Creates a new default Microsoft auth method instance.
   factory MicrosoftAuthMethod.defaultMethod({
@@ -247,15 +250,15 @@ abstract class MicrosoftAuthMethod with FirebaseAuthMethod, CanLinkTo {
     idToken: idToken,
     nonce: nonce,
   );
-
-  /// Creates a new Microsoft auth method instance.
-  const MicrosoftAuthMethod();
 }
 
 /// Authenticates using Twitter.
 abstract class TwitterAuthMethod with FirebaseAuthMethod, CanLinkTo {
   /// The provider id.
   static const String providerId = 'twitter.com';
+
+  /// Creates a new Twitter auth method instance.
+  const TwitterAuthMethod();
 
   /// Creates a new default Twitter auth method instance.
   factory TwitterAuthMethod.defaultMethod({
@@ -270,9 +273,6 @@ abstract class TwitterAuthMethod with FirebaseAuthMethod, CanLinkTo {
   }) => TwitterAuthMethodRest(
     accessToken: accessToken,
   );
-
-  /// Creates a new Twitter auth method instance.
-  const TwitterAuthMethod();
 }
 
 /// Holds a sign-in result.

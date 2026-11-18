@@ -1,3 +1,4 @@
+import 'package:meta/meta.dart';
 import 'package:open_authenticator/model/app_links/openauthenticator.dart';
 
 /// Handles `openauthenticator://purchases/` links.
@@ -9,6 +10,7 @@ extension type AppPurchasesLink(OpenAuthenticatorAppLink uri) implements OpenAut
   static const String _kHost = 'purchases';
 
   /// Returns whether the given [uri] is a valid purchases app link.
+  @redeclare
   bool get isValid => uri.isScheme(_kScheme) && uri.host == _kHost;
 }
 
@@ -18,5 +20,6 @@ extension type AppPurchasesSuccessLink(AppPurchasesLink uri) implements AppPurch
   static const String _kPath = '/success';
 
   /// Returns whether the given [uri] is a valid purchases success app link.
+  @redeclare
   bool get isValid => (this as AppPurchasesLink).isValid && uri.path == _kPath;
 }

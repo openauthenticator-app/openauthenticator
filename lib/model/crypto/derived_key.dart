@@ -22,19 +22,19 @@ class DerivedKeyNotifier extends AsyncNotifier<DerivedKey?> {
 
   @override
   FutureOr<DerivedKey?> build() async {
-    CachedSimpleSecureStorage simpleSecureStorage = await ref.watch(secureStorageProvider.future);
-    String? derivedKey = simpleSecureStorage.read(_kPasswordDerivedKeyKey);
+    final CachedSimpleSecureStorage simpleSecureStorage = await ref.watch(secureStorageProvider.future);
+    final String? derivedKey = simpleSecureStorage.read(_kPasswordDerivedKeyKey);
     return derivedKey == null ? null : DerivedKey._base64Decode(string: derivedKey);
   }
 
   /// Creates a new derived key instance using the [password] and uses it as [state].
   Future<DerivedKey?> updateFromPassword(String password, {bool? andWrite}) async {
-    Salt? salt = await ref.read(saltProvider.future);
+    final Salt? salt = await ref.read(saltProvider.future);
     if (salt == null) {
       return null;
     }
-    DerivedKey newKey = DerivedKey.fromPassword(password, salt);
-    String unlockMethod = await ref.read(appUnlockMethodSettingsEntryProvider.future);
+    final DerivedKey newKey = DerivedKey.fromPassword(password, salt);
+    final String unlockMethod = await ref.read(appUnlockMethodSettingsEntryProvider.future);
     if (unlockMethod == MasterPasswordAppUnlockMethod.kMethodId) {
       await ref.read(passwordSignatureVerificationMethodProvider.notifier).updatePasswordSignature(password);
     }
@@ -43,7 +43,7 @@ class DerivedKeyNotifier extends AsyncNotifier<DerivedKey?> {
     }
     andWrite ??= unlockMethod != MasterPasswordAppUnlockMethod.kMethodId;
     if (andWrite) {
-      CachedSimpleSecureStorage simpleSecureStorage = await ref.read(secureStorageProvider.future);
+      final CachedSimpleSecureStorage simpleSecureStorage = await ref.read(secureStorageProvider.future);
       await simpleSecureStorage.write(_kPasswordDerivedKeyKey, base64.encode(newKey.value));
     }
     return newKey;
@@ -51,7 +51,7 @@ class DerivedKeyNotifier extends AsyncNotifier<DerivedKey?> {
 
   /// Deletes the current derived key from the local storage.
   Future<void> deleteFromLocalStorage() async {
-    CachedSimpleSecureStorage simpleSecureStorage = await ref.read(secureStorageProvider.future);
+    final CachedSimpleSecureStorage simpleSecureStorage = await ref.read(secureStorageProvider.future);
     await simpleSecureStorage.delete(_kPasswordDerivedKeyKey);
   }
 }
