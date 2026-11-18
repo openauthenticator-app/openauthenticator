@@ -40,11 +40,8 @@ class _StorageMigrationConfirmationDialogState extends State<StorageMigrationCon
   /// Whether the user wants to create a backup.
   bool createBackup = !kDebugMode;
 
-  /// The backup password.
-  String? backupPassword;
-
   /// The backup password text editing controller.
-  late final TextEditingController backupPasswordController = TextEditingController(text: backupPassword);
+  late final TextEditingController backupPasswordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) => AppDialog(
@@ -55,7 +52,7 @@ class _StorageMigrationConfirmationDialogState extends State<StorageMigrationCon
           if (createBackup && !backupPasswordFormKey.currentState!.validate()) {
             return;
           }
-          Navigator.pop(context, StorageMigrationConfirmationResult(confirm: true, backupPassword: createBackup ? backupPassword : null));
+          Navigator.pop(context, StorageMigrationConfirmationResult(confirm: true, backupPassword: createBackup ? backupPasswordController.text : null));
         },
         child: ButtonText(MaterialLocalizations.of(context).continueButtonLabel),
       ),
