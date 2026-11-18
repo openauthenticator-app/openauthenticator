@@ -1,7 +1,7 @@
 import 'package:forui/forui.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:open_authenticator/spacing.dart';
-import 'package:open_authenticator/utils/utils.dart';
+import 'package:open_authenticator/utils/color.dart';
 
 /// The light and dark variants of a green theme.
 ({FPlatformThemeData light, FPlatformThemeData dark}) get greenTheme {

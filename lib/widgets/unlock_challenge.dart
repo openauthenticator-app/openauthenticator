@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:open_authenticator/app.dart';
+import 'package:open_authenticator/flows/app_unlock_interaction.dart';
 import 'package:open_authenticator/flows/master_password.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/app_unlock/methods/method.dart';
@@ -12,7 +13,6 @@ import 'package:open_authenticator/model/password_verification/methods/method.da
 import 'package:open_authenticator/model/password_verification/password_verification.dart';
 import 'package:open_authenticator/model/settings/app_unlock_method.dart';
 import 'package:open_authenticator/spacing.dart';
-import 'package:open_authenticator/utils/app_unlock_interaction.dart';
 import 'package:open_authenticator/utils/result/handler.dart';
 import 'package:open_authenticator/utils/result/result.dart';
 import 'package:open_authenticator/widgets/app_scaffold.dart';

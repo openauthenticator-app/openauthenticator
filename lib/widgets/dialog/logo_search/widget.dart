@@ -7,10 +7,10 @@ import 'package:material_ui/material_ui.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/spacing.dart';
 import 'package:open_authenticator/utils/debounce.dart';
-import 'package:open_authenticator/utils/form_label.dart';
 import 'package:open_authenticator/widgets/centered_circular_progress_indicator.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/logo_search/sources.dart';
+import 'package:open_authenticator/widgets/form/form_label.dart';
 import 'package:open_authenticator/widgets/smart_image.dart';
 
 /// Allows to search for logos on various sources.

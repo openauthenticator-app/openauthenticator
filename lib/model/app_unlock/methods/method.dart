@@ -4,6 +4,7 @@ import 'package:local_auth/local_auth.dart' hide LocalAuthentication;
 import 'package:open_authenticator/i18n/localizable_exception.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/model/app_unlock/interaction.dart';
+import 'package:open_authenticator/model/app_unlock/local_authentication/local_authentication.dart';
 import 'package:open_authenticator/model/app_unlock/reason.dart';
 import 'package:open_authenticator/model/crypto/derived_key.dart';
 import 'package:open_authenticator/model/crypto/salt.dart';
@@ -12,7 +13,6 @@ import 'package:open_authenticator/model/password_verification/methods/password_
 import 'package:open_authenticator/model/password_verification/password_verification.dart';
 import 'package:open_authenticator/model/totp/repository.dart';
 import 'package:open_authenticator/model/totp/totp.dart';
-import 'package:open_authenticator/utils/local_authentication/local_authentication.dart';
 import 'package:open_authenticator/utils/result/result.dart';
 
 part 'local_auth.dart';

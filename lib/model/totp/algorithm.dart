@@ -1,5 +1,5 @@
 import 'package:hashlib/hashlib.dart' as hashlib;
-import 'package:open_authenticator/utils/utils.dart';
+import 'package:open_authenticator/utils/iterable.dart';
 
 /// Allows to avoid conflicts with [totp_lib.Algorithm].
 enum Algorithm {

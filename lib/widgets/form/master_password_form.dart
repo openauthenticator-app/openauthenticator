@@ -1,8 +1,8 @@
 import 'package:forui/forui.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
-import 'package:open_authenticator/utils/form_label.dart';
-import 'package:open_authenticator/utils/utils.dart';
+import 'package:open_authenticator/utils/color.dart';
+import 'package:open_authenticator/widgets/form/form_label.dart';
 import 'package:open_authenticator/widgets/form/password_form_field.dart';
 
 /// A form to prompt for the master password.

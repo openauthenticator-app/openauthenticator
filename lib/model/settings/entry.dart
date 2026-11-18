@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:open_authenticator/utils/iterable.dart';
 import 'package:open_authenticator/utils/shared_preferences_with_prefix.dart';
-import 'package:open_authenticator/utils/utils.dart';
 
 /// The shared preferences provider.
 final FutureProvider<SharedPreferencesWithPrefix> sharedPreferencesProvider = FutureProvider.autoDispose<SharedPreferencesWithPrefix>((ref) async => await SharedPreferencesWithPrefix.create());

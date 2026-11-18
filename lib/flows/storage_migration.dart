@@ -8,7 +8,6 @@ import 'package:open_authenticator/model/backend/synchronization/storage_migrati
 import 'package:open_authenticator/model/backend/user.dart';
 import 'package:open_authenticator/model/password_verification/password_verification.dart';
 import 'package:open_authenticator/model/settings/storage_type.dart';
-import 'package:open_authenticator/utils/form_label.dart';
 import 'package:open_authenticator/utils/result/handler.dart';
 import 'package:open_authenticator/utils/result/presentation.dart';
 import 'package:open_authenticator/utils/result/result.dart';
@@ -16,6 +15,7 @@ import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
 import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
 import 'package:open_authenticator/widgets/dialog/text_input_dialog.dart';
+import 'package:open_authenticator/widgets/form/form_label.dart';
 import 'package:open_authenticator/widgets/form/password_form_field.dart';
 import 'package:open_authenticator/widgets/waiting_overlay.dart';
 

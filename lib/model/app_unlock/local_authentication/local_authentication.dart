@@ -1,7 +1,7 @@
+import 'package:open_authenticator/model/app_unlock/local_authentication/default.dart';
+import 'package:open_authenticator/model/app_unlock/local_authentication/method_channel.dart';
+import 'package:open_authenticator/model/app_unlock/local_authentication/stub.dart';
 import 'package:open_authenticator/model/app_unlock/reason.dart';
-import 'package:open_authenticator/utils/local_authentication/default.dart';
-import 'package:open_authenticator/utils/local_authentication/method_channel.dart';
-import 'package:open_authenticator/utils/local_authentication/stub.dart';
 import 'package:open_authenticator/utils/platform.dart';
 
 /// Allows to either use LocalAuthentication's Firebase Auth implementation or fallback to the method channel if needed.

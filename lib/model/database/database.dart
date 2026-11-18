@@ -9,13 +9,13 @@ import 'package:open_authenticator/model/backend/request/response.dart';
 import 'package:open_authenticator/model/backend/synchronization/push/operation.dart';
 import 'package:open_authenticator/model/backend/synchronization/push/result.dart';
 import 'package:open_authenticator/model/crypto/salt.dart';
+import 'package:open_authenticator/model/database/connection.dart';
+import 'package:open_authenticator/model/database/converters.dart';
 import 'package:open_authenticator/model/database/database.steps.dart';
 import 'package:open_authenticator/model/totp/algorithm.dart';
 import 'package:open_authenticator/model/totp/json.dart';
 import 'package:open_authenticator/model/totp/totp.dart';
-import 'package:open_authenticator/utils/drift.dart';
 import 'package:open_authenticator/utils/json.dart';
-import 'package:open_authenticator/utils/sqlite.dart';
 import 'package:path_provider/path_provider.dart';
 
 part 'database.g.dart';

@@ -8,8 +8,8 @@ import 'package:local_auth_darwin/types/auth_messages_macos.dart';
 // ignore: depend_on_referenced_packages
 import 'package:local_auth_windows/local_auth_windows.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
+import 'package:open_authenticator/model/app_unlock/local_authentication/local_authentication.dart';
 import 'package:open_authenticator/model/app_unlock/reason.dart';
-import 'package:open_authenticator/utils/local_authentication/local_authentication.dart';
 import 'package:open_authenticator/utils/platform.dart';
 import 'package:open_authenticator/utils/window.dart';
 import 'package:window_manager/window_manager.dart';
