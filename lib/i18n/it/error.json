@@ -16,7 +16,7 @@
     "empty": "Questo campo è obbligatorio",
     "email": "Email non valida",
     "secret": "Secret inserita non valido",
-    "totpDigits": "Il numero inserito deve essere uguale o maggiore di 6",
+    "totpDigits": "Inserisci un numero di cifre compreso tra 6 e 15",
     "masterPassword": "Password inserita non valida",
     "confirmation": "La conferma non corrisponde",
     "url": "URL non valido"

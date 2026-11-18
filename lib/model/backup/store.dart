@@ -32,7 +32,7 @@ class BackupStore extends AsyncNotifier<List<BackupPath>> {
       if (!ref.mounted) {
         return const ResultCancelled();
       }
-      final Backup backup = backupPath.read(currentCryptoStore, password);
+      final Backup backup = await backupPath.read(currentCryptoStore, password);
       final Result restoreResult = await backup.restore(ref.read(totpRepositoryProvider.notifier));
       if (restoreResult is! ResultSuccess) {
         return restoreResult.to<Backup>((value) => backup);
@@ -67,7 +67,7 @@ class BackupStore extends AsyncNotifier<List<BackupPath>> {
       }
       state = AsyncData(
         [
-          ...(await future),
+          ...(await future).where((existing) => existing.path != backup.backupPath.path),
           backup.backupPath,
         ]..sort(),
       );
@@ -86,18 +86,21 @@ class BackupStore extends AsyncNotifier<List<BackupPath>> {
   Future<Result<BackupPath>> import(File backupFile) async {
     final KeepAliveLink keepAliveLink = ref.keepAlive();
     try {
-      if (!Backup._isBackupFileContentValid(backupFile)) {
-        throw _InvalidBackupContentException();
-      }
+      await Backup._readContent(backupFile);
       final DateTime? dateTime = BackupPath._extractFromBackupPath(backupFile);
       final BackupPath backupPath = await BackupPath.create(dateTime: dateTime ?? DateTime.now());
-      backupFile.copySync(backupPath.path);
+      try {
+        await backupFile.copy(backupPath.path);
+      } catch (_) {
+        await backupPath.delete();
+        rethrow;
+      }
       if (!ref.mounted) {
         return const ResultCancelled();
       }
       state = AsyncData(
         [
-          ...(await future),
+          ...(await future).where((existing) => existing.path != backupPath.path),
           backupPath,
         ]..sort(),
       );

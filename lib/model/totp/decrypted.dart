@@ -118,6 +118,9 @@ class DecryptedTotp extends Totp {
     String? imageUrl,
     DateTime? updatedAt,
   }) {
+    if (!Totp.validPeriod(validity?.inSeconds) || !Totp.validDigits(digits)) {
+      return null;
+    }
     final EncryptedData? encryptedData = EncryptedData.encrypt(
       cryptoStore: cryptoStore,
       secret: secret,

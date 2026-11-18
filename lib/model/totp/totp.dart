@@ -46,6 +46,12 @@ class Totp extends Equatable implements Comparable<Totp> {
   /// The default validity to use.
   static const Duration kDefaultValidity = Duration(seconds: 30);
 
+  /// Whether a period can be used for TOTP generation.
+  static bool validPeriod(Object? seconds) => seconds == null || (seconds is int && seconds > 0 && seconds <= 2147483647);
+
+  /// Whether the generator supports this number of digits.
+  static bool validDigits(Object? digits) => digits == null || (digits is int && digits >= 4 && digits <= 15);
+
   /// The TOTP UUID.
   final String uuid;
 

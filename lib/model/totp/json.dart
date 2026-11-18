@@ -13,12 +13,21 @@ extension JsonTotp on Totp {
   /// Creates a new TOTP from the specified JSON data.
   static Totp? tryFromJson(JsonMap data, {String? uuid}) {
     final EncryptedData? encryptedData = JsonEncryptedData.fromJson(data);
-    uuid ??= data[Totp.kUuidKey];
-    if (encryptedData == null || uuid == null) {
+    final Object? id = uuid ?? data[Totp.kUuidKey];
+    final Object? timestamp = data[Totp.kUpdatedAtKey];
+    final Object? algorithm = data[Totp.kAlgorithmKey];
+    if (encryptedData == null ||
+        id is! String ||
+        !RegExp(r'^[a-zA-Z0-9_-]+$').hasMatch(id) ||
+        timestamp is! int ||
+        timestamp.abs() > 8640000000000000 ||
+        !Totp.validPeriod(data[Totp.kValidityKey]) ||
+        !Totp.validDigits(data[Totp.kDigitsKey]) ||
+        (algorithm != null && (algorithm is! String || Algorithm.fromString(algorithm) == null))) {
       return null;
     }
     return Totp(
-      uuid: uuid,
+      uuid: id,
       encryptedData: encryptedData,
       algorithm: data[Totp.kAlgorithmKey] is! String ? null : Algorithm.fromString(data[Totp.kAlgorithmKey]),
       digits: data[Totp.kDigitsKey] is! int ? null : data[Totp.kDigitsKey],
@@ -42,7 +51,8 @@ extension JsonTotp on Totp {
 extension JsonEncryptedData on EncryptedData {
   /// Creates a new encrypted data from the specified JSON data.
   static EncryptedData? fromJson(JsonMap data) {
-    if (data[Totp.kSecretKey] is! List || data[Totp.kEncryptionSaltKey] is! List) {
+    bool bytes(Object? value) => value is List && value.every((byte) => byte is int && byte >= 0 && byte <= 255);
+    if (!bytes(data[Totp.kSecretKey]) || !bytes(data[Totp.kEncryptionSaltKey]) || [Totp.kLabelKey, Totp.kIssuerKey, Totp.kImageUrlKey].any((key) => data[key] != null && !bytes(data[key]))) {
       return null;
     }
     return EncryptedData(

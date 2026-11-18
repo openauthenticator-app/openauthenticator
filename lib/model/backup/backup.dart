@@ -56,25 +56,27 @@ class Backup implements Comparable<Backup> {
   /// Returns the backup date.
   DateTime get dateTime => backupPath.timestamp;
 
-  /// Returns whether the given [file] is a valid backup file.
-  static bool _isBackupFileContentValid(File file) {
-    if (!file.existsSync()) {
-      return false;
+  /// Reads the backup envelope and checks its required fields.
+  static Future<JsonMap> _readContent(File file) async {
+    if (!await file.exists()) {
+      throw _BackupFileDoesNotExistException(path: file.path);
     }
-    try {
-      final JsonMap jsonData = jsonDecode(file.readAsStringSync());
-      return jsonData[kTotpsKey] is List && jsonData[kSaltKey] is String && jsonData[kPasswordSignatureKey] is String;
-    } on FormatException {
-      return false;
+    final Object? data = jsonDecode(await file.readAsString());
+    if (data is! JsonMap || data[kTotpsKey] is! List || data[kSaltKey] is! String || data[kPasswordSignatureKey] is! String) {
+      throw _InvalidBackupContentException();
     }
+    return data;
   }
 
   static Future<Backup> _create(String password, CryptoStore currentCryptoStore, List<Totp> totps) async {
-    final CryptoStore newStore = CryptoStore.fromPassword(password, Salt.generate());
+    final CryptoStore newStore = await CryptoStore.fromPasswordInIsolate(password, Salt.generate());
     final List<Totp> toBackup = [];
     for (final Totp totp in totps) {
       final DecryptedTotp? decryptedTotp = totp.changeEncryptionKey(currentCryptoStore, newStore);
-      toBackup.add(decryptedTotp ?? totp);
+      if (decryptedTotp == null) {
+        throw _InvalidBackupContentException();
+      }
+      toBackup.add(decryptedTotp);
     }
     return Backup._(
       backupPath: await BackupPath.create(),
@@ -85,45 +87,43 @@ class Backup implements Comparable<Backup> {
   }
 
   /// Read the backup content from the given file.
-  factory Backup._read(BackupPath backupPath, CryptoStore currentCryptoStore, String password) {
+  static Future<Backup> _read(BackupPath backupPath, CryptoStore currentCryptoStore, String password) async {
     final File file = backupPath.file;
-    if (!file.existsSync()) {
-      throw _BackupFileDoesNotExistException(path: file.path);
-    }
-
-    if (!_isBackupFileContentValid(file)) {
-      throw _InvalidBackupContentException();
-    }
-
-    final JsonMap jsonData = jsonDecode(file.readAsStringSync());
-    final CryptoStore cryptoStore = CryptoStore.fromPassword(password, Salt.base64Decode(string: jsonData[kSaltKey]));
+    final JsonMap jsonData = await _readContent(file);
+    final CryptoStore cryptoStore = await CryptoStore.fromPasswordInIsolate(password, Salt.base64Decode(string: jsonData[kSaltKey]));
     if (!(cryptoStore.hmacSecretKey.verify(base64.decode(jsonData[kPasswordSignatureKey]), utf8.encode(password)))) {
       throw InvalidBackupPasswordException();
     }
 
     final List jsonTotps = jsonData[kTotpsKey];
     final List<Totp> totps = [];
-    final int defaultUpdatedAt = file.lastModifiedSync().millisecondsSinceEpoch;
+    final uuids = <String>{};
+    final int defaultUpdatedAt = (await file.lastModified()).millisecondsSinceEpoch;
     for (final dynamic jsonTotp in jsonTotps) {
       if (jsonTotp is! JsonMap) {
-        continue;
+        throw _InvalidBackupContentException();
       }
       if (jsonTotp[Totp.kUpdatedAtKey] == null) {
         jsonTotp[Totp.kUpdatedAtKey] = defaultUpdatedAt;
       }
       final Totp? totp = JsonTotp.tryFromJson(jsonTotp);
-      if (totp != null) {
-        final DecryptedTotp? decryptedTotp = totp.changeEncryptionKey(cryptoStore, currentCryptoStore);
-        totps.add(decryptedTotp ?? totp);
+      if (totp == null || !uuids.add(totp.uuid)) {
+        throw _InvalidBackupContentException();
       }
-    }
-    if (totps.isEmpty && jsonTotps.isNotEmpty) {
-      throw InvalidBackupPasswordException();
+      final Totp original = totp.decrypt(cryptoStore);
+      if (original is! DecryptedTotp) {
+        throw _InvalidBackupContentException();
+      }
+      final DecryptedTotp? decrypted = original.changeEncryptionKey(cryptoStore, currentCryptoStore);
+      if (decrypted == null) {
+        throw _InvalidBackupContentException();
+      }
+      totps.add(decrypted);
     }
     return Backup._(
-      backupPath: BackupPath.fromPath(path: file.path)!,
+      backupPath: backupPath,
       passwordSignature: jsonData[kPasswordSignatureKey],
-      salt: Salt.base64Decode(string: jsonData[kSaltKey]),
+      salt: cryptoStore.salt,
       totps: totps,
     );
   }
@@ -133,16 +133,19 @@ class Backup implements Comparable<Backup> {
 
   /// Saves this backup content.
   Future<void> save() async {
-    final File file = await backupPath.createFile();
-    await file.writeAsString(
-      jsonEncode({
-        kPasswordSignatureKey: passwordSignature,
-        kSaltKey: base64.encode(salt.value),
-        kTotpsKey: [
-          for (final Totp totp in totps) totp.toJson(),
-        ],
-      }),
-    );
+    try {
+      await backupPath.file.writeAsString(
+        jsonEncode({
+          kPasswordSignatureKey: passwordSignature,
+          kSaltKey: base64.encode(salt.value),
+          kTotpsKey: [for (final Totp totp in totps) totp.toJson()],
+        }),
+        flush: true,
+      );
+    } catch (_) {
+      await backupPath.delete();
+      rethrow;
+    }
   }
 
   /// Deletes this backup.

@@ -454,7 +454,8 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
   }
 
   /// Whether the TOTP is valid.
-  bool get isValidTotp => validateSecret() == null && validateLabel() == null && validateIssuer() == null && validateDigits() == null && validateValidity() == null;
+  bool get isValidTotp =>
+      validateSecret() == null && validateLabel() == null && validateIssuer() == null && validateDigits(digitsController.text) == null && validateValidity(validityController.text) == null;
 
   /// Validates the [secret].
   String? validateSecret([String? secret]) {
@@ -495,7 +496,7 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
     if (parsedDigits == null) {
       return translations.error.validation.number;
     }
-    if (parsedDigits < 6) {
+    if (parsedDigits < 6 || !Totp.validDigits(parsedDigits)) {
       return translations.error.validation.totpDigits;
     }
     return null;
@@ -507,7 +508,7 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
       return null;
     }
     final int? parsedValidity = int.tryParse(validity);
-    if (parsedValidity == null) {
+    if (parsedValidity == null || !Totp.validPeriod(parsedValidity)) {
       return translations.error.validation.number;
     }
     return null;

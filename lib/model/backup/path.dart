@@ -3,7 +3,7 @@ part of 'backup.dart';
 /// Represents a backup path.
 class BackupPath implements Comparable<BackupPath> {
   /// The backup filename regex.
-  static const String _kBackupFilenameRegex = r'\d{13}\.bak';
+  static const String _kBackupFilenameRegex = r'^\d{13}\.bak$';
 
   /// The backup path.
   final String path;
@@ -30,11 +30,17 @@ class BackupPath implements Comparable<BackupPath> {
 
   /// Creates a new backup path.
   static Future<BackupPath> create({DateTime? dateTime}) async {
-    dateTime ??= DateTime.now();
-    return BackupPath._(
-      path: join((await getBackupsDirectory()).path, '${dateTime.millisecondsSinceEpoch}.bak'),
-      timestamp: dateTime,
-    );
+    final Directory directory = await getBackupsDirectory(create: true);
+    int timestamp = (dateTime ?? DateTime.now()).millisecondsSinceEpoch;
+    while (true) {
+      final File destination = File(join(directory.path, '$timestamp.bak'));
+      try {
+        await destination.create(exclusive: true);
+        return BackupPath._(path: destination.path, timestamp: DateTime.fromMillisecondsSinceEpoch(timestamp));
+      } on PathExistsException {
+        timestamp++;
+      }
+    }
   }
 
   /// Extracts the backup timestamp from the given [file].
@@ -54,22 +60,13 @@ class BackupPath implements Comparable<BackupPath> {
   int compareTo(BackupPath other) => other.timestamp.compareTo(timestamp);
 
   /// Reads the backup content.
-  Backup read(CryptoStore currentCryptoStore, String password) => Backup._read(this, currentCryptoStore, password);
+  Future<Backup> read(CryptoStore currentCryptoStore, String password) => Backup._read(this, currentCryptoStore, password);
 
   /// Returns the backup file.
   File get file => File(path);
 
   /// Returns the backup filename.
   String get filename => file.uri.pathSegments.last;
-
-  /// Creates the backup file if it doesn't exist.
-  Future<File> createFile() async {
-    final File file = this.file;
-    if (!file.existsSync()) {
-      await file.create(recursive: true);
-    }
-    return file;
-  }
 
   /// Deletes this backup.
   Future<void> delete() async {
@@ -83,8 +80,8 @@ class BackupPath implements Comparable<BackupPath> {
   static Future<Directory> getBackupsDirectory({bool create = false}) async {
     const String name = '${App.appName} Backups${kDebugMode ? ' (Debug)' : ''}';
     final Directory directory = Directory(join((await getApplicationDocumentsDirectory()).path, name));
-    if (create && !directory.existsSync()) {
-      directory.createSync(recursive: true);
+    if (create) {
+      await directory.create(recursive: true);
     }
     return directory;
   }

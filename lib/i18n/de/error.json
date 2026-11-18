@@ -16,7 +16,7 @@
     "empty": "Dieses Feld ist erforderlich",
     "email": "Ungültige E-Mail",
     "secret": "Ungültiges Geheimnis eingegeben",
-    "totpDigits": "Diese Zahl muss mindestens 6 betragen",
+    "totpDigits": "Geben Sie eine Stellenzahl zwischen 6 und 15 ein",
     "masterPassword": "Ungültiges Passwort eingegeben",
     "confirmation": "Die Bestätigung stimmt nicht überein",
     "url": "Ungültige URL."

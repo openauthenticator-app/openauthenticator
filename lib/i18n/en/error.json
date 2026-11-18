@@ -16,7 +16,7 @@
     "empty": "This field is required",
     "email": "Invalid email",
     "secret": "Invalid secret entered",
-    "totpDigits": "This number should be super or equal than 6",
+    "totpDigits": "Enter a number of digits between 6 and 15",
     "masterPassword": "Invalid password entered",
     "confirmation": "Confirmation doesn't match",
     "url": "Invalid URL entered"
