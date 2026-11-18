@@ -5,13 +5,13 @@ import 'package:drift/drift.dart' show Migrator, Table, TableInfo;
 
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:open_authenticator/model/backend/request/response.dart';
-import 'package:open_authenticator/model/backend/synchronization/push/operation.dart';
-import 'package:open_authenticator/model/backend/synchronization/push/result.dart';
-import 'package:open_authenticator/model/crypto/salt.dart';
-import 'package:open_authenticator/model/database/database.dart';
-import 'package:open_authenticator/model/database/database.steps.dart';
-import 'package:open_authenticator/model/totp/totp.dart';
+import 'package:open_authenticator/core/backend/request/response.dart';
+import 'package:open_authenticator/core/backend/synchronization/push/operation.dart';
+import 'package:open_authenticator/core/backend/synchronization/push/result.dart';
+import 'package:open_authenticator/core/crypto/salt.dart';
+import 'package:open_authenticator/core/database/database.dart';
+import 'package:open_authenticator/core/database/database.steps.dart';
+import 'package:open_authenticator/core/totp/totp.dart';
 
 void main() {
   late AppDatabase database;

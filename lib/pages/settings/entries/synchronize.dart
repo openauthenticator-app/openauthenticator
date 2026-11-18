@@ -1,14 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:open_authenticator/core/backend/user.dart';
+import 'package:open_authenticator/core/purchases/contributor_plan.dart';
+import 'package:open_authenticator/core/settings/storage_type.dart';
+import 'package:open_authenticator/core/totp/limit.dart';
+import 'package:open_authenticator/core/totp/repository.dart';
+import 'package:open_authenticator/core/totp/totp.dart';
 import 'package:open_authenticator/flows/storage_migration.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
-import 'package:open_authenticator/model/backend/user.dart';
-import 'package:open_authenticator/model/purchases/contributor_plan.dart';
-import 'package:open_authenticator/model/settings/storage_type.dart';
-import 'package:open_authenticator/model/totp/limit.dart';
-import 'package:open_authenticator/model/totp/repository.dart';
-import 'package:open_authenticator/model/totp/totp.dart';
 import 'package:open_authenticator/pages/settings/entries/widgets.dart';
 
 /// Allows the user to choose its storage type.

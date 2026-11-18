@@ -1,6 +1,6 @@
 import 'package:forui/forui.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:open_authenticator/model/totp/decrypted.dart';
+import 'package:open_authenticator/core/totp/decrypted.dart';
 import 'package:open_authenticator/widgets/totp/time_based.dart';
 
 /// Displays a TOTP code.

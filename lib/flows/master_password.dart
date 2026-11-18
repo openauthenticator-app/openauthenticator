@@ -1,11 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:open_authenticator/core/app_unlock/reason.dart';
+import 'package:open_authenticator/core/settings/app_unlock_method.dart';
+import 'package:open_authenticator/core/totp/repository.dart';
 import 'package:open_authenticator/flows/app_flow.dart';
 import 'package:open_authenticator/flows/app_unlock_interaction.dart';
-import 'package:open_authenticator/model/app_unlock/reason.dart';
-import 'package:open_authenticator/model/settings/app_unlock_method.dart';
-import 'package:open_authenticator/model/totp/repository.dart';
 import 'package:open_authenticator/utils/result/handler.dart';
 import 'package:open_authenticator/utils/result/result.dart';
 import 'package:open_authenticator/widgets/dialog/change_master_password_dialog.dart';

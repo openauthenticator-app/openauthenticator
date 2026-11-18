@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:open_authenticator/core/backend/authentication/providers/provider.dart';
+import 'package:open_authenticator/core/backend/user.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
-import 'package:open_authenticator/model/backend/authentication/providers/provider.dart';
-import 'package:open_authenticator/model/backend/user.dart';
 import 'package:open_authenticator/spacing.dart';
 import 'package:open_authenticator/utils/color.dart';
 import 'package:open_authenticator/utils/result/result.dart';

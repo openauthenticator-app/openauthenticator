@@ -2,13 +2,13 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:open_authenticator/core/backup/backup.dart';
+import 'package:open_authenticator/core/crypto/salt.dart';
+import 'package:open_authenticator/core/crypto/store.dart';
+import 'package:open_authenticator/core/totp/decrypted.dart';
+import 'package:open_authenticator/core/totp/json.dart';
+import 'package:open_authenticator/core/totp/totp.dart';
 import 'package:open_authenticator/i18n/localizable_exception.dart';
-import 'package:open_authenticator/model/backup/backup.dart';
-import 'package:open_authenticator/model/crypto/salt.dart';
-import 'package:open_authenticator/model/crypto/store.dart';
-import 'package:open_authenticator/model/totp/decrypted.dart';
-import 'package:open_authenticator/model/totp/json.dart';
-import 'package:open_authenticator/model/totp/totp.dart';
 import 'package:open_authenticator/utils/json.dart';
 
 void main() {

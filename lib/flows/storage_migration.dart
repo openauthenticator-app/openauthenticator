@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:open_authenticator/core/backend/synchronization/storage_migration.dart';
+import 'package:open_authenticator/core/backend/user.dart';
+import 'package:open_authenticator/core/password_verification/password_verification.dart';
+import 'package:open_authenticator/core/settings/storage_type.dart';
 import 'package:open_authenticator/flows/app_flow.dart';
-import 'package:open_authenticator/model/backend/synchronization/storage_migration.dart';
-import 'package:open_authenticator/model/backend/user.dart';
-import 'package:open_authenticator/model/password_verification/password_verification.dart';
-import 'package:open_authenticator/model/settings/storage_type.dart';
 import 'package:open_authenticator/utils/result/handler.dart';
 import 'package:open_authenticator/utils/result/presentation.dart';
 import 'package:open_authenticator/utils/result/result.dart';

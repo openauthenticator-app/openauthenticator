@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:open_authenticator/model/app_unlock/reason.dart';
+import 'package:open_authenticator/core/app_unlock/reason.dart';
 import 'package:path/path.dart' as path;
 
 /// Generates the polkit policy file and translations as well.

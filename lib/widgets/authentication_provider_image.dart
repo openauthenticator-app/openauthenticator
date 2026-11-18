@@ -1,5 +1,5 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:open_authenticator/model/backend/authentication/providers/provider.dart';
+import 'package:open_authenticator/core/backend/authentication/providers/provider.dart';
 import 'package:open_authenticator/widgets/sized_scalable_image.dart';
 
 /// The image of an [AuthenticationProvider].

@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:open_authenticator/model/settings/theme.dart';
+import 'package:open_authenticator/core/settings/theme.dart';
 
 /// Allows to listen to the platform's brightness.
 mixin BrightnessListener<T extends ConsumerStatefulWidget> on ConsumerState<T> {

@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:open_authenticator/model/backend/authentication/session.dart';
-import 'package:open_authenticator/model/backend/backend.dart';
-import 'package:open_authenticator/model/backend/request/request.dart';
-import 'package:open_authenticator/model/backend/request/response.dart';
+import 'package:open_authenticator/core/backend/authentication/session.dart';
+import 'package:open_authenticator/core/backend/backend.dart';
+import 'package:open_authenticator/core/backend/request/request.dart';
+import 'package:open_authenticator/core/backend/request/response.dart';
 import 'package:open_authenticator/utils/result/result.dart';
 
 const _original = Session(accessToken: 'access', refreshToken: 'refresh');

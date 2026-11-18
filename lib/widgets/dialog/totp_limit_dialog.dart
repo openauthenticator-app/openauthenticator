@@ -1,12 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:open_authenticator/core/backend/user.dart';
+import 'package:open_authenticator/core/purchases/contributor_plan.dart';
+import 'package:open_authenticator/core/settings/storage_type.dart';
 import 'package:open_authenticator/flows/contributor_plan.dart';
 import 'package:open_authenticator/flows/storage_migration.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
-import 'package:open_authenticator/model/backend/user.dart';
-import 'package:open_authenticator/model/purchases/contributor_plan.dart';
-import 'package:open_authenticator/model/settings/storage_type.dart';
 import 'package:open_authenticator/spacing.dart';
 import 'package:open_authenticator/utils/result/handler.dart';
 import 'package:open_authenticator/utils/result/result.dart';
