@@ -54,14 +54,6 @@ class AppDatabase extends _$AppDatabase {
   @override
   MigrationStrategy get migration => MigrationStrategy(onUpgrade: schemaUpgrade);
 
-  /// Stores the given [totp].
-  Future<void> addTotp(Totp totp) async {
-    await into(totps).insert(
-      totp.asDriftTotp,
-      mode: .insertOrReplace,
-    );
-  }
-
   /// Stores the given [totps].
   Future<void> addTotps(List<Totp> totps) async {
     await batch((batch) {
@@ -78,11 +70,6 @@ class AppDatabase extends _$AppDatabase {
     await (delete(totps)..where((totp) => totp.uuid.isIn(tombstones.keys))).go();
     await markAsDeleted(tombstones);
   });
-
-  /// Updates the [totp].
-  Future<void> updateTotp(Totp totp) async {
-    await update(totps).replace(totp.asDriftTotp);
-  }
 
   /// Updates all [totps].
   Future<void> updateTotps(List<Totp> totps) async {

@@ -92,19 +92,14 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
       if (deletedTombstones.isNotEmpty) {
         await database.removeDeletionMarks(deletedTombstones);
       }
-      if (inserts.length == 1) {
-        await database.addTotp(inserts.first);
-      } else {
-        await database.addTotps(inserts);
-      }
-      final StorageType storageType = await ref.read(storageTypeSettingsEntryProvider.future);
-      if (storageType == .shared && !fromNetwork) {
-        _enqueue(
-          SetTotpsPushOperation(
-            totps: inserts,
-          ),
-        );
-      }
+      await database.addTotps(inserts);
+      await _enqueueIfNeeded(
+        SetTotpsPushOperation(
+          totps: inserts,
+        ),
+        isEmpty: inserts.isEmpty,
+        fromNetwork: fromNetwork,
+      );
       final CryptoStore? cryptoStore = await ref.read(cryptoStoreProvider.future);
       final List<Totp> decrypted = inserts.decrypt(cryptoStore);
       ref
@@ -140,20 +135,21 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
       }
       await database.replaceTotps(inserts, tombstonesToInsert);
 
-      final StorageType storageType = await ref.read(storageTypeSettingsEntryProvider.future);
-      if (storageType == .shared && !fromNetwork) {
-        _enqueue(
-          DeleteTotpsPushOperation(
-            tombstones: tombstonesToInsert,
-          ),
-          andRun: false,
-        );
-        _enqueue(
-          SetTotpsPushOperation(
-            totps: inserts,
-          ),
-        );
-      }
+      await _enqueueIfNeeded(
+        DeleteTotpsPushOperation(
+          tombstones: tombstonesToInsert,
+        ),
+        isEmpty: tombstonesToInsert.isEmpty,
+        fromNetwork: fromNetwork,
+        andRun: inserts.isEmpty,
+      );
+      await _enqueueIfNeeded(
+        SetTotpsPushOperation(
+          totps: inserts,
+        ),
+        isEmpty: inserts.isEmpty,
+        fromNetwork: fromNetwork,
+      );
       final CryptoStore? cryptoStore = await ref.read(cryptoStoreProvider.future);
       final List<Totp> decrypted = inserts.decrypt(cryptoStore);
       final TotpImageCacheManager totpImageCacheManager = ref.read(totpImageCacheManagerProvider.notifier);
@@ -176,7 +172,6 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
   Future<Result<Totp?>> updateTotp(
     DecryptedTotp totp, {
     bool fromNetwork = false,
-    bool insertIfNonExistent = false,
   }) async {
     final Result<List<Totp>> result = await _updateTotps(
       [totp],
@@ -209,6 +204,7 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
       for (final Totp totp in totps) {
         if (!uuids.contains(totp.uuid)) {
           updates.remove(totp);
+          continue;
         }
         final DateTime? deletedAt = deletedTotps[totp.uuid];
         if (deletedAt == null) {
@@ -223,19 +219,14 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
       if (deletedTombstones.isNotEmpty) {
         await database.removeDeletionMarks(deletedTombstones);
       }
-      if (updates.length == 1) {
-        await database.updateTotp(updates.first);
-      } else {
-        await database.updateTotps(updates);
-      }
-      final StorageType storageType = await ref.read(storageTypeSettingsEntryProvider.future);
-      if (storageType == .shared && !fromNetwork) {
-        _enqueue(
-          SetTotpsPushOperation(
-            totps: updates,
-          ),
-        );
-      }
+      await database.updateTotps(updates);
+      await _enqueueIfNeeded(
+        SetTotpsPushOperation(
+          totps: updates,
+        ),
+        isEmpty: updates.isEmpty,
+        fromNetwork: fromNetwork,
+      );
       final CryptoStore? cryptoStore = await ref.read(cryptoStoreProvider.future);
       final List<Totp> decrypted = updates.decrypt(cryptoStore);
       ref
@@ -290,14 +281,13 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
         deletes[entry.key] = entry.value;
       }
       await database.deleteTotps(deletes);
-      final StorageType storageType = await ref.read(storageTypeSettingsEntryProvider.future);
-      if (storageType == .shared && !fromNetwork) {
-        _enqueue(
-          DeleteTotpsPushOperation(
-            tombstones: deletes,
-          ),
-        );
-      }
+      await _enqueueIfNeeded(
+        DeleteTotpsPushOperation(
+          tombstones: deletes,
+        ),
+        isEmpty: deletes.isEmpty,
+        fromNetwork: fromNetwork,
+      );
       ref
           .read(totpImageCacheManagerProvider.notifier)
           .deleteCachedImages(
@@ -338,26 +328,33 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
       }
       final List<Totp> totpsList = await future;
       final CryptoStore? currentCryptoStore = await ref.read(cryptoStoreProvider.future);
+      final AppDatabase database = ref.read(appDatabaseProvider);
+      List<Totp>? newTotps;
       if (updateTotps && currentCryptoStore != null) {
         final CryptoStore newCryptoStore = CryptoStore.fromPassword(password, currentCryptoStore.salt);
-        final List<Totp> newTotps = [];
-        for (final Totp totp in totpsList) {
-          final DecryptedTotp? decryptedTotp = totp.changeEncryptionKey(currentCryptoStore, newCryptoStore);
-          newTotps.add(decryptedTotp ?? totp);
-        }
-        final AppDatabase database = ref.read(appDatabaseProvider);
+        newTotps = [
+          for (final Totp totp in totpsList) totp.changeEncryptionKey(currentCryptoStore, newCryptoStore) ?? totp,
+        ];
         await database.replaceTotps(newTotps, {});
-        final StorageType storageType = await ref.read(storageTypeSettingsEntryProvider.future);
-        if (storageType == .shared) {
-          _enqueue(
-            SetTotpsPushOperation(
-              totps: newTotps,
-            ),
-          );
-        }
       }
-      await ref.read(saltProvider.notifier).generateIfNeeded();
-      await ref.read(derivedKeyProvider.notifier).updateFromPassword(password);
+      try {
+        await ref.read(saltProvider.notifier).generateIfNeeded();
+        await ref.read(derivedKeyProvider.notifier).updateFromPassword(password);
+      } catch (_) {
+        // The TOTPs have been encrypted with a key that has not been saved. So we restore them.
+        if (newTotps != null) {
+          await database.replaceTotps(totpsList, {});
+        }
+        rethrow;
+      }
+      if (newTotps != null) {
+        await _enqueueIfNeeded(
+          SetTotpsPushOperation(
+            totps: newTotps,
+          ),
+          isEmpty: newTotps.isEmpty,
+        );
+      }
       return ResultSuccess(value: password);
     } catch (ex, stackTrace) {
       return ResultError(
@@ -367,13 +364,21 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
     }
   }
 
-  /// Enqueues the given [operation].
-  void _enqueue(PushOperation operation, {bool andRun = true}) => ref
-      .read(pushOperationsQueueProvider.notifier)
-      .enqueue(
-        operation,
-        andRun: andRun,
-      );
+  /// Enqueues the given [operation], if the storage is shared and if the change does not come from the network.
+  Future<void> _enqueueIfNeeded(
+    PushOperation operation, {
+    required bool isEmpty,
+    bool fromNetwork = false,
+    bool andRun = true,
+  }) async {
+    if (isEmpty || fromNetwork) {
+      return;
+    }
+    final StorageType storageType = await ref.read(storageTypeSettingsEntryProvider.future);
+    if (storageType == .shared) {
+      await ref.read(pushOperationsQueueProvider.notifier).enqueue(operation, andRun: andRun);
+    }
+  }
 }
 
 /// Allows to easily decrypt a TOTP list.
