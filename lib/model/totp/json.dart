@@ -8,7 +8,18 @@ import 'package:open_authenticator/utils/json.dart';
 /// Gives some useful properties for serializing TOTPs.
 extension JsonTotp on Totp {
   /// Force creating a new TOTP from the specified JSON data.
-  static Totp fromJson(JsonMap data, {String? uuid}) => tryFromJson(data, uuid: uuid)!;
+  static Totp fromJson(JsonMap data, {String? uuid}) => tryFromJson(withSupportedParameters(data), uuid: uuid)!;
+
+  /// Older clients accepted unusable periods and digit counts. Keep their encrypted data and use TOTP defaults.
+  static JsonMap withSupportedParameters(JsonMap data) {
+    if (Totp.validDigits(data[Totp.kDigitsKey]) && Totp.validPeriod(data[Totp.kValidityKey])) {
+      return data;
+    }
+    return {
+      for (final MapEntry<String, dynamic> field in data.entries)
+        if ((field.key != Totp.kDigitsKey || Totp.validDigits(field.value)) && (field.key != Totp.kValidityKey || Totp.validPeriod(field.value))) field.key: field.value,
+    };
+  }
 
   /// Creates a new TOTP from the specified JSON data.
   static Totp? tryFromJson(JsonMap data, {String? uuid}) {

@@ -71,6 +71,35 @@ void main() {
       expect(await database.listPendingBackendPushOperations(), isEmpty);
     });
 
+    test('older queued entries retain their ciphertext with supported generation parameters', () async {
+      await database.addPendingBackendPushOperation(
+        SetTotpsPushOperation.raw(
+          payload: {
+            'a': {
+              'validity': 0,
+              'digits': 2,
+              'secret': [1, 2],
+            },
+            'b': {
+              'validity': 60,
+              'digits': 8,
+              'secret': [3],
+            },
+          },
+        ),
+      );
+      expect((await database.listPendingBackendPushOperations()).single.payload, {
+        'a': {
+          'secret': [1, 2],
+        },
+        'b': {
+          'validity': 60,
+          'digits': 8,
+          'secret': [3],
+        },
+      });
+    });
+
     test('a late reply keeps a retry behind edits queued while the request was running', () async {
       final date = DateTime.fromMillisecondsSinceEpoch(1345);
       final first = DeleteTotpsPushOperation.raw(uuid: 'first', createdAt: date, payload: {'a': 1345, 'b': 1345, 'c': 1345});

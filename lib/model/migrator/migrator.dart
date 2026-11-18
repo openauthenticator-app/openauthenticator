@@ -100,7 +100,7 @@ class Migrator extends AsyncNotifier<MigrationState> {
         }
         final int updatedAt = data[updatedAtFieldName] is Timestamp ? (data[updatedAtFieldName] as Timestamp).toDate().millisecondsSinceEpoch : now;
         final Totp? totp = JsonTotp.tryFromJson({
-          ...data,
+          ...JsonTotp.withSupportedParameters(data),
           Totp.kUpdatedAtKey: updatedAt,
         });
         if (totp == null) {

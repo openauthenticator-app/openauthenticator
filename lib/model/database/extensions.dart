@@ -25,7 +25,9 @@ extension _ToOpenAuthenticatorBackendPushOperation on _DriftBackendPushOperation
   PushOperation get asBackendPushOperation => switch (kind) {
     .set => SetTotpsPushOperation.raw(
       uuid: uuid,
-      payload: jsonDecode(jsonPayload).cast<String, dynamic>(),
+      payload: {
+        for (final MapEntry<String, dynamic> entry in decodeJsonMap(jsonPayload).entries) entry.key: entry.value is JsonMap ? JsonTotp.withSupportedParameters(entry.value) : entry.value,
+      },
       createdAt: createdAt,
     ),
     .delete => DeleteTotpsPushOperation.raw(

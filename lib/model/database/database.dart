@@ -11,6 +11,7 @@ import 'package:open_authenticator/model/backend/synchronization/push/result.dar
 import 'package:open_authenticator/model/crypto/salt.dart';
 import 'package:open_authenticator/model/database/database.steps.dart';
 import 'package:open_authenticator/model/totp/algorithm.dart';
+import 'package:open_authenticator/model/totp/json.dart';
 import 'package:open_authenticator/model/totp/totp.dart';
 import 'package:open_authenticator/utils/drift.dart';
 import 'package:open_authenticator/utils/json.dart';
