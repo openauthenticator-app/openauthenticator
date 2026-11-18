@@ -14,12 +14,13 @@ import 'package:open_authenticator/model/crypto/store.dart';
 import 'package:open_authenticator/model/database/database.dart';
 import 'package:open_authenticator/model/password_verification/password_verification.dart';
 import 'package:open_authenticator/model/settings/entry.dart';
-import 'package:open_authenticator/model/totp/decrypted.dart';
 import 'package:open_authenticator/model/totp/totp.dart';
 import 'package:open_authenticator/utils/result/result.dart';
 
 /// The storage type settings entry provider.
-final AsyncNotifierProvider<StorageTypeSettingsEntry, StorageType> storageTypeSettingsEntryProvider = AsyncNotifierProvider.autoDispose<StorageTypeSettingsEntry, StorageType>(StorageTypeSettingsEntry.new);
+final AsyncNotifierProvider<StorageTypeSettingsEntry, StorageType> storageTypeSettingsEntryProvider = AsyncNotifierProvider.autoDispose<StorageTypeSettingsEntry, StorageType>(
+  StorageTypeSettingsEntry.new,
+);
 
 /// A settings entry that allows to get and set the storage type.
 class StorageTypeSettingsEntry extends EnumSettingsEntry<StorageType> {
@@ -44,11 +45,13 @@ class StorageTypeSettingsEntry extends EnumSettingsEntry<StorageType> {
     try {
       if (masterPassword != null) {
         final Result<bool> passwordCheckResult = await (await ref.read(passwordVerificationProvider.future)).isPasswordValid(masterPassword);
-        if (passwordCheckResult is! ResultSuccess) {
-          throw (passwordCheckResult as ResultError).exception;
-        }
-        if (!(passwordCheckResult as ResultSuccess<bool>).value) {
-          throw _CurrentStoragePasswordMismatchException();
+        switch (passwordCheckResult) {
+          case ResultError(:final exception, :final stackTrace):
+            Error.throwWithStackTrace(exception, stackTrace);
+          case ResultSuccess(value: true):
+            break;
+          default:
+            throw _CurrentStoragePasswordMismatchException();
         }
       }
 
@@ -100,27 +103,28 @@ class StorageTypeSettingsEntry extends EnumSettingsEntry<StorageType> {
       if (masterPassword == null || response.totps.isEmpty) {
         toAdd.addAll(currentStorageTotps);
       } else {
+        // Key derivation is expensive, so we only do it once per salt.
+        final Map<Salt, CryptoStore> cryptoStores = {};
+        Future<CryptoStore> cryptoStoreFor(Salt salt) async => cryptoStores[salt] ??= await CryptoStore.fromPasswordInIsolate(masterPassword, salt);
+
         for (final Totp totp in response.totps) {
-          final CryptoStore cryptoStore = CryptoStore.fromPassword(masterPassword, totp.encryptedData.encryptionSalt);
+          final CryptoStore cryptoStore = await cryptoStoreFor(totp.encryptedData.encryptionSalt);
           if (totp.encryptedData.canDecryptData(cryptoStore)) {
             newCryptoStore = cryptoStore;
             break;
           }
         }
-        newCryptoStore ??= CryptoStore.fromPassword(masterPassword, response.totps.first.encryptedData.encryptionSalt);
+        if (newCryptoStore == null) {
+          // The remote TOTPs have been encrypted using another password. Using the current one would mix up keys.
+          throw _RemoteStoragePasswordMismatchException();
+        }
 
         final CryptoStore? currentCryptoStore = await ref.read(cryptoStoreProvider.future);
         for (final Totp totp in currentStorageTotps) {
-          CryptoStore oldCryptoStore;
-          if (currentCryptoStore != null && totp.encryptedData.canDecryptData(currentCryptoStore)) {
-            oldCryptoStore = currentCryptoStore;
-          } else if (totp.encryptedData.canDecryptData(newCryptoStore)) {
-            oldCryptoStore = newCryptoStore;
-          } else {
-            oldCryptoStore = CryptoStore.fromPassword(masterPassword, totp.encryptedData.encryptionSalt);
-          }
-          final DecryptedTotp? decryptedTotp = totp.changeEncryptionKey(oldCryptoStore, newCryptoStore);
-          toAdd.add(decryptedTotp ?? totp);
+          final CryptoStore oldCryptoStore = currentCryptoStore != null && totp.encryptedData.canDecryptData(currentCryptoStore)
+              ? currentCryptoStore
+              : await cryptoStoreFor(totp.encryptedData.encryptionSalt);
+          toAdd.add(totp.changeEncryptionKey(oldCryptoStore, newCryptoStore) ?? totp);
         }
       }
 
@@ -206,6 +210,15 @@ class _BackupException extends _StorageMigrationException {
   _BackupException()
     : super(
         localizedErrorMessage: translations.error.storageMigration.backupError,
+      );
+}
+
+/// When the provided password cannot decrypt the TOTPs stored online.
+class _RemoteStoragePasswordMismatchException extends _StorageMigrationException {
+  /// Creates a new remote storage password mismatch exception instance.
+  _RemoteStoragePasswordMismatchException()
+    : super(
+        localizedErrorMessage: translations.error.storageMigration.remoteStoragePasswordMismatch,
       );
 }
 

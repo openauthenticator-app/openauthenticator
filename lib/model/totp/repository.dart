@@ -331,7 +331,7 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
       final AppDatabase database = ref.read(appDatabaseProvider);
       List<Totp>? newTotps;
       if (updateTotps && currentCryptoStore != null) {
-        final CryptoStore newCryptoStore = CryptoStore.fromPassword(password, currentCryptoStore.salt);
+        final CryptoStore newCryptoStore = await CryptoStore.fromPasswordInIsolate(password, currentCryptoStore.salt);
         newTotps = [
           for (final Totp totp in totpsList) totp.changeEncryptionKey(currentCryptoStore, newCryptoStore) ?? totp,
         ];

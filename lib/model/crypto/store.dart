@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:isolate';
 
 import 'package:cipherlib/random.dart';
 import 'package:equatable/equatable.dart';
@@ -51,15 +52,21 @@ class CryptoStore with Equatable {
     required this.salt,
   });
 
-  /// Creates a [CryptoStoreWithPasswordSignature] from the given [password].
+  /// Creates a [CryptoStore] from the given [password].
   CryptoStore.fromPassword(String password, Salt salt)
     : this._(
         key: DerivedKey.fromPassword(password, salt),
         salt: salt,
       );
 
+  /// Creates a [CryptoStore] from the given [password], deriving the key in a separate isolate to avoid blocking the UI.
+  static Future<CryptoStore> fromPasswordInIsolate(String password, Salt salt) async => CryptoStore._(
+    key: await Isolate.run(() => DerivedKey.fromPassword(password, salt)),
+    salt: salt,
+  );
+
   /// Encrypts the given text.
-  Uint8List? encrypt(String text) {
+  Uint8List encrypt(String text) {
     final Uint8List initializationVector = randomBytes(_initializationVectorLength);
     return Uint8List.fromList([
       ...initializationVector,

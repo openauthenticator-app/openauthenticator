@@ -65,6 +65,7 @@
     "backupError": "Une erreur est survenue durant la sauvegarde. Veuillez réessayer.",
     "anotherDeletedTotpPolicyShouldBeUsed": "Une autre politique de suppression de TOTP devrait être utilisée.",
     "currentStoragePasswordMismatch": "Mot de passe invalide.",
+    "remoteStoragePasswordMismatch": "Vos TOTPs en ligne ont été chiffrés avec un autre mot de passe maître. Veuillez modifier le mot de passe maître de cet appareil pour qu'il corresponde à celui utilisé sur vos autres appareils, puis réessayez.",
     "generic": "Une erreur est survenue pendant la migration de vos données. Veuillez réessayer plus tard."
   },
   "revenueCat": {

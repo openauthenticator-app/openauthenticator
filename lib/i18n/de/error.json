@@ -65,6 +65,7 @@
     "backupError": "Beim Erstellen der Sicherung ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
     "anotherDeletedTotpPolicyShouldBeUsed": "Eine andere gelöschte TOTP-Strategie sollte verwendet werden.",
     "currentStoragePasswordMismatch": "Ungültiges Master-Passwort eingegeben.",
+    "remoteStoragePasswordMismatch": "Ihre Online-TOTPs wurden mit einem anderen Master-Passwort verschlüsselt. Bitte ändern Sie das Master-Passwort auf diesem Gerät, damit es mit dem auf Ihren anderen Geräten übereinstimmt, und versuchen Sie es erneut.",
     "generic": "Beim Migrieren Ihrer Daten ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut."
   },
   "revenueCat": {
