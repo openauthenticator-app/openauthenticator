@@ -75,6 +75,7 @@
   "totp": {
     "create": "Ce TOTP ne peut pas être créé.",
     "decrypt": "Impossible de déchiffrer ce TOTP. Assurez-vous d'avoir entré le bon mot de passe.",
+    "undecryptable": "Impossible de déchiffrer $count TOTP(s) avec votre mot de passe maître actuel. Touchez-les dans la liste pour les déchiffrer avec le mot de passe utilisé pour les chiffrer, ou supprimez-les, puis réessayez.",
     "changeCryptoStore": {
       "noCryptoStore": "Impossible de récupérer le magasin de chiffrement actuel. Veuillez fermer et rouvrir l'application.",
       "generic": "Impossible de chiffrer le TOTP avec le magasin de chiffrement actuel."

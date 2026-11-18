@@ -12,6 +12,7 @@ import 'package:open_authenticator/core/settings/storage_type.dart';
 import 'package:open_authenticator/core/totp/decrypted.dart';
 import 'package:open_authenticator/core/totp/image_cache.dart';
 import 'package:open_authenticator/core/totp/totp.dart';
+import 'package:open_authenticator/core/totp/undecryptable.dart';
 import 'package:open_authenticator/utils/result/result.dart';
 
 /// The provider instance.
@@ -147,9 +148,19 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
         final CryptoStore newStore = await CryptoStore.fromPasswordInIsolate(password, currentCryptoStore.salt);
         await database.transaction(() async {
           final List<Totp> records = await database.listTotps();
-          final List<DecryptedTotp> updated = [
-            for (final totp in records) totp.changeEncryptionKey(currentCryptoStore, newStore) ?? (throw StateError('Could not re-encrypt TOTP ${totp.uuid}.')),
-          ];
+          final List<DecryptedTotp> updated = [];
+          final List<String> undecryptable = [];
+          for (final Totp totp in records) {
+            final DecryptedTotp? decryptedTotp = totp.changeEncryptionKey(currentCryptoStore, newStore);
+            if (decryptedTotp == null) {
+              undecryptable.add(totp.uuid);
+            } else {
+              updated.add(decryptedTotp);
+            }
+          }
+          if (undecryptable.isNotEmpty) {
+            throw UndecryptableTotpsException(undecryptable);
+          }
           await database.addTotps(updated);
           if (enqueue && updated.isNotEmpty) {
             await database.addPendingBackendPushOperation(SetTotpsPushOperation(totps: updated));

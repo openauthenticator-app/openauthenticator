@@ -75,6 +75,7 @@
   "totp": {
     "create": "Este TOTP não pode ser criado.",
     "decrypt": "Falha ao descriptografar este TOTP. Certifique-se de que você tenha inserido a senha correta.",
+    "undecryptable": "Não é possível descriptografar $count TOTP(s) com sua senha mestra atual. Toque neles na lista para descriptografá-los com a senha usada para criptografá-los, ou exclua-os, e tente novamente.",
     "changeCryptoStore": {
       "noCryptoStore": "Não foi possível obter o armazenamento de criptografia atual. Feche e abra novamente a aplicação.",
       "generic": "Falha ao criptografar este TOTP com o armazenamento de criptografia atual."

@@ -10,7 +10,9 @@ import 'package:open_authenticator/core/crypto/store.dart';
 import 'package:open_authenticator/core/database/database.dart';
 import 'package:open_authenticator/core/password_verification/password_verification.dart';
 import 'package:open_authenticator/core/settings/storage_type.dart';
+import 'package:open_authenticator/core/totp/decrypted.dart';
 import 'package:open_authenticator/core/totp/totp.dart';
+import 'package:open_authenticator/core/totp/undecryptable.dart';
 import 'package:open_authenticator/i18n/localizable_exception.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/utils/result/result.dart';
@@ -117,11 +119,20 @@ class StorageMigrator {
         }
 
         final CryptoStore? currentCryptoStore = await ref.read(cryptoStoreProvider.future);
+        final List<String> undecryptable = [];
         for (final Totp totp in currentStorageTotps) {
           final CryptoStore oldCryptoStore = currentCryptoStore != null && totp.encryptedData.canDecryptData(currentCryptoStore)
               ? currentCryptoStore
               : await cryptoStoreFor(totp.encryptedData.encryptionSalt);
-          toAdd.add(totp.changeEncryptionKey(oldCryptoStore, newCryptoStore) ?? (throw _CurrentStoragePasswordMismatchException()));
+          final DecryptedTotp? decryptedTotp = totp.changeEncryptionKey(oldCryptoStore, newCryptoStore);
+          if (decryptedTotp == null) {
+            undecryptable.add(totp.uuid);
+          } else {
+            toAdd.add(decryptedTotp);
+          }
+        }
+        if (undecryptable.isNotEmpty) {
+          throw UndecryptableTotpsException(undecryptable);
         }
       }
 

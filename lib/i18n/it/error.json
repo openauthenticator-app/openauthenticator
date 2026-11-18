@@ -75,6 +75,7 @@
   "totp": {
     "create": "Questo TOTP non può essere creato.",
     "decrypt": "Impossibile decifrare questo TOTP. Assicurati di aver inserito la password corretta.",
+    "undecryptable": "Impossibile decifrare $count TOTP con la tua password principale attuale. Toccali nell'elenco per decifrarli con la password usata per cifrarli, oppure eliminali, poi riprova.",
     "changeCryptoStore": {
       "noCryptoStore": "Impossibile ottenere lo store di crittografia corrente. Chiudi e riapri l'applicazione.",
       "generic": "Impossibile crittografare il TOTP con lo store di crittografia corrente."

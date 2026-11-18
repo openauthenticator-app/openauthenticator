@@ -75,6 +75,7 @@
   "totp": {
     "create": "Dieses TOTP konnte nicht erstellt werden.",
     "decrypt": "Entschlüsselung des TOTP fehlgeschlagen. Bitte stelle sicher, dass du das richtige Passwort eingegeben hast.",
+    "undecryptable": "$count TOTP(s) können mit Ihrem aktuellen Master-Passwort nicht entschlüsselt werden. Tippen Sie in der Liste darauf, um sie mit dem Passwort zu entschlüsseln, mit dem sie verschlüsselt wurden, oder löschen Sie sie, und versuchen Sie es dann erneut.",
     "changeCryptoStore": {
       "noCryptoStore": "Aktueller Krypto-Speicher konnte nicht geladen werden. Bitte schließe die App und öffne sie erneut.",
       "generic": "Verschlüsselung des TOTP mit dem aktuellen Krypto-Speicher fehlgeschlagen."

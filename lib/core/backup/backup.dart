@@ -12,6 +12,7 @@ import 'package:open_authenticator/core/totp/decrypted.dart';
 import 'package:open_authenticator/core/totp/json.dart';
 import 'package:open_authenticator/core/totp/repository.dart';
 import 'package:open_authenticator/core/totp/totp.dart';
+import 'package:open_authenticator/core/totp/undecryptable.dart';
 import 'package:open_authenticator/i18n/localizable_exception.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/utils/json.dart';
@@ -71,12 +72,17 @@ class Backup implements Comparable<Backup> {
   static Future<Backup> _create(String password, CryptoStore currentCryptoStore, List<Totp> totps) async {
     final CryptoStore newStore = await CryptoStore.fromPasswordInIsolate(password, Salt.generate());
     final List<Totp> toBackup = [];
+    final List<String> undecryptable = [];
     for (final Totp totp in totps) {
       final DecryptedTotp? decryptedTotp = totp.changeEncryptionKey(currentCryptoStore, newStore);
       if (decryptedTotp == null) {
-        throw _InvalidBackupContentException();
+        undecryptable.add(totp.uuid);
+      } else {
+        toBackup.add(decryptedTotp);
       }
-      toBackup.add(decryptedTotp);
+    }
+    if (undecryptable.isNotEmpty) {
+      throw UndecryptableTotpsException(undecryptable);
     }
     return Backup._(
       backupPath: await BackupPath.create(),

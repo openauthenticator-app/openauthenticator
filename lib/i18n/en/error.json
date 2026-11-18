@@ -75,6 +75,7 @@
   "totp": {
     "create": "This TOTP could not be created.",
     "decrypt": "Failed to decrypt this TOTP. Please ensure you have entered the correct password.",
+    "undecryptable": "$count TOTP(s) cannot be decrypted with your current master password. Tap them in the list to decrypt them using the password that was used to encrypt them, or delete them, then try again.",
     "changeCryptoStore": {
       "noCryptoStore": "Unable to get current crypto store. Please close and reopen the app.",
       "generic": "Failed to encrypt TOTP with current crypto store."
