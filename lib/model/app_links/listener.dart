@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:app_links/app_links.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:open_authenticator/model/app_links/openauthenticator.dart';
-import 'package:open_authenticator/model/app_links/otpauth_totp.dart';
 
 /// The AppLinks listener provider.
 final appLinksListenerProvider = AsyncNotifierProvider<AppLinksListener, Uri?>(AppLinksListener.new);
@@ -23,12 +21,8 @@ class AppLinksListener extends AsyncNotifier<Uri?> {
 
   /// Manually provides the [uri].
   void provideLink(Uri uri) {
+    // Links are extension types, so there's no need to wrap them : the listeners check their validity themselves.
     if (ref.mounted) {
-      if ((uri as OtpAuthTotpLink).isValid) {
-        uri = OtpAuthTotpLink(uri);
-      } else if ((uri as OpenAuthenticatorAppLink).isValid) {
-        uri = OpenAuthenticatorAppLink(uri);
-      }
       state = AsyncData(uri);
     }
   }

@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/painting.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart';
 import 'package:http/http.dart' as http;
 import 'package:open_authenticator/model/settings/cache_totp_pictures.dart';
 import 'package:open_authenticator/model/totp/decrypted.dart';
@@ -18,7 +19,6 @@ import 'package:open_authenticator/widgets/totp/image.dart';
 import 'package:open_authenticator/widgets/totp/widget.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:riverpod/src/providers/future_provider.dart';
 
 /// The TOTP image cache manager provider.
 final totpImageCacheManagerProvider = AsyncNotifierProvider<TotpImageCacheManager, Map<String, CacheObject>>(TotpImageCacheManager.new);

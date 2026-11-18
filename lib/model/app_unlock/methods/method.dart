@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart';
 import 'package:local_auth/local_auth.dart' hide LocalAuthentication;
 import 'package:open_authenticator/i18n/localizable_exception.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
@@ -13,7 +14,6 @@ import 'package:open_authenticator/model/totp/repository.dart';
 import 'package:open_authenticator/model/totp/totp.dart';
 import 'package:open_authenticator/utils/local_authentication/local_authentication.dart';
 import 'package:open_authenticator/utils/result/result.dart';
-import 'package:riverpod/src/providers/provider.dart';
 
 part 'local_auth.dart';
 part 'master_password.dart';

@@ -121,16 +121,14 @@ class Totp extends Equatable implements Comparable<Totp> {
     if (decryptedData == null) {
       return null;
     }
-    return result.isDecrypted
-        ? DecryptedTotp(
-            uuid: result.uuid,
-            decryptedData: decryptedData,
-            algorithm: result.algorithm,
-            digits: result.digits,
-            validity: result.validity,
-            updatedAt: DateTime.now(),
-          )
-        : null;
+    return DecryptedTotp(
+      uuid: result.uuid,
+      decryptedData: decryptedData,
+      algorithm: result.algorithm,
+      digits: result.digits,
+      validity: result.validity,
+      updatedAt: DateTime.now(),
+    );
   }
 
   /// Returns a copy of the current TOTP instance.
