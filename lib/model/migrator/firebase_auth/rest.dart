@@ -48,15 +48,17 @@ class FirebaseAuthRest extends FirebaseAuth {
     await super.initialize(ref);
     _methodChannel.setMethodCallHandler(_handlePlatformCall);
     simpleSecureStorage = await ref.read(secureStorageProvider.future);
+    _currentUser?.dispose();
+    _currentUser = null;
     final String? userData = simpleSecureStorage?.read(_kUserData);
     if (userData == null) {
-      _onUserChanged(methodChannelCall: _kCallInstall);
+      await _onUserChanged(methodChannelCall: _kCallInstall);
       return;
     }
     final RestUser currentUser = RestUser.fromJson(jsonDecode(userData));
     _currentUser = currentUser;
     currentUser.addListener(_onUserChanged);
-    _onUserChanged(methodChannelCall: _kCallInstall);
+    await _onUserChanged(methodChannelCall: _kCallInstall);
     if (!await currentUser.reload()) {
       await signOut();
     }
@@ -132,29 +134,19 @@ class FirebaseAuthRest extends FirebaseAuth {
   Stream<RestUser?> get userChanges => _controller.stream;
 
   /// Triggered when the current user has changed.
-  void _onUserChanged({String methodChannelCall = _kCallUserChanged}) {
-    _controller.add(_currentUser);
-    if (_currentUser == null) {
-      if (simpleSecureStorage == null) {
-        SimpleSecureStorage.delete(_kUserData);
-      } else {
-        simpleSecureStorage!.delete(_kUserData);
-      }
-    } else {
-      if (simpleSecureStorage == null) {
-        SimpleSecureStorage.write(_kUserData, jsonEncode(_currentUser!.toJson()));
-      } else {
-        simpleSecureStorage!.write(_kUserData, jsonEncode(_currentUser!.toJson()));
-      }
-    }
-    _methodChannel.invokeMethod(
-      methodChannelCall,
-      {
+  Future<void> _onUserChanged({String methodChannelCall = _kCallUserChanged}) async {
+    final RestUser? user = _currentUser;
+    _controller.add(user);
+    final Future<void> persist = user == null
+        ? (simpleSecureStorage?.delete(_kUserData) ?? SimpleSecureStorage.delete(_kUserData))
+        : (simpleSecureStorage?.write(_kUserData, jsonEncode(user.toJson())) ?? SimpleSecureStorage.write(_kUserData, jsonEncode(user.toJson())));
+    await Future.wait<void>([
+      persist,
+      _methodChannel.invokeMethod<void>(methodChannelCall, {
         'appName': Firebase.app().name,
-        if (_currentUser?.uid != null) 'userUid': _currentUser?.uid,
-        // if (_currentUser?._idToken != null) 'idToken': _currentUser?._idToken,
-      },
-    );
+        if (user != null) 'userUid': user.uid,
+      }),
+    ]);
   }
 
   /// Handles platform calls.

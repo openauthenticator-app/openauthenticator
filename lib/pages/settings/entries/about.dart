@@ -28,7 +28,7 @@ class AboutSettingsEntryWidget extends StatelessWidget with FTileMixin {
             style: TextStyle(fontStyle: .italic),
           ),
           appVersion: TextSpan(
-            text: snapshot.data ?? '1.0.0',
+            text: snapshot.data ?? '—',
             style: const TextStyle(fontStyle: .italic),
           ),
           appAuthor: const TextSpan(

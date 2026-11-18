@@ -54,17 +54,13 @@ class Migrator extends AsyncNotifier<MigrationState> {
       if (newStorageType == .shared) {
         await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
         await FirebaseAuth.instance.initialize(ref);
-        await Future.delayed(const Duration(seconds: 2));
         final Result totpsMigrationResult = await _migrateFirebaseTotps();
+        if (totpsMigrationResult is! ResultSuccess) {
+          return totpsMigrationResult.to((_) => null);
+        }
         final Result userMigrationResult = await _migrateFirebaseUser();
-        if (totpsMigrationResult is! ResultSuccess || userMigrationResult is! ResultSuccess) {
-          if (totpsMigrationResult is ResultError) {
-            Error.throwWithStackTrace(totpsMigrationResult.exception, totpsMigrationResult.stackTrace);
-          }
-          if (userMigrationResult is ResultError) {
-            Error.throwWithStackTrace(userMigrationResult.exception, userMigrationResult.stackTrace);
-          }
-          return (totpsMigrationResult is! ResultSuccess ? userMigrationResult : totpsMigrationResult).to((_) => null);
+        if (userMigrationResult is! ResultSuccess) {
+          return userMigrationResult.to((_) => null);
         }
       }
       await markMigrated();
@@ -93,26 +89,26 @@ class Migrator extends AsyncNotifier<MigrationState> {
       }
       final DocumentReference<JsonMap> userDataDocument = FirebaseFirestore.instance.collection(user.uid).doc(userDataDocumentName);
       final CollectionReference totpsCollection = userDataDocument.collection(totpsCollectionName);
-      final QuerySnapshot result = await totpsCollection.orderBy(Totp.kIssuerKey).get();
+      final QuerySnapshot result = await totpsCollection.get(const GetOptions(source: Source.server));
       final List<QueryDocumentSnapshot> docs = result.docs;
       final List<Totp> totps = [];
       final int now = DateTime.now().millisecondsSinceEpoch;
       for (final QueryDocumentSnapshot doc in docs) {
         final dynamic data = doc.data();
         if (data is! Map<String, Object?>) {
-          continue;
+          throw const FormatException('Invalid Firebase TOTP.');
         }
         final int updatedAt = data[updatedAtFieldName] is Timestamp ? (data[updatedAtFieldName] as Timestamp).toDate().millisecondsSinceEpoch : now;
         final Totp? totp = JsonTotp.tryFromJson({
           ...data,
           Totp.kUpdatedAtKey: updatedAt,
         });
-        if (totp != null) {
-          totps.add(totp);
+        if (totp == null) {
+          throw const FormatException('Invalid Firebase TOTP.');
         }
+        totps.add(totp);
       }
-      await ref.read(totpRepositoryProvider.notifier).addTotps(totps);
-      return const ResultSuccess();
+      return await ref.read(totpRepositoryProvider.notifier).addTotps(totps);
     } catch (ex, stackTrace) {
       return ResultError(
         exception: ex,

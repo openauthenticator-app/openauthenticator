@@ -20,7 +20,8 @@ class FirebaseAuthDefault extends FirebaseAuth {
   Future<void> initialize(Ref ref) async {
     await super.initialize(ref);
     await firebase_auth.FirebaseAuth.instance.setLanguageCode(locale);
-    final firebase_auth.User? user = firebase_auth.FirebaseAuth.instance.currentUser;
+    await _userStreamSubscription?.cancel();
+    final firebase_auth.User? user = await firebase_auth.FirebaseAuth.instance.authStateChanges().first;
     _currentUser = _createUserFromFirebaseUser(user);
     _userStreamSubscription = firebase_auth.FirebaseAuth.instance.userChanges().map(_createUserFromFirebaseUser).listen((user) {
       _currentUser = user;

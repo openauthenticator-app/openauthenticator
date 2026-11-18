@@ -34,7 +34,10 @@ abstract class FirebaseAuth {
 
   /// Initializes the current instance.
   @mustCallSuper
-  FutureOr<void> initialize(Ref ref) => _localeStreamSubscription = LocaleSettings.getLocaleStream().listen((locale) => onLocaleChange(locale.languageCode));
+  Future<void> initialize(Ref ref) async {
+    await _localeStreamSubscription?.cancel();
+    _localeStreamSubscription = LocaleSettings.getLocaleStream().listen((locale) => onLocaleChange(locale.languageCode));
+  }
 
   /// Triggered when the locale has changed.
   @mustCallSuper
