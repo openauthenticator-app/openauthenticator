@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:forui/forui.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:open_authenticator/flows/app_flow.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
@@ -7,10 +6,8 @@ import 'package:open_authenticator/model/backend/authentication/providers/provid
 import 'package:open_authenticator/utils/result/handler.dart';
 import 'package:open_authenticator/utils/result/presentation.dart';
 import 'package:open_authenticator/utils/result/result.dart';
-import 'package:open_authenticator/widgets/button_text.dart';
-import 'package:open_authenticator/widgets/clickable.dart';
-import 'package:open_authenticator/widgets/dialog/app_dialog.dart';
 import 'package:open_authenticator/widgets/dialog/confirmation_dialog.dart';
+import 'package:open_authenticator/widgets/dialog/email_confirmation_action_dialog.dart';
 import 'package:open_authenticator/widgets/dialog/text_input_dialog.dart';
 import 'package:open_authenticator/widgets/waiting_overlay.dart';
 
@@ -28,7 +25,7 @@ class EmailConfirmationFlow extends AppFlow {
     ResultPresentation presentation = .successAndErrorDialog,
   }) => keepAliveWhile(() async {
     Result result;
-    final _ConfirmAction? confirmAction = await _ConfirmActionPickerDialog.openDialog(context);
+    final EmailConfirmationAction? confirmAction = await EmailConfirmationActionPickerDialog.openDialog(context);
     if (confirmAction == null || !context.mounted) {
       result = const ResultCancelled();
     } else {
@@ -82,49 +79,4 @@ class EmailConfirmationFlow extends AppFlow {
       future: ref.read(authenticationProviders).email.confirm(code),
     );
   }
-}
-
-/// Picks for a confirmation action.
-class _ConfirmActionPickerDialog extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) => AppDialog(
-    title: Text(translations.emailConfirmation.confirmActionPickerDialog.title),
-    actions: [
-      ClickableButton(
-        variant: .secondary,
-        onPress: () => Navigator.pop(context),
-        child: ButtonText(MaterialLocalizations.of(context).cancelButtonLabel),
-      ),
-    ],
-    children: [
-      ClickableTile(
-        prefix: const Icon(FLucideIcons.check),
-        title: Text(translations.emailConfirmation.confirmActionPickerDialog.confirm.title),
-        subtitle: Text(translations.emailConfirmation.confirmActionPickerDialog.confirm.subtitle),
-        onPress: () => Navigator.pop(context, _ConfirmAction.tryConfirm),
-      ),
-      ClickableTile(
-        variant: .destructive,
-        prefix: const Icon(FLucideIcons.x),
-        title: Text(translations.emailConfirmation.confirmActionPickerDialog.cancelConfirmation.title),
-        subtitle: Text(translations.emailConfirmation.confirmActionPickerDialog.cancelConfirmation.subtitle),
-        onPress: () => Navigator.pop(context, _ConfirmAction.cancelConfirmation),
-      ),
-    ],
-  );
-
-  /// Opens the dialog.
-  static Future<_ConfirmAction?> openDialog(BuildContext context) => showFDialog<_ConfirmAction>(
-    context: context,
-    builder: (context, style, animation) => _ConfirmActionPickerDialog(),
-  );
-}
-
-/// A [_ConfirmActionPickerDialog] result.
-enum _ConfirmAction {
-  /// Tries to confirm the account.
-  tryConfirm,
-
-  /// Cancels the confirmation.
-  cancelConfirmation,
 }
