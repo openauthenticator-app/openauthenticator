@@ -30,7 +30,6 @@ class Session with Equatable {
   Session copyWith({
     String? accessToken,
     String? refreshToken,
-    bool? isValid,
   }) => Session(
     accessToken: accessToken ?? this.accessToken,
     refreshToken: refreshToken ?? this.refreshToken,
@@ -73,19 +72,15 @@ class StoredSessionNotifier extends AsyncNotifier<Session?> {
     await simpleSecureStorage.write(_kAccessToken, session.accessToken);
     await simpleSecureStorage.write(_kRefreshToken, session.refreshToken);
     if (ref.mounted) {
-      state = AsyncData(
-        Session(
-          accessToken: session.accessToken,
-          refreshToken: session.refreshToken,
-        ),
-      );
+      state = AsyncData(session);
     }
   }
 
   /// Clears the session.
   Future<Result> clear() async {
-    await SimpleSecureStorage.delete(_kAccessToken);
-    await SimpleSecureStorage.delete(_kRefreshToken);
+    final CachedSimpleSecureStorage simpleSecureStorage = await ref.read(secureStorageProvider.future);
+    await simpleSecureStorage.delete(_kAccessToken);
+    await simpleSecureStorage.delete(_kRefreshToken);
     if (!ref.mounted) {
       return const ResultCancelled();
     }
@@ -122,7 +117,7 @@ class SessionRefreshManager extends Notifier<SessionRefreshState> {
     final Completer<Result<Session>> pendingRefresh = Completer();
     state = SessionRefreshStateInProgress(pendingRefresh: pendingRefresh);
     try {
-      final BackendClient backend = await ref.read(backendClientProvider.notifier);
+      final BackendClient backend = ref.read(backendClientProvider.notifier);
       result = await _sendRefreshRequest(backend, session: session);
       switch (result) {
         case ResultSuccess<Session>():
@@ -174,6 +169,8 @@ class SessionRefreshManager extends Notifier<SessionRefreshState> {
           refreshToken: session.refreshToken,
         ),
         session: session,
+        // We're already refreshing the session. Trying to refresh it again would wait for this refresh forever.
+        autoRefreshAccessToken: false,
       );
       return result.to((response) => response!.session);
     } catch (ex, stackTrace) {
