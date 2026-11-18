@@ -17,20 +17,29 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
+  material_ui: ^1.11.1
+  args: ^2.7.0
+  meta: ^1.19.0
   animations: ^3.0.0
   flutter_riverpod: ^3.5.0
   simple_secure_storage: ^0.4.3
   jovial_svg: ^1.1.31
+  jovial_misc: ^0.10.0
   mobile_scanner: ^7.5.0
   html: ^0.15.7
   path_provider: ^2.1.6
   shared_preferences: ^2.5.6
+  shared_preferences_linux: any
+  shared_preferences_windows: any
   uuid: ^4.6.0
   equatable: ^3.0.0
   drift: ^2.35.4
   drift_flutter: ^0.3.1
   path: ^1.9.1
   local_auth: ^3.0.2
+  local_auth_android: any
+  local_auth_darwin: any
+  local_auth_windows: any
   package_info_plus: ^10.2.2
   http: ^1.6.0
   qr_flutter: ^4.1.0
@@ -63,16 +72,6 @@ dependencies:
   firebase_core: ^5.2.0
   firebase_auth: ^7.1.0
   cloud_firestore: ^7.2.0
-  material_ui: ^1.11.1
-  cupertino_ui: ^1.1.7
-  args: ^2.7.0
-  meta: ^1.19.0
-  local_auth_android: ^2.3.0
-  local_auth_darwin: ^2.0.5
-  local_auth_windows: ^2.0.2
-  jovial_misc: ^0.10.0
-  shared_preferences_linux: ^2.4.1
-  shared_preferences_windows: ^2.4.1
 
 dev_dependencies:
   flutter_lints: ^6.0.0
@@ -83,9 +82,6 @@ dev_dependencies:
   release: ^0.2.0
   flutter_test:
     sdk: flutter
-
-dependency_overrides:
-  xml: ^7.0.1
 
 flutter:
   assets:
