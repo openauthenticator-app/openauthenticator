@@ -55,7 +55,7 @@ abstract class RevenueCatClient {
     required this.purchasesConfiguration,
     this.purchaseTimeout = Duration.zero,
     required this.backendHost,
-  }) : assert(purchasesConfiguration.appUserID != null);
+  }) : assert(purchasesConfiguration.appUserID != null, 'An app user ID is required.');
 
   /// Creates a new RevenueCat client instance that corresponds to the given [platform].
   factory RevenueCatClient.fromPlatform({

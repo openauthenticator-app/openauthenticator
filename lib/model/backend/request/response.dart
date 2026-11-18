@@ -108,8 +108,10 @@ class EmailConfirmResponse extends BackendResponse {
 
 /// Represents a provider login response.
 class ProviderLoginResponse extends BackendResponse {
+  /// The created session.
   final Session session;
 
+  /// Creates a new provider login response instance.
   const ProviderLoginResponse({
     required this.session,
   });

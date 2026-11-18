@@ -7,7 +7,9 @@ extension IterableUtils<T> on Iterable<T> {
   /// Returns the first element satisfying [test], or `null` if there are none.
   T? firstWhereOrNull(bool Function(T element) test) {
     for (final element in this) {
-      if (test(element)) return element;
+      if (test(element)) {
+        return element;
+      }
     }
     return null;
   }
@@ -103,7 +105,7 @@ extension ColorUtils on Color {
 
   /// Lightens the color.
   Color lighten({double amount = 0.1}) {
-    assert(amount >= 0 && amount <= 1);
+    assert(amount >= 0 && amount <= 1, 'The amount must be between 0 and 1.');
 
     final HSLColor hsl = HSLColor.fromColor(this);
     final HSLColor hslDark = hsl.withLightness((hsl.lightness + amount).clamp(0.0, 1.0));
@@ -113,7 +115,7 @@ extension ColorUtils on Color {
 
   /// Darkens the color.
   Color darken({double amount = 0.1}) {
-    assert(amount >= 0 && amount <= 1);
+    assert(amount >= 0 && amount <= 1, 'The amount must be between 0 and 1.');
 
     final HSLColor hsl = HSLColor.fromColor(this);
     final HSLColor hslDark = hsl.withLightness((hsl.lightness - amount).clamp(0.0, 1.0));

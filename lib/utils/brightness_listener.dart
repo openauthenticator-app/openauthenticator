@@ -29,6 +29,7 @@ mixin BrightnessListener<T extends ConsumerStatefulWidget> on ConsumerState<T> {
     }
   }
 
+  /// Triggered when the platform brightness has changed.
   @protected
   void onBrightnessChange(Brightness brightness) {
     void changeBrightness() => _currentBrightness = brightness;

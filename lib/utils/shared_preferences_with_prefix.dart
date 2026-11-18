@@ -129,5 +129,5 @@ class SharedPreferencesWithPrefix {
   Future<void> remove(String key) async => await _sharedPreferences.remove(prefix + key);
 
   /// Clears cache and platform preferences that match filter options.
-  Future<void> clear() async => Future.forEach(keys, remove);
+  Future<void> clear() => Future.forEach(keys, remove);
 }

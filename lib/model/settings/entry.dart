@@ -45,14 +45,14 @@ class SettingsEntry<T> extends AsyncNotifier<T> {
   /// Loads the value from preferences.
   @protected
   Future<T> loadFromPreferences(SharedPreferencesWithPrefix preferences) async {
-    assert(T == String || T == bool || T == int || T == double || T == List<String>);
+    assert(T == String || T == bool || T == int || T == double || T == List<String>, 'Unsupported preference type : $T.');
     return preferences.get(key) as T;
   }
 
   /// Saves the value to preferences.
   @protected
   Future<void> saveToPreferences(SharedPreferencesWithPrefix preferences, T value) async {
-    assert(T == String || T == bool || T == int || T == double || T == List<String>);
+    assert(T == String || T == bool || T == int || T == double || T == List<String>, 'Unsupported preference type : $T.');
     if (T == String) {
       await preferences.setString(key, value as String);
     } else if (T == bool) {

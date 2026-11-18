@@ -112,4 +112,4 @@ class MasterPasswordNoPasswordVerificationMethodAvailable extends CannotUnlockEx
 }
 
 /// Indicates that the master password is invalid.
-class MasterPasswordCheckException extends CannotUnlockException {}
+class MasterPasswordCheckException extends CannotUnlockException;

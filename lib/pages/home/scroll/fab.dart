@@ -62,7 +62,7 @@ class _FloatingAddButton extends StatelessWidget {
       shape: BoxShape.circle,
       boxShadow: context.theme.style.shadow,
       gradient: LinearGradient(
-        begin: const Alignment(-1, -1),
+        begin: Alignment.topLeft,
         end: const Alignment(0.8, 0.8),
         colors: [
           for (final Color color in AppTitleGradient.gradient.colors) color.darken(amount: darken),

@@ -46,7 +46,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// Creates a new Drift storage instance using the given [executor].
   @visibleForTesting
-  AppDatabase.forTesting(super.executor);
+  AppDatabase.forTesting(super.e);
 
   @override
   int get schemaVersion => 2;

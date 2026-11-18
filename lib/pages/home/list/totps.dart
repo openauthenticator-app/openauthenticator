@@ -145,7 +145,7 @@ class _TotpsListWidget extends ConsumerWidget {
     }
 
     final TotpRepository repository = ref.read(totpRepositoryProvider.notifier);
-    (CryptoStore, List<DecryptedTotp>) decryptedTotps = await showWaitingOverlay(
+    final (CryptoStore, List<DecryptedTotp>) decryptedTotps = await showWaitingOverlay(
       context,
       future: () async {
         final CryptoStore previousCryptoStore = CryptoStore.fromPassword(password, totp.encryptedData.encryptionSalt);

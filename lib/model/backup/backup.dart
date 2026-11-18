@@ -85,7 +85,7 @@ class Backup implements Comparable<Backup> {
   }
 
   /// Read the backup content from the given file.
-  static Backup _read(BackupPath backupPath, CryptoStore currentCryptoStore, String password) {
+  factory Backup._read(BackupPath backupPath, CryptoStore currentCryptoStore, String password) {
     final File file = backupPath.file;
     if (!file.existsSync()) {
       throw _BackupFileDoesNotExistException(path: file.path);
@@ -120,11 +120,10 @@ class Backup implements Comparable<Backup> {
     if (totps.isEmpty && jsonTotps.isNotEmpty) {
       throw InvalidBackupPasswordException();
     }
-    final JsonMap backupData = jsonDecode(file.readAsStringSync());
     return Backup._(
       backupPath: BackupPath.fromPath(path: file.path)!,
-      passwordSignature: backupData[kPasswordSignatureKey],
-      salt: Salt.base64Decode(string: backupData[kSaltKey]),
+      passwordSignature: jsonData[kPasswordSignatureKey],
+      salt: Salt.base64Decode(string: jsonData[kSaltKey]),
       totps: totps,
     );
   }

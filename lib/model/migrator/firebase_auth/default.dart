@@ -98,7 +98,7 @@ class FirebaseAuthUser extends User {
   Future<String?> getIdToken({bool forceRefresh = false}) async => await _firebaseUser.getIdToken(forceRefresh);
 
   @override
-  Future<void> reload() async => _firebaseUser.reload();
+  Future<void> reload() => _firebaseUser.reload();
 
   /// Links the current user to the given [provider].
   Future<firebase_auth.UserCredential> linkWithProvider(firebase_auth.AuthProvider provider) => _firebaseUser.linkWithProvider(provider);

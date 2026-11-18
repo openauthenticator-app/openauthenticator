@@ -24,7 +24,10 @@ import 'package:path_provider/path_provider.dart';
 final totpImageCacheManagerProvider = AsyncNotifierProvider<TotpImageCacheManager, Map<String, CacheObject>>(TotpImageCacheManager.new);
 
 /// Resolves the best image source for a TOTP.
-final FutureProviderFamily<ResolvedTotpImage?, ({String? imageUrl, String uuid})> totpResolvedImageProvider = FutureProvider.family.autoDispose<ResolvedTotpImage?, ({String uuid, String? imageUrl})>((ref, args) async {
+final FutureProviderFamily<ResolvedTotpImage?, ({String? imageUrl, String uuid})> totpResolvedImageProvider = FutureProvider.family.autoDispose<ResolvedTotpImage?, ({String uuid, String? imageUrl})>((
+  ref,
+  args,
+) {
   ref.watch(totpImageCacheManagerProvider);
   return ref
       .read(totpImageCacheManagerProvider.notifier)

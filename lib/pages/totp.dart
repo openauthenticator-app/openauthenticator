@@ -364,7 +364,7 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
     ),
     FTextFormField(
       control: .managed(controller: digitsController),
-      keyboardType: const TextInputType.numberWithOptions(),
+      keyboardType: TextInputType.number,
       label: FormLabelWithIcon(
         icon: FLucideIcons.binary,
         text: translations.totp.page.digits,
@@ -375,7 +375,7 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
     ),
     FTextFormField(
       control: .managed(controller: validityController),
-      keyboardType: const TextInputType.numberWithOptions(),
+      keyboardType: TextInputType.number,
       label: FormLabelWithIcon(
         icon: FLucideIcons.clock,
         text: translations.totp.page.validity,
@@ -458,12 +458,11 @@ class _TotpPageState extends ConsumerState<TotpPage> with BrightnessListener {
 
   /// Validates the [secret].
   String? validateSecret([String? secret]) {
-    secret ??= this.secret;
-    secret = secret.toUpperCase();
-    if (secret.isEmpty) {
+    final String upperCaseSecret = (secret ?? this.secret).toUpperCase();
+    if (upperCaseSecret.isEmpty) {
       return translations.error.validation.empty;
     }
-    if (!isValidBase32(secret)) {
+    if (!isValidBase32(upperCaseSecret)) {
       return translations.error.validation.secret;
     }
     return null;

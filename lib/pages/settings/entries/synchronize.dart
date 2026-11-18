@@ -75,7 +75,7 @@ class SynchronizeSettingsEntryWidget extends CheckboxSettingsEntryWidget<Storage
   }
 
   @override
-  Widget? buildSubtitle(BuildContext context, WidgetRef ref, StorageType? storageType) {
+  Widget? buildSubtitle(BuildContext context, WidgetRef ref, StorageType? value) {
     final ContributorPlanState? contributorPlanState = ref.watch(contributorPlanStateProvider).value;
     final User user = ref.watch(userProvider).value!;
     final AsyncValue<List<Totp>> totps = ref.watch(totpRepositoryProvider);
@@ -97,11 +97,11 @@ class SynchronizeSettingsEntryWidget extends CheckboxSettingsEntryWidget<Storage
               style: const TextStyle(fontStyle: .italic),
             ),
           ),
-          if (storageType == .localOnly && totps.value.length > user.totpsLimit)
+          if (value == .localOnly && totps.value.length > user.totpsLimit)
             TextSpan(
               text: '\n${translations.settings.synchronization.synchronizeTotps.subtitle.totpLimit.notEnabled}',
             ),
-          if (storageType == .shared && contributorPlanState == .inactive)
+          if (value == .shared && contributorPlanState == .inactive)
             TextSpan(
               text: '\n${translations.settings.synchronization.synchronizeTotps.subtitle.totpLimit.enabled}',
             ),

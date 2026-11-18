@@ -248,8 +248,6 @@ class _RestoreBackupDialogState extends ConsumerState<_RestoreBackupDialog> {
             initialDirectory: directory.path,
             fileName: backup.filename,
             bytes: Uint8List(0),
-            type: FileType.custom,
-            allowedExtensions: ['bak'],
             windowsOptions: const WindowsOptions(lockParentWindow: true),
             linuxOptions: const LinuxOptions(lockParentWindow: true),
           );

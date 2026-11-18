@@ -158,8 +158,8 @@ class _ChangeMasterPasswordDialogState extends ConsumerState<_ChangeMasterPasswo
 
   /// Checks whether the backup password is valid.
   String? isBackupPasswordValid(String? value) {
-    value ??= backupPasswordController.text;
-    if (createBackup && value.isEmpty) {
+    final String password = value ?? backupPasswordController.text;
+    if (createBackup && password.isEmpty) {
       return translations.error.validation.empty;
     }
     return null;

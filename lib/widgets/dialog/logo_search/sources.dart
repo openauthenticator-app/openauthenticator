@@ -213,7 +213,7 @@ class WikimediaSource with Source {
       if (query is JsonMap) {
         final dynamic search = query['search'];
         if (search is List) {
-          for (final dynamic element in search) {
+          for (final Object? element in search) {
             if (element is JsonMap) {
               final String logo = element['title'];
               if (logo.endsWith('.png') || logo.endsWith('.jpg') || logo.endsWith('.jpeg') || logo.endsWith('.tiff') || logo.endsWith('.webp') || logo.endsWith('.svg')) {

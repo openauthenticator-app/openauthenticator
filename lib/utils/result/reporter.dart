@@ -63,15 +63,14 @@ void reportResult<T>(
   Result<T> result, {
   ResultReporting? reporting,
 }) {
-  if (reporting == null && result is ResultError) {
-    if (kDebugMode) {
-      reporting = _sendToSentry((result as ResultError).exception) ? .consoleAndSentry : .console;
-    } else {
-      reporting = _sendToSentry((result as ResultError).exception) ? .sentry : .none;
-    }
-  }
-  if (reporting != null) {
-    for (final ResultReporter reporter in reporting._reporters) {
+  final ResultReporting? actualReporting = switch (result) {
+    _ when reporting != null => reporting,
+    ResultError(:final exception) when kDebugMode => _sendToSentry(exception) ? .consoleAndSentry : .console,
+    ResultError(:final exception) => _sendToSentry(exception) ? .sentry : .none,
+    _ => null,
+  };
+  if (actualReporting != null) {
+    for (final ResultReporter reporter in actualReporting._reporters) {
       reporter.report(result);
     }
   }

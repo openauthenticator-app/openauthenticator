@@ -48,13 +48,13 @@ class TotpLimit with Equatable {
 
   /// Returns whether the user should be able to change the current storage type.
   bool canChangeStorageType(StorageType? currentStorageType) {
-    currentStorageType ??= storageType == StorageType.shared ? StorageType.localOnly : StorageType.shared;
-    if (currentStorageType == StorageType.shared) {
+    final StorageType current = currentStorageType ?? (storageType == StorageType.shared ? StorageType.localOnly : StorageType.shared);
+    if (current == StorageType.shared) {
       return true;
     }
     return !_willExceedIfAddMore(
       count: 0,
-      storageType: currentStorageType == StorageType.shared ? StorageType.localOnly : StorageType.shared,
+      storageType: current == StorageType.shared ? StorageType.localOnly : StorageType.shared,
     );
   }
 

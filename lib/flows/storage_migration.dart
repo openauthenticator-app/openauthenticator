@@ -38,6 +38,7 @@ class StorageMigrationFlow extends AppFlow {
     StorageMigrationDeletedTotpPolicy storageMigrationDeletedTotpPolicy = .ask,
     ResultPresentation presentation = .successAndErrorDialog,
   }) => keepAliveWhile(() async {
+    String? masterPassword = currentStorageMasterPassword;
     final Result result = await (() async {
       final StorageType currentType = await ref.read(storageTypeSettingsEntryProvider.future);
       if (!context.mounted) {
@@ -51,7 +52,7 @@ class StorageMigrationFlow extends AppFlow {
           }
           backupPassword ??= result.backupPassword;
         }
-        final Result<bool> passwordCheckResult = await (await ref.read(passwordVerificationProvider.future)).isPasswordValid(currentStorageMasterPassword ?? '');
+        final Result<bool> passwordCheckResult = await (await ref.read(passwordVerificationProvider.future)).isPasswordValid(masterPassword ?? '');
         if (passwordCheckResult is! ResultSuccess<bool> || !passwordCheckResult.value) {
           if (!context.mounted) {
             return const ResultCancelled();
@@ -60,7 +61,7 @@ class StorageMigrationFlow extends AppFlow {
           if (enteredCurrentStorageMasterPassword == null || !context.mounted) {
             return const ResultCancelled();
           }
-          currentStorageMasterPassword = enteredCurrentStorageMasterPassword;
+          masterPassword = enteredCurrentStorageMasterPassword;
         }
       }
       if (!context.mounted) {
@@ -72,7 +73,7 @@ class StorageMigrationFlow extends AppFlow {
             .read(storageTypeSettingsEntryProvider.notifier)
             .changeValue(
               newType,
-              masterPassword: currentStorageMasterPassword,
+              masterPassword: masterPassword,
               backupPassword: backupPassword,
               storageMigrationDeletedTotpPolicy: storageMigrationDeletedTotpPolicy,
             ),
@@ -102,7 +103,7 @@ class StorageMigrationFlow extends AppFlow {
               showConfirmation: false,
               logout: logout,
               backupPassword: backupPassword,
-              currentStorageMasterPassword: currentStorageMasterPassword,
+              currentStorageMasterPassword: masterPassword,
               storageMigrationDeletedTotpPolicy: enteredStorageMigrationDeletedTotpPolicy,
               presentation: presentation,
             );
@@ -216,8 +217,8 @@ class _ConfirmationDialogState extends State<_ConfirmationDialog> {
 
   /// Checks whether the backup password is valid.
   String? isBackupPasswordValid(String? value) {
-    value ??= backupPasswordController.text;
-    if (createBackup && value.isEmpty) {
+    final String password = value ?? backupPasswordController.text;
+    if (createBackup && password.isEmpty) {
       return translations.error.validation.empty;
     }
     return null;
