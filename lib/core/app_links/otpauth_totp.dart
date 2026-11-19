@@ -36,7 +36,9 @@ extension type OtpAuthTotpLink(Uri uri) implements Uri {
     final UriBuilder builder = UriBuilder(
       scheme: _kScheme,
       host: _kHost,
-      path: label,
+      pathSegments: [
+        if (label != null) issuer == null || issuer.isEmpty || label.isEmpty ? label : '$issuer:$label',
+      ],
     );
     builder.appendQueryParameter(_kSecretKey, secret);
     if (issuer != null) {
@@ -60,17 +62,25 @@ extension type OtpAuthTotpLink(Uri uri) implements Uri {
   /// Returns the encoded secret.
   String get encodedSecret => uri.queryParameters[_kSecretKey]!;
 
-  /// Returns the decoded secret.
-  String get label {
-    String label = Uri.decodeFull(uri.path);
-    if (label.startsWith('/')) {
-      label = label.substring(1);
+  /// Reads the account name and the optional issuer prefix from the label.
+  ({String label, String? issuer}) get _account {
+    final String pathLabel = uri.pathSegments.join('/');
+    final String? issuer = uri.queryParameters[_kIssuerKey];
+    final int separator = pathLabel.indexOf(':');
+    if (separator > 0) {
+      final String prefix = pathLabel.substring(0, separator);
+      if (issuer == null || issuer.isEmpty || issuer == prefix) {
+        return (label: pathLabel.substring(separator + 1).trimLeft(), issuer: prefix);
+      }
     }
-    return label;
+    return (label: pathLabel, issuer: issuer);
   }
 
+  /// Returns the account name.
+  String get label => _account.label;
+
   /// Returns the issuer.
-  String? get issuer => uri.queryParameters[_kIssuerKey];
+  String? get issuer => _account.issuer;
 
   /// Returns the algorithm.
   Algorithm? get algorithm => uri.queryParameters.containsKey(_kAlgorithmKey) ? Algorithm.fromString(uri.queryParameters[_kAlgorithmKey]!) : null;
