@@ -33,12 +33,11 @@ extension type OtpAuthTotpLink(Uri uri) implements Uri {
     int? digits,
     Duration? validity,
   }) {
+    final String? pathLabel = issuer == null || issuer.isEmpty || label == null || label.isEmpty ? label : '$issuer:$label';
     final UriBuilder builder = UriBuilder(
       scheme: _kScheme,
       host: _kHost,
-      pathSegments: [
-        if (label != null) issuer == null || issuer.isEmpty || label.isEmpty ? label : '$issuer:$label',
-      ],
+      pathSegments: [?pathLabel],
     );
     builder.appendQueryParameter(_kSecretKey, secret);
     if (issuer != null) {

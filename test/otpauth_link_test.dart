@@ -5,7 +5,7 @@ void main() {
   OtpAuthTotpLink parse(String label, [String query = '']) => OtpAuthTotpLink(Uri.parse('otpauth://totp/$label?secret=JBSWY3DPEHPK3PXP$query'));
 
   test('reads issuer prefixes with either separator and accepts labels without a prefix', () {
-    for (final link in [
+    for (final OtpAuthTotpLink link in [
       parse('Atelier%20QA:Compte%20Beta', '&issuer=Atelier%20QA'),
       parse('Atelier%20QA%3A%20Compte%20Beta'),
       parse('Compte%20Beta', '&issuer=Atelier%20QA'),
@@ -14,7 +14,7 @@ void main() {
       expect(link.issuer, 'Atelier QA');
     }
 
-    final distinct = parse('Archive:Compte', '&issuer=Atelier');
+    final OtpAuthTotpLink distinct = parse('Archive:Compte', '&issuer=Atelier');
     expect(distinct.label, 'Archive:Compte');
     expect(distinct.issuer, 'Atelier');
   });
