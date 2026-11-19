@@ -146,27 +146,29 @@ class TotpRepository extends AsyncNotifier<List<Totp>> {
       final DerivedKeyNotifier keyNotifier = ref.read(derivedKeyProvider.notifier);
       if (updateTotps && currentCryptoStore != null) {
         final CryptoStore newStore = await CryptoStore.fromPasswordInIsolate(password, currentCryptoStore.salt);
-        await database.transaction(() async {
-          final List<Totp> records = await database.listTotps();
-          final List<DecryptedTotp> updated = [];
-          final List<String> undecryptable = [];
-          for (final Totp totp in records) {
-            final DecryptedTotp? decryptedTotp = totp.changeEncryptionKey(currentCryptoStore, newStore);
-            if (decryptedTotp == null) {
-              undecryptable.add(totp.uuid);
-            } else {
-              updated.add(decryptedTotp);
+        await database.transactionWithCredentials(
+          writeVault: () async {
+            final List<Totp> records = await database.listTotps();
+            final List<DecryptedTotp> updated = [];
+            final List<String> undecryptable = [];
+            for (final Totp totp in records) {
+              final DecryptedTotp? decryptedTotp = totp.changeEncryptionKey(currentCryptoStore, newStore);
+              if (decryptedTotp == null) {
+                undecryptable.add(totp.uuid);
+              } else {
+                updated.add(decryptedTotp);
+              }
             }
-          }
-          if (undecryptable.isNotEmpty) {
-            throw UndecryptableTotpsException(undecryptable);
-          }
-          await database.addTotps(updated);
-          if (enqueue && updated.isNotEmpty) {
-            await database.addPendingBackendPushOperation(SetTotpsPushOperation(totps: updated));
-          }
-          await keyNotifier.updateFromPassword(password, derivedStore: newStore);
-        });
+            if (undecryptable.isNotEmpty) {
+              throw UndecryptableTotpsException(undecryptable);
+            }
+            await database.addTotps(updated);
+            if (enqueue && updated.isNotEmpty) {
+              await database.addPendingBackendPushOperation(SetTotpsPushOperation(totps: updated));
+            }
+          },
+          updateCredentials: () => keyNotifier.updateFromPassword(password, derivedStore: newStore),
+        );
         if (enqueue) {
           _notifySync();
         }

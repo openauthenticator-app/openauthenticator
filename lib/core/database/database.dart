@@ -54,6 +54,16 @@ class AppDatabase extends _$AppDatabase {
   @override
   MigrationStrategy get migration => MigrationStrategy(onUpgrade: (migrator, from, to) => transaction(() => schemaUpgrade(migrator, from, to)));
 
+  /// Rolls back the vault writes if persisting the associated credentials fails.
+  Future<void> transactionWithCredentials({required Future<void> Function() writeVault, required Future<void> Function() updateCredentials}) {
+    // Credential changes notify providers that can read the vault after the transaction closes.
+    final Future<void> Function() notifyOutsideTransaction = Zone.current.bindCallback(updateCredentials);
+    return transaction(() async {
+      await writeVault();
+      await notifyOutsideTransaction();
+    });
+  }
+
   /// Stores the given [totps].
   Future<void> addTotps(List<Totp> totps) async {
     await batch((batch) {

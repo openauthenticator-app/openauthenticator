@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -25,6 +26,25 @@ void main() {
     ),
     updatedAt: DateTime.fromMillisecondsSinceEpoch(1000),
   );
+
+  test('reads scheduled by a key change use the committed vault on the background database', () async {
+    final Directory directory = await Directory.systemTemp.createTemp('openauthenticator-key-change-');
+    final db = AppDatabase.forTesting(NativeDatabase.createInBackground(File('${directory.path}/vault.sqlite')));
+    addTearDown(() async {
+      await db.close();
+      await directory.delete(recursive: true);
+    });
+    final committed = Completer<void>();
+    late Future<List<Totp>> refreshed;
+    await db.transactionWithCredentials(
+      writeVault: () => db.addTotps([createTotp('saved')]),
+      updateCredentials: () async {
+        refreshed = committed.future.then((_) => db.listTotps());
+      },
+    );
+    committed.complete();
+    expect((await refreshed).single.uuid, 'saved');
+  });
 
   group('database mutations', () {
     setUp(() => database = AppDatabase.forTesting(NativeDatabase.memory()));

@@ -49,16 +49,16 @@ class StorageMigrator {
         }
       }
 
-      if (value == .localOnly) {
-        await ref.read(storageTypeSettingsEntryProvider.notifier).changeValue(value);
-        return const ResultSuccess();
-      }
-
       if (backupPassword != null) {
         final Result<Backup> backupResult = await ref.read(backupStoreProvider.notifier).doBackup(backupPassword);
         if (backupResult is! ResultSuccess) {
           throw _BackupException();
         }
+      }
+
+      if (value == .localOnly) {
+        await ref.read(storageTypeSettingsEntryProvider.notifier).changeValue(value);
+        return const ResultSuccess();
       }
 
       final AppDatabase database = ref.read(appDatabaseProvider);
@@ -138,32 +138,36 @@ class StorageMigrator {
       }
 
       final Salt? previousSalt = await ref.read(saltProvider.future);
-      await database.transaction(() async {
-        await database.addTotps(toAdd);
-        if (tombstonesToRemove.isNotEmpty) {
-          await database.removeDeletionMarks(tombstonesToRemove);
-        }
-        if (toAdd.isNotEmpty) {
-          await database.addPendingBackendPushOperation(SetTotpsPushOperation(totps: toAdd));
-        }
-        if (toDelete.isNotEmpty) {
-          await database.addPendingBackendPushOperation(DeleteTotpsPushOperation(tombstones: toDelete));
-        }
-        if (newCryptoStore case final store?) {
-          final SaltNotifier salts = ref.read(saltProvider.notifier);
-          if (previousSalt != store.salt) {
-            await salts.changeSalt(store.salt);
+      await database.transactionWithCredentials(
+        writeVault: () async {
+          await database.addTotps(toAdd);
+          if (tombstonesToRemove.isNotEmpty) {
+            await database.removeDeletionMarks(tombstonesToRemove);
           }
-          try {
-            await ref.read(derivedKeyProvider.notifier).updateFromPassword(masterPassword!, derivedStore: store);
-          } catch (_) {
+          if (toAdd.isNotEmpty) {
+            await database.addPendingBackendPushOperation(SetTotpsPushOperation(totps: toAdd));
+          }
+          if (toDelete.isNotEmpty) {
+            await database.addPendingBackendPushOperation(DeleteTotpsPushOperation(tombstones: toDelete));
+          }
+        },
+        updateCredentials: () async {
+          if (newCryptoStore case final store?) {
+            final SaltNotifier salts = ref.read(saltProvider.notifier);
             if (previousSalt != store.salt) {
-              await salts.changeSalt(previousSalt);
+              await salts.changeSalt(store.salt);
             }
-            rethrow;
+            try {
+              await ref.read(derivedKeyProvider.notifier).updateFromPassword(masterPassword!, derivedStore: store);
+            } catch (_) {
+              if (previousSalt != store.salt) {
+                await salts.changeSalt(previousSalt);
+              }
+              rethrow;
+            }
           }
-        }
-      });
+        },
+      );
 
       await ref.read(storageTypeSettingsEntryProvider.notifier).changeValue(value);
       // The synchronization controller may not have been created yet (eg. if nothing has been synchronized so far).
