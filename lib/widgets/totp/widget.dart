@@ -284,13 +284,13 @@ class _DesktopActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) => FPopoverMenu(
     autofocus: true,
-    menu: [
+    menuBuilder: (_, controller, _) => [
       FItemGroup(
         children: [
           if (totp.isDecrypted)
             Clickable(
               child: FItem(
-                onPress: onEditPress,
+                onPress: _menuAction(context, controller, onEditPress),
                 prefix: const Icon(FLucideIcons.pencil),
                 title: Text(translations.totp.actions.desktopButtons.edit),
               ),
@@ -298,7 +298,7 @@ class _DesktopActions extends StatelessWidget {
           else
             Clickable(
               child: FItem(
-                onPress: onDecryptPress,
+                onPress: _menuAction(context, controller, onDecryptPress),
                 prefix: const Icon(FLucideIcons.lock),
                 title: Text(translations.totp.actions.decrypt),
               ),
@@ -317,7 +317,7 @@ class _DesktopActions extends StatelessWidget {
                   ),
                 ),
               ),
-              onPress: onDeletePress,
+              onPress: _menuAction(context, controller, onDeletePress),
               prefix: const Icon(FLucideIcons.trash),
               title: Text(translations.totp.actions.desktopButtons.delete),
             ),
@@ -332,4 +332,17 @@ class _DesktopActions extends StatelessWidget {
       child: child,
     ),
   );
+
+  /// Closes the menu before navigating or opening a dialog.
+  static VoidCallback? _menuAction(BuildContext context, FPopoverController controller, VoidCallback? action) {
+    if (action == null) {
+      return null;
+    }
+    return () async {
+      await controller.hide();
+      if (context.mounted) {
+        action();
+      }
+    };
+  }
 }
