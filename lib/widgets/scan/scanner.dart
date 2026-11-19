@@ -36,16 +36,18 @@ class QrCodeScanner extends StatefulWidget {
 
 /// The QR code scanner state.
 class _QrCodeScannerState extends State<QrCodeScanner> {
-  /// The mobile scanner controller controller.
-  MobileScannerController controller = MobileScannerController(
+  /// The mobile scanner controller.
+  final MobileScannerController controller = MobileScannerController(
     formats: const [
       BarcodeFormat.qrCode,
     ],
   );
 
   @override
-  Widget build(BuildContext context) {
-    final Size size = MediaQuery.sizeOf(context);
+  Widget build(BuildContext context) => LayoutBuilder(builder: _buildScanner);
+
+  Widget _buildScanner(BuildContext context, BoxConstraints constraints) {
+    final Size size = constraints.biggest;
     final Rect scanWindow = Rect.fromCenter(
       center: size.center(Offset.zero),
       width: math.min(200, size.width),
@@ -64,7 +66,9 @@ class _QrCodeScannerState extends State<QrCodeScanner> {
                 widget.onScan!(barcodeValue).then((resume) async {
                   if (resume) {
                     await Future.delayed(const Duration(seconds: 2));
-                    controller.start();
+                    if (mounted) {
+                      await controller.start();
+                    }
                   }
                 });
               }
@@ -76,17 +80,11 @@ class _QrCodeScannerState extends State<QrCodeScanner> {
             errorBuilder: (context, error) => ScannerErrorWidget(error: error),
           ),
         ),
-        ValueListenableBuilder(
-          valueListenable: controller,
-          builder: (context, value, child) {
-            if (!value.isInitialized || !value.isRunning || value.error != null) {
-              return const SizedBox();
-            }
-
-            return CustomPaint(
-              painter: ScannerOverlay(scanWindow: scanWindow),
-            );
-          },
+        ScanWindowOverlay(
+          controller: controller,
+          scanWindow: scanWindow,
+          borderRadius: BorderRadius.circular(12),
+          borderWidth: 4,
         ),
         Positioned(
           top: kToolbarHeight,
@@ -108,69 +106,8 @@ class _QrCodeScannerState extends State<QrCodeScanner> {
   }
 
   @override
-  Future<void> dispose() async {
-    controller.dispose();
+  void dispose() {
+    unawaited(controller.dispose());
     super.dispose();
   }
-}
-
-/// The scanner overlay.
-class ScannerOverlay extends CustomPainter {
-  /// The scan window instance.
-  final Rect scanWindow;
-
-  /// The border radius.
-  final double borderRadius;
-
-  /// Creates a new scanner overlay instance.
-  const ScannerOverlay({
-    required this.scanWindow,
-    this.borderRadius = 12.0,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final Path backgroundPath = Path()..addRect(Rect.fromLTWH(0, 0, size.width, size.height));
-
-    final Path cutoutPath = Path()
-      ..addRRect(
-        RRect.fromRectAndCorners(
-          scanWindow,
-          topLeft: Radius.circular(borderRadius),
-          topRight: Radius.circular(borderRadius),
-          bottomLeft: Radius.circular(borderRadius),
-          bottomRight: Radius.circular(borderRadius),
-        ),
-      );
-
-    final Paint backgroundPaint = Paint()
-      ..color = Colors.black.withValues(alpha: 0.5)
-      ..style = PaintingStyle.fill
-      ..blendMode = BlendMode.dstOver;
-
-    final Path backgroundWithCutout = Path.combine(
-      PathOperation.difference,
-      backgroundPath,
-      cutoutPath,
-    );
-
-    final Paint borderPaint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 4.0;
-
-    final RRect borderRect = RRect.fromRectAndCorners(
-      scanWindow,
-      topLeft: Radius.circular(borderRadius),
-      topRight: Radius.circular(borderRadius),
-      bottomLeft: Radius.circular(borderRadius),
-      bottomRight: Radius.circular(borderRadius),
-    );
-
-    canvas.drawPath(backgroundWithCutout, backgroundPaint);
-    canvas.drawRRect(borderRect, borderPaint);
-  }
-
-  @override
-  bool shouldRepaint(ScannerOverlay oldDelegate) => scanWindow != oldDelegate.scanWindow || borderRadius != oldDelegate.borderRadius;
 }
