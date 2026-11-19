@@ -39,39 +39,8 @@ class SynchronizeSettingsEntryWidget extends CheckboxSettingsEntryWidget<Storage
 
   @override
   Widget createTile(BuildContext context, WidgetRef ref, {StorageType? value, bool enabled = true}) {
-    if (value == null) {
-      return super.createTile(
-        context,
-        ref,
-        enabled: false,
-      );
-    }
-    final AsyncValue<ContributorPlanState> state = ref.watch(contributorPlanStateProvider);
-    return switch (state) {
-      AsyncData() =>
-        state.value == .inactive
-            ? FutureBuilder(
-                future: ref.watch(totpLimitProvider.future),
-                builder: (context, snapshot) => super.createTile(
-                  context,
-                  ref,
-                  value: value,
-                  enabled: snapshot.data?.isExceeded != true,
-                ),
-              )
-            : super.createTile(
-                context,
-                ref,
-                value: value,
-                enabled: enabled,
-              ),
-      _ => super.createTile(
-        context,
-        ref,
-        value: value,
-        enabled: value == .shared,
-      ),
-    };
+    final bool canChange = value == StorageType.shared || (value == StorageType.localOnly && ref.watch(totpLimitProvider).asData?.value.canEnableSynchronization == true);
+    return super.createTile(context, ref, value: value, enabled: enabled && canChange);
   }
 
   @override

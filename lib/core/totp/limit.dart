@@ -35,28 +35,13 @@ class TotpLimit with Equatable {
     required this.currentTotpCount,
   });
 
-  /// Returns whether the limit will be exceeded if one more TOTP is added.
-  bool _willExceedIfAddMore({
-    int count = 1,
-    StorageType? storageType,
-  }) => (storageType ?? this.storageType) == StorageType.shared && userTotpsLimit != null && currentTotpCount + count > userTotpsLimit!;
+  bool _exceedsLimit(int count) => userTotpsLimit != null && count > userTotpsLimit!;
 
-  /// Returns whether the limit will be exceeded if one more TOTP is added.
-  bool willExceedIfAddMore({int count = 1}) => _willExceedIfAddMore(
-    count: count,
-  );
+  /// Returns whether adding the entries would exceed the synchronized vault quota.
+  bool willExceedIfAddMore({int count = 1}) => storageType == StorageType.shared && _exceedsLimit(currentTotpCount + count);
 
-  /// Returns whether the user should be able to change the current storage type.
-  bool canChangeStorageType(StorageType? currentStorageType) {
-    final StorageType current = currentStorageType ?? (storageType == StorageType.shared ? StorageType.localOnly : StorageType.shared);
-    if (current == StorageType.shared) {
-      return true;
-    }
-    return !_willExceedIfAddMore(
-      count: 0,
-      storageType: current == StorageType.shared ? StorageType.localOnly : StorageType.shared,
-    );
-  }
+  /// Whether the existing local vault fits in the account's synchronized vault.
+  bool get canEnableSynchronization => !_exceedsLimit(currentTotpCount);
 
   /// Returns whether the TOTP limit is exceeded.
   bool get isExceeded => willExceedIfAddMore(count: 0);
