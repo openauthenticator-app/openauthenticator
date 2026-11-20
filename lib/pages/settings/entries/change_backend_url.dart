@@ -24,6 +24,7 @@ class ChangeBackendUrlSettingsEntryWidget extends ConsumerWidget with FTileMixin
     super.key,
   });
 
+  /// Builds the setting that verifies a backend before switching to it.
   @override
   Widget build(BuildContext context, WidgetRef ref) => ClickableTile(
     prefix: const Icon(FLucideIcons.globe),

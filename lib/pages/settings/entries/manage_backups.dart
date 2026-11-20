@@ -68,6 +68,7 @@ class _RestoreBackupDialog extends ConsumerStatefulWidget {
 
 /// The restore backup dialog state.
 class _RestoreBackupDialogState extends ConsumerState<_RestoreBackupDialog> {
+  /// Lists the available backups and the actions for each file.
   @override
   Widget build(BuildContext context) {
     final AsyncValue<List<BackupPath>> backups = ref.watch(backupStoreProvider);

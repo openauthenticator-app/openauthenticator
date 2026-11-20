@@ -45,6 +45,7 @@ class AppDialog extends StatelessWidget {
     this.scrollable = true,
   });
 
+  /// Lays out the dialog while preserving the identity of keyed children.
   @override
   Widget build(BuildContext context) {
     final EdgeInsets listViewPadding = contentPadding ?? kDefaultContentPadding;

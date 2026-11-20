@@ -62,6 +62,7 @@ class _IntroPageState extends ConsumerState<IntroPage> with BrightnessListener {
     );
   }
 
+  /// Builds the current setup step and its navigation controls.
   @override
   Widget build(BuildContext context) => PopScope(
     canPop: false,
