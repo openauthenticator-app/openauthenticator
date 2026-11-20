@@ -61,8 +61,6 @@
     "unsupported": "A digitalização não é suportada neste dispositivo (código: $exception)."
   },
   "storageMigration": {
-    "getTotps": "Ocorreu um erro ao obter seus TOTPs remotos. Tente novamente mais tarde.",
-    "backupError": "Ocorreu um erro ao fazer o backup. Tente novamente.",
     "anotherDeletedTotpPolicyShouldBeUsed": "Outra política de TOTP excluída deve ser usada.",
     "currentStoragePasswordMismatch": "Senha mestra inválida inserida.",
     "remoteStoragePasswordMismatch": "Seus TOTPs online foram criptografados com outra senha mestra. Altere a senha mestra deste dispositivo para que corresponda à usada nos seus outros dispositivos e tente novamente.",

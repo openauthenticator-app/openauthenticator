@@ -61,8 +61,6 @@
     "unsupported": "La scansione non è supportata su questo dispositivo (codice: $exception)."
   },
   "storageMigration": {
-    "getTotps": "Si è verificato un errore durante il recupero dei tuoi TOTPs. Riprova.",
-    "backupError": "Si è verificato un errore durante l'esecuzione del backup. Riprova.",
     "anotherDeletedTotpPolicyShouldBeUsed": "Una altra politica di eliminazione TOTP dovrebbe essere usata.",
     "currentStoragePasswordMismatch": "Password inserita non valida.",
     "remoteStoragePasswordMismatch": "I tuoi TOTPs online sono stati cifrati con un'altra password principale. Modifica la password principale di questo dispositivo in modo che corrisponda a quella usata sugli altri dispositivi, poi riprova.",

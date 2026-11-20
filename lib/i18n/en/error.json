@@ -61,8 +61,6 @@
     "unsupported": "Scanning is not supported on this device (code : $exception)."
   },
   "storageMigration": {
-    "getTotps": "An error occurred while getting your remote TOTPs. Please try again later.",
-    "backupError": "An error occurred while doing the backup. Please try again.",
     "anotherDeletedTotpPolicyShouldBeUsed": "Another deleted TOTP policy should be used.",
     "currentStoragePasswordMismatch": "Invalid master password entered.",
     "remoteStoragePasswordMismatch": "Your online TOTPs have been encrypted using another master password. Please change your master password on this device so that it matches the one used on your other devices, then try again.",
