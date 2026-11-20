@@ -1,4 +1,3 @@
-import 'package:flutter/widgets.dart' show AppLifecycleState, WidgetsBinding;
 import 'package:local_auth/local_auth.dart' as local_auth;
 // ignore: depend_on_referenced_packages
 import 'package:local_auth_android/local_auth_android.dart';
@@ -29,8 +28,7 @@ class LocalAuthenticationDefault extends LocalAuthentication {
   /// Opens a native prompt when the application can present it.
   @override
   Future<bool> authenticate(UnlockReason reason) async {
-    final AppLifecycleState? lifecycle = WidgetsBinding.instance.lifecycleState;
-    if (_authenticating || (currentPlatform.isMobile && (lifecycle == AppLifecycleState.paused || lifecycle == AppLifecycleState.hidden || lifecycle == AppLifecycleState.detached))) {
+    if (_authenticating || isMobileAppInBackground) {
       return false;
     }
     final Window? window = currentWindow;

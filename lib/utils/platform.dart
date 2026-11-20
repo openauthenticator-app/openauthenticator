@@ -1,5 +1,9 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart' show AppLifecycleState, WidgetsBinding;
 import 'package:uuid/uuid.dart';
+
+/// Whether the app is in the background on mobile, where it cannot present native prompts (eg. biometrics).
+bool get isMobileAppInBackground => currentPlatform.isMobile && const [AppLifecycleState.paused, AppLifecycleState.hidden, AppLifecycleState.detached].contains(WidgetsBinding.instance.lifecycleState);
 
 /// Returns the current platform.
 Platform currentPlatform = () {

@@ -13,6 +13,7 @@ import 'package:open_authenticator/flows/app_unlock_interaction.dart';
 import 'package:open_authenticator/flows/master_password.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/spacing.dart';
+import 'package:open_authenticator/utils/platform.dart';
 import 'package:open_authenticator/utils/result/handler.dart';
 import 'package:open_authenticator/utils/result/result.dart';
 import 'package:open_authenticator/widgets/app_scaffold.dart';
@@ -42,12 +43,44 @@ class _UnlockChallengeState extends ConsumerState<UnlockChallenge> {
   /// Will be non-null if the app cannot be unlocked for a specific reason.
   CannotUnlockException? cannotUnlockException;
 
+  /// Allows to retry the automatic unlock when the app goes back to the foreground.
+  late final AppLifecycleListener _lifecycleListener;
+
+  /// Whether the automatic unlock has been postponed, because the app went to the background.
+  bool _unlockPostponed = false;
+
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      tryUnlockIfNeeded();
-    });
+    _lifecycleListener = AppLifecycleListener(onResume: _onResume);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _tryAutomaticUnlock());
+  }
+
+  @override
+  void dispose() {
+    _lifecycleListener.dispose();
+    super.dispose();
+  }
+
+  /// Tries to unlock the app without any user action, postponing it if the app goes to the background meanwhile.
+  /// In this case, the native prompt cannot be presented (or is closed by the system).
+  Future<void> _tryAutomaticUnlock() async {
+    if (!isMobileAppInBackground) {
+      await tryUnlockIfNeeded();
+    }
+    if (mounted && isMobileAppInBackground && ref.read(appLockStateProvider).value == AppLockState.locked) {
+      _unlockPostponed = true;
+    }
+  }
+
+  /// Triggered when the app goes back to the foreground.
+  /// Only a postponed unlock is retried : retrying after every resume would reopen a prompt that has just been cancelled
+  /// (eg. iOS goes inactive, not paused, while presenting Face ID).
+  void _onResume() {
+    if (_unlockPostponed) {
+      _unlockPostponed = false;
+      _tryAutomaticUnlock();
+    }
   }
 
   @override
