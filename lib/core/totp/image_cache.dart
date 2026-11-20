@@ -54,22 +54,34 @@ class TotpImageCacheManager extends AsyncNotifier<Map<String, CacheObject>> {
   /// Serializes cache state mutations and index writes.
   Future<void> _cacheMutationQueue = Future.value();
 
+  int _generation = 0;
+
   @override
   FutureOr<Map<String, CacheObject>> build() async {
     final File index = await _getIndexFile();
-    Map<String, CacheObject> cached = {};
+    final Map<String, CacheObject> cached = {};
     if (await index.exists()) {
-      final JsonMap json = decodeJsonMap(await index.readAsString());
-      cached = {
-        for (final MapEntry<String, dynamic> entry in json.entries) //
-          entry.key: CacheObject.fromJson(entry.value),
-      };
+      try {
+        final Object? json = jsonDecode(utf8.decode(await index.readAsBytes()));
+        if (json is JsonMap) {
+          for (final MapEntry<String, dynamic> entry in json.entries) {
+            final Object? value = entry.value;
+            if (value is String || (value is JsonMap && value['url'] is String)) {
+              cached[entry.key] = CacheObject.fromJson(value);
+            }
+          }
+        }
+      } on FormatException {
+        // A truncated cache index can be rebuilt from the vault.
+        await index.delete();
+      }
     }
     return await _repairCache(cached);
   }
 
   /// Caches the TOTP image.
   Future<void> cacheImage(Totp totp, {bool checkSettings = true}) async {
+    final int generation = _generation;
     try {
       if (!totp.isDecrypted) {
         return;
@@ -84,31 +96,42 @@ class TotpImageCacheManager extends AsyncNotifier<Map<String, CacheObject>> {
       if (imageUrl == null) {
         await deleteCachedImage(totp.uuid);
       } else {
-        final File file = await _getTotpCachedImageFile(totp.uuid, createDirectory: true);
+        final File file = await _getTotpCachedImageFile(totp.uuid);
         final CacheObject? previousCacheObject = (_currentCachedState() ?? await future)[totp.uuid];
         if (previousCacheObject?.url == imageUrl && await file.exists()) {
           return;
         }
-        final http.Response response = await http.get(Uri.parse(imageUrl));
+        final http.Response response;
+        try {
+          response = await http.get(Uri.parse(imageUrl)).timeout(const Duration(seconds: 10));
+        } on http.ClientException {
+          return;
+        } on TimeoutException {
+          return;
+        }
         if (response.statusCode < 200 || response.statusCode >= 300) {
           throw HttpException(
             'Failed to cache image: HTTP ${response.statusCode}.',
             uri: Uri.parse(imageUrl),
           );
         }
-        await file.writeAsBytes(response.bodyBytes);
-        await _evictCachedImageFile(file);
-        ImageType imageType;
-        if (imageUrl.endsWith('.svg')) {
-          imageType = .svg;
-          if (await JovialSvgUtils.svgToSi(response.body, file)) {
-            imageType = .si;
-          }
-        } else {
-          imageType = .other;
-        }
-
         await _enqueueCacheMutation(() async {
+          if (generation != _generation) {
+            return;
+          }
+          await file.parent.create(recursive: true);
+          await file.writeAsBytes(response.bodyBytes);
+          await _evictCachedImageFile(file);
+          ImageType imageType;
+          if (imageUrl.endsWith('.svg')) {
+            imageType = .svg;
+            if (await JovialSvgUtils.svgToSi(response.body, file)) {
+              imageType = .si;
+            }
+          } else {
+            imageType = .other;
+          }
+
           final Map<String, CacheObject> cached = await _readCachedState();
           cached[totp.uuid] = CacheObject(
             url: imageUrl,
@@ -194,6 +217,7 @@ class TotpImageCacheManager extends AsyncNotifier<Map<String, CacheObject>> {
     Iterable<Totp>? totps,
     bool checkSettings = true,
   }) async {
+    final int generation = _generation;
     if (checkSettings) {
       final bool cacheEnabled = await ref.read(cacheTotpPicturesSettingsEntryProvider.future);
       if (!cacheEnabled) {
@@ -202,6 +226,9 @@ class TotpImageCacheManager extends AsyncNotifier<Map<String, CacheObject>> {
     }
     final List<Totp> cacheableTotps = List.of(totps ?? await ref.read(totpRepositoryProvider.future));
     for (int i = 0; i < cacheableTotps.length; i += _kFillCacheConcurrency) {
+      if (generation != _generation) {
+        return;
+      }
       final int end = (i + _kFillCacheConcurrency).clamp(0, cacheableTotps.length);
       await Future.wait([
         for (final Totp totp in cacheableTotps.sublist(i, end))
@@ -215,6 +242,8 @@ class TotpImageCacheManager extends AsyncNotifier<Map<String, CacheObject>> {
 
   /// Clears the cache.
   Future<void> clearCache() async {
+    _generation++;
+    await future;
     await _enqueueCacheMutation(() async {
       final Directory directory = await _getTotpImagesDirectory();
       if (await directory.exists()) {
@@ -233,13 +262,16 @@ class TotpImageCacheManager extends AsyncNotifier<Map<String, CacheObject>> {
   Future<void> _saveIndex({Map<String, CacheObject>? content}) async {
     content ??= await _readCachedState();
     final File index = await _getIndexFile();
-    await index.create(recursive: true);
-    await index.writeAsString(
+    await index.parent.create(recursive: true);
+    final temporary = File('${index.path}.tmp');
+    await temporary.writeAsString(
       jsonEncode({
         for (final MapEntry<String, CacheObject> entry in content.entries) //
           entry.key: entry.value.toJson(),
       }),
+      flush: true,
     );
+    await temporary.rename(index.path);
   }
 
   /// Queues a cache mutation to keep the state and index consistent.
@@ -267,9 +299,13 @@ class TotpImageCacheManager extends AsyncNotifier<Map<String, CacheObject>> {
     final Map<String, CacheObject> repaired = {};
 
     for (final MapEntry<String, CacheObject> entry in cached.entries) {
+      if (!fileNames.contains(entry.key)) {
+        changed = true;
+        continue;
+      }
       final String? currentImageUrl = currentImageUrls[entry.key];
       final bool isUnusedForTooLong = entry.value.lastAccessedAt != null && now.difference(entry.value.lastAccessedAt!) >= _kUnusedCacheTtl;
-      final bool keep = currentImageUrl != null && currentImageUrl == entry.value.url && fileNames.contains(entry.key) && !isUnusedForTooLong;
+      final bool keep = currentImageUrl != null && currentImageUrl == entry.value.url && !isUnusedForTooLong;
       if (keep) {
         repaired[entry.key] = entry.value;
       } else {
@@ -296,7 +332,7 @@ class TotpImageCacheManager extends AsyncNotifier<Map<String, CacheObject>> {
   };
 
   /// Returns the TOTP cached image file.
-  static Future<File> _getTotpCachedImageFile(String uuid, {bool createDirectory = false}) async => File(join((await _getTotpImagesDirectory(create: createDirectory)).path, uuid));
+  static Future<File> _getTotpCachedImageFile(String uuid) async => File(join((await _getTotpImagesDirectory()).path, uuid));
 
   /// Evicts every image provider variant used by TOTP images.
   static Future<void> _evictCachedImageFile(File file) async {
@@ -312,14 +348,8 @@ class TotpImageCacheManager extends AsyncNotifier<Map<String, CacheObject>> {
     ]);
   }
 
-  /// Returns the totp images directory, creating it if doesn't exist yet.
-  static Future<Directory> _getTotpImagesDirectory({bool create = false}) async {
-    final Directory directory = Directory(join((await getApplicationCacheDirectory()).path, 'totps_images'));
-    if (create && !await directory.exists()) {
-      await directory.create(recursive: true);
-    }
-    return directory;
-  }
+  /// Returns the TOTP images directory.
+  static Future<Directory> _getTotpImagesDirectory() async => Directory(join((await getApplicationCacheDirectory()).path, 'totps_images'));
 }
 
 /// A cache object, holding a TOTP image URL with its type.
@@ -361,7 +391,7 @@ class CacheObject {
         (type) => type.name == json['imageType'],
         orElse: () => ImageType.inferFromSource(url),
       ),
-      lastAccessedAt: json['lastAccessedAt'] == null ? null : DateTime.tryParse(json['lastAccessedAt']),
+      lastAccessedAt: json['lastAccessedAt'] is String ? DateTime.tryParse(json['lastAccessedAt']) : null,
     );
   }
 
