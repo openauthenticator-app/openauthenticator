@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -31,7 +30,7 @@ void main() {
     final PathProviderPlatform previous = PathProviderPlatform.instance;
     PathProviderPlatform.instance = _CacheDirectory(root);
     addTearDown(() => PathProviderPlatform.instance = previous);
-    final directory = await Directory('${root.path}/totps_images').create();
+    final Directory directory = await Directory('${root.path}/totps_images').create();
     final File index = await File('${directory.path}/index.json').writeAsString('{');
     final File orphan = await File('${directory.path}/unused').writeAsString('old');
     final HttpServer server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
@@ -43,7 +42,7 @@ void main() {
     expect(await orphan.exists(), isFalse);
 
     final CryptoStore key = await CryptoStore.fromPasswordInIsolate('fixture', Salt.generate());
-    final item = DecryptedTotp.create(cryptoStore: key, secret: 'JBSWY3DPEHPK3PXP', label: 'fixture', imageUrl: 'http://127.0.0.1:${server.port}/logo.png')!;
+    final DecryptedTotp item = DecryptedTotp.create(cryptoStore: key, secret: 'JBSWY3DPEHPK3PXP', label: 'fixture', imageUrl: 'http://127.0.0.1:${server.port}/logo.png')!;
     final Future<HttpRequest> arriving = server.first;
     final Future<void> pending = cache.cacheImage(item, checkSettings: false);
     final HttpRequest request = await arriving;
