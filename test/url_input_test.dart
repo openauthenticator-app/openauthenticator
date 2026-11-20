@@ -9,7 +9,18 @@ void main() {
   test('only complete HTTP backend addresses can be probed and saved', () {
     expect(BackendUrl.tryParse(' http://localhost:3000/ '), 'http://localhost:3000');
     expect(BackendUrl.tryParse('https://example.org/api/'), 'https://example.org/api');
-    for (final input in ['', '/ping', 'example.org', 'https://', 'ftp://example.org', 'https://a b', 'https://example.org:65536', 'https://example.org:abc']) {
+    for (final input in [
+      '',
+      '/ping',
+      'example.org',
+      'https://',
+      'ftp://example.org',
+      'https://a b',
+      'https://example.org:65536',
+      'https://example.org:-2',
+      'https://example.org:${'9' * 45}',
+      'https://example.org:abc',
+    ]) {
       expect(BackendUrl.tryParse(input), isNull, reason: input);
     }
   });
