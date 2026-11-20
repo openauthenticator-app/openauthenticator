@@ -43,9 +43,14 @@ class _QrCodeScannerState extends State<QrCodeScanner> {
     ],
   );
 
+  /// Whether a barcode callback is stopping or restarting the camera.
+  bool _handlingScan = false;
+
+  /// Builds the scanner with its actual preview constraints.
   @override
   Widget build(BuildContext context) => LayoutBuilder(builder: _buildScanner);
 
+  /// Fits the scan window and its overlay to the same preview.
   Widget _buildScanner(BuildContext context, BoxConstraints constraints) {
     final Size size = constraints.biggest;
     final Rect scanWindow = Rect.fromCenter(
@@ -59,20 +64,7 @@ class _QrCodeScannerState extends State<QrCodeScanner> {
         Center(
           child: MobileScanner(
             placeholderBuilder: widget.placeholderBuilder,
-            onDetect: (barcodes) {
-              final String? barcodeValue = barcodes.barcodes.firstOrNull?.rawValue;
-              if (barcodeValue != null && widget.onScan != null) {
-                controller.stop();
-                widget.onScan!(barcodeValue).then((resume) async {
-                  if (resume) {
-                    await Future.delayed(const Duration(seconds: 2));
-                    if (mounted) {
-                      await controller.start();
-                    }
-                  }
-                });
-              }
-            },
+            onDetect: _onDetect,
             onDetectError: widget.onError ?? printException,
             fit: BoxFit.contain,
             controller: controller,
@@ -105,6 +97,32 @@ class _QrCodeScannerState extends State<QrCodeScanner> {
     );
   }
 
+  /// Handles one barcode at a time and resumes only while the scanner is mounted.
+  Future<void> _onDetect(BarcodeCapture capture) async {
+    final String? value = capture.barcodes.firstOrNull?.rawValue;
+    final Future<bool> Function(String)? onScan = widget.onScan;
+    if (_handlingScan || value == null || onScan == null) {
+      return;
+    }
+    _handlingScan = true;
+    try {
+      await controller.stop();
+      if (mounted && await onScan(value)) {
+        await Future<void>.delayed(const Duration(seconds: 2));
+        if (mounted) {
+          await controller.start();
+        }
+      }
+    } catch (error, stackTrace) {
+      if (mounted) {
+        (widget.onError ?? printException)(error, stackTrace);
+      }
+    } finally {
+      _handlingScan = false;
+    }
+  }
+
+  /// Releases the camera controller when the scanner closes.
   @override
   void dispose() {
     unawaited(controller.dispose());
