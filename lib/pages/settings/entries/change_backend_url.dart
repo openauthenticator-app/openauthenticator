@@ -31,17 +31,6 @@ class ChangeBackendUrlSettingsEntryWidget extends ConsumerWidget with FTileMixin
     title: Text(translations.settings.dangerZone.changeBackendUrl.title),
     subtitle: Text(translations.settings.dangerZone.changeBackendUrl.subtitle),
     onPress: () async {
-      final Result result = await ref
-          .read(storageMigrationFlowProvider)
-          .changeStorageType(
-            context,
-            .localOnly,
-            logout: true,
-            presentation: .successAndErrorToast,
-          );
-      if (!context.mounted || result is! ResultSuccess) {
-        return;
-      }
       final String currentUrl = await showWaitingOverlay(
         context,
         future: ref.read(backendUrlSettingsEntryProvider.future),
@@ -49,15 +38,16 @@ class ChangeBackendUrlSettingsEntryWidget extends ConsumerWidget with FTileMixin
       if (!context.mounted) {
         return;
       }
-      final String? url = await TextInputDialog.prompt(
+      final String? input = await TextInputDialog.prompt(
         context,
         title: translations.settings.dangerZone.changeBackendUrl.inputDialog.title,
         message: translations.settings.dangerZone.changeBackendUrl.inputDialog.message(defaultBackendUrl: App.defaultBackendUrl),
         keyboardType: .url,
         initialValue: currentUrl,
-        validator: (string) => Uri.tryParse(string ?? '') == null ? translations.error.validation.url : null,
+        validator: (string) => BackendUrl.tryParse(string) == null ? translations.error.validation.url : null,
       );
-      if (url == null || !context.mounted) {
+      final BackendUrl? url = BackendUrl.tryParse(input);
+      if (url == null || url == currentUrl || !context.mounted) {
         return;
       }
       final Result<PingBackendResponse> pingBackendResponse = await showWaitingOverlay(
@@ -81,7 +71,15 @@ class ChangeBackendUrlSettingsEntryWidget extends ConsumerWidget with FTileMixin
         );
         return;
       }
-      if (!context.mounted) {
+      final Result result = await ref
+          .read(storageMigrationFlowProvider)
+          .changeStorageType(
+            context,
+            .localOnly,
+            logout: true,
+            presentation: .successAndErrorToast,
+          );
+      if (!context.mounted || result is! ResultSuccess) {
         return;
       }
       final Result cancelConfirmationResult = await showWaitingOverlay(
@@ -101,7 +99,7 @@ class ChangeBackendUrlSettingsEntryWidget extends ConsumerWidget with FTileMixin
       }
       await showWaitingOverlay(
         context,
-        future: ref.read(backendUrlSettingsEntryProvider.notifier).changeValue(BackendUrl(url)),
+        future: ref.read(backendUrlSettingsEntryProvider.notifier).changeValue(url),
       );
       if (context.mounted) {
         showSuccessToast(

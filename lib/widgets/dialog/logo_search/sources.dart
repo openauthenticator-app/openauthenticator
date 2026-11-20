@@ -113,23 +113,20 @@ class DirectSource with Source {
     }
 
     final Uri? directUri = Uri.tryParse(trimmed);
-    if (directUri?.hasScheme == true && directUri?.hasAuthority == true) {
-      yield directUri!;
+    if (directUri != null && directUri.hasScheme) {
+      if ((directUri.isScheme('http') || directUri.isScheme('https')) && directUri.host.isNotEmpty && directUri.userInfo.isEmpty) {
+        yield directUri;
+      }
       return;
     }
 
-    final String hostLikeKeywords = trimmed.replaceFirst(RegExp(r'^www\.', caseSensitive: false), '');
-    if (!hostLikeKeywords.contains(' ') && hostLikeKeywords.contains('.')) {
-      yield Uri.https(hostLikeKeywords, '');
-      yield Uri.https('www.$hostLikeKeywords', '');
+    final String compact = trimmed.replaceAll(RegExp(r'\s+'), '').replaceFirst(RegExp(r'^www\.', caseSensitive: false), '');
+    if (compact.isEmpty || compact.contains(RegExp(r'[^a-zA-Z0-9.\-]'))) {
       return;
     }
-
-    final String compactKeywords = trimmed.replaceAll(RegExp(r'\s+'), '');
-    if (compactKeywords.isNotEmpty) {
-      yield Uri.https('$compactKeywords.com', '');
-      yield Uri.https('www.$compactKeywords.com', '');
-    }
+    final String host = compact.contains('.') ? compact : '$compact.com';
+    yield Uri.https(host, '');
+    yield Uri.https('www.$host', '');
   }
 
   /// Extracts image URLs from the HTML meta and link tags.
