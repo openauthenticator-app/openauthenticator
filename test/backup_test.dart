@@ -80,8 +80,12 @@ void main() {
     const password = 'backup password';
     final CryptoStore store = await CryptoStore.fromPasswordInIsolate(password, Salt.generate());
     final CryptoStore current = await CryptoStore.fromPasswordInIsolate('device password', Salt.generate());
+
+    /// Creates an encrypted entry for a particular device or backup key.
     JsonMap entry(CryptoStore key) => DecryptedTotp.create(cryptoStore: key, secret: 'JBSWY3DPEHPK3PXP', label: 'Fixture')!.toJson();
     final JsonMap valid = entry(store);
+
+    /// Writes a backup fixture and reads it with the destination key.
     Future<Backup> read(List<Object?> entries) async {
       await file.writeAsString(
         jsonEncode({

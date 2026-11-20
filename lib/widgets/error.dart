@@ -116,6 +116,7 @@ class _ErrorWithStackTraceState extends State<ErrorWithStackTrace> with SingleTi
   /// Whether the stacktrace is expanded.
   bool expanded = false;
 
+  /// Displays the error and allows its details to be expanded or copied.
   @override
   Widget build(BuildContext context) => Column(
     mainAxisSize: MainAxisSize.min,

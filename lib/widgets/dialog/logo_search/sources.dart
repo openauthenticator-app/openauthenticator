@@ -59,9 +59,6 @@ mixin DirectApiSource on Source {
 
 /// Search directly on the target website.
 class DirectSource with Source {
-  /// Creates a new direct source instance.
-  const DirectSource();
-
   /// The meta image attributes to look for.
   static const List<String> _kMetaImageAttributes = [
     'og:logo',
@@ -83,6 +80,9 @@ class DirectSource with Source {
     'shortcut icon',
     'mask-icon',
   ];
+
+  /// Creates a new direct source instance.
+  const DirectSource();
 
   @override
   String get name => 'Direct';
