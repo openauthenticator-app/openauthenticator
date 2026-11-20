@@ -73,6 +73,31 @@ void main() {
     expect(await BackupPath.list().toList(), isEmpty);
   });
 
+  test('backups are stored in Documents, with a fallback when Documents is not usable', () async {
+    final Directory root = await Directory.systemTemp.createTemp('backup-location-');
+    addTearDown(() async {
+      await Process.run('chmod', ['-R', 'u+rwx', root.path]);
+      await root.delete(recursive: true);
+    });
+    final PathProviderPlatform previous = PathProviderPlatform.instance;
+    PathProviderPlatform.instance = _BackupDirectories(root);
+    addTearDown(() => PathProviderPlatform.instance = previous);
+
+    final BackupPath inDocuments = await BackupPath.create();
+    expect(inDocuments.path, startsWith('${root.path}/documents/'));
+
+    // Makes the Documents backups directory read-only : new backups go to the support directory.
+    final Directory documentsBackups = inDocuments.file.parent;
+    await Process.run('chmod', ['a-w', documentsBackups.path]);
+    final BackupPath inSupport = await BackupPath.create();
+    expect(inSupport.path, startsWith('${root.path}/support/'));
+    expect((await BackupPath.list().toList()).map((backup) => backup.path), unorderedEquals([inDocuments.path, inSupport.path]));
+
+    // An unreadable directory must not hide the other backups.
+    await Process.run('chmod', ['a-rwx', documentsBackups.path]);
+    expect((await BackupPath.list().toList()).map((backup) => backup.path), [inSupport.path]);
+  }, skip: !Platform.isLinux);
+
   test('backup restore validates every entry before returning the vault', () async {
     final Directory directory = await Directory.systemTemp.createTemp('open-authenticator-backup-');
     addTearDown(() => directory.delete(recursive: true));

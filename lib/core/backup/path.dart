@@ -33,8 +33,23 @@ class BackupPath implements Comparable<BackupPath> {
 
   /// Creates a new backup path.
   static Future<BackupPath> create({DateTime? dateTime}) async {
-    final Directory directory = await getBackupsDirectory(create: true);
-    int timestamp = (dateTime ?? DateTime.now()).millisecondsSinceEpoch;
+    final int timestamp = (dateTime ?? DateTime.now()).millisecondsSinceEpoch;
+    try {
+      return await _createIn(await getBackupsDirectory(create: true), timestamp);
+    } on FileSystemException {
+      if (!_hasFallbackDirectory) {
+        rethrow;
+      }
+      // Documents may be read-only for the app (eg. sandboxes or Windows controlled folder access).
+      final Directory fallback = await _getFallbackBackupsDirectory();
+      await fallback.create(recursive: true);
+      return await _createIn(fallback, timestamp);
+    }
+  }
+
+  /// Creates a new backup file in [directory], incrementing [initialTimestamp] until the filename is available.
+  static Future<BackupPath> _createIn(Directory directory, int initialTimestamp) async {
+    int timestamp = initialTimestamp;
     while (true) {
       final File destination = File(join(directory.path, '$timestamp.bak'));
       try {
@@ -79,48 +94,67 @@ class BackupPath implements Comparable<BackupPath> {
     }
   }
 
-  /// Whether the system Documents directory may be redirected or sandboxed.
-  static bool get _useAppDirectory => Platform.isLinux || Platform.isWindows;
+  /// Whether backups can be stored in the app support directory when Documents is not usable.
+  /// Documents is preferred, because it is kept when the app is uninstalled and is often synchronized by the user.
+  static bool get _hasFallbackDirectory => Platform.isLinux || Platform.isWindows;
 
   /// Returns the directory where new backups are stored.
   static Future<Directory> getBackupsDirectory({bool create = false}) async {
-    final Directory parent = _useAppDirectory ? await getApplicationSupportDirectory() : await getApplicationDocumentsDirectory();
-    final directory = Directory(join(parent.path, _directoryName));
+    final Directory directory = await _getDocumentsBackupsDirectory() ?? await _getFallbackBackupsDirectory();
     if (create) {
       await directory.create(recursive: true);
     }
     return directory;
   }
 
-  /// Lists current backups, including accessible collections in Documents.
+  /// Returns the backups directory inside Documents, if Documents is available.
+  static Future<Directory?> _getDocumentsBackupsDirectory() async {
+    try {
+      return Directory(join((await getApplicationDocumentsDirectory()).path, _directoryName));
+    } on MissingPlatformDirectoryException {
+      if (!_hasFallbackDirectory) {
+        rethrow;
+      }
+      return null;
+    }
+  }
+
+  /// Returns the backups directory inside the app support directory.
+  static Future<Directory> _getFallbackBackupsDirectory() async => Directory(join((await getApplicationSupportDirectory()).path, _directoryName));
+
+  /// Lists current backups, including the ones stored in the fallback directory.
   static Stream<BackupPath> list() async* {
-    final Directory directory = await getBackupsDirectory();
-    yield* _listDirectory(directory);
-    if (_useAppDirectory) {
-      try {
-        final documents = Directory(join((await getApplicationDocumentsDirectory()).path, _directoryName));
-        if (documents.path != directory.path) {
-          yield* _listDirectory(documents);
-        }
-      } on PathAccessException {
-        // Sandboxed apps may not have access to Documents.
-      } on MissingPlatformDirectoryException {
-        // Documents may be unavailable on this device.
+    final Set<String> listed = {};
+    for (final Directory? directory in [
+      await _getDocumentsBackupsDirectory(),
+      if (_hasFallbackDirectory) await _getFallbackBackupsDirectory(),
+    ]) {
+      if (directory != null && listed.add(directory.absolute.path)) {
+        yield* Stream.fromIterable(await _listDirectory(directory));
       }
     }
   }
 
   /// Enumerates backup files directly inside [directory].
-  static Stream<BackupPath> _listDirectory(Directory directory) async* {
-    if (await directory.exists()) {
-      await for (final FileSystemEntity entity in directory.list(followLinks: false)) {
-        if (entity is File) {
-          final BackupPath? backup = fromPath(path: entity.path);
-          if (backup != null) {
-            yield backup;
+  static Future<List<BackupPath>> _listDirectory(Directory directory) async {
+    final List<BackupPath> result = [];
+    try {
+      if (await directory.exists()) {
+        await for (final FileSystemEntity entity in directory.list(followLinks: false)) {
+          if (entity is File) {
+            final BackupPath? backup = fromPath(path: entity.path);
+            if (backup != null) {
+              result.add(backup);
+            }
           }
         }
       }
+    } on FileSystemException {
+      if (!_hasFallbackDirectory) {
+        rethrow;
+      }
+      // An inaccessible directory (eg. sandboxed Documents) must not hide the other backups.
     }
+    return result;
   }
 }
