@@ -56,7 +56,7 @@ sealed class AppUnlockMethod<T> {
       return await _tryUnlock(interaction, reason);
     } catch (ex, stackTrace) {
       if (ex is LocalAuthException) {
-        if (ex.code == LocalAuthExceptionCode.userCanceled || ex.code == LocalAuthExceptionCode.systemCanceled) {
+        if (ex.code == LocalAuthExceptionCode.userCanceled || ex.code == LocalAuthExceptionCode.systemCanceled || ex.code == LocalAuthExceptionCode.authInProgress) {
           return const ResultCancelled();
         }
       }

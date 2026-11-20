@@ -19,6 +19,9 @@ class LocalAuthenticationDefault extends LocalAuthentication {
   /// The [local_auth.LocalAuthentication] instance.
   final local_auth.LocalAuthentication _localAuthentication;
 
+  /// Whether a native authentication prompt is already open.
+  bool _authenticating = false;
+
   /// Creates a new default local authentication instance.
   LocalAuthenticationDefault() : _localAuthentication = local_auth.LocalAuthentication();
 
@@ -26,10 +29,14 @@ class LocalAuthenticationDefault extends LocalAuthentication {
   Future<bool> authenticate(UnlockReason reason) async {
     final Window? window = currentWindow;
     final bool wasAlwaysOnTop = window?.isAlwaysOnTop ?? false;
-    window
-      ?..focus()
-      ..isAlwaysOnTop = true;
+    if (_authenticating) {
+      return false;
+    }
+    _authenticating = true;
     try {
+      window
+        ?..focus()
+        ..isAlwaysOnTop = true;
       return await _localAuthentication.authenticate(
         localizedReason: translations.appUnlock.localAuthentication[reason.name] ?? 'Authenticate to access the app.',
         authMessages: [
@@ -48,6 +55,7 @@ class LocalAuthenticationDefault extends LocalAuthentication {
         ],
       );
     } finally {
+      _authenticating = false;
       if (window != null) {
         window.isAlwaysOnTop = wasAlwaysOnTop;
         if (currentPlatform == Platform.macOS || currentPlatform == Platform.windows) {

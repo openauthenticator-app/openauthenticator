@@ -110,7 +110,7 @@ sealed class AuthenticationProvider {
       }
       return const ResultSuccess();
     } catch (ex, stackTrace) {
-      if (ex is PlatformException && ex.code == 'cancelled') {
+      if (ex is PlatformException && (ex.code == 'cancelled' || ex.code == 'already_running')) {
         return const ResultCancelled();
       }
       return ResultError(

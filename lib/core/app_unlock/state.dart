@@ -20,7 +20,8 @@ class AppLockStateNotifier extends AsyncNotifier<AppLockState> {
 
   /// Tries to unlock the app.
   Future<Result> unlock(AppUnlockInteraction interaction) async {
-    if ((await future) == .unlockChallengedStarted || !interaction.canInteract || !ref.mounted) {
+    await future;
+    if (!ref.mounted || state.value == .unlockChallengedStarted || !interaction.canInteract) {
       return const ResultCancelled();
     }
     state = const AsyncData(.unlockChallengedStarted);
