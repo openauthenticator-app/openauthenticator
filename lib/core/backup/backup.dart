@@ -35,6 +35,9 @@ class Backup implements Comparable<Backup> {
   /// The password signature JSON key.
   static const String kPasswordSignatureKey = 'passwordSignature';
 
+  /// The length in bytes of an HMAC-SHA-256 backup password signature.
+  static const int _signatureLength = 256 ~/ 8;
+
   /// The backup path.
   final BackupPath backupPath;
 
@@ -59,20 +62,24 @@ class Backup implements Comparable<Backup> {
   DateTime get dateTime => backupPath.timestamp;
 
   /// Reads the backup envelope and checks its required fields.
-  static Future<JsonMap> _readContent(File file) async {
+  static Future<({List totps, Salt salt, Uint8List signature})> _readContent(File file) async {
     if (!await file.exists()) {
       throw _BackupFileDoesNotExistException(path: file.path);
     }
-    final Object? data;
     try {
-      data = jsonDecode(utf8.decode(await file.readAsBytes()));
+      final Object? data = jsonDecode(utf8.decode(await file.readAsBytes()));
+      if (data case {kTotpsKey: final List totps, kSaltKey: final String encodedSalt, kPasswordSignatureKey: final String encodedSignature}) {
+        final salt = Salt.base64Decode(string: encodedSalt);
+        final Uint8List signature = base64.decode(encodedSignature);
+        // Argon2 requires a salt of at least eight bytes.
+        if (salt.value.length >= 8 && signature.length == _signatureLength) {
+          return (totps: totps, salt: salt, signature: signature);
+        }
+      }
     } on FormatException {
       throw _InvalidBackupContentException();
     }
-    if (data is! JsonMap || data[kTotpsKey] is! List || data[kSaltKey] is! String || data[kPasswordSignatureKey] is! String) {
-      throw _InvalidBackupContentException();
-    }
-    return data;
+    throw _InvalidBackupContentException();
   }
 
   /// Encrypts [totps] with a new backup key, including an empty vault during setup.
@@ -105,17 +112,16 @@ class Backup implements Comparable<Backup> {
   /// Read the backup content from the given file.
   static Future<Backup> _read(BackupPath backupPath, CryptoStore currentCryptoStore, String password) async {
     final File file = backupPath.file;
-    final JsonMap jsonData = await _readContent(file);
-    final CryptoStore cryptoStore = await CryptoStore.fromPasswordInIsolate(password, Salt.base64Decode(string: jsonData[kSaltKey]));
-    if (!(cryptoStore.hmacSecretKey.verify(base64.decode(jsonData[kPasswordSignatureKey]), utf8.encode(password)))) {
+    final (totps: List entries, :Salt salt, :Uint8List signature) = await _readContent(file);
+    final CryptoStore cryptoStore = await CryptoStore.fromPasswordInIsolate(password, salt);
+    if (!cryptoStore.hmacSecretKey.verify(signature, utf8.encode(password))) {
       throw InvalidBackupPasswordException();
     }
 
-    final List jsonTotps = jsonData[kTotpsKey];
     final List<Totp> totps = [];
     final uuids = <String>{};
     final int defaultUpdatedAt = (await file.lastModified()).millisecondsSinceEpoch;
-    for (final dynamic jsonTotp in jsonTotps) {
+    for (final dynamic jsonTotp in entries) {
       if (jsonTotp is! JsonMap) {
         throw _InvalidBackupContentException();
       }
@@ -138,7 +144,7 @@ class Backup implements Comparable<Backup> {
     }
     return Backup._(
       backupPath: backupPath,
-      passwordSignature: jsonData[kPasswordSignatureKey],
+      passwordSignature: base64.encode(signature),
       salt: cryptoStore.salt,
       totps: totps,
     );

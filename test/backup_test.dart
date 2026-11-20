@@ -52,6 +52,18 @@ void main() {
     expect(first, isA<ResultSuccess<Backup>>());
     final CryptoStore key = await CryptoStore.fromPasswordInIsolate('device', Salt.generate());
     expect((await first.valueOrNull!.backupPath.read(key, 'fixture')).totps, isEmpty);
+    final JsonMap envelope = jsonDecode(await first.valueOrNull!.backupPath.file.readAsString());
+    final File invalidFile = File('${root.path}/invalid.bak');
+    for (final JsonMap change in [
+      {Backup.kSaltKey: '!'},
+      {Backup.kSaltKey: 'AA=='},
+      {Backup.kPasswordSignatureKey: '!'},
+      {Backup.kPasswordSignatureKey: 'AA=='},
+    ]) {
+      await invalidFile.writeAsString(jsonEncode({...envelope, ...change}));
+      final Result<BackupPath> imported = await store.import(invalidFile);
+      expect(imported, isA<ResultError>().having((result) => result.exception, 'exception', isA<LocalizableException>()));
+    }
     expect(await store.doBackup('second fixture'), isA<ResultSuccess<Backup>>());
     final List<BackupPath> snapshots = await container.read(backupStoreProvider.future);
     expect(snapshots, hasLength(2));
