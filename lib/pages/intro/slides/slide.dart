@@ -40,13 +40,14 @@ class CurrentIntroPageSlideNotifier extends AsyncNotifier<CurrentIntroSlideState
 
   /// Goes to the next slide.
   /// Returns `true` if the intro should finish.
-  Future<bool> goToNextSlide(BuildContext context) async {
+  Future<bool> goToNextSlide() async {
     final CurrentIntroSlideState slideState = await future;
     if (slideState.slide == .password) {
       final String? password = (slideState as PasswordIntroPageSlideState).password;
       if (password == null) {
         return false;
       }
+      await ref.read(saltProvider.notifier).generateIfNeeded();
       if (!slideState.saveDerivedKey) {
         await ref
             .read(appUnlockMethodSettingsEntryProvider.notifier)
@@ -55,7 +56,6 @@ class CurrentIntroPageSlideNotifier extends AsyncNotifier<CurrentIntroSlideState
               enableResult: ResultSuccess<String>(value: password),
             );
       }
-      await ref.read(saltProvider.notifier).generateIfNeeded();
       await ref.read(derivedKeyProvider.notifier).updateFromPassword(password);
     }
     final CurrentIntroSlideState? next = slideState._createNextSlideState();
