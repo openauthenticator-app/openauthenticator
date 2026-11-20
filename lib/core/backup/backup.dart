@@ -16,6 +16,7 @@ import 'package:open_authenticator/core/totp/undecryptable.dart';
 import 'package:open_authenticator/i18n/localizable_exception.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/utils/json.dart';
+import 'package:open_authenticator/utils/result/reporter.dart';
 import 'package:open_authenticator/utils/result/result.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -62,19 +63,27 @@ class Backup implements Comparable<Backup> {
     if (!await file.exists()) {
       throw _BackupFileDoesNotExistException(path: file.path);
     }
-    final Object? data = jsonDecode(await file.readAsString());
+    final Object? data;
+    try {
+      data = jsonDecode(utf8.decode(await file.readAsBytes()));
+    } on FormatException {
+      throw _InvalidBackupContentException();
+    }
     if (data is! JsonMap || data[kTotpsKey] is! List || data[kSaltKey] is! String || data[kPasswordSignatureKey] is! String) {
       throw _InvalidBackupContentException();
     }
     return data;
   }
 
-  static Future<Backup> _create(String password, CryptoStore currentCryptoStore, List<Totp> totps) async {
+  static Future<Backup> _create(String password, CryptoStore? currentCryptoStore, List<Totp> totps) async {
+    if (currentCryptoStore == null && totps.isNotEmpty) {
+      throw _CryptoError();
+    }
     final CryptoStore newStore = await CryptoStore.fromPasswordInIsolate(password, Salt.generate());
     final List<Totp> toBackup = [];
     final List<String> undecryptable = [];
     for (final Totp totp in totps) {
-      final DecryptedTotp? decryptedTotp = totp.changeEncryptionKey(currentCryptoStore, newStore);
+      final DecryptedTotp? decryptedTotp = totp.changeEncryptionKey(currentCryptoStore!, newStore);
       if (decryptedTotp == null) {
         undecryptable.add(totp.uuid);
       } else {
@@ -172,7 +181,7 @@ class _BackupFileDoesNotExistException extends LocalizableException {
 }
 
 /// Thrown when an invalid password has been provided.
-class InvalidBackupPasswordException extends LocalizableException {
+class InvalidBackupPasswordException extends LocalizableException with UserError {
   /// Creates a new invalid password exception instance.
   InvalidBackupPasswordException()
     : super(
@@ -181,7 +190,7 @@ class InvalidBackupPasswordException extends LocalizableException {
 }
 
 /// Thrown when the backup content is invalid.
-class _InvalidBackupContentException extends LocalizableException {
+class _InvalidBackupContentException extends LocalizableException with UserError {
   /// Creates a new invalid backup content exception instance.
   _InvalidBackupContentException()
     : super(

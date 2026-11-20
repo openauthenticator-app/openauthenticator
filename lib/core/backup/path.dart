@@ -76,13 +76,48 @@ class BackupPath implements Comparable<BackupPath> {
     }
   }
 
-  /// Returns the backup directory.
+  static const String _directoryName = '${App.appName} Backups${kDebugMode ? ' (Debug)' : ''}';
+
+  static bool get _useAppDirectory => Platform.isLinux || Platform.isWindows;
+
+  /// Returns the directory where new backups are stored.
   static Future<Directory> getBackupsDirectory({bool create = false}) async {
-    const String name = '${App.appName} Backups${kDebugMode ? ' (Debug)' : ''}';
-    final Directory directory = Directory(join((await getApplicationDocumentsDirectory()).path, name));
+    final Directory parent = _useAppDirectory ? await getApplicationSupportDirectory() : await getApplicationDocumentsDirectory();
+    final directory = Directory(join(parent.path, _directoryName));
     if (create) {
       await directory.create(recursive: true);
     }
     return directory;
+  }
+
+  /// Lists current backups, including accessible collections in Documents.
+  static Stream<BackupPath> list() async* {
+    final Directory directory = await getBackupsDirectory();
+    yield* _listDirectory(directory);
+    if (_useAppDirectory) {
+      try {
+        final documents = Directory(join((await getApplicationDocumentsDirectory()).path, _directoryName));
+        if (documents.path != directory.path) {
+          yield* _listDirectory(documents);
+        }
+      } on PathAccessException {
+        // Sandboxed apps may not have access to Documents.
+      } on MissingPlatformDirectoryException {
+        // Documents may be unavailable on this device.
+      }
+    }
+  }
+
+  static Stream<BackupPath> _listDirectory(Directory directory) async* {
+    if (await directory.exists()) {
+      await for (final FileSystemEntity entity in directory.list(followLinks: false)) {
+        if (entity is File) {
+          final BackupPath? backup = fromPath(path: entity.path);
+          if (backup != null) {
+            yield backup;
+          }
+        }
+      }
+    }
   }
 }

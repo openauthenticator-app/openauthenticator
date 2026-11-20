@@ -6,20 +6,7 @@ final AsyncNotifierProvider<BackupStore, List<BackupPath>> backupStoreProvider =
 /// Contains all backups.
 class BackupStore extends AsyncNotifier<List<BackupPath>> {
   @override
-  FutureOr<List<BackupPath>> build() async {
-    final List<BackupPath> result = [];
-    final Directory directory = await BackupPath.getBackupsDirectory();
-    if (!directory.existsSync()) {
-      return result;
-    }
-    for (final FileSystemEntity entity in directory.listSync(followLinks: false)) {
-      final BackupPath? path = BackupPath.fromPath(path: entity.path);
-      if (path != null) {
-        result.add(path);
-      }
-    }
-    return result..sort();
-  }
+  FutureOr<List<BackupPath>> build() async => (await BackupPath.list().toList())..sort();
 
   /// Restores the [backupPath] with the given [password].
   Future<Result<Backup>> restoreBackup(BackupPath backupPath, String password) async {
@@ -53,9 +40,6 @@ class BackupStore extends AsyncNotifier<List<BackupPath>> {
     final KeepAliveLink keepAliveLink = ref.keepAlive();
     try {
       final CryptoStore? currentCryptoStore = await ref.read(cryptoStoreProvider.future);
-      if (currentCryptoStore == null) {
-        throw _CryptoError();
-      }
       if (!ref.mounted) {
         return const ResultCancelled();
       }
@@ -124,7 +108,10 @@ class BackupStore extends AsyncNotifier<List<BackupPath>> {
         return const ResultCancelled();
       }
       state = AsyncData(
-        (await future)..remove(backupPath),
+        [
+          for (final path in await future)
+            if (path.path != backupPath.path) path,
+        ],
       );
       return const ResultSuccess();
     } catch (ex, stackTrace) {
