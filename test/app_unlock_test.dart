@@ -1,8 +1,10 @@
 import 'dart:async';
 
+import 'package:flutter/widgets.dart' show AppLifecycleState;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:open_authenticator/core/app_unlock/interaction.dart';
+import 'package:open_authenticator/core/app_unlock/local_authentication/default.dart';
 import 'package:open_authenticator/core/app_unlock/methods/method.dart';
 import 'package:open_authenticator/core/app_unlock/reason.dart';
 import 'package:open_authenticator/core/app_unlock/state.dart';
@@ -45,6 +47,15 @@ class _Interaction extends Fake implements AppUnlockInteraction {
 
 /// Checks overlapping unlock requests against an open authentication prompt.
 void main() {
+  testWidgets('a background mobile app waits for foreground interaction before presenting biometrics', (tester) async {
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+    try {
+      expect(await LocalAuthenticationDefault().authenticate(UnlockReason.openApp), isFalse);
+    } finally {
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    }
+  });
+
   test('simultaneous unlock requests open one prompt and cancellation keeps the vault locked', () async {
     final settings = _PromptSettings();
     final container = ProviderContainer.test(overrides: [appUnlockMethodSettingsEntryProvider.overrideWith(() => settings)]);
