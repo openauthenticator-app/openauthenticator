@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 import 'package:open_authenticator/utils/result/result.dart';
 import 'package:open_authenticator/utils/sentry.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
@@ -77,14 +79,18 @@ void reportResult<T>(
 }
 
 /// Whether the given [ex] should be sent to Sentry.
-bool _sendToSentry(Object? ex) =>
-    kSentryEnabled &&
-    switch (ex) {
-      UserError(:final reportToSentry) => reportToSentry,
-      SocketException(:final osError) => !{7, 8, -2, -5}.contains(osError?.errorCode),
-      TimeoutException() => false,
-      _ => true,
-    };
+bool _sendToSentry(Object? ex) => kSentryEnabled && isReportableException(ex);
+
+/// Whether the given [ex] is worth reporting.
+/// Network failures and busy clipboards depend on the user environment (connection, proxies, other apps), so they cannot be fixed by the app.
+/// This is also used to filter the errors that are automatically caught by Sentry.
+bool isReportableException(Object? ex) => switch (ex) {
+  UserError(:final reportToSentry) => reportToSentry,
+  SocketException() || HandshakeException() || http.ClientException() || TimeoutException() => false,
+  // Another app may hold the Windows clipboard, including when a text field pastes text.
+  PlatformException(code: 'Clipboard error') => false,
+  _ => true,
+};
 
 /// Reports a [Result].
 abstract interface class ResultReporter {

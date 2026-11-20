@@ -1,15 +1,33 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
 import 'package:open_authenticator/core/backend/request/error.dart';
 import 'package:open_authenticator/utils/result/handler.dart';
+import 'package:open_authenticator/utils/result/reporter.dart';
 import 'package:open_authenticator/utils/result/result.dart';
 import 'package:open_authenticator/utils/sentry.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 /// Checks which user-visible errors are forwarded to crash reporting.
 void main() {
+  test('environment failures are not reported, unlike unexpected platform errors', () {
+    for (final Object ex in [
+      const SocketException('Connection reset by peer'),
+      const HandshakeException('CERTIFICATE_VERIFY_FAILED'),
+      http.ClientException('Connection closed before full header was received'),
+      TimeoutException('fixture'),
+      PlatformException(code: 'Clipboard error', message: 'Unable to get clipboard data'),
+    ]) {
+      expect(isReportableException(ex), isFalse, reason: '$ex');
+    }
+    expect(isReportableException(PlatformException(code: 'write_error')), isTrue);
+    expect(isReportableException(StateError('fixture')), isTrue);
+  });
+
   testWidgets('an expired verification code stays out of Sentry while unexpected failures are reported', (tester) async {
     late BuildContext context;
     await tester.pumpWidget(

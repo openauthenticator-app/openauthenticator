@@ -30,6 +30,7 @@ import 'package:open_authenticator/themes.dart';
 import 'package:open_authenticator/utils/platform.dart';
 import 'package:open_authenticator/utils/rate_my_app.dart';
 import 'package:open_authenticator/utils/result/handler.dart';
+import 'package:open_authenticator/utils/result/reporter.dart';
 import 'package:open_authenticator/utils/result/result.dart';
 import 'package:open_authenticator/utils/sentry.dart';
 import 'package:open_authenticator/utils/window.dart';
@@ -79,7 +80,9 @@ Future<void> main() async {
   );
   return kSentryEnabled
       ? SentryFlutter.init(
-          (options) => options..dsn = App.sentryDsn,
+          (options) => options
+            ..dsn = App.sentryDsn
+            ..beforeSend = ((event, hint) => isReportableException(event.throwable) ? event : null),
           appRunner: appRunner,
         )
       : appRunner();
