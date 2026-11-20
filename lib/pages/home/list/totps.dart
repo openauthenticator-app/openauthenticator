@@ -126,10 +126,7 @@ class _TotpsListWidget extends ConsumerWidget {
   /// Allows to copy the code to the clipboard.
   static Future<void> copyCode(BuildContext context, DecryptedTotp totp) async {
     HapticFeedback.mediumImpact();
-    await Clipboard.setData(ClipboardData(text: totp.generateCode()));
-    if (context.mounted) {
-      showSuccessToast(context, text: translations.totp.actions.copyConfirmation);
-    }
+    await copyText(context, totp.generateCode(), confirmation: translations.totp.actions.copyConfirmation);
   }
 
   /// Tries to decrypt the current TOTP.

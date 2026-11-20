@@ -5,10 +5,10 @@ import 'package:open_authenticator/app.dart';
 import 'package:open_authenticator/i18n/localizable_exception.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/spacing.dart';
+import 'package:open_authenticator/utils/clipboard.dart';
 import 'package:open_authenticator/utils/uri_builder.dart';
 import 'package:open_authenticator/widgets/button_text.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
-import 'package:open_authenticator/widgets/toast.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// A widget displaying an error with the option to retry.
@@ -158,27 +158,8 @@ class _ErrorWithStackTraceState extends State<ErrorWithStackTrace> with SingleTi
           if (expanded)
             ClickableButton.icon(
               onPress: () async {
-                try {
-                  HapticFeedback.mediumImpact();
-                  await Clipboard.setData(
-                    ClipboardData(
-                      text: details,
-                    ),
-                  );
-                  if (context.mounted) {
-                    showSuccessToast(
-                      context,
-                      text: translations.error.noError,
-                    );
-                  }
-                } catch (ex) {
-                  if (context.mounted) {
-                    showErrorToast(
-                      context,
-                      text: translations.error.generic.withException(exception: ex),
-                    );
-                  }
-                }
+                HapticFeedback.mediumImpact();
+                await copyText(context, details, confirmation: translations.error.noError);
               },
               variant: .ghost,
               child: const Icon(FLucideIcons.copy),

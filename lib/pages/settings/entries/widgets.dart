@@ -4,8 +4,8 @@ import 'package:forui/forui.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:open_authenticator/core/settings/entry.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
+import 'package:open_authenticator/utils/clipboard.dart';
 import 'package:open_authenticator/widgets/clickable.dart';
-import 'package:open_authenticator/widgets/toast.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Allows to configure boolean values.
@@ -121,12 +121,16 @@ class UriSettingsEntry extends StatelessWidget with FTileMixin {
         ? null
         : (() async {
             if (canLaunchUri) {
-              await launchUrl(uri);
-              return;
+              try {
+                if (await launchUrl(uri)) {
+                  return;
+                }
+              } on PlatformException {
+                // Offer the link via the clipboard if opening it failed.
+              }
             }
-            await Clipboard.setData(ClipboardData(text: uri.toString()));
             if (context.mounted) {
-              showSuccessToast(context, text: translations.miscellaneous.urlCopiedToClipboard);
+              await copyText(context, uri.toString(), confirmation: translations.miscellaneous.urlCopiedToClipboard);
             }
           }),
   );
