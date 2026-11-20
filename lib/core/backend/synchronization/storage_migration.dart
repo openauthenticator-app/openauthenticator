@@ -52,7 +52,7 @@ class StorageMigrator {
       if (backupPassword != null) {
         final Result<Backup> backupResult = await ref.read(backupStoreProvider.notifier).doBackup(backupPassword);
         if (backupResult is! ResultSuccess) {
-          throw _BackupException();
+          return backupResult;
         }
       }
 
@@ -68,7 +68,7 @@ class StorageMigrator {
             const GetUserTotpsRequest(),
           );
       if (result is! ResultSuccess<GetUserTotpsResponse>) {
-        throw _GetTotpsError();
+        return result;
       }
 
       final GetUserTotpsResponse response = result.value;
@@ -193,30 +193,12 @@ sealed class _StorageMigrationException extends LocalizableException {
        );
 }
 
-/// Thrown when we're not able to get the user TOTPs.
-class _GetTotpsError extends _StorageMigrationException {
-  /// Creates a new generic migration error instance.
-  _GetTotpsError()
-    : super(
-        localizedErrorMessage: translations.error.storageMigration.getTotps,
-      );
-}
-
 /// Whether we should ask for a different [StorageMigrationDeletedTotpPolicy].
 class ShouldAskForDifferentDeletedTotpPolicyException extends _StorageMigrationException {
   /// Creates a new storage migration policy exception instance.
   ShouldAskForDifferentDeletedTotpPolicyException()
     : super(
         localizedErrorMessage: translations.error.storageMigration.anotherDeletedTotpPolicyShouldBeUsed,
-      );
-}
-
-/// When we haven't succeeded to do the asked backup.
-class _BackupException extends _StorageMigrationException {
-  /// Creates a new backup exception instance.
-  _BackupException()
-    : super(
-        localizedErrorMessage: translations.error.storageMigration.backupError,
       );
 }
 

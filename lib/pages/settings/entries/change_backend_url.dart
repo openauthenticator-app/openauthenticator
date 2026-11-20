@@ -66,6 +66,7 @@ class ChangeBackendUrlSettingsEntryWidget extends ConsumerWidget with FTileMixin
         handleResult(
           context,
           pingBackendResponse,
+          reporting: pingBackendResponse is ResultError<PingBackendResponse> && pingBackendResponse.exception is InvalidJsonResponse ? .none : null,
           buildErrorToastMessage: (_) => translations.error.backend.invalidBackendUrl,
           presentation: .successAndErrorToast,
         );
