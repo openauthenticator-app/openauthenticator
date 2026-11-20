@@ -83,6 +83,7 @@ class _RestoreBackupDialogState extends ConsumerState<_RestoreBackupDialog> {
             ),
           for (final BackupPath backup in value)
             ExpandableTile(
+              key: ValueKey(backup.path),
               title: Text(
                 '${DateFormat.yMd(translations.$meta.locale.underscoreTag).format(backup.timestamp)} ${DateFormat.Hms(translations.$meta.locale.underscoreTag).format(backup.timestamp)}',
               ),

@@ -44,6 +44,7 @@ void main() {
     addTearDown(() => directory.deleteSync(recursive: true));
     final file = File('${directory.path}/1700000000000.bak')..writeAsStringSync('encrypted backup fixture');
     final BackupPath backup = BackupPath.fromPath(path: file.path)!;
+    final List<BackupPath> backups = [backup];
     final FilePickerPlatform originalPicker = FilePickerPlatform.instance;
     final picker = _DocumentPicker();
     FilePickerPlatform.instance = picker;
@@ -60,7 +61,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          backupStoreProvider.overrideWithBuild((ref, notifier) => [backup]),
+          backupStoreProvider.overrideWithBuild((ref, notifier) => List.of(backups)),
         ],
         child: MaterialApp(
           localizationsDelegates: GlobalMaterialLocalizations.delegates,
@@ -94,5 +95,15 @@ void main() {
     expect(payload, file.readAsBytesSync());
     await tester.pumpAndSettle();
     expect(find.text(translations.error.noError), findsOneWidget);
+
+    final File newerFile = File('${directory.path}/1700000000001.bak')..createSync();
+    backups.insert(0, BackupPath.fromPath(path: newerFile.path)!);
+    ProviderScope.containerOf(tester.element(find.byType(ManageBackupSettingsEntryWidget))).invalidate(backupStoreProvider);
+    await tester.pumpAndSettle();
+    final List<double> expansion = tester.widgetList<ExpandableTile>(find.byType(ExpandableTile)).map((tile) {
+      final Finder transition = find.descendant(of: find.byWidget(tile), matching: find.byType(SizeTransition));
+      return tester.widget<SizeTransition>(transition).sizeFactor.value;
+    }).toList();
+    expect(expansion, [0.0, 1.0]);
   });
 }
