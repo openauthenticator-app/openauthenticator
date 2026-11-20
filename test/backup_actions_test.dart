@@ -40,7 +40,7 @@ class _DocumentPicker extends FilePickerPlatform {
 /// Checks file export and the rectangle passed to the native share sheet.
 void main() {
   testWidgets('backup actions export the original bytes and anchor sharing to the selected button', (tester) async {
-    final directory = Directory.systemTemp.createTempSync('backup-actions-');
+    final Directory directory = Directory.systemTemp.createTempSync('backup-actions-');
     addTearDown(() => directory.deleteSync(recursive: true));
     final file = File('${directory.path}/1700000000000.bak')..writeAsStringSync('encrypted backup fixture');
     final BackupPath backup = BackupPath.fromPath(path: file.path)!;
@@ -77,13 +77,13 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.descendant(of: find.byType(ExpandableTile), matching: find.byIcon(FLucideIcons.chevronRight)));
     await tester.pumpAndSettle();
-    final share = find.text(translations.settings.backups.manageBackups.button.share);
+    final Finder share = find.text(translations.settings.backups.manageBackups.button.share);
     final Offset buttonCenter = tester.getCenter(share);
     await tester.tap(share);
     await tester.pumpAndSettle();
     expect(origin, isNotNull);
     expect(origin!.contains(buttonCenter), isTrue);
-    final export = find.text(translations.settings.backups.manageBackups.button.export);
+    final Finder export = find.text(translations.settings.backups.manageBackups.button.export);
     await tester.ensureVisible(export);
     final ClickableButton button = tester.widget(find.ancestor(of: export, matching: find.byType(ClickableButton)));
     final Uint8List? payload = await tester.runAsync(() {
