@@ -4,6 +4,7 @@ import 'package:http/testing.dart';
 import 'package:open_authenticator/core/settings/backend_url.dart';
 import 'package:open_authenticator/widgets/dialog/logo_search/sources.dart';
 
+/// Checks backend addresses and free-text logo searches.
 void main() {
   test('only complete HTTP backend addresses can be probed and saved', () {
     expect(BackendUrl.tryParse(' http://localhost:3000/ '), 'http://localhost:3000');

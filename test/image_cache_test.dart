@@ -10,14 +10,20 @@ import 'package:open_authenticator/core/totp/image_cache.dart';
 import 'package:open_authenticator/core/totp/repository.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 
+/// Supplies a temporary application cache directory.
 class _CacheDirectory extends PathProviderPlatform {
-  _CacheDirectory(this.root);
+  /// The temporary directory used by the image cache.
   final Directory root;
 
+  /// Creates a path provider rooted in [root].
+  _CacheDirectory(this.root);
+
+  /// Returns the test cache directory.
   @override
   Future<String> getApplicationCachePath() async => root.path;
 }
 
+/// Checks cache repair and concurrent cache clearing.
 void main() {
   test('repairs a truncated index and keeps an in-flight image from undoing a cache clear', () async {
     final Directory root = await Directory.systemTemp.createTemp('totp-image-cache-');

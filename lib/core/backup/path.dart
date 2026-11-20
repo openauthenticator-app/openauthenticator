@@ -5,6 +5,9 @@ class BackupPath implements Comparable<BackupPath> {
   /// The backup filename regex.
   static const String _kBackupFilenameRegex = r'^\d{13}\.bak$';
 
+  /// The name of the folder containing the vault backups.
+  static const String _directoryName = '${App.appName} Backups${kDebugMode ? ' (Debug)' : ''}';
+
   /// The backup path.
   final String path;
 
@@ -76,8 +79,7 @@ class BackupPath implements Comparable<BackupPath> {
     }
   }
 
-  static const String _directoryName = '${App.appName} Backups${kDebugMode ? ' (Debug)' : ''}';
-
+  /// Whether the system Documents directory may be redirected or sandboxed.
   static bool get _useAppDirectory => Platform.isLinux || Platform.isWindows;
 
   /// Returns the directory where new backups are stored.
@@ -108,6 +110,7 @@ class BackupPath implements Comparable<BackupPath> {
     }
   }
 
+  /// Enumerates backup files directly inside [directory].
   static Stream<BackupPath> _listDirectory(Directory directory) async* {
     if (await directory.exists()) {
       await for (final FileSystemEntity entity in directory.list(followLinks: false)) {

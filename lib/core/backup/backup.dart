@@ -75,6 +75,7 @@ class Backup implements Comparable<Backup> {
     return data;
   }
 
+  /// Encrypts [totps] with a new backup key, including an empty vault during setup.
   static Future<Backup> _create(String password, CryptoStore? currentCryptoStore, List<Totp> totps) async {
     if (currentCryptoStore == null && totps.isNotEmpty) {
       throw _CryptoError();

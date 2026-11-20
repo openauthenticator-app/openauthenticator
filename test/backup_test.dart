@@ -15,18 +15,24 @@ import 'package:open_authenticator/utils/json.dart';
 import 'package:open_authenticator/utils/result/result.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 
+/// Supplies private backup directories for each test.
 class _BackupDirectories extends PathProviderPlatform {
-  _BackupDirectories(this.root);
-
+  /// The temporary root of the test file system.
   final Directory root;
 
+  /// Creates a path provider rooted in [root].
+  _BackupDirectories(this.root);
+
+  /// Returns the directory for application-managed backups.
   @override
   Future<String> getApplicationSupportPath() async => '${root.path}/support';
 
+  /// Returns the directory for user-managed documents.
   @override
   Future<String> getApplicationDocumentsPath() async => '${root.path}/documents';
 }
 
+/// Checks encrypted backup creation, restoration and removal.
 void main() {
   test('first-time setup can back up an empty vault and delete multiple listed backups', () async {
     final Directory root = await Directory.systemTemp.createTemp('backup-setup-');

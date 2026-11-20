@@ -54,8 +54,10 @@ class TotpImageCacheManager extends AsyncNotifier<Map<String, CacheObject>> {
   /// Serializes cache state mutations and index writes.
   Future<void> _cacheMutationQueue = Future.value();
 
+  /// Identifies downloads started after the last cache clear.
   int _generation = 0;
 
+  /// Loads the image index and repairs entries that no longer match the vault.
   @override
   FutureOr<Map<String, CacheObject>> build() async {
     final File index = await _getIndexFile();

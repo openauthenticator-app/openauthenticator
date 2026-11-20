@@ -5,6 +5,7 @@ final AsyncNotifierProvider<BackupStore, List<BackupPath>> backupStoreProvider =
 
 /// Contains all backups.
 class BackupStore extends AsyncNotifier<List<BackupPath>> {
+  /// Loads all accessible backups, starting with the most recent.
   @override
   FutureOr<List<BackupPath>> build() async => (await BackupPath.list().toList())..sort();
 
