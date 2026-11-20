@@ -162,7 +162,7 @@ class TotpImageCacheManager extends AsyncNotifier<Map<String, CacheObject>> {
       for (final String uuid in uuids) {
         final File file = await _getTotpCachedImageFile(uuid);
         await _evictCachedImageFile(file);
-        await file.deleteIfExists();
+        await file.tryDelete();
         cached.remove(uuid);
       }
       if (ref.mounted) {
@@ -248,8 +248,16 @@ class TotpImageCacheManager extends AsyncNotifier<Map<String, CacheObject>> {
     await future;
     await _enqueueCacheMutation(() async {
       final Directory directory = await _getTotpImagesDirectory();
-      if (await directory.exists()) {
-        await directory.delete(recursive: true);
+      if (!await directory.tryDelete(recursive: true)) {
+        // Some files are locked (eg. images being displayed on Windows) : deletes all the other ones and empties the index.
+        try {
+          await for (final FileSystemEntity entity in directory.list()) {
+            await entity.tryDelete(recursive: true);
+          }
+          await _saveIndex(content: const {});
+        } on FileSystemException {
+          // The remaining files will be removed by the next cache repair.
+        }
       }
       if (ref.mounted) {
         state = const AsyncData({});
@@ -312,13 +320,13 @@ class TotpImageCacheManager extends AsyncNotifier<Map<String, CacheObject>> {
         repaired[entry.key] = entry.value;
       } else {
         changed = true;
-        await (await _getTotpCachedImageFile(entry.key)).deleteIfExists();
+        await (await _getTotpCachedImageFile(entry.key)).tryDelete();
       }
     }
 
     for (final String fileName in fileNames.difference(repaired.keys.toSet())) {
       changed = true;
-      await (await _getTotpCachedImageFile(fileName)).deleteIfExists();
+      await (await _getTotpCachedImageFile(fileName)).tryDelete();
     }
 
     if (changed) {
@@ -418,12 +426,18 @@ class CacheObject {
   );
 }
 
-/// Allows to easily delete a file without checking if it exists.
-extension _DeleteIfExists on File {
-  /// Deletes the current file if it exists.
-  Future<void> deleteIfExists() async {
-    if (await exists()) {
-      await delete();
+/// Allows to delete cache files that may be locked.
+extension _TryDelete on FileSystemEntity {
+  /// Deletes this entity if it exists.
+  /// Returns `false` if it could not be deleted (eg. an image being read on Windows) : orphan files are removed by the next cache repair.
+  Future<bool> tryDelete({bool recursive = false}) async {
+    try {
+      if (await exists()) {
+        await delete(recursive: recursive);
+      }
+      return true;
+    } on FileSystemException {
+      return false;
     }
   }
 }

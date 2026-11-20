@@ -53,4 +53,26 @@ void main() {
     expect(await directory.exists(), isFalse);
     expect(await container.read(totpImageCacheManagerProvider.future), isEmpty);
   });
+
+  test('clearing the cache does not fail when some files cannot be deleted', () async {
+    final Directory root = await Directory.systemTemp.createTemp('totp-image-cache-locked-');
+    final Directory directory = await Directory('${root.path}/totps_images').create();
+    addTearDown(() async {
+      await Process.run('chmod', ['-R', 'u+rwx', root.path]);
+      await root.delete(recursive: true);
+    });
+    final PathProviderPlatform previous = PathProviderPlatform.instance;
+    PathProviderPlatform.instance = _CacheDirectory(root);
+    addTearDown(() => PathProviderPlatform.instance = previous);
+    final container = ProviderContainer.test(overrides: [totpRepositoryProvider.overrideWithBuild((ref, notifier) => [])]);
+    final TotpImageCacheManager cache = container.read(totpImageCacheManagerProvider.notifier);
+    expect(await container.read(totpImageCacheManagerProvider.future), isEmpty);
+
+    // Simulates files that cannot be deleted (eg. locked by Windows) with a read-only directory.
+    final File locked = await File('${directory.path}/locked').writeAsString('image');
+    await Process.run('chmod', ['a-w', directory.path]);
+    await cache.clearCache();
+    expect(await locked.exists(), isTrue);
+    expect(await container.read(totpImageCacheManagerProvider.future), isEmpty);
+  }, skip: !Platform.isLinux);
 }
