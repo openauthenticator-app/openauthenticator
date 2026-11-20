@@ -80,9 +80,9 @@ void reportResult<T>(
 bool _sendToSentry(Object? ex) =>
     kSentryEnabled &&
     switch (ex) {
-      SocketException(:final osError) => !{7, 8}.contains(osError?.errorCode),
-      TimeoutException() => false,
       UserError(:final reportToSentry) => reportToSentry,
+      SocketException(:final osError) => !{7, 8, -2, -5}.contains(osError?.errorCode),
+      TimeoutException() => false,
       _ => true,
     };
 

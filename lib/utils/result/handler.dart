@@ -8,7 +8,7 @@ void handleResult<T>(
   BuildContext context,
   Result<T> result, {
   ResultPresentation presentation = .successAndErrorDialog,
-  ResultReporting reporting = .consoleAndSentry,
+  ResultReporting? reporting,
   MessageBuilder<T>? buildSuccessToastMessage,
   MessageBuilder<Object?>? buildErrorToastMessage,
   MessageBuilder<Object?>? buildErrorDialogMessage,

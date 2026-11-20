@@ -136,7 +136,8 @@ class ConfirmationEmailSent extends RedirectResult {
 }
 
 /// The email confirmation state provider.
-final AsyncNotifierProvider<EmailConfirmationStateNotifier, EmailConfirmationData?> emailConfirmationStateProvider = AsyncNotifierProvider.autoDispose<EmailConfirmationStateNotifier, EmailConfirmationData?>(EmailConfirmationStateNotifier.new);
+final AsyncNotifierProvider<EmailConfirmationStateNotifier, EmailConfirmationData?> emailConfirmationStateProvider =
+    AsyncNotifierProvider.autoDispose<EmailConfirmationStateNotifier, EmailConfirmationData?>(EmailConfirmationStateNotifier.new);
 
 /// The email confirmation state notifier.
 class EmailConfirmationStateNotifier extends AsyncNotifier<EmailConfirmationData?> {
@@ -217,7 +218,7 @@ class EmailConfirmationData with Equatable {
 }
 
 /// Triggered when there is no email to confirm.
-class _NoEmailToConfirmException extends LocalizableException {
+class _NoEmailToConfirmException extends LocalizableException with UserError {
   /// Creates a new no email to confirm exception instance.
   _NoEmailToConfirmException()
     : super(

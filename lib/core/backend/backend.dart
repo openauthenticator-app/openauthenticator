@@ -13,6 +13,7 @@ import 'package:open_authenticator/core/settings/backend_url.dart';
 import 'package:open_authenticator/i18n/localizable_exception.dart';
 import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/utils/platform.dart';
+import 'package:open_authenticator/utils/result/reporter.dart';
 import 'package:open_authenticator/utils/result/result.dart';
 import 'package:open_authenticator/utils/uri_builder.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -71,7 +72,7 @@ class BackendClient extends AsyncNotifier<Map<String, String>> {
     try {
       final bool canSendRequests = (await ref.read(connectivityStateProvider.future)).canSendRequests;
       if (!canSendRequests) {
-        throw const SocketException('No internet connection.');
+        throw const _OfflineException();
       }
 
       final Map<String, String> headers = await _writeAppClientIdIfNeeded();
@@ -137,4 +138,10 @@ class InvalidSessionException extends LocalizableException {
     : super(
         localizedErrorMessage: translations.error.backend.invalidSession,
       );
+}
+
+/// Indicates that a request could not start because the device is offline.
+class _OfflineException extends SocketException with UserError {
+  /// Creates an offline error for the caller.
+  const _OfflineException() : super('No internet connection.');
 }
