@@ -69,9 +69,13 @@ class HomePage extends ConsumerStatefulWidget {
   /// The home page name.
   static const String name = Navigator.defaultRouteName;
 
+  /// Overrides the platform default placement of the add button.
+  final bool? useFloatingAddButton;
+
   /// Creates a new home page instance.
   const HomePage({
     super.key,
+    this.useFloatingAddButton,
   });
 
   @override
@@ -84,7 +88,9 @@ class _HomePageState extends ConsumerState<HomePage> {
   late final ItemScrollController itemScrollController = ItemScrollController();
 
   /// Whether to display the floating action button.
-  bool showFloatingActionButton = _RevealFloatingActionButtonWidget.hasFloatingActionButton;
+  bool showFloatingActionButton = true;
+
+  bool get useFloatingAddButton => widget.useFloatingAddButton ?? (currentPlatform == Platform.android || kDebugMode);
 
   /// Whether to display the search box.
   bool showSearchBox = false;
@@ -112,7 +118,7 @@ class _HomePageState extends ConsumerState<HomePage> {
       scrollable: !totps.hasValue,
       paddingBuilder: (_) => EdgeInsets.zero,
       header: _HomePageHeader(
-        showAddButton: !_RevealFloatingActionButtonWidget.hasFloatingActionButton,
+        showAddButton: !useFloatingAddButton,
         onAddButtonPress: () => onAddButtonPress(context),
         onTotpSelectedFollowingSearch: (index) async {
           itemScrollController.jumpTo(index: index);
@@ -152,6 +158,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             ),
           ),
           child: _RevealFloatingActionButtonWidget(
+            enabled: useFloatingAddButton,
             onHideFloatingActionButton: () {
               if (showFloatingActionButton) {
                 setState(() => showFloatingActionButton = false);
@@ -183,7 +190,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           ),
         );
         return [
-          if (_RevealFloatingActionButtonWidget.hasFloatingActionButton)
+          if (useFloatingAddButton)
             Stack(
               alignment: Alignment.bottomRight,
               children: [

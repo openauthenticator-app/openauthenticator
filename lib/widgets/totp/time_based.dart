@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:clock/clock.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:open_authenticator/core/totp/totp.dart';
 
@@ -74,7 +75,7 @@ abstract class TimeBasedTotpWidgetState<T extends TimeBasedTotpWidget> extends S
 
   /// Calculates the expiration duration.
   Duration calculateExpirationDuration([DateTime? date]) {
-    date ??= DateTime.now();
+    date ??= clock.now();
     return _calculateExpirationDate(date).difference(date);
   }
 

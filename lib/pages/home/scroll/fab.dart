@@ -2,8 +2,8 @@ part of '../page.dart';
 
 /// A widget that triggers a callback when the user scrolls, so that the floating action button can be hidden or shown.
 class _RevealFloatingActionButtonWidget extends StatelessWidget {
-  /// Whether to display the floating action button initially.
-  static final bool hasFloatingActionButton = currentPlatform == Platform.android || kDebugMode;
+  /// Whether scrolling controls a floating add button on this platform.
+  final bool enabled;
 
   /// Called when the user scrolls up.
   final VoidCallback? onHideFloatingActionButton;
@@ -17,13 +17,14 @@ class _RevealFloatingActionButtonWidget extends StatelessWidget {
   /// Creates a new reveal floating action button widget instance.
   const _RevealFloatingActionButtonWidget({
     super.key,
+    required this.enabled,
     this.onHideFloatingActionButton,
     this.onShowFloatingActionButton,
     required this.child,
   });
 
   @override
-  Widget build(BuildContext context) => hasFloatingActionButton
+  Widget build(BuildContext context) => enabled
       ? NotificationListener<UserScrollNotification>(
           onNotification: (notification) {
             if (notification.metrics.maxScrollExtent != notification.metrics.minScrollExtent) {

@@ -1,0 +1,429 @@
+{
+  "pixelRatio": 2.5,
+  "style": {
+    "background": "#000000",
+    "glow": "#00A557",
+    "title": "#FFFFFF",
+    "subtitle": "#A0A0A0",
+    "accent": "#00E87A",
+    "titleScale": 1,
+    "subtitleScale": 1
+  },
+  "devices": {
+    "iphone": {
+      "platform": "iOS",
+      "width": 440,
+      "height": 960
+    },
+    "android-phone": {
+      "platform": "android",
+      "width": 440,
+      "height": 960
+    },
+    "ipad": {
+      "platform": "iOS",
+      "width": 820,
+      "height": 1024
+    },
+    "android-tablet": {
+      "platform": "android",
+      "width": 900,
+      "height": 670
+    },
+    "mac": {
+      "platform": "macOS",
+      "width": 1220,
+      "height": 910
+    },
+    "windows": {
+      "platform": "windows",
+      "width": 1220,
+      "height": 910
+    },
+    "windows-compact": {
+      "platform": "windows",
+      "width": 700,
+      "height": 910
+    },
+    "linux": {
+      "platform": "linux",
+      "width": 1220,
+      "height": 910
+    }
+  },
+  "formats": {
+    "iphone": {
+      "width": 1260,
+      "height": 2736,
+      "device": "iphone",
+      "companion": "mac",
+      "scenes": [
+        "01-brand",
+        "02-accounts",
+        "03-setup",
+        "04-sync"
+      ]
+    },
+    "ipad": {
+      "width": 2064,
+      "height": 2752,
+      "device": "ipad",
+      "companion": "mac",
+      "scenes": [
+        "01-brand",
+        "02-accounts",
+        "03-setup",
+        "04-sync"
+      ]
+    },
+    "macos": {
+      "width": 2880,
+      "height": 1800,
+      "device": "mac",
+      "companion": "iphone",
+      "scenes": [
+        "01-brand",
+        "02-accounts",
+        "03-setup",
+        "04-sync"
+      ]
+    },
+    "android-phone": {
+      "width": 1242,
+      "height": 2688,
+      "device": "android-phone",
+      "companion": "windows-compact",
+      "scenes": [
+        "01-brand",
+        "02-accounts",
+        "03-setup",
+        "04-sync"
+      ]
+    },
+    "android-tablet-7": {
+      "width": 2304,
+      "height": 1440,
+      "device": "android-tablet",
+      "theme": "dark",
+      "scenes": [
+        "01-tablet"
+      ],
+      "style": {
+        "titleScale": 1.75,
+        "subtitleScale": 1.25,
+        "glow": "#00B25E"
+      }
+    },
+    "android-tablet-10": {
+      "width": 2560,
+      "height": 1800,
+      "scenes": [
+        "01-download"
+      ]
+    },
+    "windows": {
+      "width": 2880,
+      "height": 1800,
+      "device": "windows",
+      "companion": "android-phone",
+      "scenes": [
+        "01-brand",
+        "02-accounts",
+        "03-setup",
+        "04-sync"
+      ]
+    },
+    "linux": {
+      "width": 2880,
+      "height": 1800,
+      "device": "linux",
+      "companion": "android-phone",
+      "scenes": [
+        "01-brand",
+        "02-accounts",
+        "03-setup",
+        "04-sync"
+      ]
+    },
+    "play-header": {
+      "width": 1024,
+      "height": 500,
+      "scenes": [
+        "header"
+      ],
+      "captionBox": [
+        0.28,
+        0.3,
+        0.69,
+        0.43
+      ],
+      "artworkBox": [
+        0.1,
+        0.36,
+        0.14,
+        0.28
+      ],
+      "style": {
+        "background": "#0C0D0C",
+        "glow": "#067440",
+        "glowCenter": [
+          0.51,
+          1.07
+        ],
+        "glowRadius": [
+          0.37,
+          0.65
+        ]
+      }
+    }
+  },
+  "scenes": {
+    "01-brand": {
+      "layout": "brand",
+      "captions": {
+        "en": {
+          "title": "Open **Authenticator**",
+          "subtitle": "A *free*, *cross-platform* and *open-source* OTP app.",
+          "phone": {
+            "title": "Open\n**Authenticator**",
+            "subtitle": "A *free*, *cross-platform*\nand *open-source*\nOTP app."
+          },
+          "portrait": {
+            "subtitle": "A *free*, *cross-platform*\nand *open-source* OTP app."
+          }
+        },
+        "fr": {
+          "title": "Open **Authenticator**",
+          "subtitle": "Une application OTP *gratuite*,\n*multiplateforme* et *open source*.",
+          "phone": {
+            "title": "Open\n**Authenticator**",
+            "subtitle": "Une application OTP\n*gratuite*, *multiplateforme*\net *open source*."
+          }
+        },
+        "de": {
+          "title": "Open **Authenticator**",
+          "subtitle": "Eine *kostenlose*, *plattformübergreifende*\nund *Open-Source*-OTP-App.",
+          "phone": {
+            "title": "Open\n**Authenticator**",
+            "subtitle": "Eine *kostenlose*,\n*plattformübergreifende*\nund *Open-Source*-OTP-App."
+          },
+          "portrait": {
+            "subtitle": "Eine *kostenlose*,\n*plattformübergreifende*\nund *Open-Source*-OTP-App."
+          }
+        },
+        "it": {
+          "title": "Open **Authenticator**",
+          "subtitle": "Un'app OTP *gratuita*, *multipiattaforma* e *open source*.",
+          "phone": {
+            "title": "Open\n**Authenticator**",
+            "subtitle": "Un'app OTP *gratuita*,\n*multipiattaforma*\ne *open source*."
+          },
+          "portrait": {
+            "subtitle": "Un'app OTP *gratuita*,\n*multipiattaforma* e *open source*."
+          }
+        },
+        "pt": {
+          "title": "Open **Authenticator**",
+          "subtitle": "Um aplicativo OTP *gratuito*,\n*multiplataforma* e de *código aberto*.",
+          "phone": {
+            "title": "Open\n**Authenticator**",
+            "subtitle": "Um aplicativo OTP\n*gratuito*, *multiplataforma*\ne de *código aberto*."
+          }
+        }
+      }
+    },
+    "02-accounts": {
+      "layout": "accounts",
+      "captions": {
+        "en": {
+          "title": "*Protect* your online life.",
+          "subtitle": "Enable 2FA and add all your accounts.",
+          "phone": {
+            "subtitle": "Enable 2FA and add all\nyour accounts."
+          }
+        },
+        "fr": {
+          "title": "*Protégez* votre vie virtuelle.",
+          "subtitle": "Activez la 2FA et ajoutez tous vos comptes.",
+          "phone": {
+            "title": "*Protégez* votre vie\nvirtuelle.",
+            "subtitle": "Activez la 2FA et\najoutez tous vos comptes."
+          }
+        },
+        "de": {
+          "title": "*Schützen* Sie Ihr Online-Leben.",
+          "subtitle": "Aktivieren Sie 2FA und fügen Sie all Ihre Konten hinzu.",
+          "phone": {
+            "title": "*Schützen* Sie Ihr\nOnline-Leben.",
+            "subtitle": "Aktivieren Sie 2FA und\nfügen Sie all Ihre Konten hinzu."
+          },
+          "portrait": {
+            "subtitle": "Aktivieren Sie 2FA und\nfügen Sie all Ihre Konten hinzu."
+          }
+        },
+        "it": {
+          "title": "*Proteggi* la tua vita online.",
+          "subtitle": "Attiva la 2FA e aggiungi tutti i tuoi account.",
+          "phone": {
+            "title": "*Proteggi* la tua vita\nonline.",
+            "subtitle": "Attiva la 2FA e aggiungi\ntutti i tuoi account."
+          }
+        },
+        "pt": {
+          "title": "*Proteja* a sua vida online.",
+          "subtitle": "Ative a 2FA e adicione todas as suas contas.",
+          "phone": {
+            "title": "*Proteja* a sua vida\nonline.",
+            "subtitle": "Ative a 2FA e adicione\ntodas as suas contas."
+          }
+        }
+      }
+    },
+    "03-setup": {
+      "layout": "setup",
+      "captions": {
+        "en": {
+          "title": "*Fast* and *easy* setup.",
+          "subtitle": "With a QR code or manually.",
+          "phone": {
+            "subtitle": "With a QR code or\nmanually."
+          }
+        },
+        "fr": {
+          "title": "Configuration *rapide* et *facile*.",
+          "subtitle": "Avec un QR code ou manuellement.",
+          "phone": {
+            "title": "Configuration *rapide*\net *facile*.",
+            "subtitle": "Avec un QR code ou\nmanuellement."
+          }
+        },
+        "de": {
+          "title": "*Schnelle* und *einfache* Einrichtung.",
+          "subtitle": "Mit einem QR-Code oder manuell.",
+          "phone": {
+            "title": "*Schnelle* und *einfache*\nEinrichtung.",
+            "subtitle": "Mit einem QR-Code oder\nmanuell."
+          }
+        },
+        "it": {
+          "title": "Configurazione *rapida* e *semplice*.",
+          "subtitle": "Con un codice QR o manualmente.",
+          "phone": {
+            "title": "Configurazione *rapida*\ne *semplice*.",
+            "subtitle": "Con un codice QR o\nmanualmente."
+          }
+        },
+        "pt": {
+          "title": "Configuração *rápida* e *fácil*.",
+          "subtitle": "Com um código QR ou manualmente.",
+          "phone": {
+            "title": "Configuração\n*rápida* e *fácil*.",
+            "subtitle": "Com um código QR ou\nmanualmente."
+          }
+        }
+      }
+    },
+    "04-sync": {
+      "layout": "sync",
+      "captions": {
+        "en": {
+          "title": "Available *everywhere*.",
+          "subtitle": "Synchronize your TOTPs on all your devices.",
+          "phone": {
+            "subtitle": "Synchronize your TOTPs\non all your devices."
+          }
+        },
+        "fr": {
+          "title": "Disponible *partout*.",
+          "subtitle": "Synchronisez vos TOTPs sur tous vos appareils.",
+          "phone": {
+            "subtitle": "Synchronisez vos TOTPs\nsur tous vos appareils."
+          }
+        },
+        "de": {
+          "title": "*Überall* verfügbar.",
+          "subtitle": "Synchronisieren Sie Ihre TOTPs\nauf all Ihren Geräten."
+        },
+        "it": {
+          "title": "Disponibile *ovunque*.",
+          "subtitle": "Sincronizza i tuoi TOTPs su\ntutti i tuoi dispositivi.",
+          "phone": {
+            "subtitle": "Sincronizza i tuoi TOTPs\nsu tutti i tuoi dispositivi."
+          },
+          "portrait": {
+            "subtitle": "Sincronizza i tuoi TOTPs\nsu tutti i tuoi dispositivi."
+          }
+        },
+        "pt": {
+          "title": "Disponível em *todo lugar*.",
+          "subtitle": "Sincronize seus TOTPs em\ntodos os seus dispositivos.",
+          "phone": {
+            "title": "Disponível em\n*todo lugar*."
+          }
+        }
+      }
+    },
+    "01-tablet": {
+      "layout": "accounts",
+      "captions": {
+        "en": {
+          "title": "Available *now*.",
+          "subtitle": "On phones, computers and tablets."
+        },
+        "fr": {
+          "title": "Disponible dès *maintenant*.",
+          "subtitle": "Sur téléphones, ordinateurs et tablettes."
+        },
+        "de": {
+          "title": "*Jetzt* verfügbar.",
+          "subtitle": "Auf Smartphones, Computern und Tablets."
+        },
+        "it": {
+          "title": "Disponibile *ora*.",
+          "subtitle": "Su telefoni, computer e tablet."
+        },
+        "pt": {
+          "title": "Disponível *agora*.",
+          "subtitle": "Em telemóveis, computadores e tablets."
+        }
+      }
+    },
+    "01-download": {
+      "layout": "download",
+      "captions": {
+        "en": {
+          "title": "Download **Open Authenticator** *now*.",
+          "subtitle": "What are you waiting for?"
+        },
+        "fr": {
+          "title": "Téléchargez **Open Authenticator** *maintenant*.",
+          "subtitle": "Qu’attendez-vous ?"
+        },
+        "de": {
+          "title": "Laden Sie **Open Authenticator** *jetzt herunter*.",
+          "subtitle": "Worauf warten Sie noch?"
+        },
+        "it": {
+          "title": "Scarica *subito* **Open Authenticator**.",
+          "subtitle": "Cosa stai aspettando?"
+        },
+        "pt": {
+          "title": "Baixe o **Open Authenticator** *agora*.",
+          "subtitle": "O que você está esperando?"
+        }
+      },
+      "style": {
+        "glow": "#006F3A"
+      }
+    },
+    "header": {
+      "layout": "banner",
+      "captions": {
+        "*": {
+          "title": "Open **Authenticator**",
+          "subtitle": "https://openauthenticator.app"
+        }
+      }
+    }
+  }
+}

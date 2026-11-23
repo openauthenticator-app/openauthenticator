@@ -8,12 +8,16 @@ import 'package:window_manager/window_manager.dart';
 
 /// Allows to display a window frame.
 class DesktopWindowFrame extends StatelessWidget {
+  /// The window controlled by this frame. Defaults to the primary app window.
+  final Window? window;
+
   /// The child widget.
   final Widget child;
 
   /// Creates a new window frame widget instance.
   const DesktopWindowFrame({
     super.key,
+    this.window,
     required this.child,
   });
 
@@ -25,7 +29,7 @@ class DesktopWindowFrame extends StatelessWidget {
             Container(
               color: context.theme.colors.background,
               padding: const EdgeInsets.all(kSpace),
-              child: _DragArea(),
+              child: _DragArea(window ?? currentWindow),
             ),
             Expanded(child: child),
           ],
@@ -35,6 +39,10 @@ class DesktopWindowFrame extends StatelessWidget {
 
 /// Drag area for the app.
 class _DragArea extends StatefulWidget {
+  final Window? window;
+
+  _DragArea(this.window) : super(key: ObjectKey(window));
+
   @override
   State<StatefulWidget> createState() => _DragAreaState();
 }
@@ -42,7 +50,7 @@ class _DragArea extends StatefulWidget {
 /// The drag area widget state.
 class _DragAreaState extends State<_DragArea> {
   /// The current window.
-  final Window? window = currentWindow;
+  Window? get window => widget.window;
 
   /// The window listener ID.
   ListenerId? listenerId;

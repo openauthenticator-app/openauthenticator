@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:clock/clock.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:open_authenticator/core/totp/decrypted.dart';
@@ -199,7 +200,7 @@ class _TotpCountdownImageCircularProgressState extends TimeBasedTotpWidgetState<
   @override
   void initState() {
     super.initState();
-    if (((DateTime.now().millisecondsSinceEpoch ~/ 1000) ~/ validity.inSeconds).isEven) {
+    if (((clock.now().millisecondsSinceEpoch ~/ 1000) ~/ validity.inSeconds).isEven) {
       changeColors();
     }
     scheduleAnimation();
