@@ -2,6 +2,28 @@
 set -euo pipefail
 set -x
 
+if [[ ${1:-} == --local ]]; then
+  project_dir=$(cd "$(dirname "$0")/.." && pwd)
+  output_dir="$project_dir/build/flatpak"
+  mkdir -p "$output_dir"
+  stage=$(mktemp -d "$output_dir/.build.XXXXXXXX")
+  trap 'rm -rf "$stage"' EXIT
+  mkdir -p "$stage/flatpak"
+
+  # The packaging build cleans Flutter outputs, sets its own application ID and
+  # recreates its OSTree repository. Keep all three in the temporary project.
+  rsync -a --exclude=ephemeral "$project_dir"/{assets,lib,linux,pubspec.yaml} "$stage/"
+  if [[ -f "$project_dir/pubspec.lock" ]]; then
+    cp "$project_dir/pubspec.lock" "$stage/"
+  fi
+  cp "$project_dir"/flatpak/{app.yaml,app.metainfo.xml,build-flutter-app.sh,flatpak-build-subcommand.sh} "$stage/flatpak/"
+  sed 's/\r$//' "$project_dir/flatpak/app.desktop" > "$stage/flatpak/app.desktop"
+  (cd "$stage/flatpak" && bash ./build-flutter-app.sh)
+  mv "$stage/flatpak/"*.flatpak "$stage/flatpak/"*.tar.gz "$output_dir/"
+  echo "Flatpak and portable archive: $output_dir"
+  exit 0
+fi
+
 project_name=OpenAuthenticator
 app_id=app.openauthenticator.OpenAuthenticator
 archive_name="$project_name-Linux-Portable.tar.gz"
@@ -135,7 +157,7 @@ if [[ -n "${FLATPAK_GPG_KEY_ID:-}" ]]; then
 fi
 
 flatpak build-update-repo "$repo_dir" "${update_repo_args[@]}"
-flatpak build-bundle "$repo_dir" "$flatpak_bundle" "$app_id"
+flatpak build-bundle "$repo_dir" "$flatpak_bundle" "$app_id" "${FLATPAK_REPO_DEFAULT_BRANCH:-master}"
 
 if [[ -n "${FLATPAK_REPO_URL:-}" ]]; then
   write_flatpakrepo_file "$FLATPAK_REPO_URL"

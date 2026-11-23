@@ -136,6 +136,33 @@ To run the app :
 flutter run
 ```
 
+### Build the app
+
+After the development setup, run the build utility from the repository root.
+
+```sh
+dart run open_authenticator:build --list
+dart run open_authenticator:build linux aab
+dart run open_authenticator:build apk -- --debug
+dart run open_authenticator:build --dry-run ipa macos msix
+```
+
+Choose one or more targets. Flutter builds default to release. For a single
+Flutter, MSIX or Snap target, arguments after `--` go directly to its build tool.
+
+| Targets                  | Host                        | Output                                                             |
+|--------------------------|-----------------------------|--------------------------------------------------------------------|
+| `android` / `aab`, `apk` | Linux, macOS, Windows       | Play Store bundle or installable APK under `build/app/outputs/`    |
+| `ios`, `ipa`, `macos`    | macOS                       | iOS app, Xcode archive and signed IPA, or macOS app under `build/` |
+| `windows`, `msix`        | Windows                     | Windows app or Store package under `build/windows/`                |
+| `linux`                  | Linux                       | Desktop bundle under `build/linux/`                                |
+| `flatpak`                | x86_64 Linux                | Local Flatpak and portable tarball under `build/flatpak/`          |
+| `snap`                   | Linux with Docker and rsync | Snap in the project root or `SNAP_OUTPUT_DIR`                      |
+
+Flatpak uses rsync, flatpak-builder and the Freedesktop 25.08 runtime and SDK.
+Store builds use the project's existing signing settings. The packaging targets
+produce local artifacts.
+
 ## Contributing
 
 Contributions are more than welcome. For setup details, contribution rules and PR expectations, read the

@@ -20,10 +20,12 @@ load_env_file() {
     return 0
   fi
 
+  set +x
   set -a
   # shellcheck disable=SC1090
   . "$candidate"
   set +a
+  set -x
 }
 
 strip_trailing_cr() {
