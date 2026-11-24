@@ -89,6 +89,8 @@ bool isReportableException(Object? ex) => switch (ex) {
   SocketException() || HandshakeException() || http.ClientException() || TimeoutException() => false,
   // Another app may hold the Windows clipboard, including when a text field pastes text.
   PlatformException(code: 'Clipboard error') => false,
+  // Cancelling a platform event stream that is already closed (eg. by a plugin restarting its stream) has no effect.
+  PlatformException(code: 'error', message: 'No active stream to cancel') => false,
   _ => true,
 };
 

@@ -21,10 +21,12 @@ void main() {
       http.ClientException('Connection closed before full header was received'),
       TimeoutException('fixture'),
       PlatformException(code: 'Clipboard error', message: 'Unable to get clipboard data'),
+      PlatformException(code: 'error', message: 'No active stream to cancel'),
     ]) {
       expect(isReportableException(ex), isFalse, reason: '$ex');
     }
     expect(isReportableException(PlatformException(code: 'write_error')), isTrue);
+    expect(isReportableException(PlatformException(code: 'error', message: 'No active stream to listen')), isTrue);
     expect(isReportableException(StateError('fixture')), isTrue);
   });
 
