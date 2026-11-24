@@ -32,6 +32,9 @@
     "invalidContent": "Invalid backup content.",
     "crypto": "A cryptographic error occurred."
   },
+  "secureStorage": {
+    "writeFailed": "Your device's secure storage could not save your data ($message). Please make sure it is available and unlocked, then try again."
+  },
   "appUnlock": {
     "generic": "Failed to unlock the app. Please try again.",
     "localAuthenticationDeviceNotSupported": "Cannot unlock the app because your device is not supported by local authentication. Disable this locking method with the button below.",

@@ -32,6 +32,9 @@
     "invalidContent": "Conteúdo inválido.",
     "crypto": "Ocorreu um erro de criptografia."
   },
+  "secureStorage": {
+    "writeFailed": "O armazenamento seguro do seu dispositivo não conseguiu salvar seus dados ($message). Verifique se ele está disponível e desbloqueado e tente novamente."
+  },
   "appUnlock": {
     "generic": "Falha ao desbloquear a aplicação. Tente novamente.",
     "localAuthenticationDeviceNotSupported": "Falha ao desbloquear a aplicação porque seu dispositivo não é suportado por autenticação local. Desative esta método com o botão abaixo.",

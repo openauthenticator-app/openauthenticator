@@ -6,7 +6,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_authenticator/app.dart';
 import 'package:open_authenticator/core/settings/app_unlock_method.dart';
 import 'package:open_authenticator/core/settings/entry.dart';
+import 'package:open_authenticator/i18n/localizable_exception.dart';
+import 'package:open_authenticator/i18n/translations.g.dart';
 import 'package:open_authenticator/utils/platform.dart';
+import 'package:open_authenticator/utils/result/reporter.dart';
 import 'package:open_authenticator/utils/shared_preferences_with_prefix.dart';
 import 'package:simple_secure_storage/simple_secure_storage.dart';
 
@@ -45,15 +48,37 @@ extension CredentialStorage on CachedSimpleSecureStorage {
     final String? previous = read(key);
     try {
       await write(key, value);
-    } catch (_) {
+    } catch (ex, stackTrace) {
       if (previous == null) {
         await delete(key, flush: false);
       } else {
         await write(key, previous, flush: false);
       }
+      if (ex is PlatformException && ex.code == SecureStorageWriteException.kPlatformErrorCode) {
+        Error.throwWithStackTrace(SecureStorageWriteException(ex), stackTrace);
+      }
       rethrow;
     }
   }
+}
+
+/// Thrown when the system secure storage (eg. a locked or missing keychain) refuses to save a credential.
+/// This depends on the user environment, so it is not reported to Sentry.
+class SecureStorageWriteException extends LocalizableException with UserError {
+  /// The error code used by the platform implementations when a write fails.
+  static const String kPlatformErrorCode = 'write_error';
+
+  /// The platform error.
+  final PlatformException cause;
+
+  /// Creates a new secure storage write exception instance.
+  SecureStorageWriteException(this.cause)
+    : super(
+        localizedErrorMessage: translations.error.secureStorage.writeFailed(message: cause.message?.trim() ?? cause.code),
+      );
+
+  @override
+  String toString() => 'SecureStorageWriteException: $cause';
 }
 
 /// Allows to clear the restored encrypted storage.

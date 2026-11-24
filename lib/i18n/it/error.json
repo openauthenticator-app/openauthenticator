@@ -32,6 +32,9 @@
     "invalidContent": "Contenuto non valido.",
     "crypto": "Si è verificato un errore di crittografia."
   },
+  "secureStorage": {
+    "writeFailed": "L'archivio sicuro del tuo dispositivo non è riuscito a salvare i tuoi dati ($message). Assicurati che sia disponibile e sbloccato, quindi riprova."
+  },
   "appUnlock": {
     "generic": "Impossibile sbloccare l'applicazione. Riprova.",
     "localAuthenticationDeviceNotSupported": "Impossibile sbloccare l'applicazione perché il tuo dispositivo non è supportato dall'autenticazione locale. Disattiva questa modalità con il pulsante sotto.",

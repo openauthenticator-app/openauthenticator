@@ -32,6 +32,9 @@
     "invalidContent": "Contenu invalide.",
     "crypto": "Une erreur de chiffrement est survenue."
   },
+  "secureStorage": {
+    "writeFailed": "Le stockage sécurisé de votre appareil n'a pas pu enregistrer vos données ($message). Veuillez vérifier qu'il est disponible et déverrouillé, puis réessayer."
+  },
   "appUnlock": {
     "generic": "Impossible de déverrouiller l'application. Veuillez réessayer.",
     "localAuthenticationDeviceNotSupported": "Impossible de déverrouiller l'application car votre appareil n'est pas pris en charge par l'authentification locale. Désactivez cette méthode avec le bouton ci-dessous.",

@@ -32,6 +32,9 @@
     "invalidContent": "Ungültiges Backup-Inhalt.",
     "crypto": "Ein kryptographisches Fehler ist aufgetreten."
   },
+  "secureStorage": {
+    "writeFailed": "Der sichere Speicher Ihres Geräts konnte Ihre Daten nicht speichern ($message). Bitte stellen Sie sicher, dass er verfügbar und entsperrt ist, und versuchen Sie es erneut."
+  },
   "appUnlock": {
     "generic": "Beim Entsperren der App ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
     "localAuthenticationDeviceNotSupported": "Die App kann nicht entsperrt werden, da Ihr Gerät die lokale Authentifizierung nicht unterstützt. Deaktivieren Sie diese Sperrmethode mit der Schaltfläche unten.",
