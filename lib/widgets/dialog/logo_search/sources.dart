@@ -24,8 +24,20 @@ mixin Source {
     HttpHeaders.userAgentHeader: 'OpenAuthenticator logo search (${App.githubRepositoryUrl})',
   };
 
+  /// The time allowed for a source search or an image check.
+  static const Duration _requestTimeout = Duration(seconds: 8);
+
   /// The source name (to display attributions).
   String get name;
+
+  /// Returns candidates from this source, or an empty list if it fails or times out.
+  Future<Iterable<Uri>> search(http.Client client, String userKeywords) async {
+    try {
+      return await Future<Iterable<Uri>>.sync(() => _trySearch(client, userKeywords)).timeout(_requestTimeout);
+    } catch (_) {
+      return const [];
+    }
+  }
 
   /// Searches using this source.
   FutureOr<Iterable<Uri>> _trySearch(http.Client client, String userKeywords);
@@ -33,7 +45,7 @@ mixin Source {
   /// Check whether the given [imageUrl] is good to display.
   static Future<bool> check(http.Client client, Uri imageUrl) async {
     try {
-      final http.Response response = await client.head(imageUrl, headers: defaultHeaders);
+      final http.Response response = await client.head(imageUrl, headers: defaultHeaders).timeout(_requestTimeout);
       return response.statusCode == HttpStatus.ok;
     } catch (_) {
       return false;
@@ -297,13 +309,4 @@ class BrandfetchSource with Source {
 
   /// The endpoint URL.
   Uri buildEndpointUrl(String keywords) => Uri.https('api.brandfetch.io', '/v2/search/$keywords');
-}
-
-/// Allows to quickly search on a source list.
-extension Search on List<Source> {
-  /// Searches using these sources, avoiding errors.
-  Future<List<Uri>> search(http.Client client, String userKeywords) async => [
-    for (final Source source in this) //
-      ...await source._trySearch(client, userKeywords),
-  ];
 }

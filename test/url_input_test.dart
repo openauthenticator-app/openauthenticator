@@ -32,11 +32,11 @@ void main() {
       return http.Response('<link rel="icon" href="/logo.png">', 200);
     });
     for (final input in ['a:bad port', 'site.test]', 'A [Brand]', 'https://']) {
-      expect(await [const DirectSource()].search(client, input), isEmpty);
+      expect(await const DirectSource().search(client, input), isEmpty);
     }
     expect(requests, isEmpty);
     for (final input in ['Demo Brand', 'demobrand.com', 'https://demobrand.com/page']) {
-      expect(await [const DirectSource()].search(client, input), [Uri.https('demobrand.com', '/logo.png')]);
+      expect(await const DirectSource().search(client, input), [Uri.https('demobrand.com', '/logo.png')]);
     }
   });
 }

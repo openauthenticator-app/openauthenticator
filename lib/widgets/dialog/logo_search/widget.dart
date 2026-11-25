@@ -47,16 +47,20 @@ class _LogoSearchState extends State<LogoSearch> {
   /// The HTTP client.
   final http.Client client = http.Client();
 
-  /// The search keywords.
-  late TextEditingController searchKeywordsController = TextEditingController(text: widget.initialSearchKeywords ?? kDefaultSearch)
-    ..addListener(() {
-      if (mounted) {
-        debounce.milliseconds(500, search);
-      }
-    });
+  /// The initial text displayed in the search field.
+  late final String initialKeywords;
 
-  /// All searches triggered by the user.
-  final Map<String, List<String>> searches = {};
+  /// The normalized keywords for the current search.
+  late String searchKeywords;
+
+  /// Identifies the current search, even when revisiting the same keywords.
+  int searchRevision = 0;
+
+  /// Whether the current search is waiting on any sources or images.
+  bool searching = true;
+
+  /// The images found for the current keywords.
+  final List<String> imageUrls = [];
 
   /// The images that failed to render.
   final Set<String> imageErrors = {};
@@ -64,9 +68,10 @@ class _LogoSearchState extends State<LogoSearch> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      debounce.milliseconds(100, search);
-    });
+    final String initialText = widget.initialSearchKeywords?.trim() ?? '';
+    initialKeywords = initialText.isEmpty ? kDefaultSearch : initialText;
+    searchKeywords = initialKeywords.toLowerCase();
+    unawaited(search());
   }
 
   @override
@@ -74,7 +79,10 @@ class _LogoSearchState extends State<LogoSearch> {
     mainAxisSize: .min,
     children: [
       FTextFormField(
-        control: .managed(controller: searchKeywordsController),
+        control: .managed(
+          initial: TextEditingValue(text: initialKeywords),
+          onChange: onKeywordsChanged,
+        ),
         style: .delta(
           color: .delta(
             [
@@ -106,17 +114,16 @@ class _LogoSearchState extends State<LogoSearch> {
           ),
         ),
       ),
-      if (searches[filteredSearchKeywords]?.isNotEmpty == true)
+      if (imageUrls.isNotEmpty)
         Wrap(
           alignment: .center,
           spacing: widget.imageWidth / 10,
           runSpacing: widget.imageWidth / 10,
           children: [
-            for (final String logo in searches[filteredSearchKeywords]!) //
-              buildImageWidget(logo),
+            for (final String logo in imageUrls) buildImageWidget(logo),
           ],
         )
-      else if (searches.isNotEmpty)
+      else if (searching)
         const CenteredCircularProgressIndicator()
       else
         Text(
@@ -130,37 +137,48 @@ class _LogoSearchState extends State<LogoSearch> {
   void dispose() {
     debounce.clear(search);
     client.close();
-    searchKeywordsController.dispose();
     super.dispose();
   }
 
-  /// Returns the search keywords, non null and lowercased.
-  String get filteredSearchKeywords => searchKeywordsController.text.trim().isEmpty ? kDefaultSearch : searchKeywordsController.text.trim().toLowerCase();
+  /// Queues a new search when the keywords change.
+  void onKeywordsChanged(TextEditingValue value) {
+    final String text = value.text.trim().toLowerCase();
+    final String keywords = text.isEmpty ? kDefaultSearch : text;
+    if (keywords == searchKeywords) {
+      return;
+    }
+    setState(() {
+      searchKeywords = keywords;
+      searchRevision++;
+      searching = true;
+      imageUrls.clear();
+    });
+    debounce.milliseconds(500, search);
+  }
 
-  /// Triggers the search.
+  /// Looks up each source independently and displays logos as their checks finish.
   Future<void> search() async {
-    final String keywords = filteredSearchKeywords;
-    if (!mounted || searches.containsKey(keywords)) {
-      return;
-    }
-
-    setState(searches.clear);
-    final List<Uri> logos = await Source.sources.search(client, keywords);
-    if (!mounted) {
-      return;
-    }
-
-    setState(() => searches.putIfAbsent(keywords, () => []));
-    for (final Uri logo in logos) {
-      if (await Source.check(client, logo) && mounted && searches.containsKey(keywords) && !imageErrors.contains(logo.toString())) {
-        setState(() => searches[keywords]?.add(logo.toString()));
-      }
-      if (!searches.containsKey(keywords)) {
-        break;
-      }
-    }
-    if (mounted && searches[keywords]?.isEmpty == true) {
-      setState(() => searches.remove(keywords));
+    final String keywords = searchKeywords;
+    final int revision = searchRevision;
+    final Set<Uri> candidates = {};
+    await Future.wait(
+      Source.sources.map((source) async {
+        final Iterable<Uri> logos = await source.search(client, keywords);
+        if (!mounted || revision != searchRevision) {
+          return;
+        }
+        await Future.wait(
+          logos.where(candidates.add).map((logo) async {
+            final String url = logo.toString();
+            if (await Source.check(client, logo) && mounted && revision == searchRevision && !imageErrors.contains(url)) {
+              setState(() => imageUrls.add(url));
+            }
+          }),
+        );
+      }),
+    );
+    if (mounted && revision == searchRevision) {
+      setState(() => searching = false);
     }
   }
 
@@ -170,19 +188,12 @@ class _LogoSearchState extends State<LogoSearch> {
       if (!mounted || !imageErrors.add(imageUrl)) {
         return;
       }
-      setState(() {
-        searches.updateAll((_, logos) => logos..remove(imageUrl));
-        searches.removeWhere((_, logos) => logos.isEmpty);
-      });
+      setState(() => imageUrls.remove(imageUrl));
     });
   }
 
   /// Builds the image widget that corresponds to the [imageUrl].
   Widget buildImageWidget(String imageUrl) {
-    if (imageErrors.contains(imageUrl)) {
-      return const SizedBox.shrink();
-    }
-
     Widget image = UnconstrainedBox(
       child: SizedBox(
         width: widget.imageWidth,
