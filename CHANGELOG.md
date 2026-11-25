@@ -1,5 +1,11 @@
 # 📰 Open Authenticator changelog
 
+## v2.1.2
+Released on November 25, 2026.
+
+* **FIX**: Fixed a bug with the logo picker dialog. ([#a8632a7](https://github.com/openauthenticator-app/openauthenticator/commit/a8632a7))
+* **FIX**: Fixed some problems with toasts and dialogs. ([#d18d454](https://github.com/openauthenticator-app/openauthenticator/commit/d18d454))
+
 ## v2.1.1
 Released on November 25, 2026.
 

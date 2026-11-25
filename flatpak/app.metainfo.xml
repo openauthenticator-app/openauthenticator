@@ -77,6 +77,15 @@
   </branding>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="2.1.2" date="2026-11-25">
+      <url type="details">https://github.com/openauthenticator-app/openauthenticator/releases/tag/2.1.2</url>
+      <description type="changelog">
+        <ul>
+          <li>Fixed a bug with the logo picker dialog.</li>
+          <li>Fixed some problems with toasts and dialogs.</li>
+        </ul>
+      </description>
+    </release>
     <release version="2.1.1" date="2026-11-25">
       <url type="details">https://github.com/openauthenticator-app/openauthenticator/releases/tag/2.1.1</url>
       <description type="changelog">
