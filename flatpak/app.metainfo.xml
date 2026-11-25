@@ -77,6 +77,80 @@
   </branding>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="2.1.1" date="2026-11-25">
+      <url type="details">https://github.com/openauthenticator-app/openauthenticator/releases/tag/2.1.1</url>
+      <description type="changelog">
+        <ul>
+          <li>Update the Gradle toolchain for Flutter 3.50.</li>
+          <li>Documented backup, image cache and test helpers.</li>
+          <li>Documented updated widget builders and backup fixtures.</li>
+          <li>Apply the analyzer suggestions for TOTP links.</li>
+          <li>Ordered logo source members and documented error and test helpers.</li>
+          <li>Specified fixture types in regression tests.</li>
+          <li>Specified widget finder and directory types in the backup test.</li>
+          <li>Localized the app into Spanish.</li>
+          <li>Allow session refresh to retry after a transient failure.</li>
+          <li>Center the QR scan window in the camera preview.</li>
+          <li>Database writes that replace or delete TOTPs are now transactional.</li>
+          <li>Deferred biometric prompts while the app was in the background.</li>
+          <li>Enabling the synchronization does not mix up encryption keys anymore when the entered password cannot decrypt the online TOTPs.</li>
+          <li>Fixed backup creation, export, sharing and deletion.</li>
+          <li>Fixed external links being handled twice.</li>
+          <li>Fixed no backup being created when enabling or disabling the synchronization.</li>
+          <li>Fixed pending synchronization operations not being pushed when going back online or after a local change during a retry delay.</li>
+          <li>Fixed the app freezing when refreshing a session with an expired refresh token.</li>
+          <li>Fixed the email confirmation not being saved when the confirmation entry is not displayed.</li>
+          <li>Fixed the image cache clearing failing when some files were locked.</li>
+          <li>Fixed various static analysis issues.</li>
+          <li>Keep native authentication tied to the app window.</li>
+          <li>Keep vault limit actions available when billing is unavailable.</li>
+          <li>Keep vault observers outside key-change transactions and honor migration backups.</li>
+          <li>Kept backup actions attached to the selected file when the list changed.</li>
+          <li>Kept expected authentication and offline errors out of crash reports.</li>
+          <li>Kept network, TLS and busy clipboard errors out of crash reports.</li>
+          <li>Kept password setup retryable when the system keychain was unavailable.</li>
+          <li>Kept the harmless "No active stream to cancel" platform error out of crash reports.</li>
+          <li>Master password changes are now rolled back if the new key cannot be saved.</li>
+          <li>Match TOTP searches regardless of case and close desktop menus after selection.</li>
+          <li>Persist vault changes and pending sync operations together.</li>
+          <li>Preserved migration failures and handled unsuitable backend responses.</li>
+          <li>Prevented overlapping authentication prompts.</li>
+          <li>Recover unsupported parameters in legacy TOTP records.</li>
+          <li>Recovered damaged image caches and serialized writes with cache clearing.</li>
+          <li>Rejected malformed encryption metadata when importing backups.</li>
+          <li>Rejected negative and oversized backend ports.</li>
+          <li>Report failures when migrating or clearing local data.</li>
+          <li>Retried busy clipboard writes and handled failed link launches.</li>
+          <li>Retried the automatic unlock when the app went to the background before the biometric prompt could be shown.</li>
+          <li>Separate issuer prefixes from account names in TOTP links.</li>
+          <li>Serialized QR detections and guarded camera restarts.</li>
+          <li>Shown a localized error instead of reporting it when the system keychain refused to save a credential.</li>
+          <li>Stored backups in Documents again, falling back to the app support directory when Documents is not usable.</li>
+          <li>The synchronization now starts right after being enabled.</li>
+          <li>Undecryptable TOTPs are now reported with an explanation instead of failing silently.</li>
+          <li>Undecryptable TOTPs can now be deleted on desktop.</li>
+          <li>Use the account quota to enable vault synchronization.</li>
+          <li>Validate every backup entry before replacing the vault.</li>
+          <li>Validated backend URLs and logo search input before sending requests.</li>
+          <li>Added a build utility.</li>
+          <li>Added a utility to easily take screenshots.</li>
+          <li>Migrated to SPM.</li>
+          <li>Removed unused storage migration error translations.</li>
+          <li>Updated Darwin projects.</li>
+          <li>Updated build scripts to use project root for path resolution.</li>
+          <li>Updated the last screenshot.</li>
+          <li>Enabled more lint rules and specified types.</li>
+          <li>Migrated to the native `window_manager` API.</li>
+          <li>Moved domain code out of `lib/utils` and split `lib/utils/utils.dart`.</li>
+          <li>Moved the dialogs defined in flows to `lib/widgets/dialog`.</li>
+          <li>Moved the storage migration logic from the storage type settings entry to a `StorageMigrator`.</li>
+          <li>Removed some unused code and imports of Riverpod internals.</li>
+          <li>Renamed `lib/model` to `lib/core`.</li>
+          <li>Simplified backend errors handling.</li>
+          <li>Split backend requests and responses by domain.</li>
+        </ul>
+      </description>
+    </release>
     <release version="2.1.0" date="2026-06-29">
       <url type="details">https://github.com/openauthenticator-app/openauthenticator/releases/tag/2.1.0</url>
       <description type="changelog">

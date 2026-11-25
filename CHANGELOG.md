@@ -1,5 +1,53 @@
 # 📰 Open Authenticator changelog
 
+## v2.1.1
+Released on November 25, 2026.
+
+* **FEAT**: Localized the app into Spanish. ([#fc4c245](https://github.com/openauthenticator-app/openauthenticator/commit/fc4c245))
+* **FIX**: Allow session refresh to retry after a transient failure. ([#a8af4bb](https://github.com/openauthenticator-app/openauthenticator/commit/a8af4bb))
+* **FIX**: Center the QR scan window in the camera preview. ([#ea773c1](https://github.com/openauthenticator-app/openauthenticator/commit/ea773c1))
+* **FIX**: Database writes that replace or delete TOTPs are now transactional. ([#91b6dfe](https://github.com/openauthenticator-app/openauthenticator/commit/91b6dfe))
+* **FIX**: Deferred biometric prompts while the app was in the background. ([#13783e6](https://github.com/openauthenticator-app/openauthenticator/commit/13783e6))
+* **FIX**: Enabling the synchronization does not mix up encryption keys anymore when the entered password cannot decrypt the online TOTPs. ([#ebaa143](https://github.com/openauthenticator-app/openauthenticator/commit/ebaa143))
+* **FIX**: Fixed backup creation, export, sharing and deletion. ([#2977be3](https://github.com/openauthenticator-app/openauthenticator/commit/2977be3))
+* **FIX**: Fixed external links being handled twice. ([#18df4a8](https://github.com/openauthenticator-app/openauthenticator/commit/18df4a8))
+* **FIX**: Fixed no backup being created when enabling or disabling the synchronization. ([#6e847a9](https://github.com/openauthenticator-app/openauthenticator/commit/6e847a9))
+* **FIX**: Fixed pending synchronization operations not being pushed when going back online or after a local change during a retry delay. ([#5953601](https://github.com/openauthenticator-app/openauthenticator/commit/5953601))
+* **FIX**: Fixed the app freezing when refreshing a session with an expired refresh token. ([#5ba9eb7](https://github.com/openauthenticator-app/openauthenticator/commit/5ba9eb7))
+* **FIX**: Fixed the email confirmation not being saved when the confirmation entry is not displayed. ([#8077878](https://github.com/openauthenticator-app/openauthenticator/commit/8077878))
+* **FIX**: Fixed the image cache clearing failing when some files were locked. ([#3a2a0fd](https://github.com/openauthenticator-app/openauthenticator/commit/3a2a0fd))
+* **FIX**: Fixed various static analysis issues. ([#1b2f854](https://github.com/openauthenticator-app/openauthenticator/commit/1b2f854))
+* **FIX**: Keep native authentication tied to the app window. ([#2a4286a](https://github.com/openauthenticator-app/openauthenticator/commit/2a4286a))
+* **FIX**: Keep vault limit actions available when billing is unavailable. ([#ab0d09e](https://github.com/openauthenticator-app/openauthenticator/commit/ab0d09e))
+* **FIX**: Keep vault observers outside key-change transactions and honor migration backups. ([#f4a3127](https://github.com/openauthenticator-app/openauthenticator/commit/f4a3127))
+* **FIX**: Kept backup actions attached to the selected file when the list changed. ([#3299ae5](https://github.com/openauthenticator-app/openauthenticator/commit/3299ae5))
+* **FIX**: Kept expected authentication and offline errors out of crash reports. ([#d335464](https://github.com/openauthenticator-app/openauthenticator/commit/d335464))
+* **FIX**: Kept network, TLS and busy clipboard errors out of crash reports. ([#6a724e9](https://github.com/openauthenticator-app/openauthenticator/commit/6a724e9))
+* **FIX**: Kept password setup retryable when the system keychain was unavailable. ([#d5b20cf](https://github.com/openauthenticator-app/openauthenticator/commit/d5b20cf))
+* **FIX**: Kept the harmless "No active stream to cancel" platform error out of crash reports. ([#1bdb147](https://github.com/openauthenticator-app/openauthenticator/commit/1bdb147))
+* **FIX**: Master password changes are now rolled back if the new key cannot be saved. ([#0e28341](https://github.com/openauthenticator-app/openauthenticator/commit/0e28341))
+* **FIX**: Match TOTP searches regardless of case and close desktop menus after selection. ([#9b6d890](https://github.com/openauthenticator-app/openauthenticator/commit/9b6d890))
+* **FIX**: Persist vault changes and pending sync operations together. ([#184b934](https://github.com/openauthenticator-app/openauthenticator/commit/184b934))
+* **FIX**: Preserved migration failures and handled unsuitable backend responses. ([#5ac1433](https://github.com/openauthenticator-app/openauthenticator/commit/5ac1433))
+* **FIX**: Prevented overlapping authentication prompts. ([#8b51676](https://github.com/openauthenticator-app/openauthenticator/commit/8b51676))
+* **FIX**: Recover unsupported parameters in legacy TOTP records. ([#963d86c](https://github.com/openauthenticator-app/openauthenticator/commit/963d86c))
+* **FIX**: Recovered damaged image caches and serialized writes with cache clearing. ([#11febd9](https://github.com/openauthenticator-app/openauthenticator/commit/11febd9))
+* **FIX**: Rejected malformed encryption metadata when importing backups. ([#4b8c3e5](https://github.com/openauthenticator-app/openauthenticator/commit/4b8c3e5))
+* **FIX**: Rejected negative and oversized backend ports. ([#7a5ce0d](https://github.com/openauthenticator-app/openauthenticator/commit/7a5ce0d))
+* **FIX**: Report failures when migrating or clearing local data. ([#691c1bb](https://github.com/openauthenticator-app/openauthenticator/commit/691c1bb))
+* **FIX**: Retried busy clipboard writes and handled failed link launches. ([#b3d3cdb](https://github.com/openauthenticator-app/openauthenticator/commit/b3d3cdb))
+* **FIX**: Retried the automatic unlock when the app went to the background before the biometric prompt could be shown. ([#f3cfb44](https://github.com/openauthenticator-app/openauthenticator/commit/f3cfb44))
+* **FIX**: Separate issuer prefixes from account names in TOTP links. ([#ff1c9aa](https://github.com/openauthenticator-app/openauthenticator/commit/ff1c9aa))
+* **FIX**: Serialized QR detections and guarded camera restarts. ([#82491fa](https://github.com/openauthenticator-app/openauthenticator/commit/82491fa))
+* **FIX**: Shown a localized error instead of reporting it when the system keychain refused to save a credential. ([#84f90dd](https://github.com/openauthenticator-app/openauthenticator/commit/84f90dd))
+* **FIX**: Stored backups in Documents again, falling back to the app support directory when Documents is not usable. ([#c2ba091](https://github.com/openauthenticator-app/openauthenticator/commit/c2ba091))
+* **FIX**: The synchronization now starts right after being enabled. ([#1df9b27](https://github.com/openauthenticator-app/openauthenticator/commit/1df9b27))
+* **FIX**: Undecryptable TOTPs are now reported with an explanation instead of failing silently. ([#5e96640](https://github.com/openauthenticator-app/openauthenticator/commit/5e96640))
+* **FIX**: Undecryptable TOTPs can now be deleted on desktop. ([#e355477](https://github.com/openauthenticator-app/openauthenticator/commit/e355477))
+* **FIX**: Use the account quota to enable vault synchronization. ([#130ebdc](https://github.com/openauthenticator-app/openauthenticator/commit/130ebdc))
+* **FIX**: Validate every backup entry before replacing the vault. ([#73466b3](https://github.com/openauthenticator-app/openauthenticator/commit/73466b3))
+* **FIX**: Validated backend URLs and logo search input before sending requests. ([#1ae58b4](https://github.com/openauthenticator-app/openauthenticator/commit/1ae58b4))
+
 ## v2.1.0
 Released on June 29, 2026.
 
