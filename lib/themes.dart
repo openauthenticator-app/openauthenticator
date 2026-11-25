@@ -150,6 +150,7 @@ FThemeData _adaptLightTheme(FThemeData light, {required bool touch}) {
       boxShadow: [tileShadow],
     ),
     toasterStyle: _adaptToasterStyle(
+      touch: touch,
       boxShadow: [tileShadow],
     ),
     alertStyles: _adaptAlertStyles(
@@ -180,7 +181,7 @@ FThemeData _adaptDarkTheme(FThemeData dark, {required bool touch}) => dark.copyW
   popoverMenuStyle: _adaptPopoverMenuStyle(
     hoveredBackgroundColor: Colors.white12,
   ),
-  toasterStyle: _adaptToasterStyle(),
+  toasterStyle: _adaptToasterStyle(touch: touch),
 );
 
 /// Adapts the header styles.
@@ -383,8 +384,10 @@ FPopoverMenuStyleDelta _adaptPopoverMenuStyle({
 
 /// Adapts the toaster styles.
 FToasterStyleDelta _adaptToasterStyle({
+  required bool touch,
   List<BoxShadow>? boxShadow,
 }) => .delta(
+  toastAlignment: touch ? .bottomCenter : .bottomEnd,
   toastStyles: .delta(
     [
       .all(

@@ -5,7 +5,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:open_authenticator/themes.dart';
 import 'package:open_authenticator/utils/clipboard.dart';
 
-/// Checks feedback when the clipboard is temporarily or persistently locked.
+/// Checks feedback and toast placement when the clipboard is locked.
 void main() {
   for (final persistent in [false, true]) {
     testWidgets('a locked clipboard is retried once (persistent: $persistent)', (tester) async {
@@ -40,6 +40,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 50));
       await copying;
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
       expect(writes, 2);
       if (persistent) {
         expect(find.textContaining('Fixture clipboard is busy'), findsOneWidget);
@@ -47,6 +48,10 @@ void main() {
       } else {
         expect(find.text('Copied fixture'), findsOneWidget);
       }
+      final Offset toastCenter = tester.getCenter(find.byType(FToast));
+      final Offset screenCenter = tester.getCenter(find.byType(FToaster));
+      expect(toastCenter.dx, closeTo(screenCenter.dx, 1));
+      expect(toastCenter.dy, greaterThan(screenCenter.dy));
       await tester.pumpWidget(const SizedBox());
     });
   }

@@ -92,9 +92,6 @@ class AppDialog extends StatelessWidget {
             ),
         ],
       ),
-      style: const .delta(
-        insetPadding: .value(.zero),
-      ),
       animation: animation,
     );
   }
