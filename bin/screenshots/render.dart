@@ -215,7 +215,8 @@ void _paintLayout(Canvas canvas, Poster poster, ui.Image? screen, ScalableImage 
       final bool cropMac = portrait && platform == app.Platform.macOS && art == null;
       final Rect stage;
       if (cropMac) {
-        stage = box(null, phone ? .30 : .18, .325, .82, .555);
+        // Keep the centered app title fully beyond the phone poster's right edge.
+        stage = box(null, phone ? .325 : .18, .325, .82, .555);
       } else if (portrait) {
         stage = box(art, .055, .32, .89, .56);
       } else {

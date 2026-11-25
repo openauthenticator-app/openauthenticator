@@ -8,7 +8,7 @@ dart run open_authenticator:screenshots
 ```
 
 Open `build/screenshots/index.html` to browse the result. The default campaign produces **162 store
-PNGs** and **84 raw Flutter captures** across English, French, German, Italian, Portuguese and
+PNGs** and **78 raw Flutter captures** across English, French, German, Italian, Portuguese and
 Spanish. It runs headlessly with the project's Flutter SDK and fictional accounts. The white key
 artwork and all three poster typefaces are bundled in [assets](assets), alongside the font licenses.
 The PSDs are optional.
@@ -41,8 +41,8 @@ output directory to keep another campaign.
 
 Windows and Linux captures include the app’s own `DesktopWindowFrame`. Mac captures use the graphite
 title bar and three colored controls from the macOS artwork. Sync slides use the frame of the
-displayed companion device. The Android phone poster shows a compact Windows window so the accounts
-and right-hand window controls fit together.
+displayed companion device. The Android phone, iPhone and iPad sync posters show the same Mac window
+entering from the right, with all three controls visible.
 
 `--capture-only` renders the application screens required by the selection. Brand, download and
 banner slides can be composed directly. After editing captions, colors or output layouts, use

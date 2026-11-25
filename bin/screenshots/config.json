@@ -40,11 +40,6 @@
       "width": 1220,
       "height": 910
     },
-    "windows-compact": {
-      "platform": "windows",
-      "width": 700,
-      "height": 910
-    },
     "linux": {
       "platform": "linux",
       "width": 1220,
@@ -92,7 +87,7 @@
       "width": 1242,
       "height": 2688,
       "device": "android-phone",
-      "companion": "windows-compact",
+      "companion": "mac",
       "scenes": [
         "01-brand",
         "02-accounts",
