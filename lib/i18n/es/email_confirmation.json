@@ -1,0 +1,22 @@
+{
+  "confirmActionPickerDialog": {
+    "title": "¿Qué quiere hacer?",
+    "confirm": {
+      "title": "Confirmar su cuenta",
+      "subtitle": "Pegue el código que ha recibido por correo electrónico para confirmar su cuenta."
+    },
+    "cancelConfirmation": {
+      "title": "Cancelar la confirmación de la cuenta",
+      "subtitle": "Anule la confirmación de su cuenta.",
+      "validationDialog": {
+        "title": "Confirmación",
+        "message": "¿Seguro que quiere continuar?"
+      }
+    }
+  },
+  "success": "Dirección de correo electrónico confirmada.",
+  "codeDialog": {
+    "title": "Código de confirmación",
+    "message": "Abra el enlace en este dispositivo o pegue el código a continuación para confirmar su dirección de correo electrónico."
+  }
+}

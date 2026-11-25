@@ -23,6 +23,7 @@
 		<string>de</string>
 		<string>pt</string>
 		<string>it</string>
+		<string>es</string>
 	</array>
 	<key>CFBundleName</key>
 	<string>Open Authenticator</string>

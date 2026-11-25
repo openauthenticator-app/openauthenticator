@@ -1,0 +1,17 @@
+{
+  "widget": "$app está bloqueada.",
+  "authenticationRequired": "Se requiere autenticación",
+  "localAuthentication(map)": {
+    "openApp": "Autentíquese para acceder a la aplicación.",
+    "sensibleAction": "Autentíquese para continuar.",
+    "enable": "Autentíquese para activar la autenticación local.",
+    "disable": "Autentíquese para desactivar la autenticación local."
+  },
+  "masterPasswordDialogMessage": "Introduzca su contraseña maestra para desbloquear la aplicación.",
+  "button": {
+    "disable": "Desactivar",
+    "changeMasterPassword": "Cambiar la contraseña maestra",
+    "unlock": "Desbloquear",
+    "cancel": "Cancelar"
+  }
+}

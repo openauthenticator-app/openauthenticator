@@ -1,0 +1,18 @@
+{
+  "empty": "Aún no hay códigos TOTP.\nPuede añadir uno cuando quiera.",
+  "addDialog": {
+    "title": "Añadir un código TOTP",
+    "qrCode": {
+      "title": "Añadir con un código QR",
+      "subtitle": "Escanee un código QR de TOTP para añadirlo automáticamente a la aplicación."
+    },
+    "manually": {
+      "title": "Añadir manualmente",
+      "subtitle": "Introduzca los datos del código TOTP, como la clave secreta, la etiqueta y el emisor."
+    }
+  },
+  "noCryptoStore": {
+    "message": "No se ha podido cargar el almacén de claves. La aplicación no puede cifrar ni descifrar datos. Reinicie la aplicación o establezca una nueva contraseña maestra con el botón de abajo.",
+    "resetButton": "Restablecer la contraseña maestra"
+  }
+}

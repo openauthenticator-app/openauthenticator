@@ -1,0 +1,21 @@
+{
+  "confirmDialog": {
+    "title": "Confirmación",
+    "message": {
+      "enable": "¿Quiere sincronizar sus códigos TOTP? Estarán disponibles en todos sus dispositivos sincronizados.",
+      "disable": "¿Quiere dejar de sincronizar sus códigos TOTP? Los cambios que haga en este dispositivo dejarán de reflejarse en los demás dispositivos vinculados."
+    }
+  },
+  "deletedTotpPolicyPickerDialog": {
+    "title": "Migrar códigos TOTP",
+    "message": "Algunos códigos TOTP se han eliminado de este dispositivo, pero siguen en el almacenamiento remoto. ¿Qué quiere hacer con ellos?",
+    "delete": {
+      "title": "Eliminarlos",
+      "subtitle": "Elimine los códigos TOTP en conflicto. Esta acción no se puede deshacer."
+    },
+    "restore": {
+      "title": "Conservarlos",
+      "subtitle": "Deshaga la eliminación y conserve todos los códigos TOTP."
+    }
+  }
+}

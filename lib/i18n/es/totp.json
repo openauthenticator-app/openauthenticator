@@ -1,0 +1,86 @@
+{
+  "actions": {
+    "decrypt": "Descifrar",
+    "mobileDialog": {
+      "title": "Acciones del código TOTP",
+      "edit": {
+        "title": "Editar código TOTP",
+        "subtitle": "Edite los parámetros del código TOTP o muestre su código QR."
+      },
+      "delete": {
+        "title": "Eliminar código TOTP",
+        "subtitle": "Elimine este código TOTP de su dispositivo."
+      }
+    },
+    "desktopButtons": {
+      "edit": "Editar",
+      "delete": "Eliminar"
+    },
+    "copyConfirmation": "Copiado al portapapeles.",
+    "editConfirmationDialog": {
+      "title": "Editar este código TOTP",
+      "message": "Parece que este código TOTP se ha cifrado con una clave distinta de la actual. Esto puede ocurrir si ha cambiado su contraseña maestra en otro dispositivo. Si edita el código TOTP, se cifrará con su clave actual. ¿Quiere continuar?"
+    },
+    "deleteConfirmationDialog": {
+      "title": "Eliminar este código TOTP",
+      "message": "¿Seguro que quiere eliminar este código TOTP?"
+    }
+  },
+  "decryptDialog": {
+    "title": "Descifrar código TOTP",
+    "message": "Este código TOTP se ha cifrado con otra contraseña maestra. Introdúzcala para descifrarlo."
+  },
+  "totpKeyDialog": {
+    "title": "Código TOTP descifrado",
+    "message": {
+      "one": "¿Quiere cambiar su contraseña maestra o cifrar este código TOTP con su clave de cifrado actual?",
+      "other": "La contraseña ha permitido descifrar este código TOTP y otros más. ¿Qué quiere hacer?"
+    },
+    "choices": {
+      "changeAllDecryptedTotpsKey": {
+        "title": "Cifrar los códigos TOTP con su clave actual",
+        "subtitle": "Use su clave actual para volver a cifrar este código TOTP y todos los que se acaban de descifrar."
+      },
+      "changeTotpKey": {
+        "title": {
+          "one": "Cifrar este código TOTP con su clave actual",
+          "other": "Cifrar solo este código TOTP con su clave actual"
+        },
+        "subtitle": "Vuelva a cifrar este código TOTP con su clave actual. Podrá usar los demás códigos descifrados mientras la aplicación siga abierta."
+      },
+      "changeMasterPassword": {
+        "title": "Cambiar su contraseña maestra actual",
+        "subtitle": "Use la contraseña introducida como nueva contraseña maestra y genere una clave de cifrado a partir de ella.\nTendrá que descifrar manualmente los códigos TOTP que sigan cifrados con otra contraseña."
+      },
+      "doNothing": {
+        "title": "No hacer nada",
+        "subtitle": "Tendrá que volver a introducir esta contraseña para descifrar el código TOTP."
+      }
+    }
+  },
+  "page": {
+    "title": {
+      "edit": "Editar código TOTP",
+      "add": "Añadir un código TOTP"
+    },
+    "label": {
+      "text": "Etiqueta",
+      "hint": "me@example.com"
+    },
+    "secret": {
+      "text": "Clave secreta",
+      "hint": "JBSWY3DPEHPK3PXP"
+    },
+    "issuer": {
+      "text": "Emisor",
+      "hint": "example.com"
+    },
+    "algorithm": "Algoritmo",
+    "digits": "Número de dígitos",
+    "validity": "Validez (en segundos)",
+    "advancedOptions": "Opciones avanzadas",
+    "showQrCode": "Mostrar código QR",
+    "save": "Guardar",
+    "uriError": "No se ha podido leer este código TOTP. ¿Seguro que es válido?"
+  }
+}

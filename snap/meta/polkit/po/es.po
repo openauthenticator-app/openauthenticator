@@ -1,0 +1,20 @@
+msgid ""
+msgstr ""
+"Language: es\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Authentication required"
+msgstr "Se requiere autenticación"
+
+msgid "Authenticate to access the app."
+msgstr "Autentíquese para acceder a la aplicación."
+
+msgid "Authenticate to continue."
+msgstr "Autentíquese para continuar."
+
+msgid "Authenticate to enable local authentication."
+msgstr "Autentíquese para activar la autenticación local."
+
+msgid "Authenticate to disable local authentication."
+msgstr "Autentíquese para desactivar la autenticación local."

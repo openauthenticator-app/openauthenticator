@@ -1,0 +1,21 @@
+{
+  "refreshUserInfo": "Actualizar los datos del usuario",
+  "disableTotpSync": "Primero debe desactivar la sincronización de códigos TOTP.",
+  "urlCopiedToClipboard": "URL copiada al portapapeles.",
+  "waitingDialogDefaultMessage": "Espere...",
+  "masterPasswordDialog": {
+    "title": "Contraseña maestra",
+    "message": "Introduzca su contraseña maestra para continuar."
+  },
+  "backupCheckbox": {
+    "checkbox": "Crear una copia de seguridad",
+    "input": {
+      "text": "Contraseña de la copia de seguridad",
+      "hint": "Introduzca la contraseña de la copia de seguridad"
+    }
+  },
+  "toast": {
+    "success": "Operación completada",
+    "error": "Error"
+  }
+}

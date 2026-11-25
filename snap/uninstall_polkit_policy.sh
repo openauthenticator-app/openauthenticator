@@ -6,7 +6,7 @@ POLICY_ID="polkit.app.openauthenticator"
 POLICY_FILENAME="${POLICY_ID}.policy"
 POLICY_DEST_PATH="/usr/share/polkit-1/actions/${POLICY_FILENAME}"
 
-LOCALES=("fr" "de" "it" "pt")
+LOCALES=("fr" "de" "it" "pt" "es")
 
 # Check root
 if [[ $EUID -ne 0 ]]; then

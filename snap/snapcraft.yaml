@@ -100,7 +100,7 @@ parts:
       for po in *.po; do
         lang=${po%.po}
         mkdir -p $SNAPCRAFT_PART_INSTALL/usr/share/locale/$lang/LC_MESSAGES
-        msgfmt $po -o $SNAPCRAFT_PART_INSTALL/usr/share/locale/$lang/LC_MESSAGES/app.openauthenticator.mo
+        msgfmt $po -o $SNAPCRAFT_PART_INSTALL/usr/share/locale/$lang/LC_MESSAGES/polkit.app.openauthenticator.mo
       done
     build-packages:
       - gettext

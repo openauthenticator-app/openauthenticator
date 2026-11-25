@@ -1,0 +1,110 @@
+{
+  "noError": "Operación completada correctamente.",
+  "widget": {
+    "title": "Error",
+    "stackTrace": {
+      "show": "Mostrar traza de pila",
+      "hide": "Ocultar traza de pila"
+    },
+    "button": {
+      "report": "Informar",
+      "retry": "Reintentar"
+    }
+  },
+  "validation": {
+    "number": "Introduzca un número válido",
+    "empty": "Este campo es obligatorio",
+    "email": "Dirección de correo electrónico no válida",
+    "secret": "Clave secreta no válida",
+    "totpDigits": "Introduzca un número de dígitos entre 6 y 15",
+    "masterPassword": "Contraseña no válida",
+    "confirmation": "La confirmación no coincide",
+    "url": "URL no válida"
+  },
+  "generic": {
+    "noException": "Algo ha salido mal.",
+    "withException": "Se ha producido un error (excepción: $exception).",
+    "tryAgain": "Vuelva a intentarlo más tarde."
+  },
+  "backup": {
+    "fileDoesNotExist": "No existe el archivo de copia de seguridad: $path.",
+    "invalidPassword": "La contraseña no es válida.",
+    "invalidContent": "El contenido de la copia de seguridad no es válido.",
+    "crypto": "Se ha producido un error criptográfico."
+  },
+  "secureStorage": {
+    "writeFailed": "El almacenamiento seguro del dispositivo no ha podido guardar sus datos ($message). Compruebe que está disponible y desbloqueado antes de volver a intentarlo."
+  },
+  "appUnlock": {
+    "generic": "No se ha podido desbloquear la aplicación. Vuelva a intentarlo.",
+    "localAuthenticationDeviceNotSupported": "No se puede desbloquear la aplicación porque su dispositivo no admite la autenticación local. Desactive este método de bloqueo con el botón de abajo.",
+    "noPasswordVerificationMethodAvailable": "No se puede desbloquear la aplicación con su contraseña porque se ha alterado la integridad de los datos de la aplicación. Cambie su contraseña maestra para continuar.\nAún tendrá que descifrar manualmente sus códigos TOTP."
+  },
+  "backend": {
+    "invalidJsonResponse": "Respuesta no válida de $route (HTTP $statusCode): $body.",
+    "expiredCode": "El código de verificación ha caducado. Vuelva a iniciar sesión.",
+    "invalidUri": "El servidor ha enviado un URI no válido. Póngase en contacto con nosotros.",
+    "noEmailToConfirm": "No hay ninguna dirección de correo electrónico pendiente de confirmar.",
+    "invalidSession": "Su sesión no es válida. Vuelva a iniciar sesión.",
+    "noSession": "Debe iniciar sesión para continuar.",
+    "emailAlreadySent": "Ya se ha enviado un mensaje a esta dirección. Revise su bandeja de entrada o espere unos minutos antes de volver a intentarlo.",
+    "noCancelCode": "El servidor no ha proporcionado un código de cancelación. Vuelva a intentarlo más tarde.",
+    "expiredSession": "Su sesión ha caducado. Vuelva a iniciar sesión.",
+    "invalidPayload": "Los datos enviados no son válidos. Vuelva a intentarlo más tarde.",
+    "invalidToken": "Su token no es válido. Vuelva a iniciar sesión.",
+    "invalidVerificationCode": "Su código de verificación no es válido.",
+    "invalidAppVersion": "La versión de la aplicación no es válida. Actualice a la versión más reciente.",
+    "invalidBackendUrl": "La URL del servidor no es válida.",
+    "providerUserAlreadyExists": "Ya existe un usuario con la misma identidad en este proveedor, así que no se puede vincular a su cuenta."
+  },
+  "scan": {
+    "noUri": "No se ha podido leer este código QR. Compruebe que sea un código QR de TOTP válido.",
+    "accessDenied": "No se ha podido acceder a la cámara (acceso denegado: $exception).",
+    "controllerUninitialized": "El controlador no se ha inicializado (código: $exception).",
+    "unsupported": "Este dispositivo no admite el escaneo (código: $exception)."
+  },
+  "storageMigration": {
+    "anotherDeletedTotpPolicyShouldBeUsed": "Elija otra opción para gestionar los códigos TOTP eliminados.",
+    "currentStoragePasswordMismatch": "La contraseña maestra no es válida.",
+    "remoteStoragePasswordMismatch": "Sus códigos TOTP en línea se han cifrado con otra contraseña maestra. Cambie la contraseña maestra de este dispositivo para que coincida con la de sus otros dispositivos y vuelva a intentarlo.",
+    "generic": "Se ha producido un error al migrar sus datos. Vuelva a intentarlo más tarde."
+  },
+  "revenueCat": {
+    "noClient": "No hay ningún cliente de RevenueCat disponible.",
+    "cannotRestorePurchases": "Este cliente de RevenueCat no puede restaurar compras."
+  },
+  "totp": {
+    "create": "No se ha podido crear este código TOTP.",
+    "decrypt": "No se ha podido descifrar este código TOTP. Compruebe que ha introducido la contraseña correcta.",
+    "undecryptable": "Número de códigos TOTP que no se pueden descifrar con su contraseña maestra actual: $count. Selecciónelos en la lista para descifrarlos con la contraseña que se usó para cifrarlos, o elimínelos. Después, vuelva a intentarlo.",
+    "changeCryptoStore": {
+      "noCryptoStore": "No se ha podido acceder al almacén de claves actual. Cierre y vuelva a abrir la aplicación.",
+      "generic": "No se ha podido cifrar el código TOTP con el almacén de claves actual."
+    }
+  },
+  "pushOperationErrorKind": {
+    "invalidUuid": "Identificador de operación no válido.",
+    "invalidTotp": "Datos TOTP no válidos.",
+    "invalidUpdateTimestamp": "Fecha de actualización no válida.",
+    "deletedTotp": "Este código TOTP ya se había eliminado.",
+    "invalidDeleteTimestamp": "Fecha de eliminación no válida.",
+    "maxOperationsCountExceeded": "Hay demasiados cambios pendientes.",
+    "tooManyTotps": "Se ha alcanzado el límite de códigos TOTP.",
+    "genericError": "No se ha podido sincronizar."
+  },
+  "passwordMismatch": "La contraseña del nuevo almacén de claves es incorrecta.",
+  "migrator": {
+    "message": "Se ha producido un error al migrar sus datos. Vuelva a intentarlo.",
+    "noFirebaseUser": "No hay ningún usuario de Firebase disponible. Vuelva a intentarlo más tarde o póngase en contacto con nosotros.",
+    "idToken": "No se ha podido obtener el token de identificación. Vuelva a intentarlo más tarde.",
+    "httpError": "No se ha podido completar la migración. Error HTTP $statusCode: $body.",
+    "migrationCancelled": "Migración cancelada.",
+    "firebaseUserNotFound": "No se ha encontrado al usuario de Firebase. Póngase en contacto con nosotros.",
+    "invalidIdToken": "El token de identificación no es válido. Póngase en contacto con nosotros.",
+    "invalidUserId": "El identificador del usuario no es válido. Póngase en contacto con nosotros.",
+    "userAlreadyMigrated": "Su cuenta ya se ha migrado. Inicie sesión con sus credenciales.",
+    "noSupportedAuthenticationProvider": "No se ha encontrado ningún proveedor de autenticación compatible. Póngase en contacto con nosotros.",
+    "userWithProviderIdAlreadyExists": "Ya existe un usuario con el mismo identificador de proveedor, así que no se puede migrar su cuenta con las credenciales actuales. Póngase en contacto con nosotros.",
+    "userCreationFailed": "Se ha producido un error al crear su cuenta. Póngase en contacto con nosotros."
+  }
+}

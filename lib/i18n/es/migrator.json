@@ -1,0 +1,8 @@
+{
+  "title": "¡Le damos la bienvenida de nuevo!",
+  "message": "La aplicación se ha actualizado a una nueva versión. Migre sus códigos TOTP para seguir utilizándolos. Si había iniciado sesión, su cuenta también se migrará durante el proceso.",
+  "button": {
+    "migrate": "Migrar",
+    "dontMigrate": "No migrar"
+  }
+}

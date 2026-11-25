@@ -1,0 +1,197 @@
+{
+  "title": "Ajustes",
+  "application": {
+    "title": "Aplicación",
+    "contributorPlan": {
+      "title": "Plan de colaboración",
+      "subtitle": {
+        "loading": "Comprobando el estado de su suscripción...",
+        "active": "Tiene una suscripción al Plan de colaboración. ¡Muchas gracias!",
+        "inactive": "Actualmente no tiene una suscripción al Plan de colaboración."
+      },
+      "subscriptionDialog": {
+        "title": "Su Plan de colaboración",
+        "message": "Ya tiene una suscripción al Plan de colaboración. Con ella ayuda a que este pequeño proyecto de código abierto siga creciendo. Muchas gracias.",
+        "manageSubscription": {
+          "button": "Gestionar suscripción",
+          "error": "No se ha podido abrir la página para gestionar la suscripción. Si se suscribió en otro dispositivo, inténtelo desde allí."
+        }
+      }
+    },
+    "cacheTotpPictures": {
+      "title": "Guardar imágenes de los códigos TOTP",
+      "subtitle": "Guarde las imágenes de sus códigos TOTP en el dispositivo para que estén siempre disponibles."
+    },
+    "displayCopyIconButton": {
+      "title": "Mostrar el botón de copiar",
+      "subtitle": "Muestra un botón para copiar junto a cada código TOTP. Si lo desactiva, basta con pulsar el código para copiarlo al portapapeles."
+    },
+    "displaySearchIconButton": {
+      "title": "Mostrar el botón de búsqueda",
+      "subtitle": "Muestra un botón de búsqueda en la barra de menús. Si lo desactiva, la barra de búsqueda aparece encima de la lista de códigos TOTP."
+    },
+    "theme": {
+      "title": "Tema",
+      "subtitle": "Cambie el tema de la aplicación y elija entre el modo claro y el oscuro.",
+      "themePickerDialog": {
+        "title": "Tema",
+        "theme": {
+          "name(map)": {
+            "system": "Sistema",
+            "light": "Claro",
+            "dark": "Oscuro"
+          },
+          "description(map)": {
+            "system": "Usar el tema del sistema.",
+            "light": "Usar el tema claro.",
+            "dark": "Usar el tema oscuro."
+          }
+        }
+      }
+    }
+  },
+  "security": {
+    "title": "Seguridad",
+    "enableLocalAuth": {
+      "title": "Activar la autenticación local",
+      "subtitle": "Añade una capa de seguridad al pedirle que desbloquee la aplicación cada vez que la abra."
+    },
+    "saveDerivedKey": {
+      "title": "Guardar la clave de cifrado",
+      "subtitle": "Guarde la clave que se usa para cifrar y descifrar los datos. Así, no tendrá que volver a introducir su contraseña maestra cada vez que abra la aplicación."
+    },
+    "changeMasterPassword": {
+      "title": "Cambiar la contraseña maestra",
+      "subtitle": {
+        "text": "Puede cambiar su contraseña maestra en cualquier momento.",
+        "sync": "Tendrá que volver a introducirla en todos los dispositivos en los que sincronice Open Authenticator."
+      }
+    }
+  },
+  "synchronization": {
+    "title": "Sincronización",
+    "accountLink": {
+      "title": "Vincular otros proveedores",
+      "subtitle": {
+        "text": "Vincule su cuenta a otros proveedores de autenticación para poder iniciar sesión con ellos.",
+        "linkedProviders(rich)": "\nProveedores vinculados a su cuenta: $providers."
+      }
+    },
+    "accountLogin": {
+      "logIn": {
+        "title": "Iniciar sesión",
+        "subtitle": "Inicie sesión para sincronizar sus códigos TOTP entre sus dispositivos."
+      },
+      "logOut": {
+        "title": "Cerrar sesión",
+        "subtitle(rich)": "Cierre sesión para dejar de sincronizar sus códigos TOTP con este dispositivo.\nHa iniciado sesión como $user."
+      }
+    },
+    "confirmEmail": {
+      "title": "Confirmar su correo electrónico",
+      "subtitle(rich)": "Se ha enviado un correo de confirmación a $email.\nAbra el enlace para terminar de iniciar sesión o pulse aquí para introducir el código manualmente."
+    },
+    "synchronizeTotps": {
+      "title": "Sincronizar códigos TOTP",
+      "subtitle": {
+        "description": "Sincronice sus códigos TOTP con todos los dispositivos en los que haya iniciado sesión.",
+        "totpLimit": {
+          "limit(rich)": "Puede sincronizar hasta $limit códigos TOTP. Actualmente tiene $count.",
+          "notEnabled": "Suscríbase al Plan de colaboración o elimine algunos códigos TOTP para activar esta opción.",
+          "enabled": "Suscríbase al Plan de colaboración para sincronizar más códigos."
+        }
+      }
+    }
+  },
+  "backups": {
+    "title": "Copias de seguridad",
+    "backupNow": {
+      "title": "Crear una copia de seguridad",
+      "subtitle": "Cree ahora una copia de seguridad de sus códigos TOTP.",
+      "passwordDialog": {
+        "title": "Contraseña de la copia de seguridad",
+        "message": "Introduzca una contraseña para su copia de seguridad."
+      }
+    },
+    "manageBackups": {
+      "title": "Gestionar copias de seguridad",
+      "subtitle": {
+        "zero": "No tiene ninguna copia de seguridad guardada.",
+        "one(rich)": "Tiene $backups copia de seguridad guardada.",
+        "more(rich)": "Tiene $backups copias de seguridad guardadas."
+      },
+      "backupsDialogTitle": "Gestionar copias de seguridad",
+      "restoreBackupPasswordDialog": {
+        "title": "Contraseña de la copia de seguridad",
+        "message": "Introduzca la contraseña de su copia de seguridad."
+      },
+      "deleteBackupConfirmationDialog": {
+        "title": "Eliminar copia de seguridad",
+        "message": "¿Quiere eliminar esta copia de seguridad?"
+      },
+      "shareBackupDialog": {
+        "subject": "Exportar copia de seguridad",
+        "text": "Comparta la copia de seguridad."
+      },
+      "importBackupDialogTitle": "Importar una copia de seguridad",
+      "exportBackupDialogTitle": "Exportar una copia de seguridad",
+      "button": {
+        "import": "Importar una copia de seguridad",
+        "restore": "Restaurar",
+        "share": "Compartir",
+        "export": "Exportar",
+        "delete": "Eliminar"
+      }
+    }
+  },
+  "about": {
+    "title": "Acerca de",
+    "translate": {
+      "title": "Ayudar a traducir la aplicación",
+      "subtitle": "Abra la página de traducción. Si habla otro idioma y quiere ayudar a traducir $appName, aquí puede hacerlo."
+    },
+    "github": {
+      "title": "Informar de errores o sugerir funciones",
+      "subtitle": "Abra la página de la aplicación en GitHub para informar de errores o sugerir nuevas funciones."
+    },
+    "aboutApp": {
+      "title": "$appName",
+      "subtitle(rich)": "$appName v$appVersion, por $appAuthor.",
+      "dialogLegalese": "$appName es una aplicación de código abierto creada por $appAuthor."
+    }
+  },
+  "dangerZone": {
+    "title": "Zona de peligro",
+    "changeBackendUrl": {
+      "title": "Cambiar la URL del servidor",
+      "subtitle": "Cambie la URL del servidor que usa la aplicación.",
+      "inputDialog": {
+        "title": "URL del servidor",
+        "message": "Introduzca la URL del servidor. La URL predeterminada es «$defaultBackendUrl»."
+      }
+    },
+    "deleteAccount": {
+      "title": "Eliminar su cuenta",
+      "subtitle": "Elimine su cuenta y todos sus datos sincronizados."
+    },
+    "clearData": {
+      "title": "Borrar todos los datos",
+      "subtitle": "Borre todos los datos que la aplicación ha guardado en este dispositivo.",
+      "confirmationDialog": {
+        "title": "Borrar los datos de la aplicación",
+        "message": "¿Seguro que quiere borrar los datos de la aplicación? Esta acción es irreversible. Si ha sincronizado sus códigos TOTP, esta acción no los eliminará del almacenamiento en línea."
+      },
+      "backupDeleteConfirmationDialog": {
+        "title": "Eliminar copias de seguridad",
+        "message": "¿Quiere eliminar también sus copias de seguridad?"
+      },
+      "doneDialog": {
+        "title": "Datos eliminados",
+        "message": {
+          "appWillClose": "Se han eliminado los datos. La aplicación se cerrará para finalizar la operación. Puede volver a abrirla cuando quiera.",
+          "closeAppManually": "Se han eliminado los datos. Reinicie la aplicación para finalizar la operación."
+        }
+      }
+    }
+  }
+}

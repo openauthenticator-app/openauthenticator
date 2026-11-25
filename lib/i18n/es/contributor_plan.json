@@ -1,0 +1,38 @@
+{
+  "subscribeSuccess": {
+    "immediate": "Ya tiene una suscripción al Plan de colaboración. ¡Muchas gracias!",
+    "delayed": "La compra se ha realizado correctamente. Es posible que deba esperar unos minutos o reiniciar la aplicación."
+  },
+  "fallbackPaywall": {
+    "title(rich)": "Plan de ${title(colaboración)}",
+    "features": [
+      "Sincronice tantos códigos TOTP como quiera.",
+      "Contribuya al software de código abierto.",
+      "Ayúdenos a mejorar la aplicación."
+    ],
+    "packageType": {
+      "choose": "Elija la frecuencia de facturación:",
+      "empty": "No hay opciones disponibles para suscribirse al Plan de colaboración.",
+      "name(map)": {
+        "annual": "Anual",
+        "monthly": "Mensual"
+      },
+      "interval(map)": {
+        "annual": "año",
+        "monthly": "mes"
+      },
+      "price(rich)": "$price / $interval",
+      "subtitle(map)": {
+        "annual": "Facturación anual.",
+        "monthly": "Facturación mensual."
+      }
+    },
+    "button": {
+      "subscribed": "Suscripción activa",
+      "privacyPolicy": "Política de privacidad",
+      "termsOfService": "Condiciones del servicio",
+      "restorePurchases": "Restaurar compras"
+    },
+    "restorePurchasesSuccess": "Sus compras se han restaurado correctamente."
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "android": {
+    "signInTitle": "Se requiere autenticación",
+    "signInHint": "Verificar identidad"
+  },
+  "fallbackMessage": "Se ha producido un error al comprobar la autenticación local en su dispositivo. Introduzca su contraseña maestra para continuar y desactivar la autenticación local."
+}

@@ -1,0 +1,4 @@
+"NSAppleMusicUsageDescription" = "Permita el acceso a su biblioteca multimedia para buscar una copia de seguridad.";
+"NSCameraUsageDescription" = "Permita el acceso a la cámara para escanear un código QR.";
+"NSMicrophoneUsageDescription" = "Permita el acceso al micrófono para escanear un código QR.";
+"NSPhotoLibraryUsageDescription" = "Permita el acceso a su fototeca para buscar una copia de seguridad.";

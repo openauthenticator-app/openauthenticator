@@ -1,0 +1,20 @@
+{
+  "title": "Límite de códigos TOTP alcanzado",
+  "message": {
+    "error": "Ha alcanzado el número máximo de códigos TOTP que puede sincronizar. No podemos mostrarle las opciones disponibles para ampliar el límite. Vuelva a intentarlo más tarde o póngase en contacto con nosotros si necesita ayuda.",
+    "notSubscribed": {
+      "auto": "Está sincronizando sus códigos TOTP y ha superado el límite de $count códigos sin una suscripción al Plan de colaboración. Puede guardarlos en este dispositivo y desactivar la sincronización, o suscribirse al plan.",
+      "manual": "Está sincronizando sus códigos TOTP y puede tener hasta $count códigos sin una suscripción al Plan de colaboración. Para añadir otro, puede guardarlos en este dispositivo y desactivar la sincronización, o suscribirse al plan."
+    },
+    "alreadySubscribed": {
+      "auto": "Está sincronizando sus códigos TOTP y ha superado el límite de $count códigos. Debe guardarlos en este dispositivo y desactivar la sincronización. Si aloja su propio servidor, podrá evitar este límite.",
+      "manual": "Está sincronizando sus códigos TOTP y tiene un límite de $count códigos. Para añadir otro, debe guardarlos en este dispositivo y desactivar la sincronización. Si aloja su propio servidor, podrá evitar este límite."
+    }
+  },
+  "actions": {
+    "subscribe": "Suscribirse",
+    "stopSynchronization": "Desactivar la sincronización",
+    "selfHost": "Alojar su propio servidor",
+    "cancel": "Cancelar"
+  }
+}

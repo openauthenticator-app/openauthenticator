@@ -7,11 +7,11 @@ run:
 dart run open_authenticator:screenshots
 ```
 
-Open `build/screenshots/index.html` to browse the result. The default campaign produces **135 store
-PNGs** and **70 raw Flutter captures** across English, French, German, Italian and Portuguese. It
-runs headlessly with the project's Flutter SDK and fictional accounts. The white key artwork and all
-three poster typefaces are bundled in [assets](assets), alongside the font licenses. The PSDs are
-optional.
+Open `build/screenshots/index.html` to browse the result. The default campaign produces **162 store
+PNGs** and **84 raw Flutter captures** across English, French, German, Italian, Portuguese and
+Spanish. It runs headlessly with the project's Flutter SDK and fictional accounts. The white key
+artwork and all three poster typefaces are bundled in [assets](assets), alongside the font licenses.
+The PSDs are optional.
 
 | Format ID                   | Output dimensions | Slides per language                                         |
 |-----------------------------|-------------------|-------------------------------------------------------------|

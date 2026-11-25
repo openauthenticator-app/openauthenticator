@@ -7,7 +7,7 @@ POLICY_FILENAME="${POLICY_ID}.policy"
 POLICY_SRC_PATH="$(dirname "$0")/meta/polkit/${POLICY_FILENAME}"
 POLICY_DEST_PATH="/usr/share/polkit-1/actions/${POLICY_FILENAME}"
 
-LOCALES=("fr" "de" "it" "pt")
+LOCALES=("fr" "de" "it" "pt" "es")
 PO_DIR="$(dirname "$0")/meta/polkit/po"
 
 # Check root

@@ -229,6 +229,14 @@
             "title": "Open\n**Authenticator**",
             "subtitle": "Um aplicativo OTP\n*gratuito*, *multiplataforma*\ne de *código aberto*."
           }
+        },
+        "es": {
+          "title": "Open **Authenticator**",
+          "subtitle": "Una aplicación OTP *gratuita*,\n*multiplataforma* y de *código abierto*.",
+          "phone": {
+            "title": "Open\n**Authenticator**",
+            "subtitle": "Una aplicación OTP *gratuita*,\n*multiplataforma*\ny de *código abierto*."
+          }
         }
       }
     },
@@ -276,6 +284,14 @@
             "title": "*Proteja* a sua vida\nonline.",
             "subtitle": "Ative a 2FA e adicione\ntodas as suas contas."
           }
+        },
+        "es": {
+          "title": "*Proteja* sus cuentas en línea.",
+          "subtitle": "Active la 2FA y añada todas sus cuentas.",
+          "phone": {
+            "title": "*Proteja* sus cuentas\nen línea.",
+            "subtitle": "Active la 2FA y añada\ntodas sus cuentas."
+          }
         }
       }
     },
@@ -320,6 +336,14 @@
             "title": "Configuração\n*rápida* e *fácil*.",
             "subtitle": "Com um código QR ou\nmanualmente."
           }
+        },
+        "es": {
+          "title": "Configuración *rápida* y *sencilla*.",
+          "subtitle": "Con un código QR o manualmente.",
+          "phone": {
+            "title": "Configuración\n*rápida* y *sencilla*.",
+            "subtitle": "Con un código QR\no manualmente."
+          }
         }
       }
     },
@@ -360,6 +384,14 @@
           "phone": {
             "title": "Disponível em\n*todo lugar*."
           }
+        },
+        "es": {
+          "title": "Disponible en *todas partes*.",
+          "subtitle": "Sincronice sus códigos TOTP en todos sus dispositivos.",
+          "phone": {
+            "title": "Disponible en\n*todas partes*.",
+            "subtitle": "Sincronice sus códigos TOTP\nen todos sus dispositivos."
+          }
         }
       }
     },
@@ -385,6 +417,10 @@
         "pt": {
           "title": "Disponível *agora*.",
           "subtitle": "Em telemóveis, computadores e tablets."
+        },
+        "es": {
+          "title": "Disponible *ya*.",
+          "subtitle": "En teléfonos, equipos de escritorio y tabletas."
         }
       }
     },
@@ -410,6 +446,10 @@
         "pt": {
           "title": "Baixe o **Open Authenticator** *agora*.",
           "subtitle": "O que você está esperando?"
+        },
+        "es": {
+          "title": "Descargue **Open Authenticator** *ya*.",
+          "subtitle": "¿A qué espera?"
         }
       },
       "style": {

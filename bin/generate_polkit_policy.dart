@@ -50,7 +50,14 @@ Future<void> main() async {
       continue;
     }
     stdout.writeln('Generating $locale translation...');
-    String translationFileContent = '''msgid "${translations["en"]!["authenticationRequired"]}"
+    String translationFileContent =
+        '''msgid ""
+msgstr ""
+"Language: $locale\\n"
+"Content-Type: text/plain; charset=UTF-8\\n"
+"Content-Transfer-Encoding: 8bit\\n"
+
+msgid "${translations["en"]!["authenticationRequired"]}"
 msgstr "${translations[locale]!["authenticationRequired"]}"
 ''';
     for (final UnlockReason reason in UnlockReason.values) {

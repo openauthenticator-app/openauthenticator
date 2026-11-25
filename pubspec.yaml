@@ -97,7 +97,7 @@ msix_config:
   publisher: CN=13F97469-F5E7-4417-A3EC-E47287736FE3
   store: true
   logo_path: windows/msix.png
-  languages: en, fr, de, pt, it
+  languages: en, fr, de, pt, it, es
   trim_logo: false
   capabilities: internetClientServer
   protocol_activation: rc-653ef11675,otpauth,openauthenticator

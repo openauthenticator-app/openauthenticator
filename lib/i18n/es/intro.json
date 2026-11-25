@@ -1,0 +1,29 @@
+{
+  "welcome": {
+    "firstParagraph": "Gracias por descargar $app, una aplicación de código abierto con la que podrá gestionar fácilmente sus códigos TOTP (contraseñas de un solo uso basadas en el tiempo).",
+    "secondParagraph": "En los siguientes pasos podrá configurarla según sus necesidades.",
+    "thirdParagraph": "¡Espero que disfrute usando esta aplicación tanto como yo he disfrutado creándola!"
+  },
+  "logIn": {
+    "title": "Sincronice sus códigos TOTP",
+    "firstParagraph": "Pulse «Iniciar sesión» para sincronizar sus códigos TOTP entre sus dispositivos.",
+    "secondParagraph": "Este paso es opcional.",
+    "thirdParagraph": "Si activa la sincronización, limitaremos la cantidad de códigos TOTP para evitar un uso excesivo del servidor.",
+    "fourthParagraph": "Puede ampliar este límite en cualquier momento suscribiéndose al Plan de colaboración en los ajustes de $app.",
+    "button": {
+      "loggedOut": "Iniciar sesión",
+      "loggedIn": "Sesión iniciada",
+      "confirmEmail": "Confirmar correo electrónico"
+    }
+  },
+  "password": {
+    "title": "Proteja sus datos",
+    "firstParagraph": "Para proteger sus datos, debe establecer una contraseña maestra.",
+    "secondParagraph": "Esta contraseña se usará para cifrar sus datos y nunca se enviará a un servidor remoto.",
+    "thirdParagraph": "Si la olvida, no podremos recuperarla. Guárdela en un lugar seguro."
+  },
+  "button": {
+    "next": "Siguiente",
+    "finish": "Finalizar"
+  }
+}

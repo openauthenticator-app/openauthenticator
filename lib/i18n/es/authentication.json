@@ -1,0 +1,73 @@
+{
+  "emailDialog": {
+    "title": "Su correo electrónico",
+    "message": "Introduzca su dirección de correo electrónico y le enviaremos un enlace para iniciar sesión."
+  },
+  "logIn": {
+    "waitingLoginMessage": "Inicie sesión en la ventana que se ha abierto. No cierre la aplicación.",
+    "successNeedConfirmation": "Recibirá en breve un correo de confirmación. Abra el enlace en este dispositivo para iniciar sesión.",
+    "success": "Sesión iniciada correctamente."
+  },
+  "link": {
+    "linkSuccess": "Proveedor vinculado correctamente.",
+    "unlinkSuccess": "Proveedor desvinculado correctamente.",
+    "unlinkConfirmationDialog": {
+      "title": "Desvincular proveedor",
+      "message": "¿Quiere desvincular este proveedor de autenticación de su cuenta?"
+    }
+  },
+  "deleteConfirmationDialog": {
+    "title": "Eliminar cuenta",
+    "message": "¿Seguro que quiere eliminar su cuenta? Para protegerla, deberá volver a autenticarse antes de continuar."
+  },
+  "authenticationProvider(map)": {
+    "email": {
+      "name": "Correo electrónico",
+      "description": "Inicie sesión con su correo electrónico. Le enviaremos un enlace de confirmación sin necesidad de contraseña."
+    },
+    "google": {
+      "name": "Google",
+      "description": "Inicie sesión con su cuenta de Google."
+    },
+    "apple": {
+      "name": "Apple",
+      "description": "Inicie sesión con su cuenta de Apple."
+    },
+    "microsoft": {
+      "name": "Microsoft",
+      "description": "Inicie sesión con su cuenta de Microsoft."
+    },
+    "twitter": {
+      "name": "X",
+      "description": "Inicie sesión con su cuenta de X."
+    },
+    "github": {
+      "name": "GitHub",
+      "description": "Inicie sesión con su cuenta de GitHub."
+    }
+  },
+  "signInDialog": {
+    "title": "Iniciar sesión",
+    "email": {
+      "title": "Iniciar sesión con el correo electrónico",
+      "hint": "Introduzca su dirección de correo electrónico",
+      "description": {
+        "signIn": "Introduzca su correo electrónico. Le enviaremos enseguida un enlace para iniciar sesión sin contraseña.",
+        "waitingForConfirmation": "Recibirá en breve un correo de confirmación. Abra el enlace en este dispositivo para continuar.",
+        "alreadySignedIn": "Ya ha iniciado sesión con su dirección de correo electrónico.",
+        "cannotUse": "No se ha podido iniciar sesión con su dirección de correo electrónico. Pruebe con otro método."
+      },
+      "button": "Enviar enlace"
+    },
+    "separator": "O bien:"
+  },
+  "invalidSessionDialog": {
+    "title": "Sesión no válida",
+    "message": "Su sesión ha caducado o no es válida. Vuelva a iniciar sesión para sincronizar sus códigos TOTP.",
+    "button": {
+      "logIn": "Iniciar sesión",
+      "logOut": "Cerrar sesión"
+    }
+  },
+  "providerPickerDialogTitle": "Elija un método de inicio de sesión"
+}
