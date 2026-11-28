@@ -21,7 +21,7 @@ dependencies:
   meta: ^1.19.0
   animations: ^3.0.0
   flutter_riverpod: ^3.5.0
-  simple_secure_storage: ^0.4.3
+  simple_secure_storage: ^0.4.5
   jovial_svg: ^1.1.31
   jovial_misc: ^0.10.0
   mobile_scanner: ^7.5.0
@@ -44,8 +44,8 @@ dependencies:
   qr_flutter: ^4.1.0
   intl: ^0.20.3
   url_launcher: ^6.3.3
-  purchases_flutter: ^11.0.4
-  purchases_ui_flutter: ^11.0.4
+  purchases_flutter: ^12.0.0
+  purchases_ui_flutter: ^12.0.0
   purchases_dart:
     git:
       url: https://github.com/openauthenticator-app/purchases-dart.git
@@ -64,10 +64,10 @@ dependencies:
   connectivity_plus: ^7.3.2
   connectivity_plus_linux_portal: ^0.0.4
   dbus: ^0.8.1
-  sentry_flutter: ^10.6.0
+  sentry_flutter: ^10.7.0
   forui: ^0.28.0
   forui_assets: ^0.25.0
-  custom_refresh_indicator: ^4.0.2
+  custom_refresh_indicator: ^4.1.0
   # TODO: Remove Firebase dependencies once migration is finished.
   firebase_core: ^5.2.0
   firebase_auth: ^7.1.0
