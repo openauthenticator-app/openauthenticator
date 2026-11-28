@@ -50,6 +50,7 @@ apps:
     slots:
       - open-authenticator-dbus
     environment:
+      CONNECTIVITY_BACKEND: portal
       LD_LIBRARY_PATH: $SNAP/usr/lib/jvm/default-java/lib/server:$LD_LIBRARY_PATH
       XDG_DATA_DIRS: $SNAP/usr/share:$XDG_DATA_DIRS
 
