@@ -46,6 +46,7 @@ apps:
     plugs:
       - network
       - network-status
+      - password-manager-service
       - polkit
     slots:
       - open-authenticator-dbus
