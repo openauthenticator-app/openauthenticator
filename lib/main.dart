@@ -63,9 +63,11 @@ Future<void> main() async {
       ..show()
       ..focus();
     if (currentPlatform == .linux) {
-      final bool isFlatpak = io.Platform.environment.containsKey('FLATPAK_ID') || io.Platform.environment['container'] == 'flatpak';
-      final String? backend = io.Platform.environment['CONNECTIVITY_BACKEND'];
-      if (isFlatpak || backend == 'portal') {
+      final Map<String, String> environment = io.Platform.environment;
+      final bool isFlatpak = environment.containsKey('FLATPAK_ID') || environment['container'] == 'flatpak';
+      // Strictly confined snaps can only query the network status through the portal (`network-status` plug), not NetworkManager.
+      final bool isSnap = environment.containsKey('SNAP');
+      if (isFlatpak || isSnap || environment['CONNECTIVITY_BACKEND'] == 'portal') {
         ConnectivityPlusLinuxPortalPlugin.registerWith();
       }
     }
