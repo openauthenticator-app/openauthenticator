@@ -1,0 +1,184 @@
+name: Build release downloads
+
+on:
+  release:
+    types: [ published ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.release.id || github.run_id }}
+
+jobs:
+  build:
+    name: Build ${{ matrix.platform }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: Windows
+            runner: windows-2022
+            asset: openauthenticator-windows-x64.zip
+          - platform: Linux
+            runner: ubuntu-26.04
+            asset: openauthenticator-linux-x64.zip
+          - platform: macOS
+            runner: macos-26
+            asset: openauthenticator-macos.dmg
+          - platform: Android
+            runner: ubuntu-26.04
+            asset: openauthenticator-android.apk
+    env:
+      RELEASE_ASSET: ${{ matrix.asset }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: '3.50.1'
+          cache: true
+
+      - name: Install Linux dependencies
+        if: matrix.platform == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libpolkit-gobject-1-dev libsecret-1-dev libcurl4-openssl-dev
+
+      - uses: actions/setup-java@v5
+        if: matrix.platform == 'Android'
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Generate application files
+        shell: bash
+        env:
+          SENTRY_DSN: ${{ vars.SENTRY_DSN }}
+          REVENUE_CAT_PUBLIC_KEY_ANDROID: ${{ vars.REVENUE_CAT_PUBLIC_KEY_ANDROID }}
+          REVENUE_CAT_PUBLIC_KEY_DARWIN: ${{ vars.REVENUE_CAT_PUBLIC_KEY_DARWIN }}
+          REVENUE_CAT_PUBLIC_KEY_WINDOWS_LINUX: ${{ vars.REVENUE_CAT_PUBLIC_KEY_WINDOWS_LINUX }}
+          REVENUE_CAT_OFFERING_ID: ${{ vars.REVENUE_CAT_OFFERING_ID }}
+          LOGO_DEV_API_KEY: ${{ vars.LOGO_DEV_API_KEY }}
+        run: |
+          flutter pub get
+          dart run open_authenticator:compile_svg
+          dart run build_runner build --delete-conflicting-outputs
+          dart run slang
+          dart run open_authenticator:generate \
+            --sentry-dsn="$SENTRY_DSN" \
+            --revenue-cat-public-key-android="$REVENUE_CAT_PUBLIC_KEY_ANDROID" \
+            --revenue-cat-public-key-darwin="$REVENUE_CAT_PUBLIC_KEY_DARWIN" \
+            --revenue-cat-public-key-windows-linux="$REVENUE_CAT_PUBLIC_KEY_WINDOWS_LINUX" \
+            --revenue-cat-offering-id="$REVENUE_CAT_OFFERING_ID" \
+            --logo-dev-api-key="$LOGO_DEV_API_KEY"
+          mkdir -p dist
+
+      - name: Build Windows ZIP
+        if: matrix.platform == 'Windows'
+        shell: pwsh
+        run: |
+          flutter build windows --release "--dart-define=GITHUB_RELEASE_ASSET=$env:RELEASE_ASSET"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $bundle = 'build/windows/x64/runner/Release'
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          $vsPath = & $vswhere -latest -version '[17.0,18.0)' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          $redist = Get-Content "$vsPath\VC\Auxiliary\Build\Microsoft.VCRedistVersion.default.txt"
+          Copy-Item "$vsPath\VC\Redist\MSVC\$redist\x64\Microsoft.VC143.CRT\*.dll" $bundle
+          Compress-Archive -Path "$bundle/*" -DestinationPath "dist/$env:RELEASE_ASSET"
+
+      - name: Build Linux ZIP
+        if: matrix.platform == 'Linux'
+        shell: bash
+        run: |
+          flutter build linux --release --dart-define="GITHUB_RELEASE_ASSET=$RELEASE_ASSET"
+          bundle=build/linux/x64/release/bundle
+          cp -L /usr/lib/x86_64-linux-gnu/libsecret-1.so.0 /usr/lib/x86_64-linux-gnu/libpolkit-gobject-1.so.0 "$bundle/lib/"
+          (cd "$bundle" && zip -qr "$GITHUB_WORKSPACE/dist/$RELEASE_ASSET" .)
+
+      - name: Build, sign and notarize macOS DMG
+        if: matrix.platform == 'macOS'
+        env:
+          MACOS_FIREBASE_PLIST_BASE64: ${{ secrets.MACOS_FIREBASE_PLIST_BASE64 }}
+          MACOS_CERTIFICATE_BASE64: ${{ secrets.MACOS_CERTIFICATE_BASE64 }}
+          MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+          MACOS_PROVISIONING_PROFILE_BASE64: ${{ secrets.MACOS_PROVISIONING_PROFILE_BASE64 }}
+          MACOS_NOTARY_KEY_BASE64: ${{ secrets.MACOS_NOTARY_KEY_BASE64 }}
+          MACOS_NOTARY_KEY_ID: ${{ secrets.MACOS_NOTARY_KEY_ID }}
+          MACOS_NOTARY_ISSUER_ID: ${{ secrets.MACOS_NOTARY_ISSUER_ID }}
+        run: bash scripts/build-macos-release.sh
+
+      - name: Build signed Android APK
+        if: matrix.platform == 'Android'
+        shell: bash
+        env:
+          ANDROID_GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.ANDROID_GOOGLE_SERVICES_JSON_BASE64 }}
+          ANDROID_RELEASE_KEYSTORE_BASE64: ${{ secrets.ANDROID_RELEASE_KEYSTORE_BASE64 }}
+          ANDROID_RELEASE_STORE_PASSWORD: ${{ secrets.ANDROID_RELEASE_STORE_PASSWORD }}
+          ANDROID_RELEASE_ALIAS: ${{ secrets.ANDROID_RELEASE_ALIAS }}
+          ANDROID_RELEASE_KEY_PASSWORD: ${{ secrets.ANDROID_RELEASE_KEY_PASSWORD }}
+        run: |
+          : "${ANDROID_GOOGLE_SERVICES_JSON_BASE64:?Configure the Android Firebase file}"
+          : "${ANDROID_RELEASE_KEYSTORE_BASE64:?Configure the Android release keystore}"
+          : "${ANDROID_RELEASE_STORE_PASSWORD:?Configure the keystore password}"
+          : "${ANDROID_RELEASE_ALIAS:?Configure the key alias}"
+          : "${ANDROID_RELEASE_KEY_PASSWORD:?Configure the key password}"
+          umask 077
+          export ANDROID_RELEASE_STORE_FILE="$RUNNER_TEMP/openauthenticator.jks"
+          trap 'rm -f "$ANDROID_RELEASE_STORE_FILE" android/app/google-services.json' EXIT
+          printf '%s' "$ANDROID_RELEASE_KEYSTORE_BASE64" | base64 --decode > "$ANDROID_RELEASE_STORE_FILE"
+          printf '%s' "$ANDROID_GOOGLE_SERVICES_JSON_BASE64" | base64 --decode > android/app/google-services.json
+          flutter build apk --release --dart-define="GITHUB_RELEASE_ASSET=$RELEASE_ASSET"
+          apksigner=$(find "$ANDROID_HOME/build-tools" -name apksigner | sort -V | tail -1)
+          "$apksigner" verify build/app/outputs/flutter-apk/app-release.apk
+          cp build/app/outputs/flutter-apk/app-release.apk "dist/$RELEASE_ASSET"
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: ${{ matrix.asset }}
+          path: dist/${{ matrix.asset }}
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
+          overwrite: true
+
+  publish:
+    name: Attach downloads to the GitHub release
+    if: github.event_name == 'release'
+    needs: build
+    runs-on: ubuntu-26.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Upload release assets
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_ID: ${{ github.event.release.id }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          assets=$(gh api "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID/assets" --paginate --jq '.[] | [.state, .name] | @tsv')
+          for file in dist/openauthenticator-*; do
+            name=${file##*/}
+            if grep -Fxq "uploaded"$'\t'"$name" <<< "$assets"; then
+              continue
+            fi
+            flags=()
+            # A failed GitHub upload can leave a placeholder that must be replaced on retry.
+            if grep -Fxq "starter"$'\t'"$name" <<< "$assets"; then
+              flags+=(--clobber)
+            fi
+            gh release upload --repo "$GITHUB_REPOSITORY" "${flags[@]}" -- "$RELEASE_TAG" "$file"
+          done

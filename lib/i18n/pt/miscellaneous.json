@@ -1,4 +1,6 @@
 {
+  "updateAvailable": "Atualização disponível ($version)",
+  "openDownloads": "Abrir transferências",
   "refreshUserInfo": "Atualizar usuário",
   "disableTotpSync": "Você deve primeiro desabilitar a sincronização de TOTP.",
   "urlCopiedToClipboard": "URL copiada para a área de transferência!",

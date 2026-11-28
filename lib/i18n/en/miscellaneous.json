@@ -1,4 +1,6 @@
 {
+  "updateAvailable": "Update available ($version)",
+  "openDownloads": "Open downloads",
   "refreshUserInfo": "Refresh user info",
   "disableTotpSync": "You must disable TOTP synchronization first.",
   "urlCopiedToClipboard": "URL copied to clipboard !",

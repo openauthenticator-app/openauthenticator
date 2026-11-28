@@ -62,6 +62,11 @@ Open Authenticator currently targets Android, iOS, Windows, macOS and Linux.
 
 Prebuilt packages and store links are available on the [official website](https://openauthenticator.app/#download).
 
+[GitHub Releases](https://github.com/openauthenticator-app/openauthenticator/releases/latest) lists
+the
+direct downloads for Windows (x64 ZIP), Linux (x64 ZIP), macOS (DMG) and Android (APK).
+These builds check for new downloads at startup.
+
 ## Development Setup
 
 ### Prerequisites

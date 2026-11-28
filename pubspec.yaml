@@ -40,6 +40,7 @@ dependencies:
   local_auth_darwin: any
   local_auth_windows: any
   package_info_plus: ^10.2.2
+  pub_semver: ^2.2.0
   http: ^1.6.0
   qr_flutter: ^4.1.0
   intl: ^0.20.3

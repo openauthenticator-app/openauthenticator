@@ -1,5 +1,5 @@
-import java.util.Properties
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 
 plugins {
     id("com.android.application")
@@ -42,16 +42,15 @@ android {
 
     signingConfigs {
         create("release") {
-            keyAlias = keystoreProperties["keyAlias"] as String?
-            keyPassword = keystoreProperties["keyPassword"] as String?
-            storeFile = (keystoreProperties["storeFile"] as String?)?.let { file(it) }
-            storePassword = keystoreProperties["storePassword"] as String?
+            keyAlias = System.getenv("ANDROID_RELEASE_ALIAS") ?: keystoreProperties["keyAlias"] as String?
+            keyPassword = System.getenv("ANDROID_RELEASE_KEY_PASSWORD") ?: keystoreProperties["keyPassword"] as String?
+            storeFile = (System.getenv("ANDROID_RELEASE_STORE_FILE") ?: keystoreProperties["storeFile"] as String?)?.let { file(it) }
+            storePassword = System.getenv("ANDROID_RELEASE_STORE_PASSWORD") ?: keystoreProperties["storePassword"] as String?
         }
     }
 
     buildTypes {
         getByName("release") {
-            // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("release")
             isShrinkResources = true
             isMinifyEnabled = true

@@ -41,6 +41,7 @@ import 'package:open_authenticator/widgets/dialog/invalid_session_dialog.dart';
 import 'package:open_authenticator/widgets/dialog/totp_limit_dialog.dart';
 import 'package:open_authenticator/widgets/error.dart';
 import 'package:open_authenticator/widgets/migrator.dart';
+import 'package:open_authenticator/widgets/release_update_notice.dart';
 import 'package:open_authenticator/widgets/toast.dart';
 import 'package:open_authenticator/widgets/unlock_challenge.dart';
 import 'package:open_authenticator/widgets/waiting_overlay.dart';
@@ -149,6 +150,7 @@ class OpenAuthenticatorApp extends ConsumerWidget {
   }) {
     final FThemeData light = currentPlatform.isDesktop ? greenTheme.light.desktop : greenTheme.light.touch;
     final FThemeData dark = currentPlatform.isDesktop ? greenTheme.dark.desktop : greenTheme.dark.touch;
+    final bool checkForUpdates = showIntroState == 'data' && ReleaseUpdateNotice.assetName.isNotEmpty;
     return MaterialApp(
       key: ValueKey('materialApp.$showIntroState'),
       title: App.appName,
@@ -167,7 +169,7 @@ class OpenAuthenticatorApp extends ConsumerWidget {
         dark: dark,
         child: FToaster(
           child: DesktopWindowFrame(
-            child: child!,
+            child: checkForUpdates ? ReleaseUpdateNotice(child: child!) : child!,
           ),
         ),
       ),
@@ -178,7 +180,7 @@ class OpenAuthenticatorApp extends ConsumerWidget {
               ),
               HomePage.name: (_) => const _RouteWidget(
                 listen: true,
-                rateMyApp: true,
+                rateMyApp: ReleaseUpdateNotice.assetName == '',
                 child: HomePage(),
               ),
               ScanPage.name: (_) => const _RouteWidget(

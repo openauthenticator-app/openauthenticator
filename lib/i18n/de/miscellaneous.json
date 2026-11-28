@@ -1,4 +1,6 @@
 {
+  "updateAvailable": "Update verfügbar ($version)",
+  "openDownloads": "Downloads öffnen",
   "refreshUserInfo": "Benutzer aktualisieren",
   "disableTotpSync": "Sie müssen zuerst die TOTP-Synchronisation deaktivieren.",
   "urlCopiedToClipboard": "URL in die Zwischenablage kopiert!",
