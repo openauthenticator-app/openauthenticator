@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:dbus/dbus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -91,6 +92,8 @@ bool isReportableException(Object? ex) => switch (ex) {
   PlatformException(code: 'Clipboard error') => false,
   // Cancelling a platform event stream that is already closed (eg. by a plugin restarting its stream) has no effect.
   PlatformException(code: 'error', message: 'No active stream to cancel') => false,
+  // NetworkManager may be missing or forbidden by a sandbox. connectivity_plus then throws outside of its stream, and the app falls back to an unknown connectivity state.
+  DBusAccessDeniedException(:final message) || DBusServiceUnknownException(:final message) when message.contains('org.freedesktop.NetworkManager') => false,
   _ => true,
 };
 

@@ -63,6 +63,7 @@ dependencies:
   file_picker: ^13.4.1
   connectivity_plus: ^7.3.2
   connectivity_plus_linux_portal: ^0.0.4
+  dbus: ^0.8.1
   sentry_flutter: ^10.6.0
   forui: ^0.28.0
   forui_assets: ^0.25.0

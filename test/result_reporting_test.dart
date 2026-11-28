@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:dbus/dbus.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -22,11 +23,14 @@ void main() {
       TimeoutException('fixture'),
       PlatformException(code: 'Clipboard error', message: 'Unable to get clipboard data'),
       PlatformException(code: 'error', message: 'No active stream to cancel'),
+      DBusAccessDeniedException(DBusMethodErrorResponse.accessDenied('An AppArmor policy prevents this sender from sending this message to this recipient; destination="org.freedesktop.NetworkManager"')),
+      DBusServiceUnknownException(DBusMethodErrorResponse('org.freedesktop.DBus.Error.ServiceUnknown', [const DBusString('The name org.freedesktop.NetworkManager was not provided by any .service files')])),
     ]) {
       expect(isReportableException(ex), isFalse, reason: '$ex');
     }
     expect(isReportableException(PlatformException(code: 'write_error')), isTrue);
     expect(isReportableException(PlatformException(code: 'error', message: 'No active stream to listen')), isTrue);
+    expect(isReportableException(DBusAccessDeniedException(DBusMethodErrorResponse.accessDenied('destination="org.freedesktop.secrets"'))), isTrue);
     expect(isReportableException(StateError('fixture')), isTrue);
   });
 
